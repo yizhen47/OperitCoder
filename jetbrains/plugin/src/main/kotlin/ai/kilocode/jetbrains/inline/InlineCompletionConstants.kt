@@ -7,7 +7,7 @@ object InlineCompletionConstants {
     /**
      * VSCode extension command ID for inline completion generation.
      */
-    const val EXTERNAL_COMMAND_ID = "kilo-code.jetbrains.getInlineCompletions"
+    const val EXTERNAL_COMMAND_ID = "operit-coder.jetbrains.getInlineCompletions"
 
     /**
      * Command ID registered in the VSCode extension for tracking acceptance events.

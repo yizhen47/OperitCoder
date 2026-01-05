@@ -156,7 +156,7 @@ describe("Webview Async Resolution", () => {
 		await extensionHost.activate()
 
 		// Register the provider
-		extensionHost.registerWebviewProvider("kilo-code.SidebarProvider", mockProvider)
+		extensionHost.registerWebviewProvider("operit-coder.SidebarProvider", mockProvider)
 
 		// Simulate the webview registration flow
 		const vscode = (
@@ -165,7 +165,7 @@ describe("Webview Async Resolution", () => {
 			}
 		).vscode
 		if (vscode && vscode.window) {
-			vscode.window.registerWebviewViewProvider("kilo-code.SidebarProvider", mockProvider)
+			vscode.window.registerWebviewViewProvider("operit-coder.SidebarProvider", mockProvider)
 		}
 
 		// Send messages before resolution completes

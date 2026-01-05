@@ -2,13 +2,11 @@
 	"$schema": "https://unpkg.com/knip@latest/schema.json",
 	"ignore": [
 		"**/__tests__/**",
-		"apps/vscode-e2e/**",
 		"src/extension/api.ts",
 		"src/activate/**",
 		"src/workers/countTokens.ts",
 		"src/extension.ts",
-		"scripts/**",
-		"apps/web-roo-code/next-sitemap.config.cjs"
+		"scripts/**"
 	],
 	"workspaces": {
 		"src": {

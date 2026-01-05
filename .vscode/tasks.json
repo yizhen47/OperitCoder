@@ -4,78 +4,26 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "watch",
-			"dependsOn": ["watch:pnpm", "watch:webview", "watch:bundle", "watch:tsc"],
-			"presentation": {
-				"reveal": "never"
-			},
+			"label": "build:extension",
+			"type": "shell",
+			"command": "cd src && pnpm bundle",
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			},
-			"runOptions": {
-				"runOn": "folderOpen"
-			}
-		},
-		{
-			"label": "watch:pnpm",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"nodemon",
-				"--watch",
-				"package.json",
-				"--watch",
-				"src/package.json",
-				"--watch",
-				"webview-ui/package.json",
-				"--watch",
-				"pnpm-workspace.yaml",
-				"--exec",
-				"pnpm install"
-			],
-			"group": "none",
-			"isBackground": true,
 			"presentation": {
-				"group": "none",
-				"reveal": "always"
-			},
-			"problemMatcher": {
-				"pattern": { "regexp": "^$" },
-				"background": {
-					"activeOnStart": true,
-					"beginsPattern": "\\[nodemon\\] starting",
-					"endsPattern": "\\[nodemon\\] clean exit - waiting for changes before restart"
-				}
-			}
-		},
-		{
-			"label": "watch:webview",
-			"dependsOn": ["watch:pnpm"],
-			"type": "shell",
-			"command": "pnpm --filter @roo-code/vscode-webview dev",
-			"group": "build",
-			"problemMatcher": {
-				"owner": "vite",
-				"pattern": { "regexp": "^$" },
-				"background": {
-					"activeOnStart": true,
-					"beginsPattern": ".*VITE.*",
-					"endsPattern": ".*Local:.*"
-				}
-			},
-			"isBackground": true,
-			"presentation": {
-				"group": "watch",
 				"reveal": "always"
 			}
 		},
 		{
-			"label": "watch:bundle",
-			"dependsOn": ["watch:pnpm"],
+			"label": "watch:extension",
 			"type": "shell",
-			"command": "npx turbo watch:bundle",
+			"command": "cd src && pnpm watch:bundle",
 			"group": "build",
+			"isBackground": true,
+			"presentation": {
+				"reveal": "always"
+			},
 			"problemMatcher": {
 				"owner": "esbuild",
 				"pattern": {
@@ -86,24 +34,6 @@
 					"beginsPattern": "esbuild-problem-matcher#onStart",
 					"endsPattern": "esbuild-problem-matcher#onEnd"
 				}
-			},
-			"isBackground": true,
-			"presentation": {
-				"group": "watch",
-				"reveal": "always"
-			}
-		},
-		{
-			"label": "watch:tsc",
-			"dependsOn": ["watch:pnpm"],
-			"type": "shell",
-			"command": "npx turbo watch:tsc",
-			"group": "none",
-			"problemMatcher": "$tsc-watch",
-			"isBackground": true,
-			"presentation": {
-				"group": "none",
-				"reveal": "always"
 			}
 		},
 		{

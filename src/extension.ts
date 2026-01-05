@@ -347,7 +347,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	if (!context.globalState.get("firstInstallCompleted")) {
 		outputChannel.appendLine("First installation detected, opening Kilo Code sidebar!")
 		try {
-			await vscode.commands.executeCommand("kilo-code.SidebarProvider.focus")
+			await vscode.commands.executeCommand("operit-coder.SidebarProvider.focus")
 
 			outputChannel.appendLine("Opening Kilo Code walkthrough")
 

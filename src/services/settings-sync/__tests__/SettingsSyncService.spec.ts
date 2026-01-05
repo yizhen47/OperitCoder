@@ -41,16 +41,16 @@ describe("SettingsSyncService", () => {
 			await SettingsSyncService.initialize(mockContext, mockOutputChannel)
 
 			expect(mockGlobalState.setKeysForSync).toHaveBeenCalledWith([
-				"kilo-code.allowedCommands",
-				"kilo-code.deniedCommands",
-				"kilo-code.autoApprovalEnabled",
-				"kilo-code.fuzzyMatchThreshold",
-				"kilo-code.diffEnabled",
-				"kilo-code.directoryContextAddedContext",
-				"kilo-code.language",
-				"kilo-code.customModes",
-				"kilo-code.firstInstallCompleted",
-				"kilo-code.telemetrySetting",
+				"operit-coder.allowedCommands",
+				"operit-coder.deniedCommands",
+				"operit-coder.autoApprovalEnabled",
+				"operit-coder.fuzzyMatchThreshold",
+				"operit-coder.diffEnabled",
+				"operit-coder.directoryContextAddedContext",
+				"operit-coder.language",
+				"operit-coder.customModes",
+				"operit-coder.firstInstallCompleted",
+				"operit-coder.telemetrySetting",
 			])
 			expect(mockOutputChannel.appendLine).toHaveBeenCalledWith(
 				expect.stringContaining("[SettingsSyncService] Registered 10 keys for synchronization"),
@@ -81,7 +81,7 @@ describe("SettingsSyncService", () => {
 
 			expect(mockConfiguration.get).toHaveBeenCalledWith("enableSettingsSync", true)
 			expect(mockGlobalState.setKeysForSync).toHaveBeenCalledWith(
-				expect.arrayContaining(["kilo-code.allowedCommands", "kilo-code.deniedCommands"]),
+				expect.arrayContaining(["operit-coder.allowedCommands", "operit-coder.deniedCommands"]),
 			)
 		})
 
@@ -94,7 +94,7 @@ describe("SettingsSyncService", () => {
 			await SettingsSyncService.initialize(mockContext)
 
 			expect(mockGlobalState.setKeysForSync).toHaveBeenCalledWith(
-				expect.arrayContaining(["kilo-code.allowedCommands"]),
+				expect.arrayContaining(["operit-coder.allowedCommands"]),
 			)
 		})
 	})
@@ -120,16 +120,16 @@ describe("SettingsSyncService", () => {
 			const syncKeys = SettingsSyncService.getSyncKeys()
 
 			expect(syncKeys).toEqual([
-				"kilo-code.allowedCommands",
-				"kilo-code.deniedCommands",
-				"kilo-code.autoApprovalEnabled",
-				"kilo-code.fuzzyMatchThreshold",
-				"kilo-code.diffEnabled",
-				"kilo-code.directoryContextAddedContext",
-				"kilo-code.language",
-				"kilo-code.customModes",
-				"kilo-code.firstInstallCompleted",
-				"kilo-code.telemetrySetting",
+				"operit-coder.allowedCommands",
+				"operit-coder.deniedCommands",
+				"operit-coder.autoApprovalEnabled",
+				"operit-coder.fuzzyMatchThreshold",
+				"operit-coder.diffEnabled",
+				"operit-coder.directoryContextAddedContext",
+				"operit-coder.language",
+				"operit-coder.customModes",
+				"operit-coder.firstInstallCompleted",
+				"operit-coder.telemetrySetting",
 			])
 		})
 	})

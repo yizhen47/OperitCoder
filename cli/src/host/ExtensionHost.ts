@@ -331,7 +331,7 @@ export class ExtensionHost extends EventEmitter {
 
 			// Forward message directly to the webview provider instead of emitting event
 			// This prevents duplicate handling (event listener + direct call)
-			const webviewProvider = this.webviewProviders.get("kilo-code.SidebarProvider")
+			const webviewProvider = this.webviewProviders.get("operit-coder.SidebarProvider")
 
 			if (webviewProvider && typeof webviewProvider.handleCLIMessage === "function") {
 				await webviewProvider.handleCLIMessage(message)

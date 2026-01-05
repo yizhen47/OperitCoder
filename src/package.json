@@ -120,7 +120,7 @@
 			"kilo-code-ActivityBar": [
 				{
 					"type": "webview",
-					"id": "kilo-code.SidebarProvider",
+					"id": "operit-coder.SidebarProvider",
 					"name": "%views.sidebar.name%",
 					"icon": "assets/icons/kilo.png",
 					"darkIcon": "assets/icons/kilo-dark.png"
@@ -129,133 +129,133 @@
 		},
 		"commands": [
 			{
-				"command": "kilo-code.plusButtonClicked",
+				"command": "operit-coder.plusButtonClicked",
 				"title": "%command.newTask.title%",
 				"icon": "$(add)"
 			},
 			{
-				"command": "kilo-code.mcpButtonClicked",
+				"command": "operit-coder.mcpButtonClicked",
 				"title": "%command.mcpServers.title%",
 				"icon": "$(server)"
 			},
 			{
-				"command": "kilo-code.importSettings",
+				"command": "operit-coder.importSettings",
 				"title": "%command.importSettings.title%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.exportSettings",
+				"command": "operit-coder.exportSettings",
 				"title": "Export Settings",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.promptsButtonClicked",
+				"command": "operit-coder.promptsButtonClicked",
 				"title": "%command.prompts.title%",
 				"icon": "$(organization)"
 			},
 			{
-				"command": "kilo-code.historyButtonClicked",
+				"command": "operit-coder.historyButtonClicked",
 				"title": "%command.history.title%",
 				"icon": "$(history)"
 			},
 			{
-				"command": "kilo-code.marketplaceButtonClicked",
+				"command": "operit-coder.marketplaceButtonClicked",
 				"title": "%command.marketplace.title%",
 				"icon": "$(extensions)"
 			},
 			{
-				"command": "kilo-code.popoutButtonClicked",
+				"command": "operit-coder.popoutButtonClicked",
 				"title": "%command.openInEditor.title%",
 				"icon": "$(link-external)"
 			},
 			{
-				"command": "kilo-code.settingsButtonClicked",
+				"command": "operit-coder.settingsButtonClicked",
 				"title": "%command.settings.title%",
 				"icon": "$(settings-gear)"
 			},
 			{
-				"command": "kilo-code.helpButtonClicked",
+				"command": "operit-coder.helpButtonClicked",
 				"title": "%command.documentation.title%",
 				"icon": "$(question)"
 			},
 			{
-				"command": "kilo-code.openInNewTab",
+				"command": "operit-coder.openInNewTab",
 				"title": "%command.openInNewTab.title%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.explainCode",
+				"command": "operit-coder.explainCode",
 				"title": "%command.explainCode.title%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.fixCode",
+				"command": "operit-coder.fixCode",
 				"title": "%command.fixCode.title%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.improveCode",
+				"command": "operit-coder.improveCode",
 				"title": "%command.improveCode.title%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.addToContext",
+				"command": "operit-coder.addToContext",
 				"title": "%command.addToContext.title%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.addToContextAndFocus",
+				"command": "operit-coder.addToContextAndFocus",
 				"title": "Add to Context and Focus",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.newTask",
+				"command": "operit-coder.newTask",
 				"title": "%command.newTask.title%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.terminalAddToContext",
+				"command": "operit-coder.terminalAddToContext",
 				"title": "%command.terminal.addToContext.title%",
 				"category": "%extension.displayName%"
 			},
 			{
-				"command": "kilo-code.terminalFixCommand",
+				"command": "operit-coder.terminalFixCommand",
 				"title": "%command.terminal.fixCommand.title%",
 				"category": "%extension.displayName%"
 			},
 			{
-				"command": "kilo-code.terminalExplainCommand",
+				"command": "operit-coder.terminalExplainCommand",
 				"title": "%command.terminal.explainCommand.title%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.generateTerminalCommand",
+				"command": "operit-coder.generateTerminalCommand",
 				"title": "%command.terminal.generateCommand.title%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.setCustomStoragePath",
+				"command": "operit-coder.setCustomStoragePath",
 				"title": "%command.setCustomStoragePath.title%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.focusChatInput",
+				"command": "operit-coder.focusChatInput",
 				"title": "%command.focusInput.title%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.acceptInput",
+				"command": "operit-coder.acceptInput",
 				"title": "%command.acceptInput.title%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.profileButtonClicked",
+				"command": "operit-coder.profileButtonClicked",
 				"title": "%command.profile.title%",
 				"icon": "$(account)",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.vsc.generateCommitMessage",
+				"command": "operit-coder.vsc.generateCommitMessage",
 				"title": "%command.generateCommitMessage.title%",
 				"icon": {
 					"light": "assets/icons/kilo-light.svg",
@@ -264,37 +264,37 @@
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.ghost.generateSuggestions",
+				"command": "operit-coder.ghost.generateSuggestions",
 				"title": "%ghost.commands.generateSuggestions%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.ghost.cancelSuggestions",
+				"command": "operit-coder.ghost.cancelSuggestions",
 				"title": "%ghost.commands.cancelSuggestions%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.ghost.applyCurrentSuggestions",
+				"command": "operit-coder.ghost.applyCurrentSuggestions",
 				"title": "%ghost.commands.applyCurrentSuggestion%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.ghost.applyAllSuggestions",
+				"command": "operit-coder.ghost.applyAllSuggestions",
 				"title": "%ghost.commands.applyAllSuggestions%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.ghost.goToNextSuggestion",
+				"command": "operit-coder.ghost.goToNextSuggestion",
 				"title": "%ghost.commands.goToNextSuggestion%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.ghost.goToPreviousSuggestion",
+				"command": "operit-coder.ghost.goToPreviousSuggestion",
 				"title": "%ghost.commands.goToPreviousSuggestion%",
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "kilo-code.agentManagerOpen",
+				"command": "operit-coder.agentManagerOpen",
 				"title": "Open Agent Manager",
 				"icon": "$(circuit-board)",
 				"category": "%configuration.title%"
@@ -303,136 +303,136 @@
 		"menus": {
 			"editor/context": [
 				{
-					"submenu": "kilo-code.contextMenu",
+					"submenu": "operit-coder.contextMenu",
 					"group": "1"
 				}
 			],
-			"kilo-code.contextMenu": [
+			"operit-coder.contextMenu": [
 				{
-					"command": "kilo-code.explainCode",
+					"command": "operit-coder.explainCode",
 					"group": "1_actions@1"
 				},
 				{
-					"command": "kilo-code.fixCode",
+					"command": "operit-coder.fixCode",
 					"group": "1_actions@2"
 				},
 				{
-					"command": "kilo-code.improveCode",
+					"command": "operit-coder.improveCode",
 					"group": "1_actions@3"
 				},
 				{
-					"command": "kilo-code.addToContext",
+					"command": "operit-coder.addToContext",
 					"group": "1_actions@4"
 				}
 			],
 			"terminal/context": [
 				{
-					"submenu": "kilo-code.terminalMenu",
+					"submenu": "operit-coder.terminalMenu",
 					"group": "2"
 				}
 			],
-			"kilo-code.terminalMenu": [
+			"operit-coder.terminalMenu": [
 				{
-					"command": "kilo-code.terminalAddToContext",
+					"command": "operit-coder.terminalAddToContext",
 					"group": "1_actions@1"
 				},
 				{
-					"command": "kilo-code.terminalFixCommand",
+					"command": "operit-coder.terminalFixCommand",
 					"group": "1_actions@2"
 				},
 				{
-					"command": "kilo-code.terminalExplainCommand",
+					"command": "operit-coder.terminalExplainCommand",
 					"group": "1_actions@3"
 				}
 			],
 			"view/title": [
 				{
-					"command": "kilo-code.plusButtonClicked",
+					"command": "operit-coder.plusButtonClicked",
 					"group": "navigation@0",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "kilo-code.agentManagerOpen",
+					"command": "operit-coder.agentManagerOpen",
 					"group": "navigation@1",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "kilo-code.mcpButtonClicked",
+					"command": "operit-coder.mcpButtonClicked",
 					"group": "navigation@2",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "kilo-code.marketplaceButtonClicked",
+					"command": "operit-coder.marketplaceButtonClicked",
 					"group": "navigation@3",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "kilo-code.historyButtonClicked",
+					"command": "operit-coder.historyButtonClicked",
 					"group": "navigation@4",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "kilo-code.profileButtonClicked",
+					"command": "operit-coder.profileButtonClicked",
 					"group": "navigation@5",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "kilo-code.settingsButtonClicked",
+					"command": "operit-coder.settingsButtonClicked",
 					"group": "navigation@6",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "kilo-code.popoutButtonClicked",
+					"command": "operit-coder.popoutButtonClicked",
 					"group": "navigation@7",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "kilo-code.helpButtonClicked",
+					"command": "operit-coder.helpButtonClicked",
 					"group": "navigation@8",
-					"when": "false && view == kilo-code.SidebarProvider"
+					"when": "false && view == operit-coder.SidebarProvider"
 				}
 			],
 			"editor/title": [
 				{
-					"command": "kilo-code.plusButtonClicked",
+					"command": "operit-coder.plusButtonClicked",
 					"group": "navigation@1",
-					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
+					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{
-					"command": "kilo-code.mcpButtonClicked",
+					"command": "operit-coder.mcpButtonClicked",
 					"group": "navigation@2",
-					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
+					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{
-					"command": "kilo-code.historyButtonClicked",
+					"command": "operit-coder.historyButtonClicked",
 					"group": "navigation@3",
-					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
+					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{
-					"command": "kilo-code.popoutButtonClicked",
+					"command": "operit-coder.popoutButtonClicked",
 					"group": "navigation@4",
-					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
+					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{
-					"command": "kilo-code.settingsButtonClicked",
+					"command": "operit-coder.settingsButtonClicked",
 					"group": "navigation@5",
-					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
+					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{
-					"command": "kilo-code.helpButtonClicked",
+					"command": "operit-coder.helpButtonClicked",
 					"group": "navigation@6",
-					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
+					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				}
 			],
 			"scm/input": [
 				{
-					"command": "kilo-code.vsc.generateCommitMessage",
+					"command": "operit-coder.vsc.generateCommitMessage",
 					"group": "navigation"
 				}
 			],
 			"scm/title": [
 				{
-					"command": "kilo-code.vsc.generateCommitMessage",
+					"command": "operit-coder.vsc.generateCommitMessage",
 					"when": "scmProvider == git",
 					"group": "navigation"
 				}
@@ -440,35 +440,35 @@
 		},
 		"keybindings": [
 			{
-				"command": "kilo-code.focusChatInput",
+				"command": "operit-coder.focusChatInput",
 				"key": "ctrl+shift+a",
 				"mac": "cmd+shift+a",
 				"when": "true"
 			},
 			{
-				"command": "kilo-code.ghost.cancelSuggestions",
+				"command": "operit-coder.ghost.cancelSuggestions",
 				"key": "escape",
 				"when": "editorTextFocus && !editorTabMovesFocus && !inSnippetMode && kilocode.ghost.hasSuggestions"
 			},
 			{
-				"command": "kilo-code.ghost.generateSuggestions",
+				"command": "operit-coder.ghost.generateSuggestions",
 				"key": "ctrl+l",
 				"mac": "cmd+l",
 				"when": "editorTextFocus && !editorTabMovesFocus && !inSnippetMode && kilocode.ghost.enableSmartInlineTaskKeybinding && !github.copilot.completions.enabled"
 			},
 			{
-				"command": "kilo-code.ghost.showIncompatibilityExtensionPopup",
+				"command": "operit-coder.ghost.showIncompatibilityExtensionPopup",
 				"key": "ctrl+l",
 				"mac": "cmd+l",
 				"when": "editorTextFocus && !editorTabMovesFocus && !inSnippetMode && kilocode.ghost.enableSmartInlineTaskKeybinding && github.copilot.completions.enabled"
 			},
 			{
-				"command": "kilo-code.generateTerminalCommand",
+				"command": "operit-coder.generateTerminalCommand",
 				"key": "ctrl+shift+g",
 				"mac": "cmd+shift+g"
 			},
 			{
-				"command": "kilo-code.addToContext",
+				"command": "operit-coder.addToContext",
 				"key": "cmd+k cmd+a",
 				"mac": "cmd+k cmd+a",
 				"win": "ctrl+k ctrl+a",
@@ -476,7 +476,7 @@
 				"when": "editorTextFocus && editorHasSelection"
 			},
 			{
-				"command": "kilo-code.addToContextAndFocus",
+				"command": "operit-coder.addToContextAndFocus",
 				"key": "ctrl+i",
 				"mac": "cmd+i",
 				"win": "ctrl+i",
@@ -484,13 +484,13 @@
 				"when": "editorTextFocus && !github.copilot.completions.enabled && kilocode.ghost.enableQuickInlineTaskKeybinding"
 			},
 			{
-				"command": "kilo-code.ghost.showIncompatibilityExtensionPopup",
+				"command": "operit-coder.ghost.showIncompatibilityExtensionPopup",
 				"key": "ctrl+i",
 				"mac": "cmd+i",
 				"when": "editorTextFocus && github.copilot.completions.enabled && kilocode.ghost.enableQuickInlineTaskKeybinding"
 			},
 			{
-				"command": "kilo-code.toggleAutoApprove",
+				"command": "operit-coder.toggleAutoApprove",
 				"key": "cmd+alt+a",
 				"mac": "cmd+alt+a",
 				"win": "ctrl+alt+a",
@@ -499,18 +499,18 @@
 		],
 		"submenus": [
 			{
-				"id": "kilo-code.contextMenu",
+				"id": "operit-coder.contextMenu",
 				"label": "%views.contextMenu.label%"
 			},
 			{
-				"id": "kilo-code.terminalMenu",
+				"id": "operit-coder.terminalMenu",
 				"label": "%views.terminalMenu.label%"
 			}
 		],
 		"configuration": {
 			"title": "%configuration.title%",
 			"properties": {
-				"kilo-code.allowedCommands": {
+				"operit-coder.allowedCommands": {
 					"type": "array",
 					"items": {
 						"type": "string"
@@ -522,7 +522,7 @@
 					],
 					"description": "%commands.allowedCommands.description%"
 				},
-				"kilo-code.deniedCommands": {
+				"operit-coder.deniedCommands": {
 					"type": "array",
 					"items": {
 						"type": "string"
@@ -530,14 +530,14 @@
 					"default": [],
 					"description": "%commands.deniedCommands.description%"
 				},
-				"kilo-code.commandExecutionTimeout": {
+				"operit-coder.commandExecutionTimeout": {
 					"type": "number",
 					"default": 0,
 					"minimum": 0,
 					"maximum": 600,
 					"description": "%commands.commandExecutionTimeout.description%"
 				},
-				"kilo-code.commandTimeoutAllowlist": {
+				"operit-coder.commandTimeoutAllowlist": {
 					"type": "array",
 					"items": {
 						"type": "string"
@@ -545,12 +545,12 @@
 					"default": [],
 					"description": "%commands.commandTimeoutAllowlist.description%"
 				},
-				"kilo-code.preventCompletionWithOpenTodos": {
+				"operit-coder.preventCompletionWithOpenTodos": {
 					"type": "boolean",
 					"default": false,
 					"description": "%commands.preventCompletionWithOpenTodos.description%"
 				},
-				"kilo-code.vsCodeLmModelSelector": {
+				"operit-coder.vsCodeLmModelSelector": {
 					"type": "object",
 					"properties": {
 						"vendor": {
@@ -564,58 +564,58 @@
 					},
 					"description": "%settings.vsCodeLmModelSelector.description%"
 				},
-				"kilo-code.customStoragePath": {
+				"operit-coder.customStoragePath": {
 					"type": "string",
 					"default": "",
 					"description": "%settings.customStoragePath.description%"
 				},
-				"kilo-code.enableCodeActions": {
+				"operit-coder.enableCodeActions": {
 					"type": "boolean",
 					"default": true,
 					"description": "%settings.enableCodeActions.description%"
 				},
-				"kilo-code.autoImportSettingsPath": {
+				"operit-coder.autoImportSettingsPath": {
 					"type": "string",
 					"default": "",
 					"description": "%settings.autoImportSettingsPath.description%"
 				},
-				"kilo-code.maximumIndexedFilesForFileSearch": {
+				"operit-coder.maximumIndexedFilesForFileSearch": {
 					"type": "number",
 					"default": 10000,
 					"minimum": 5000,
 					"maximum": 500000,
 					"description": "%settings.maximumIndexedFilesForFileSearch.description%"
 				},
-				"kilo-code.useAgentRules": {
+				"operit-coder.useAgentRules": {
 					"type": "boolean",
 					"default": true,
 					"description": "%settings.useAgentRules.description%"
 				},
-				"kilo-code.apiRequestTimeout": {
+				"operit-coder.apiRequestTimeout": {
 					"type": "number",
 					"default": 600,
 					"minimum": 0,
 					"maximum": 86400,
 					"description": "%settings.apiRequestTimeout.description%"
 				},
-				"kilo-code.newTaskRequireTodos": {
+				"operit-coder.newTaskRequireTodos": {
 					"type": "boolean",
 					"default": false,
 					"description": "%settings.newTaskRequireTodos.description%"
 				},
-				"kilo-code.enableSettingsSync": {
+				"operit-coder.enableSettingsSync": {
 					"type": "boolean",
 					"default": true,
 					"description": "%settings.enableSettingsSync.description%"
 				},
-				"kilo-code.codeIndex.embeddingBatchSize": {
+				"operit-coder.codeIndex.embeddingBatchSize": {
 					"type": "number",
 					"default": 60,
 					"minimum": 1,
 					"maximum": 200,
 					"description": "%settings.codeIndex.embeddingBatchSize.description%"
 				},
-				"kilo-code.toolProtocol": {
+				"operit-coder.toolProtocol": {
 					"type": "string",
 					"enum": [
 						"xml",
@@ -624,7 +624,7 @@
 					"default": "xml",
 					"description": "%settings.toolProtocol.description%"
 				},
-				"kilo-code.debug": {
+				"operit-coder.debug": {
 					"type": "boolean",
 					"default": false,
 					"description": "%settings.debug.description%"
