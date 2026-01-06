@@ -1,6 +1,6 @@
 {
-	"greeting": "مرحبًا، أنا Kilo Code!",
-	"introduction": "<strong>Kilo Code هو وكيل البرمجة الذاتي الأفضل على الإطلاق.</strong> استعد للتصميم والبرمجة وتصحيح الأخطاء وزيادة إنتاجيتك بشكل غير مسبوق. للمتابعة، يحتاج Kilo Code إلى مفتاح API.",
+	"greeting": "مرحبًا، أنا Operit Coder!",
+	"introduction": "<strong>Operit Coder هو وكيل البرمجة الذاتي الأفضل على الإطلاق.</strong> استعد للتصميم والبرمجة وتصحيح الأخطاء وزيادة إنتاجيتك بشكل غير مسبوق. للمتابعة، يحتاج Operit Coder إلى مفتاح API.",
 	"notice": "عشان تبدأ، هذي الإضافة تحتاج مزوّد API.",
 	"start": "يلا نبدأ!",
 	"routers": {
@@ -16,7 +16,7 @@
 			"incentive": "جرب Roo مجاناً"
 		}
 	},
-	"chooseProvider": "عشان يشتغل سحر Kilo Code، يلزم مفتاح API.",
+	"chooseProvider": "عشان يشتغل سحر Operit Coder، يلزم مفتاح API.",
 	"providerSignup": {
 		"rooCloudProvider": "مزوّد Roo Code Cloud",
 		"rooCloudDescription": "أبسط طريقة لاستخدام Roo. مزيج مختار من النماذج المجانية والمدفوعة بتكلفة منخفضة",
@@ -38,8 +38,8 @@
 	"startRouter": "نوصي باستخدام موجّه LLM:",
 	"startCustom": "أو تقدر تستخدم مفتاح مزوّدك الخاص:",
 	"telemetry": {
-		"helpImprove": "ساهم في تحسين Kilo Code",
-		"helpImproveMessage": "يجمع Kilo Code بيانات الأخطاء والاستخدام لمساعدتنا في إصلاح الأخطاء وتحسين الإضافة. هذه البيانات التشخيصية لا تجمع الكود أو المطالبات أو المعلومات الشخصية. يمكنك إيقاف هذا في <settingsLink>الإعدادات</settingsLink>."
+		"helpImprove": "ساهم في تحسين Operit Coder",
+		"helpImproveMessage": "يجمع Operit Coder بيانات الأخطاء والاستخدام لمساعدتنا في إصلاح الأخطاء وتحسين الإضافة. هذه البيانات التشخيصية لا تجمع الكود أو المطالبات أو المعلومات الشخصية. يمكنك إيقاف هذا في <settingsLink>الإعدادات</settingsLink>."
 	},
 	"importSettings": "استيراد الإعدادات"
 }

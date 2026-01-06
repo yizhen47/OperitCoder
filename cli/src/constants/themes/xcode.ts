@@ -1,5 +1,5 @@
 /**
- * Xcode theme for Kilo Code CLI
+ * Xcode theme for Operit Coder CLI
  *
  * Based on the Xcode color scheme
  */

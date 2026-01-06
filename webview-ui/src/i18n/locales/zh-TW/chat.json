@@ -1,5 +1,5 @@
 {
-	"greeting": "歡迎使用 Kilo Code！",
+	"greeting": "歡迎使用 Operit Coder！",
 	"task": {
 		"title": "工作",
 		"expand": "展開工作",
@@ -21,7 +21,7 @@
 		"sharePublicly": "公開分享",
 		"sharePubliclyDescription": "任何擁有連結的人都可存取",
 		"connectToCloud": "連線至雲端",
-		"connectToCloudDescription": "登入 Kilo Code Cloud 以分享工作",
+		"connectToCloudDescription": "登入 Operit Coder Cloud 以分享工作",
 		"sharingDisabledByOrganization": "組織已停用分享功能",
 		"shareSuccessOrganization": "組織連結已複製到剪貼簿",
 		"shareSuccessPublic": "公開連結已複製到剪貼簿",
@@ -125,7 +125,7 @@
 		"title": "模式",
 		"marketplace": "模式市集",
 		"settings": "模式設定",
-		"description": "專門量身打造 Kilo Code 行為的角色。",
+		"description": "專門量身打造 Operit Coder 行為的角色。",
 		"searchPlaceholder": "搜尋模式...",
 		"noResults": "沒有找到結果",
 		"organizationModes": "組織模式"
@@ -200,52 +200,52 @@
 		}
 	},
 	"instructions": {
-		"wantsToFetch": "Kilo Code 想要取得詳細指示以協助目前工作"
+		"wantsToFetch": "Operit Coder 想要取得詳細指示以協助目前工作"
 	},
 	"fileOperations": {
-		"wantsToRead": "Kilo Code 想要讀取此檔案",
-		"wantsToReadMultiple": "Kilo Code 想要讀取多個檔案",
-		"wantsToReadAndXMore": "Kilo Code 想要讀取此檔案以及另外 {{count}} 個檔案",
-		"wantsToReadOutsideWorkspace": "Kilo Code 想要讀取此工作區外的檔案",
-		"didRead": "Kilo Code 已讀取此檔案",
-		"wantsToEdit": "Kilo Code 想要編輯此檔案",
-		"wantsToEditOutsideWorkspace": "Kilo Code 想要編輯此工作區外的檔案",
-		"wantsToEditProtected": "Kilo Code 想要編輯受保護的設定檔案",
-		"wantsToApplyBatchChanges": "Kilo Code 想要對多個檔案套用變更",
-		"wantsToGenerateImage": "Kilo Code 想要產生圖片",
-		"wantsToGenerateImageOutsideWorkspace": "Kilo Code 想要在工作區外產生圖片",
-		"wantsToGenerateImageProtected": "Kilo Code 想要在受保護位置產生圖片",
-		"didGenerateImage": "Kilo Code 已產生圖片",
-		"wantsToCreate": "Kilo Code 想要建立新檔案",
-		"wantsToSearchReplace": "Kilo Code 想要在此檔案中搜尋和取代",
-		"didSearchReplace": "Kilo Code 已在此檔案執行搜尋和取代",
-		"wantsToInsert": "Kilo Code 想要在此檔案中插入內容",
-		"wantsToInsertWithLineNumber": "Kilo Code 想要在此檔案第 {{lineNumber}} 行插入內容",
-		"wantsToInsertAtEnd": "Kilo Code 想要在此檔案尾端新增內容",
-		"wantsToDelete": "Kilo Code 想要刪除此檔案",
-		"wantsToDeleteDirectory": "Kilo Code 想要刪除此目錄"
+		"wantsToRead": "Operit Coder 想要讀取此檔案",
+		"wantsToReadMultiple": "Operit Coder 想要讀取多個檔案",
+		"wantsToReadAndXMore": "Operit Coder 想要讀取此檔案以及另外 {{count}} 個檔案",
+		"wantsToReadOutsideWorkspace": "Operit Coder 想要讀取此工作區外的檔案",
+		"didRead": "Operit Coder 已讀取此檔案",
+		"wantsToEdit": "Operit Coder 想要編輯此檔案",
+		"wantsToEditOutsideWorkspace": "Operit Coder 想要編輯此工作區外的檔案",
+		"wantsToEditProtected": "Operit Coder 想要編輯受保護的設定檔案",
+		"wantsToApplyBatchChanges": "Operit Coder 想要對多個檔案套用變更",
+		"wantsToGenerateImage": "Operit Coder 想要產生圖片",
+		"wantsToGenerateImageOutsideWorkspace": "Operit Coder 想要在工作區外產生圖片",
+		"wantsToGenerateImageProtected": "Operit Coder 想要在受保護位置產生圖片",
+		"didGenerateImage": "Operit Coder 已產生圖片",
+		"wantsToCreate": "Operit Coder 想要建立新檔案",
+		"wantsToSearchReplace": "Operit Coder 想要在此檔案中搜尋和取代",
+		"didSearchReplace": "Operit Coder 已在此檔案執行搜尋和取代",
+		"wantsToInsert": "Operit Coder 想要在此檔案中插入內容",
+		"wantsToInsertWithLineNumber": "Operit Coder 想要在此檔案第 {{lineNumber}} 行插入內容",
+		"wantsToInsertAtEnd": "Operit Coder 想要在此檔案尾端新增內容",
+		"wantsToDelete": "Operit Coder 想要刪除此檔案",
+		"wantsToDeleteDirectory": "Operit Coder 想要刪除此目錄"
 	},
 	"directoryOperations": {
-		"wantsToViewTopLevel": "Kilo Code 想要檢視此目錄中最上層的檔案",
-		"didViewTopLevel": "Kilo Code 已檢視此目錄中最上層的檔案",
-		"wantsToViewTopLevelOutsideWorkspace": "Kilo Code 想要檢視此目錄（工作區外）中最上層的檔案",
-		"didViewTopLevelOutsideWorkspace": "Kilo Code 已檢視此目錄（工作區外）中最上層的檔案",
-		"wantsToViewRecursive": "Kilo Code 想要遞迴檢視此目錄中的所有檔案",
-		"didViewRecursive": "Kilo Code 已遞迴檢視此目錄中的所有檔案",
-		"wantsToViewRecursiveOutsideWorkspace": "Kilo Code 想要遞迴檢視此目錄（工作區外）中的所有檔案",
-		"didViewRecursiveOutsideWorkspace": "Kilo Code 已遞迴檢視此目錄（工作區外）中的所有檔案",
-		"wantsToViewDefinitions": "Kilo Code 想要檢視此目錄中使用的原始碼定義名稱",
-		"didViewDefinitions": "Kilo Code 已檢視此目錄中使用的原始碼定義名稱",
-		"wantsToViewDefinitionsOutsideWorkspace": "Kilo Code 想要檢視此目錄（工作區外）中使用的原始碼定義名稱",
-		"didViewDefinitionsOutsideWorkspace": "Kilo Code 已檢視此目錄（工作區外）中使用的原始碼定義名稱",
-		"wantsToSearch": "Kilo Code 想要在此目錄中搜尋 <code>{{regex}}</code>",
-		"didSearch": "Kilo Code 已在此目錄中搜尋 <code>{{regex}}</code>",
-		"wantsToSearchOutsideWorkspace": "Kilo Code 想要在此目錄（工作區外）中搜尋 <code>{{regex}}</code>",
-		"didSearchOutsideWorkspace": "Kilo Code 已在此目錄（工作區外）中搜尋 <code>{{regex}}</code>"
+		"wantsToViewTopLevel": "Operit Coder 想要檢視此目錄中最上層的檔案",
+		"didViewTopLevel": "Operit Coder 已檢視此目錄中最上層的檔案",
+		"wantsToViewTopLevelOutsideWorkspace": "Operit Coder 想要檢視此目錄（工作區外）中最上層的檔案",
+		"didViewTopLevelOutsideWorkspace": "Operit Coder 已檢視此目錄（工作區外）中最上層的檔案",
+		"wantsToViewRecursive": "Operit Coder 想要遞迴檢視此目錄中的所有檔案",
+		"didViewRecursive": "Operit Coder 已遞迴檢視此目錄中的所有檔案",
+		"wantsToViewRecursiveOutsideWorkspace": "Operit Coder 想要遞迴檢視此目錄（工作區外）中的所有檔案",
+		"didViewRecursiveOutsideWorkspace": "Operit Coder 已遞迴檢視此目錄（工作區外）中的所有檔案",
+		"wantsToViewDefinitions": "Operit Coder 想要檢視此目錄中使用的原始碼定義名稱",
+		"didViewDefinitions": "Operit Coder 已檢視此目錄中使用的原始碼定義名稱",
+		"wantsToViewDefinitionsOutsideWorkspace": "Operit Coder 想要檢視此目錄（工作區外）中使用的原始碼定義名稱",
+		"didViewDefinitionsOutsideWorkspace": "Operit Coder 已檢視此目錄（工作區外）中使用的原始碼定義名稱",
+		"wantsToSearch": "Operit Coder 想要在此目錄中搜尋 <code>{{regex}}</code>",
+		"didSearch": "Operit Coder 已在此目錄中搜尋 <code>{{regex}}</code>",
+		"wantsToSearchOutsideWorkspace": "Operit Coder 想要在此目錄（工作區外）中搜尋 <code>{{regex}}</code>",
+		"didSearchOutsideWorkspace": "Operit Coder 已在此目錄（工作區外）中搜尋 <code>{{regex}}</code>"
 	},
 	"codebaseSearch": {
-		"wantsToSearch": "Kilo Code 想要在程式碼庫中搜尋 <code>{{query}}</code>",
-		"wantsToSearchWithPath": "Kilo Code 想要在 <code>{{path}}</code> 中搜尋程式碼庫 <code>{{query}}</code>",
+		"wantsToSearch": "Operit Coder 想要在程式碼庫中搜尋 <code>{{query}}</code>",
+		"wantsToSearchWithPath": "Operit Coder 想要在 <code>{{path}}</code> 中搜尋程式碼庫 <code>{{query}}</code>",
 		"didSearch_one": "找到 1 個結果",
 		"didSearch_other": "找到 {{count}} 個結果",
 		"resultTooltip": "相似度評分：{{score}} (點選開啟檔案)"
@@ -277,18 +277,18 @@
 		"youSaid": "您說"
 	},
 	"mcp": {
-		"wantsToUseTool": "Kilo Code 想要在 {{serverName}} MCP 伺服器上使用工具",
-		"wantsToAccessResource": "Kilo Code 想要存取 {{serverName}} MCP 伺服器上的資源"
+		"wantsToUseTool": "Operit Coder 想要在 {{serverName}} MCP 伺服器上使用工具",
+		"wantsToAccessResource": "Operit Coder 想要存取 {{serverName}} MCP 伺服器上的資源"
 	},
 	"modes": {
-		"wantsToSwitch": "Kilo Code 想要切換至 {{mode}} 模式",
-		"wantsToSwitchWithReason": "Kilo Code 想要切換至 {{mode}} 模式，原因：{{reason}}",
-		"didSwitch": "Kilo Code 已切換至 {{mode}} 模式",
-		"didSwitchWithReason": "Kilo Code 已切換至 {{mode}} 模式，原因：{{reason}}"
+		"wantsToSwitch": "Operit Coder 想要切換至 {{mode}} 模式",
+		"wantsToSwitchWithReason": "Operit Coder 想要切換至 {{mode}} 模式，原因：{{reason}}",
+		"didSwitch": "Operit Coder 已切換至 {{mode}} 模式",
+		"didSwitchWithReason": "Operit Coder 已切換至 {{mode}} 模式，原因：{{reason}}"
 	},
 	"subtasks": {
-		"wantsToCreate": "Kilo Code 想要在 {{mode}} 模式下建立新的子工作",
-		"wantsToFinish": "Kilo Code 想要完成此子工作",
+		"wantsToCreate": "Operit Coder 想要在 {{mode}} 模式下建立新的子工作",
+		"wantsToFinish": "Operit Coder 想要完成此子工作",
 		"newTaskContent": "子工作指示",
 		"completionContent": "子工作已完成",
 		"resultContent": "子工作結果",
@@ -296,7 +296,7 @@
 		"completionInstructions": "子工作已完成！您可以檢閱結果並提出修正或後續步驟。如果一切順利，請確認以將結果回傳給主任務。"
 	},
 	"questions": {
-		"hasQuestion": "Kilo Code 有一個問題"
+		"hasQuestion": "Operit Coder 有一個問題"
 	},
 	"taskCompleted": "工作完成",
 	"error": "錯誤",
@@ -308,7 +308,7 @@
 	"diffError": {
 		"title": "編輯失敗"
 	},
-	"troubleMessage": "Kilo Code 遇到問題...",
+	"troubleMessage": "Operit Coder 遇到問題...",
 	"powershell": {
 		"issues": "您似乎遇到了 Windows PowerShell 的問題，請參閱此說明文件"
 	},
@@ -364,7 +364,7 @@
 	},
 	"browser": {
 		"session": "瀏覽器會話",
-		"rooWantsToUse": "Kilo Code 想要使用瀏覽器",
+		"rooWantsToUse": "Operit Coder 想要使用瀏覽器",
 		"consoleLogs": "主控台記錄",
 		"noNewLogs": "（沒有新記錄）",
 		"screenshot": "瀏覽器螢幕擷圖",
@@ -412,18 +412,18 @@
 	"profileViolationWarning": "目前設定檔與您的組織設定不相容",
 	"shellIntegration": {
 		"title": "命令執行警告",
-		"description": "您的命令正在沒有 VSCode 終端機 Shell 整合的情況下執行。若要隱藏此警告，您可以在 <settingsLink>Kilo Code 設定</settingsLink> 的<strong>終端機</strong>區塊中停用 Shell 整合，或使用下方的連結來排解 VSCode 終端機整合問題。",
+		"description": "您的命令正在沒有 VSCode 終端機 Shell 整合的情況下執行。若要隱藏此警告，您可以在 <settingsLink>Operit Coder 設定</settingsLink> 的<strong>終端機</strong>區塊中停用 Shell 整合，或使用下方的連結來排解 VSCode 終端機整合問題。",
 		"troubleshooting": "點選此處查看 Shell 整合文件。"
 	},
 	"ask": {
 		"autoApprovedRequestLimitReached": {
 			"title": "已達自動核准請求上限",
-			"description": "Kilo Code 已達到 {{count}} 次 API 請求的自動核准上限。您想重設計數並繼續工作嗎？",
+			"description": "Operit Coder 已達到 {{count}} 次 API 請求的自動核准上限。您想重設計數並繼續工作嗎？",
 			"button": "重設並繼續"
 		},
 		"autoApprovedCostLimitReached": {
 			"title": "已達自動核准費用上限",
-			"description": "Kilo Code 已達到 ${{count}} 的自動核准費用上限。您想重設費用並繼續工作嗎？",
+			"description": "Operit Coder 已達到 ${{count}} 的自動核准費用上限。您想重設費用並繼續工作嗎？",
 			"button": "重設並繼續"
 		}
 	},
@@ -476,8 +476,8 @@
 		"clickToEdit": "點選以編輯訊息"
 	},
 	"slashCommand": {
-		"wantsToRun": "Kilo Code 想要執行斜線指令",
-		"didRun": "Kilo Code 執行了斜線指令"
+		"wantsToRun": "Operit Coder 想要執行斜線指令",
+		"didRun": "Operit Coder 執行了斜線指令"
 	},
 	"todo": {
 		"partial": "已完成 {{completed}} / {{total}} 個待辦事項",

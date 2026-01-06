@@ -1,5 +1,5 @@
 {
-	"greeting": "Què pot fer Kilo Code per tu?",
+	"greeting": "Què pot fer Operit Coder per tu?",
 	"task": {
 		"title": "Tasca",
 		"expand": "Expandir tasca",
@@ -21,7 +21,7 @@
 		"sharePublicly": "Compartir públicament",
 		"sharePubliclyDescription": "Qualsevol amb l'enllaç pot accedir",
 		"connectToCloud": "Connecta al núvol",
-		"connectToCloudDescription": "Inicia sessió a Kilo Code Cloud per compartir tasques",
+		"connectToCloudDescription": "Inicia sessió a Operit Coder Cloud per compartir tasques",
 		"sharingDisabledByOrganization": "Compartició deshabilitada per l'organització",
 		"shareSuccessOrganization": "Enllaç d'organització copiat al porta-retalls",
 		"shareSuccessPublic": "Enllaç públic copiat al porta-retalls",
@@ -95,7 +95,7 @@
 	"scrollToBottom": "Desplaça't al final del xat",
 	"about": "Genera, refactoritza i depura codi amb l'ajuda de la IA. Consulta la nostra <DocsLink>documentació</DocsLink> per a més informació.",
 	"docs": "Consulta els nostres <DocsLink>documents</DocsLink> per a més informació.",
-	"onboarding": "<strong> La vostra llista de tasques en aquest espai de treball està buida. </strong> Comença escrivint una tasca a continuació. \nNo esteu segur per on començar? \nMés informació sobre què pot fer Kilo Code als documents.",
+	"onboarding": "<strong> La vostra llista de tasques en aquest espai de treball està buida. </strong> Comença escrivint una tasca a continuació. \nNo esteu segur per on començar? \nMés informació sobre què pot fer Operit Coder als documents.",
 	"rooTips": {
 		"customizableModes": {
 			"title": "Modes personalitzables",
@@ -124,7 +124,7 @@
 		"title": "Modes",
 		"marketplace": "Marketplace de Modes",
 		"settings": "Configuració de Modes",
-		"description": "Personalitats especialitzades que adapten el comportament de Kilo Code.",
+		"description": "Personalitats especialitzades que adapten el comportament de Operit Coder.",
 		"searchPlaceholder": "Cerca modes...",
 		"noResults": "No s'han trobat resultats",
 		"organizationModes": "Modes d'organització"
@@ -139,7 +139,7 @@
 	"diffError": {
 		"title": "Edició fallida"
 	},
-	"troubleMessage": "Kilo Code està tenint problemes...",
+	"troubleMessage": "Operit Coder està tenint problemes...",
 	"apiRequest": {
 		"title": "Sol·licitud API",
 		"failed": "Sol·licitud API ha fallat",
@@ -179,48 +179,48 @@
 		"current": "Actual"
 	},
 	"instructions": {
-		"wantsToFetch": "Kilo Code vol obtenir instruccions detallades per ajudar amb la tasca actual."
+		"wantsToFetch": "Operit Coder vol obtenir instruccions detallades per ajudar amb la tasca actual."
 	},
 	"fileOperations": {
-		"wantsToRead": "Kilo Code vol llegir aquest fitxer",
-		"wantsToReadOutsideWorkspace": "Kilo Code vol llegir aquest fitxer fora de l'espai de treball",
-		"didRead": "Kilo Code ha llegit aquest fitxer",
-		"wantsToEdit": "Kilo Code vol editar aquest fitxer",
-		"wantsToEditOutsideWorkspace": "Kilo Code vol editar aquest fitxer fora de l'espai de treball",
-		"wantsToEditProtected": "Kilo Code vol editar un fitxer de configuració protegit",
-		"wantsToCreate": "Kilo Code vol crear un nou fitxer",
-		"wantsToSearchReplace": "Kilo Code vol realitzar cerca i substitució en aquest fitxer",
-		"didSearchReplace": "Kilo Code ha realitzat cerca i substitució en aquest fitxer",
-		"wantsToInsert": "Kilo Code vol inserir contingut en aquest fitxer",
-		"wantsToInsertWithLineNumber": "Kilo Code vol inserir contingut a la línia {{lineNumber}} d'aquest fitxer",
-		"wantsToInsertAtEnd": "Kilo Code vol afegir contingut al final d'aquest fitxer",
-		"wantsToReadAndXMore": "En Kilo Code vol llegir aquest fitxer i {{count}} més",
-		"wantsToReadMultiple": "Kilo Code vol llegir diversos fitxers",
-		"wantsToApplyBatchChanges": "Kilo Code vol aplicar canvis a múltiples fitxers",
-		"wantsToGenerateImage": "Kilo Code vol generar una imatge",
-		"wantsToGenerateImageOutsideWorkspace": "Kilo Code vol generar una imatge fora de l'espai de treball",
-		"wantsToGenerateImageProtected": "Kilo Code vol generar una imatge en una ubicació protegida",
-		"didGenerateImage": "Kilo Code ha generat una imatge",
-		"wantsToDelete": "Kilo Code vol eliminar aquest fitxer",
-		"wantsToDeleteDirectory": "Kilo Code vol eliminar aquest directori"
+		"wantsToRead": "Operit Coder vol llegir aquest fitxer",
+		"wantsToReadOutsideWorkspace": "Operit Coder vol llegir aquest fitxer fora de l'espai de treball",
+		"didRead": "Operit Coder ha llegit aquest fitxer",
+		"wantsToEdit": "Operit Coder vol editar aquest fitxer",
+		"wantsToEditOutsideWorkspace": "Operit Coder vol editar aquest fitxer fora de l'espai de treball",
+		"wantsToEditProtected": "Operit Coder vol editar un fitxer de configuració protegit",
+		"wantsToCreate": "Operit Coder vol crear un nou fitxer",
+		"wantsToSearchReplace": "Operit Coder vol realitzar cerca i substitució en aquest fitxer",
+		"didSearchReplace": "Operit Coder ha realitzat cerca i substitució en aquest fitxer",
+		"wantsToInsert": "Operit Coder vol inserir contingut en aquest fitxer",
+		"wantsToInsertWithLineNumber": "Operit Coder vol inserir contingut a la línia {{lineNumber}} d'aquest fitxer",
+		"wantsToInsertAtEnd": "Operit Coder vol afegir contingut al final d'aquest fitxer",
+		"wantsToReadAndXMore": "En Operit Coder vol llegir aquest fitxer i {{count}} més",
+		"wantsToReadMultiple": "Operit Coder vol llegir diversos fitxers",
+		"wantsToApplyBatchChanges": "Operit Coder vol aplicar canvis a múltiples fitxers",
+		"wantsToGenerateImage": "Operit Coder vol generar una imatge",
+		"wantsToGenerateImageOutsideWorkspace": "Operit Coder vol generar una imatge fora de l'espai de treball",
+		"wantsToGenerateImageProtected": "Operit Coder vol generar una imatge en una ubicació protegida",
+		"didGenerateImage": "Operit Coder ha generat una imatge",
+		"wantsToDelete": "Operit Coder vol eliminar aquest fitxer",
+		"wantsToDeleteDirectory": "Operit Coder vol eliminar aquest directori"
 	},
 	"directoryOperations": {
-		"wantsToViewTopLevel": "Kilo Code vol veure els fitxers de nivell superior en aquest directori",
-		"didViewTopLevel": "Kilo Code ha vist els fitxers de nivell superior en aquest directori",
-		"wantsToViewRecursive": "Kilo Code vol veure recursivament tots els fitxers en aquest directori",
-		"didViewRecursive": "Kilo Code ha vist recursivament tots els fitxers en aquest directori",
-		"wantsToViewDefinitions": "Kilo Code vol veure noms de definicions de codi font utilitzats en aquest directori",
-		"didViewDefinitions": "Kilo Code ha vist noms de definicions de codi font utilitzats en aquest directori",
-		"wantsToSearch": "Kilo Code vol cercar en aquest directori <code>{{regex}}</code>",
-		"didSearch": "Kilo Code ha cercat en aquest directori <code>{{regex}}</code>",
-		"wantsToSearchOutsideWorkspace": "Kilo Code vol cercar en aquest directori (fora de l'espai de treball) <code>{{regex}}</code>",
-		"didSearchOutsideWorkspace": "Kilo Code ha cercat en aquest directori (fora de l'espai de treball) <code>{{regex}}</code>",
-		"wantsToViewTopLevelOutsideWorkspace": "Kilo Code vol veure els fitxers de nivell superior en aquest directori (fora de l'espai de treball)",
-		"didViewTopLevelOutsideWorkspace": "Kilo Code ha vist els fitxers de nivell superior en aquest directori (fora de l'espai de treball)",
-		"wantsToViewRecursiveOutsideWorkspace": "Kilo Code vol veure recursivament tots els fitxers en aquest directori (fora de l'espai de treball)",
-		"didViewRecursiveOutsideWorkspace": "Kilo Code ha vist recursivament tots els fitxers en aquest directori (fora de l'espai de treball)",
-		"wantsToViewDefinitionsOutsideWorkspace": "Kilo Code vol veure noms de definicions de codi font utilitzats en aquest directori (fora de l'espai de treball)",
-		"didViewDefinitionsOutsideWorkspace": "Kilo Code ha vist noms de definicions de codi font utilitzats en aquest directori (fora de l'espai de treball)"
+		"wantsToViewTopLevel": "Operit Coder vol veure els fitxers de nivell superior en aquest directori",
+		"didViewTopLevel": "Operit Coder ha vist els fitxers de nivell superior en aquest directori",
+		"wantsToViewRecursive": "Operit Coder vol veure recursivament tots els fitxers en aquest directori",
+		"didViewRecursive": "Operit Coder ha vist recursivament tots els fitxers en aquest directori",
+		"wantsToViewDefinitions": "Operit Coder vol veure noms de definicions de codi font utilitzats en aquest directori",
+		"didViewDefinitions": "Operit Coder ha vist noms de definicions de codi font utilitzats en aquest directori",
+		"wantsToSearch": "Operit Coder vol cercar en aquest directori <code>{{regex}}</code>",
+		"didSearch": "Operit Coder ha cercat en aquest directori <code>{{regex}}</code>",
+		"wantsToSearchOutsideWorkspace": "Operit Coder vol cercar en aquest directori (fora de l'espai de treball) <code>{{regex}}</code>",
+		"didSearchOutsideWorkspace": "Operit Coder ha cercat en aquest directori (fora de l'espai de treball) <code>{{regex}}</code>",
+		"wantsToViewTopLevelOutsideWorkspace": "Operit Coder vol veure els fitxers de nivell superior en aquest directori (fora de l'espai de treball)",
+		"didViewTopLevelOutsideWorkspace": "Operit Coder ha vist els fitxers de nivell superior en aquest directori (fora de l'espai de treball)",
+		"wantsToViewRecursiveOutsideWorkspace": "Operit Coder vol veure recursivament tots els fitxers en aquest directori (fora de l'espai de treball)",
+		"didViewRecursiveOutsideWorkspace": "Operit Coder ha vist recursivament tots els fitxers en aquest directori (fora de l'espai de treball)",
+		"wantsToViewDefinitionsOutsideWorkspace": "Operit Coder vol veure noms de definicions de codi font utilitzats en aquest directori (fora de l'espai de treball)",
+		"didViewDefinitionsOutsideWorkspace": "Operit Coder ha vist noms de definicions de codi font utilitzats en aquest directori (fora de l'espai de treball)"
 	},
 	"commandOutput": "Sortida de la comanda",
 	"commandExecution": {
@@ -248,18 +248,18 @@
 		"youSaid": "Has dit"
 	},
 	"mcp": {
-		"wantsToUseTool": "Kilo Code vol utilitzar una eina al servidor MCP {{serverName}}",
-		"wantsToAccessResource": "Kilo Code vol accedir a un recurs al servidor MCP {{serverName}}"
+		"wantsToUseTool": "Operit Coder vol utilitzar una eina al servidor MCP {{serverName}}",
+		"wantsToAccessResource": "Operit Coder vol accedir a un recurs al servidor MCP {{serverName}}"
 	},
 	"modes": {
-		"wantsToSwitch": "Kilo Code vol canviar a mode <code>{{mode}}</code>",
-		"wantsToSwitchWithReason": "Kilo Code vol canviar a mode <code>{{mode}}</code> perquè: {{reason}}",
-		"didSwitch": "Kilo Code ha canviat a mode <code>{{mode}}</code>",
-		"didSwitchWithReason": "Kilo Code ha canviat a mode <code>{{mode}}</code> perquè: {{reason}}"
+		"wantsToSwitch": "Operit Coder vol canviar a mode <code>{{mode}}</code>",
+		"wantsToSwitchWithReason": "Operit Coder vol canviar a mode <code>{{mode}}</code> perquè: {{reason}}",
+		"didSwitch": "Operit Coder ha canviat a mode <code>{{mode}}</code>",
+		"didSwitchWithReason": "Operit Coder ha canviat a mode <code>{{mode}}</code> perquè: {{reason}}"
 	},
 	"subtasks": {
-		"wantsToCreate": "Kilo Code vol crear una nova subtasca en mode <code>{{mode}}</code>",
-		"wantsToFinish": "Kilo Code vol finalitzar aquesta subtasca",
+		"wantsToCreate": "Operit Coder vol crear una nova subtasca en mode <code>{{mode}}</code>",
+		"wantsToFinish": "Operit Coder vol finalitzar aquesta subtasca",
 		"newTaskContent": "Instruccions de la subtasca",
 		"completionContent": "Subtasca completada",
 		"resultContent": "Resultats de la subtasca",
@@ -267,7 +267,7 @@
 		"completionInstructions": "Subtasca completada! Pots revisar els resultats i suggerir correccions o següents passos. Si tot sembla correcte, confirma per tornar el resultat a la tasca principal."
 	},
 	"questions": {
-		"hasQuestion": "Kilo Code té una pregunta"
+		"hasQuestion": "Operit Coder té una pregunta"
 	},
 	"taskCompleted": "Tasca completada",
 	"errorDetails": {
@@ -345,7 +345,7 @@
 	},
 	"browser": {
 		"session": "Sessió del navegador",
-		"rooWantsToUse": "Kilo Code vol utilitzar el navegador",
+		"rooWantsToUse": "Operit Coder vol utilitzar el navegador",
 		"consoleLogs": "Registres de consola",
 		"noNewLogs": "(Cap registre nou)",
 		"screenshot": "Captura de pantalla del navegador",
@@ -393,24 +393,24 @@
 	"profileViolationWarning": "El perfil actual no és compatible amb la configuració de la teva organització",
 	"shellIntegration": {
 		"title": "Advertència d'execució d'ordres",
-		"description": "La teva ordre s'està executant sense la integració de shell del terminal VSCode. Per suprimir aquest advertiment, pots desactivar la integració de shell a la secció <strong>Terminal</strong> de la <settingsLink>configuració de Kilo Code</settingsLink> o solucionar problemes d'integració del terminal VSCode utilitzant l'enllaç a continuació.",
+		"description": "La teva ordre s'està executant sense la integració de shell del terminal VSCode. Per suprimir aquest advertiment, pots desactivar la integració de shell a la secció <strong>Terminal</strong> de la <settingsLink>configuració de Operit Coder</settingsLink> o solucionar problemes d'integració del terminal VSCode utilitzant l'enllaç a continuació.",
 		"troubleshooting": "Fes clic aquí per a la documentació d'integració de shell."
 	},
 	"ask": {
 		"autoApprovedRequestLimitReached": {
 			"title": "S'ha arribat al límit de sol·licituds aprovades automàticament",
-			"description": "Kilo Code ha arribat al límit aprovat automàticament de {{count}} sol·licitud(s) d'API. Vols reiniciar el comptador i continuar amb la tasca?",
+			"description": "Operit Coder ha arribat al límit aprovat automàticament de {{count}} sol·licitud(s) d'API. Vols reiniciar el comptador i continuar amb la tasca?",
 			"button": "Reiniciar i continuar"
 		},
 		"autoApprovedCostLimitReached": {
 			"title": "S'ha arribat al límit de cost d'aprovació automàtica",
 			"button": "Restableix i continua",
-			"description": "Kilo Code ha arribat al límit de cost aprovat automàticament de ${{count}}. Vols restablir el cost i continuar amb la tasca?"
+			"description": "Operit Coder ha arribat al límit de cost aprovat automàticament de ${{count}}. Vols restablir el cost i continuar amb la tasca?"
 		}
 	},
 	"codebaseSearch": {
-		"wantsToSearch": "Kilo Code vol cercar a la base de codi <code>{{query}}</code>",
-		"wantsToSearchWithPath": "Kilo Code vol cercar a la base de codi <code>{{query}}</code> a <code>{{path}}</code>",
+		"wantsToSearch": "Operit Coder vol cercar a la base de codi <code>{{query}}</code>",
+		"wantsToSearchWithPath": "Operit Coder vol cercar a la base de codi <code>{{query}}</code> a <code>{{path}}</code>",
 		"didSearch_one": "S'ha trobat 1 resultat",
 		"didSearch_other": "S'han trobat {{count}} resultats",
 		"resultTooltip": "Puntuació de similitud: {{score}} (fes clic per obrir el fitxer)"
@@ -469,8 +469,8 @@
 		"clickToEdit": "Feu clic per editar el missatge"
 	},
 	"slashCommand": {
-		"wantsToRun": "Kilo Code vol executar una comanda slash",
-		"didRun": "Kilo Code ha executat una comanda slash"
+		"wantsToRun": "Operit Coder vol executar una comanda slash",
+		"didRun": "Operit Coder ha executat una comanda slash"
 	},
 	"contextMenu": {
 		"noResults": "Sense resultats",

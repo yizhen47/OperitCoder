@@ -17,7 +17,7 @@
 		"workspace"
 	],
 	"author": {
-		"name": "Kilo Code"
+		"name": "Operit Coder"
 	},
 	"repository": {
 		"type": "git",
@@ -45,7 +45,7 @@
 		"sonnet",
 		"ai",
 		"llama",
-		"Kilo Code",
+		"Operit Coder",
 		"kilocode"
 	],
 	"activationEvents": [
@@ -57,13 +57,13 @@
 		"walkthroughs": [
 			{
 				"id": "kiloCodeWalkthrough",
-				"title": "5 ways Kilo Code helps you code",
+				"title": "5 ways Operit Coder helps you code",
 				"description": "You now have a personal AI coding assistant.",
 				"steps": [
 					{
 						"id": "welcome",
 						"title": "Write code for you",
-						"description": "Describe what you want to build. Kilo Code will write it from scratch, generate the files, and run them for you.",
+						"description": "Describe what you want to build. Operit Coder will write it from scratch, generate the files, and run them for you.",
 						"media": {
 							"markdown": "./dist/walkthrough/step1.md"
 						}
@@ -71,7 +71,7 @@
 					{
 						"id": "getting-started",
 						"title": "Understand your codebase",
-						"description": "Need clarity on how something works? Ask Kilo Code about any part of your files and get a clear explanation.",
+						"description": "Need clarity on how something works? Ask Operit Coder about any part of your files and get a clear explanation.",
 						"media": {
 							"markdown": "./dist/walkthrough/step2.md"
 						},
@@ -82,7 +82,7 @@
 					{
 						"id": "modes",
 						"title": "Get things working again",
-						"description": "Stuck on an error? Kilo Code can find the issue, fix it, and get your code running.",
+						"description": "Stuck on an error? Operit Coder can find the issue, fix it, and get your code running.",
 						"media": {
 							"markdown": "./dist/walkthrough/step3.md"
 						}
@@ -120,7 +120,7 @@
 			"kilo-code-ActivityBar": [
 				{
 					"type": "webview",
-					"id": "operit-coder.SidebarProvider",
+					"id": "kilo-code.SidebarProvider",
 					"name": "%views.sidebar.name%",
 					"icon": "assets/icons/kilo.png",
 					"darkIcon": "assets/icons/kilo-dark.png"
@@ -349,79 +349,79 @@
 				{
 					"command": "operit-coder.plusButtonClicked",
 					"group": "navigation@0",
-					"when": "view == operit-coder.SidebarProvider"
+					"when": "view == kilo-code.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.agentManagerOpen",
 					"group": "navigation@1",
-					"when": "view == operit-coder.SidebarProvider"
+					"when": "view == kilo-code.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.mcpButtonClicked",
 					"group": "navigation@2",
-					"when": "view == operit-coder.SidebarProvider"
+					"when": "view == kilo-code.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.marketplaceButtonClicked",
 					"group": "navigation@3",
-					"when": "view == operit-coder.SidebarProvider"
+					"when": "view == kilo-code.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.historyButtonClicked",
 					"group": "navigation@4",
-					"when": "view == operit-coder.SidebarProvider"
+					"when": "view == kilo-code.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.profileButtonClicked",
 					"group": "navigation@5",
-					"when": "view == operit-coder.SidebarProvider"
+					"when": "view == kilo-code.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.settingsButtonClicked",
 					"group": "navigation@6",
-					"when": "view == operit-coder.SidebarProvider"
+					"when": "view == kilo-code.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.popoutButtonClicked",
 					"group": "navigation@7",
-					"when": "view == operit-coder.SidebarProvider"
+					"when": "view == kilo-code.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.helpButtonClicked",
 					"group": "navigation@8",
-					"when": "false && view == operit-coder.SidebarProvider"
+					"when": "false && view == kilo-code.SidebarProvider"
 				}
 			],
 			"editor/title": [
 				{
 					"command": "operit-coder.plusButtonClicked",
 					"group": "navigation@1",
-					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
+					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
 				},
 				{
 					"command": "operit-coder.mcpButtonClicked",
 					"group": "navigation@2",
-					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
+					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
 				},
 				{
 					"command": "operit-coder.historyButtonClicked",
 					"group": "navigation@3",
-					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
+					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
 				},
 				{
 					"command": "operit-coder.popoutButtonClicked",
 					"group": "navigation@4",
-					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
+					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
 				},
 				{
 					"command": "operit-coder.settingsButtonClicked",
 					"group": "navigation@5",
-					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
+					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
 				},
 				{
 					"command": "operit-coder.helpButtonClicked",
 					"group": "navigation@6",
-					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
+					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
 				}
 			],
 			"scm/input": [
@@ -633,7 +633,7 @@
 		},
 		"icons": {
 			"kilo-logo": {
-				"description": "Kilo Code logo",
+				"description": "Operit Coder logo",
 				"default": {
 					"fontPath": "assets/icons/kilo-icon-font.woff2",
 					"fontCharacter": "\\F101"

@@ -204,7 +204,7 @@ export class GenerateImageTool extends BaseTool<"generate_image"> {
 
 			let result
 			// kilocode_change start: Updated from "roo" to "kilocode" provider
-			// Use Kilo Code Cloud provider (supports both chat completions and images API via OpenRouter)
+			// Use Operit Coder Cloud provider (supports both chat completions and images API via OpenRouter)
 			// Use OpenRouter provider (only supports chat completions API)
 			const handler =
 				modelProvider === "kilocode"

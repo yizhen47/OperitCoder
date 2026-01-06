@@ -17,7 +17,7 @@ vi.mock("../../../shared/package", () => ({
 		name: "kilo-code",
 		publisher: "Kilo-Org",
 		version: "1.0.0",
-		outputChannel: "Kilo-Code",
+		outputChannel: "Operit-Coder",
 	},
 }))
 

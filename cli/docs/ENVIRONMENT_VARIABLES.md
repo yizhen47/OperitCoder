@@ -1,6 +1,6 @@
 # Environment Variables Configuration
 
-The Kilo Code CLI can be fully configured using environment variables, allowing you to run it in ephemeral environments without a `config.json` file.
+The Operit Coder CLI can be fully configured using environment variables, allowing you to run it in ephemeral environments without a `config.json` file.
 
 ## Core Configuration
 

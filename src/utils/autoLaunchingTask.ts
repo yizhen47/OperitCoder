@@ -26,7 +26,7 @@ export async function checkAndRunAutoLaunchingTask(context: vscode.ExtensionCont
 		console.log(`🚀 Auto-launching task from '${configPath}' with config:\n${JSON.stringify(config)}`)
 
 		await new Promise((resolve) => setTimeout(resolve, 500))
-		await vscode.commands.executeCommand("operit-coder.SidebarProvider.focus")
+		await vscode.commands.executeCommand("kilo-code.SidebarProvider.focus")
 
 		vscode.commands.executeCommand("operit-coder.newTask", config) // Pass the full config to newTask
 	} catch (error) {

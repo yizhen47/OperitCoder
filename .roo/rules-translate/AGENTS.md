@@ -320,9 +320,9 @@ For each language that is missing translations:
 > > > > > > > AFTER
 
 <<<<<<< BEFORE
-"description": "启用后，Kilo Code 将能够与 MCP 服务器交互以获取高级功能。"
+"description": "启用后，Operit Coder 将能够与 MCP 服务器交互以获取高级功能。"
 =======
-"description": "启用后 Kilo Code 可与 MCP 服务交互获取高级功能。"
+"description": "启用后 Operit Coder 可与 MCP 服务交互获取高级功能。"
 
 > > > > > > > AFTER
 

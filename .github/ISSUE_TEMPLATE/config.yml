@@ -7,8 +7,8 @@ contact_links:
       url: https://github.com/Kilo-Org/kilocode/discussions/categories/2-design-improvements
       about: Suggestions for better design (where the current UI/UX is not clear).
     - name: Leave a Review
-      url: https://marketplace.visualstudio.com/items?itemName=kilocode.Kilo-Code&ssr=false#review-details
-      about: Enjoying Kilo Code? Leave a review here!
+      url: https://marketplace.visualstudio.com/items?itemName=kilocode.Operit-Coder&ssr=false#review-details
+      about: Enjoying Operit Coder? Leave a review here!
     - name: Join our Discord
       url: https://kilo.ai/discord
       about: Join the community.

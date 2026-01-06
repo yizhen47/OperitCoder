@@ -1,5 +1,5 @@
 {
-	"greeting": "Kilo Code sizin için ne yapabilir?",
+	"greeting": "Operit Coder sizin için ne yapabilir?",
 	"task": {
 		"title": "Görev",
 		"expand": "Görevi genişlet",
@@ -21,7 +21,7 @@
 		"sharePublicly": "Herkese açık paylaş",
 		"sharePubliclyDescription": "Bağlantıya sahip herkes erişebilir",
 		"connectToCloud": "Buluta bağlan",
-		"connectToCloudDescription": "Görevleri paylaşmak için Kilo Code Cloud'a giriş yap",
+		"connectToCloudDescription": "Görevleri paylaşmak için Operit Coder Cloud'a giriş yap",
 		"sharingDisabledByOrganization": "Paylaşım kuruluş tarafından devre dışı bırakıldı",
 		"shareSuccessOrganization": "Organizasyon bağlantısı panoya kopyalandı",
 		"shareSuccessPublic": "Genel bağlantı panoya kopyalandı",
@@ -95,7 +95,7 @@
 	"scrollToBottom": "Sohbetin altına kaydır",
 	"about": "AI yardımıyla kod oluşturun, yeniden düzenleyin ve hatalarını ayıklayın. Daha fazla bilgi için <DocsLink>belgelerimize</DocsLink> göz atın.",
 	"docs": "Daha fazla bilgi için <DocsLink>belgelerimize</DocsLink> göz atın.",
-	"onboarding": "<strong>Bu çalışma alanındaki görev listeniz boş.</strong> Aşağıya bir görev yazarak başlayın. Nasıl başlayacağınızdan emin değil misiniz? Kilo Code'nun sizin için neler yapabileceği hakkında daha fazla bilgiyi <DocsLink>belgelerde</DocsLink> okuyun.",
+	"onboarding": "<strong>Bu çalışma alanındaki görev listeniz boş.</strong> Aşağıya bir görev yazarak başlayın. Nasıl başlayacağınızdan emin değil misiniz? Operit Coder'nun sizin için neler yapabileceği hakkında daha fazla bilgiyi <DocsLink>belgelerde</DocsLink> okuyun.",
 	"rooTips": {
 		"customizableModes": {
 			"title": "Özelleştirilebilir modlar",
@@ -124,7 +124,7 @@
 		"title": "Modlar",
 		"marketplace": "Mod Pazaryeri",
 		"settings": "Mod Ayarları",
-		"description": "Kilo Code'nun davranışını özelleştiren uzmanlaşmış kişilikler.",
+		"description": "Operit Coder'nun davranışını özelleştiren uzmanlaşmış kişilikler.",
 		"searchPlaceholder": "Modları ara...",
 		"noResults": "Sonuç bulunamadı",
 		"organizationModes": "Kuruluş Modları"
@@ -139,7 +139,7 @@
 	"diffError": {
 		"title": "Düzenleme Başarısız"
 	},
-	"troubleMessage": "Kilo Code sorun yaşıyor...",
+	"troubleMessage": "Operit Coder sorun yaşıyor...",
 	"apiRequest": {
 		"title": "API İsteği",
 		"failed": "API İsteği Başarısız",
@@ -179,48 +179,48 @@
 		"current": "Mevcut"
 	},
 	"instructions": {
-		"wantsToFetch": "Kilo Code mevcut göreve yardımcı olmak için ayrıntılı talimatlar almak istiyor"
+		"wantsToFetch": "Operit Coder mevcut göreve yardımcı olmak için ayrıntılı talimatlar almak istiyor"
 	},
 	"fileOperations": {
-		"wantsToRead": "Kilo Code bu dosyayı okumak istiyor",
-		"wantsToReadOutsideWorkspace": "Kilo Code çalışma alanı dışındaki bu dosyayı okumak istiyor",
-		"didRead": "Kilo Code bu dosyayı okudu",
-		"wantsToEdit": "Kilo Code bu dosyayı düzenlemek istiyor",
-		"wantsToEditOutsideWorkspace": "Kilo Code çalışma alanı dışındaki bu dosyayı düzenlemek istiyor",
-		"wantsToEditProtected": "Kilo Code korumalı bir yapılandırma dosyasını düzenlemek istiyor",
-		"wantsToCreate": "Kilo Code yeni bir dosya oluşturmak istiyor",
-		"wantsToSearchReplace": "Kilo Code bu dosyada arama ve değiştirme yapmak istiyor",
-		"didSearchReplace": "Kilo Code bu dosyada arama ve değiştirme yaptı",
-		"wantsToInsert": "Kilo Code bu dosyaya içerik eklemek istiyor",
-		"wantsToInsertWithLineNumber": "Kilo Code bu dosyanın {{lineNumber}}. satırına içerik eklemek istiyor",
-		"wantsToInsertAtEnd": "Kilo Code bu dosyanın sonuna içerik eklemek istiyor",
-		"wantsToDelete": "Kilo Code bu dosyayı silmek istiyor",
-		"wantsToDeleteDirectory": "Kilo Code bu dizini silmek istiyor",
-		"wantsToReadAndXMore": "Kilo Code bu dosyayı ve {{count}} tane daha okumak istiyor",
-		"wantsToReadMultiple": "Kilo Code birden fazla dosya okumak istiyor",
-		"wantsToApplyBatchChanges": "Kilo Code birden fazla dosyaya değişiklik uygulamak istiyor",
-		"wantsToGenerateImage": "Kilo Code bir görsel oluşturmak istiyor",
-		"wantsToGenerateImageOutsideWorkspace": "Kilo Code çalışma alanının dışında bir görsel oluşturmak istiyor",
-		"wantsToGenerateImageProtected": "Kilo Code korumalı bir konumda görsel oluşturmak istiyor",
-		"didGenerateImage": "Kilo Code bir görsel oluşturdu"
+		"wantsToRead": "Operit Coder bu dosyayı okumak istiyor",
+		"wantsToReadOutsideWorkspace": "Operit Coder çalışma alanı dışındaki bu dosyayı okumak istiyor",
+		"didRead": "Operit Coder bu dosyayı okudu",
+		"wantsToEdit": "Operit Coder bu dosyayı düzenlemek istiyor",
+		"wantsToEditOutsideWorkspace": "Operit Coder çalışma alanı dışındaki bu dosyayı düzenlemek istiyor",
+		"wantsToEditProtected": "Operit Coder korumalı bir yapılandırma dosyasını düzenlemek istiyor",
+		"wantsToCreate": "Operit Coder yeni bir dosya oluşturmak istiyor",
+		"wantsToSearchReplace": "Operit Coder bu dosyada arama ve değiştirme yapmak istiyor",
+		"didSearchReplace": "Operit Coder bu dosyada arama ve değiştirme yaptı",
+		"wantsToInsert": "Operit Coder bu dosyaya içerik eklemek istiyor",
+		"wantsToInsertWithLineNumber": "Operit Coder bu dosyanın {{lineNumber}}. satırına içerik eklemek istiyor",
+		"wantsToInsertAtEnd": "Operit Coder bu dosyanın sonuna içerik eklemek istiyor",
+		"wantsToDelete": "Operit Coder bu dosyayı silmek istiyor",
+		"wantsToDeleteDirectory": "Operit Coder bu dizini silmek istiyor",
+		"wantsToReadAndXMore": "Operit Coder bu dosyayı ve {{count}} tane daha okumak istiyor",
+		"wantsToReadMultiple": "Operit Coder birden fazla dosya okumak istiyor",
+		"wantsToApplyBatchChanges": "Operit Coder birden fazla dosyaya değişiklik uygulamak istiyor",
+		"wantsToGenerateImage": "Operit Coder bir görsel oluşturmak istiyor",
+		"wantsToGenerateImageOutsideWorkspace": "Operit Coder çalışma alanının dışında bir görsel oluşturmak istiyor",
+		"wantsToGenerateImageProtected": "Operit Coder korumalı bir konumda görsel oluşturmak istiyor",
+		"didGenerateImage": "Operit Coder bir görsel oluşturdu"
 	},
 	"directoryOperations": {
-		"wantsToViewTopLevel": "Kilo Code bu dizindeki üst düzey dosyaları görüntülemek istiyor",
-		"didViewTopLevel": "Kilo Code bu dizindeki üst düzey dosyaları görüntüledi",
-		"wantsToViewRecursive": "Kilo Code bu dizindeki tüm dosyaları özyinelemeli olarak görüntülemek istiyor",
-		"didViewRecursive": "Kilo Code bu dizindeki tüm dosyaları özyinelemeli olarak görüntüledi",
-		"wantsToViewDefinitions": "Kilo Code bu dizinde kullanılan kaynak kod tanımlama isimlerini görüntülemek istiyor",
-		"didViewDefinitions": "Kilo Code bu dizinde kullanılan kaynak kod tanımlama isimlerini görüntüledi",
-		"wantsToSearch": "Kilo Code bu dizinde <code>{{regex}}</code> için arama yapmak istiyor",
-		"didSearch": "Kilo Code bu dizinde <code>{{regex}}</code> için arama yaptı",
-		"wantsToSearchOutsideWorkspace": "Kilo Code bu dizinde (çalışma alanı dışında) <code>{{regex}}</code> için arama yapmak istiyor",
-		"didSearchOutsideWorkspace": "Kilo Code bu dizinde (çalışma alanı dışında) <code>{{regex}}</code> için arama yaptı",
-		"wantsToViewTopLevelOutsideWorkspace": "Kilo Code bu dizindeki (çalışma alanı dışında) üst düzey dosyaları görüntülemek istiyor",
-		"didViewTopLevelOutsideWorkspace": "Kilo Code bu dizindeki (çalışma alanı dışında) üst düzey dosyaları görüntüledi",
-		"wantsToViewRecursiveOutsideWorkspace": "Kilo Code bu dizindeki (çalışma alanı dışında) tüm dosyaları özyinelemeli olarak görüntülemek istiyor",
-		"didViewRecursiveOutsideWorkspace": "Kilo Code bu dizindeki (çalışma alanı dışında) tüm dosyaları özyinelemeli olarak görüntüledi",
-		"wantsToViewDefinitionsOutsideWorkspace": "Kilo Code bu dizinde (çalışma alanı dışında) kullanılan kaynak kod tanımlama isimlerini görüntülemek istiyor",
-		"didViewDefinitionsOutsideWorkspace": "Kilo Code bu dizinde (çalışma alanı dışında) kullanılan kaynak kod tanımlama isimlerini görüntüledi"
+		"wantsToViewTopLevel": "Operit Coder bu dizindeki üst düzey dosyaları görüntülemek istiyor",
+		"didViewTopLevel": "Operit Coder bu dizindeki üst düzey dosyaları görüntüledi",
+		"wantsToViewRecursive": "Operit Coder bu dizindeki tüm dosyaları özyinelemeli olarak görüntülemek istiyor",
+		"didViewRecursive": "Operit Coder bu dizindeki tüm dosyaları özyinelemeli olarak görüntüledi",
+		"wantsToViewDefinitions": "Operit Coder bu dizinde kullanılan kaynak kod tanımlama isimlerini görüntülemek istiyor",
+		"didViewDefinitions": "Operit Coder bu dizinde kullanılan kaynak kod tanımlama isimlerini görüntüledi",
+		"wantsToSearch": "Operit Coder bu dizinde <code>{{regex}}</code> için arama yapmak istiyor",
+		"didSearch": "Operit Coder bu dizinde <code>{{regex}}</code> için arama yaptı",
+		"wantsToSearchOutsideWorkspace": "Operit Coder bu dizinde (çalışma alanı dışında) <code>{{regex}}</code> için arama yapmak istiyor",
+		"didSearchOutsideWorkspace": "Operit Coder bu dizinde (çalışma alanı dışında) <code>{{regex}}</code> için arama yaptı",
+		"wantsToViewTopLevelOutsideWorkspace": "Operit Coder bu dizindeki (çalışma alanı dışında) üst düzey dosyaları görüntülemek istiyor",
+		"didViewTopLevelOutsideWorkspace": "Operit Coder bu dizindeki (çalışma alanı dışında) üst düzey dosyaları görüntüledi",
+		"wantsToViewRecursiveOutsideWorkspace": "Operit Coder bu dizindeki (çalışma alanı dışında) tüm dosyaları özyinelemeli olarak görüntülemek istiyor",
+		"didViewRecursiveOutsideWorkspace": "Operit Coder bu dizindeki (çalışma alanı dışında) tüm dosyaları özyinelemeli olarak görüntüledi",
+		"wantsToViewDefinitionsOutsideWorkspace": "Operit Coder bu dizinde (çalışma alanı dışında) kullanılan kaynak kod tanımlama isimlerini görüntülemek istiyor",
+		"didViewDefinitionsOutsideWorkspace": "Operit Coder bu dizinde (çalışma alanı dışında) kullanılan kaynak kod tanımlama isimlerini görüntüledi"
 	},
 	"commandOutput": "Komut Çıktısı",
 	"commandExecution": {
@@ -249,18 +249,18 @@
 		"youSaid": "Dediniz ki"
 	},
 	"mcp": {
-		"wantsToUseTool": "Kilo Code {{serverName}} MCP sunucusunda bir araç kullanmak istiyor",
-		"wantsToAccessResource": "Kilo Code {{serverName}} MCP sunucusundaki bir kaynağa erişmek istiyor"
+		"wantsToUseTool": "Operit Coder {{serverName}} MCP sunucusunda bir araç kullanmak istiyor",
+		"wantsToAccessResource": "Operit Coder {{serverName}} MCP sunucusundaki bir kaynağa erişmek istiyor"
 	},
 	"modes": {
-		"wantsToSwitch": "Kilo Code <code>{{mode}}</code> moduna geçmek istiyor",
-		"wantsToSwitchWithReason": "Kilo Code <code>{{mode}}</code> moduna geçmek istiyor çünkü: {{reason}}",
-		"didSwitch": "Kilo Code <code>{{mode}}</code> moduna geçti",
-		"didSwitchWithReason": "Kilo Code <code>{{mode}}</code> moduna geçti çünkü: {{reason}}"
+		"wantsToSwitch": "Operit Coder <code>{{mode}}</code> moduna geçmek istiyor",
+		"wantsToSwitchWithReason": "Operit Coder <code>{{mode}}</code> moduna geçmek istiyor çünkü: {{reason}}",
+		"didSwitch": "Operit Coder <code>{{mode}}</code> moduna geçti",
+		"didSwitchWithReason": "Operit Coder <code>{{mode}}</code> moduna geçti çünkü: {{reason}}"
 	},
 	"subtasks": {
-		"wantsToCreate": "Kilo Code <code>{{mode}}</code> modunda yeni bir alt görev oluşturmak istiyor",
-		"wantsToFinish": "Kilo Code bu alt görevi bitirmek istiyor",
+		"wantsToCreate": "Operit Coder <code>{{mode}}</code> modunda yeni bir alt görev oluşturmak istiyor",
+		"wantsToFinish": "Operit Coder bu alt görevi bitirmek istiyor",
 		"newTaskContent": "Alt Görev Talimatları",
 		"completionContent": "Alt Görev Tamamlandı",
 		"resultContent": "Alt Görev Sonuçları",
@@ -268,7 +268,7 @@
 		"completionInstructions": "Alt görev tamamlandı! Sonuçları inceleyebilir ve düzeltmeler veya sonraki adımlar önerebilirsiniz. Her şey iyi görünüyorsa, sonucu üst göreve döndürmek için onaylayın."
 	},
 	"questions": {
-		"hasQuestion": "Kilo Code'nun bir sorusu var"
+		"hasQuestion": "Operit Coder'nun bir sorusu var"
 	},
 	"taskCompleted": "Görev Tamamlandı",
 	"errorDetails": {
@@ -346,7 +346,7 @@
 	},
 	"browser": {
 		"session": "Tarayıcı Oturumu",
-		"rooWantsToUse": "Kilo Code tarayıcıyı kullanmak istiyor",
+		"rooWantsToUse": "Operit Coder tarayıcıyı kullanmak istiyor",
 		"consoleLogs": "Konsol Kayıtları",
 		"noNewLogs": "(Yeni kayıt yok)",
 		"screenshot": "Tarayıcı ekran görüntüsü",
@@ -394,24 +394,24 @@
 	"profileViolationWarning": "Geçerli profil kuruluşunuzun ayarlarıyla uyumlu değil",
 	"shellIntegration": {
 		"title": "Komut Çalıştırma Uyarısı",
-		"description": "Komutunuz VSCode terminal kabuk entegrasyonu olmadan çalıştırılıyor. Bu uyarıyı gizlemek için <settingsLink>Kilo Code ayarları</settingsLink>'nın <strong>Terminal</strong> bölümünden kabuk entegrasyonunu devre dışı bırakabilir veya aşağıdaki bağlantıyı kullanarak VSCode terminal entegrasyonu sorunlarını giderebilirsiniz.",
+		"description": "Komutunuz VSCode terminal kabuk entegrasyonu olmadan çalıştırılıyor. Bu uyarıyı gizlemek için <settingsLink>Operit Coder ayarları</settingsLink>'nın <strong>Terminal</strong> bölümünden kabuk entegrasyonunu devre dışı bırakabilir veya aşağıdaki bağlantıyı kullanarak VSCode terminal entegrasyonu sorunlarını giderebilirsiniz.",
 		"troubleshooting": "Kabuk entegrasyonu belgelerini görmek için buraya tıklayın."
 	},
 	"ask": {
 		"autoApprovedRequestLimitReached": {
 			"title": "Otomatik Onaylanan İstek Limiti Aşıldı",
-			"description": "Kilo Code, {{count}} API isteği/istekleri için otomatik onaylanan limite ulaştı. Sayacı sıfırlamak ve göreve devam etmek istiyor musunuz?",
+			"description": "Operit Coder, {{count}} API isteği/istekleri için otomatik onaylanan limite ulaştı. Sayacı sıfırlamak ve göreve devam etmek istiyor musunuz?",
 			"button": "Sıfırla ve Devam Et"
 		},
 		"autoApprovedCostLimitReached": {
 			"title": "Otomatik Onaylanan Maliyet Sınırına Ulaşıldı",
-			"description": "Kilo Code otomatik olarak onaylanmış ${{count}} maliyet sınırına ulaştı. Maliyeti sıfırlamak ve göreve devam etmek ister misiniz?",
+			"description": "Operit Coder otomatik olarak onaylanmış ${{count}} maliyet sınırına ulaştı. Maliyeti sıfırlamak ve göreve devam etmek ister misiniz?",
 			"button": "Sıfırla ve Devam Et"
 		}
 	},
 	"codebaseSearch": {
-		"wantsToSearch": "Kilo Code kod tabanında <code>{{query}}</code> aramak istiyor",
-		"wantsToSearchWithPath": "Kilo Code <code>{{path}}</code> içinde kod tabanında <code>{{query}}</code> aramak istiyor",
+		"wantsToSearch": "Operit Coder kod tabanında <code>{{query}}</code> aramak istiyor",
+		"wantsToSearchWithPath": "Operit Coder <code>{{path}}</code> içinde kod tabanında <code>{{query}}</code> aramak istiyor",
 		"didSearch_one": "1 sonuç bulundu",
 		"didSearch_other": "{{count}} sonuç bulundu",
 		"resultTooltip": "Benzerlik puanı: {{score}} (dosyayı açmak için tıklayın)"
@@ -476,8 +476,8 @@
 		"clickToEdit": "Mesajı düzenlemek için tıkla"
 	},
 	"slashCommand": {
-		"wantsToRun": "Kilo Code bir slash komutu çalıştırmak istiyor",
-		"didRun": "Kilo Code bir slash komutu çalıştırdı"
+		"wantsToRun": "Operit Coder bir slash komutu çalıştırmak istiyor",
+		"didRun": "Operit Coder bir slash komutu çalıştırdı"
 	},
 	"todo": {
 		"partial": "{{total}} yapılacaklar listesinden {{completed}} tanesi tamamlandı",

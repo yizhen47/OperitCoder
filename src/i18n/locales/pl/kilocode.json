@@ -51,7 +51,7 @@
 		}
 	},
 	"commitMessage": {
-		"activated": "Generator wiadomości commit Kilo Code aktywowany",
+		"activated": "Generator wiadomości commit Operit Coder aktywowany",
 		"gitNotFound": "⚠️ Nie znaleziono repozytorium Git lub git jest niedostępny",
 		"gitInitError": "⚠️ Błąd inicjalizacji Git: {{error}}",
 		"generating": "Kilo: Generowanie wiadomości commit...",
@@ -64,7 +64,7 @@
 		"errors": {
 			"noProject": "Brak dostępnego projektu",
 			"timeout": "Upłynął limit czasu żądania po 30 sekundach",
-			"connectionFailed": "Nie udało się połączyć z rozszerzeniem Kilo Code",
+			"connectionFailed": "Nie udało się połączyć z rozszerzeniem Operit Coder",
 			"invalidResponse": "Nieprawidłowy format odpowiedzi otrzymany z rozszerzenia",
 			"noChanges": "Nie znaleziono zmian do zatwierdzenia",
 			"missingMessage": "Nie otrzymano komunikatu zatwierdzenia z rozszerzenia",
@@ -88,7 +88,7 @@
 		"progress": {
 			"title": "Generowanie treści commita",
 			"analyzing": "Analizowanie zmian...",
-			"connecting": "Łączenie z Kilo Code...",
+			"connecting": "Łączenie z Operit Coder...",
 			"generating": "Generowanie wiadomości do commita..."
 		},
 		"ui": {
@@ -133,8 +133,8 @@
 			"snoozed": "wstrzymane",
 			"warning": "$(warning) Autocomplete",
 			"tooltip": {
-				"basic": "Kilo Code Autocomplete",
-				"disabled": "Kilo Code Autocomplete (wyłączone)",
+				"basic": "Operit Coder Autocomplete",
+				"disabled": "Operit Coder Autocomplete (wyłączone)",
 				"tokenError": "Aby używać Autocomplete, musi być ustawiony ważny token",
 				"sessionTotal": "Całkowity koszt sesji:",
 				"provider": "Dostawca:",
@@ -149,36 +149,36 @@
 				"lessThanCent": "<$0.01"
 			}
 		},
-		"toggleMessage": "Kilo Code Autocomplete {{status}}",
+		"toggleMessage": "Operit Coder Autocomplete {{status}}",
 		"progress": {
-			"title": "Kilo Code",
+			"title": "Operit Coder",
 			"analyzing": "Analizuję twój kod...",
 			"generating": "Generuję sugerowane edycje...",
 			"processing": "Przetwarzam sugerowane edycje...",
 			"showing": "Wyświetlam sugerowane edycje..."
 		},
 		"input": {
-			"title": "Kilo Code: Szybkie Zadanie",
+			"title": "Operit Coder: Szybkie Zadanie",
 			"placeholder": "np. 'zrefaktoruj tę funkcję, aby była bardziej wydajna'"
 		},
 		"commands": {
-			"generateSuggestions": "Kilo Code: Generuj Sugerowane Edycje",
+			"generateSuggestions": "Operit Coder: Generuj Sugerowane Edycje",
 			"displaySuggestions": "Wyświetl Sugerowane Edycje",
 			"cancelSuggestions": "Anuluj Sugerowane Edycje",
 			"applyCurrentSuggestion": "Zastosuj Bieżącą Sugerowaną Edycję",
 			"applyAllSuggestions": "Zastosuj Wszystkie Sugerowane Edycje",
-			"category": "Kilo Code"
+			"category": "Operit Coder"
 		},
 		"codeAction": {
-			"title": "Kilo Code: Sugerowane Edycje"
+			"title": "Operit Coder: Sugerowane Edycje"
 		},
 		"chatParticipant": {
-			"fullName": "Kilo Code Agent",
+			"fullName": "Operit Coder Agent",
 			"name": "Agent",
 			"description": "Mogę pomóc ci w szybkich zadaniach i sugerowanych edycjach."
 		},
 		"incompatibilityExtensionPopup": {
-			"message": "Kilo Code Autocomplete jest blokowane przez konflikt z GitHub Copilot. Aby to naprawić, musisz wyłączyć sugestie inline Copilot.",
+			"message": "Operit Coder Autocomplete jest blokowane przez konflikt z GitHub Copilot. Aby to naprawić, musisz wyłączyć sugestie inline Copilot.",
 			"disableCopilot": "Wyłącz Copilot",
 			"disableInlineAssist": "Wyłącz Autocomplete"
 		}

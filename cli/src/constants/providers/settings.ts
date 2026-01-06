@@ -40,9 +40,9 @@ export interface FieldMetadata {
 export const FIELD_REGISTRY: Record<string, FieldMetadata> = {
 	// Kilocode fields
 	kilocodeToken: {
-		label: "Kilo Code Token",
+		label: "Operit Coder Token",
 		type: "password",
-		placeholder: "Enter your Kilo Code token...",
+		placeholder: "Enter your Operit Coder token...",
 	},
 	kilocodeOrganizationId: {
 		label: "Organization ID",

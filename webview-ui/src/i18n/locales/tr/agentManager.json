@@ -64,7 +64,7 @@
 		"apiRequest": "API İsteği",
 		"taskCompleted": "Görev Tamamlandı",
 		"error": "Hata",
-		"question": "Kilo Code'un bir sorusu var",
+		"question": "Operit Coder'un bir sorusu var",
 		"command": "Kilo bir komut çalıştırmak istiyor",
 		"tool": "Kilo bir araç kullanmak istiyor",
 		"usingTool": "Araç kullanılıyor: **{{tool}}** {{details}}",

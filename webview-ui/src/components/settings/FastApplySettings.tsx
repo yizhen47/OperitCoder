@@ -28,7 +28,7 @@ export const FastApplySettings = ({
 					}
 					className="w-full">
 					<VSCodeOption className="py-2 px-3" value="kilocode">
-						Kilo Code
+						Operit Coder
 					</VSCodeOption>
 					<VSCodeOption className="py-2 px-3" value="openrouter">
 						OpenRouter

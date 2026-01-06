@@ -1,7 +1,7 @@
 {
 	"welcome": {
-		"greeting": "Willkommen bei Kilo Code!",
-		"introText1": "Kilo Code ist ein kostenloser Open-Source-KI-Coding-Agent.",
+		"greeting": "Willkommen bei Operit Coder!",
+		"introText1": "Operit Coder ist ein kostenloser Open-Source-KI-Coding-Agent.",
 		"introText2": "Er funktioniert mit den neuesten KI-Modellen wie Claude Sonnet 4.5, Gemini 2.5 Pro, GPT-5 und über 450 weiteren.",
 		"introText3": "Erstelle ein kostenloses Konto und erhalte $20 Bonusguthaben bei deiner ersten Aufladung.",
 		"ctaButton": "Loslegen",
@@ -11,7 +11,7 @@
 	},
 	"lowCreditWarning": {
 		"addCredit": "Guthaben hinzufügen",
-		"lowBalance": "Ihr Kilo Code Guthaben ist niedrig",
+		"lowBalance": "Ihr Operit Coder Guthaben ist niedrig",
 		"newOrganization": "Verwendest du Kilo für die Arbeit?"
 	},
 	"pagination": {
@@ -41,16 +41,16 @@
 			"mcp": "MCP-Server"
 		},
 		"provider": {
-			"account": "Kilo Code Konto",
-			"apiKey": "Kilo Code API-Schlüssel",
-			"login": "Bei Kilo Code anmelden",
-			"logout": "Von Kilo Code abmelden",
-			"automaticFetch": "Die neuesten Modelle sind automatisch in Kilo Code verfügbar. Wenn du dir nicht sicher bist, welches Modell du wählen sollst, funktioniert Kilo Code am besten mit den empfohlenen Modellen, die oben in <strong>fetter Schrift</strong> aufgeführt sind.",
+			"account": "Operit Coder Konto",
+			"apiKey": "Operit Coder API-Schlüssel",
+			"login": "Bei Operit Coder anmelden",
+			"logout": "Von Operit Coder abmelden",
+			"automaticFetch": "Die neuesten Modelle sind automatisch in Operit Coder verfügbar. Wenn du dir nicht sicher bist, welches Modell du wählen sollst, funktioniert Operit Coder am besten mit den empfohlenen Modellen, die oben in <strong>fetter Schrift</strong> aufgeführt sind.",
 			"providerRouting": {
 				"title": "Anbieter-Routing",
 				"managedByOrganization": "Anbieter-Routing auf Organisationsebene verwalten",
 				"createOrganization": "Organisation erstellen, um Anbieter-Routing zu verwalten",
-				"description": "Kilo Code leitet Anfragen an die besten verfügbaren Anbieter für dein Modell weiter. Standardmäßig werden Anfragen über die Top-Anbieter verteilt, um die Betriebszeit zu maximieren. Du kannst jedoch einen bestimmten Anbieter für dieses Modell auswählen.",
+				"description": "Operit Coder leitet Anfragen an die besten verfügbaren Anbieter für dein Modell weiter. Standardmäßig werden Anfragen über die Top-Anbieter verteilt, um die Betriebszeit zu maximieren. Du kannst jedoch einen bestimmten Anbieter für dieses Modell auswählen.",
 				"sorting": {
 					"default": "Standard-Anbieter-Sortierung",
 					"price": "Anbieter mit niedrigeren Preisen bevorzugen",
@@ -69,7 +69,7 @@
 		"modelInfo": {
 			"contextWindow": "Kontextfenster",
 			"providerBreakdown": "Anbieter-Preis- und Funktionsübersicht",
-			"averageKiloCodeCost": "Das sind die durchschnittlichen tatsächlichen Ausgaben für Kilo Code mit diesem Modell in der letzten Woche. Sie können niedriger sein als der angegebene Preis aufgrund der Nutzung des Prompt-Caches.",
+			"averageKiloCodeCost": "Das sind die durchschnittlichen tatsächlichen Ausgaben für Operit Coder mit diesem Modell in der letzten Woche. Sie können niedriger sein als der angegebene Preis aufgrund der Nutzung des Prompt-Caches.",
 			"table": {
 				"provider": "Anbieter",
 				"context": "Der Endpunkt kann diese Anzahl von Token verarbeiten (Eingabe + Ausgabe).",
@@ -82,15 +82,15 @@
 		"contextManagement": {
 			"allowVeryLargeReads": {
 				"label": "Sehr große Dateilesevorgänge erlauben",
-				"description": "Wenn aktiviert, führt Kilo Code sehr große Datei- oder MCP-Ausgabelesevorgänge durch, auch wenn eine hohe Wahrscheinlichkeit besteht, das Kontextfenster zu überschreiten (Inhaltsgröße >80% des Kontextfensters)."
+				"description": "Wenn aktiviert, führt Operit Coder sehr große Datei- oder MCP-Ausgabelesevorgänge durch, auch wenn eine hohe Wahrscheinlichkeit besteht, das Kontextfenster zu überschreiten (Inhaltsgröße >80% des Kontextfensters)."
 			}
 		},
 		"systemNotifications": {
 			"label": "Systembenachrichtigungen aktivieren",
-			"description": "Wenn aktiviert, sendet Kilo Code Systembenachrichtigungen für wichtige Ereignisse wie Aufgabenabschluss oder Fehler.",
+			"description": "Wenn aktiviert, sendet Operit Coder Systembenachrichtigungen für wichtige Ereignisse wie Aufgabenabschluss oder Fehler.",
 			"testButton": "Benachrichtigung testen",
-			"testTitle": "Kilo Code",
-			"testMessage": "Dies ist eine Testbenachrichtigung von Kilo Code."
+			"testTitle": "Operit Coder",
+			"testMessage": "Dies ist eine Testbenachrichtigung von Operit Coder."
 		},
 		"terminal": {
 			"commandGenerator": {
@@ -111,7 +111,7 @@
 	},
 	"chat": {
 		"condense": {
-			"wantsToCondense": "Kilo Code möchte deine Unterhaltung zusammenfassen",
+			"wantsToCondense": "Operit Coder möchte deine Unterhaltung zusammenfassen",
 			"condenseConversation": "Unterhaltung zusammenfassen"
 		},
 		"seeNewChanges": "Neue Änderungen anzeigen",
@@ -142,15 +142,15 @@
 	},
 	"docs": "Dokumentation",
 	"rules": {
-		"tooltip": "Kilo Code Regeln & Workflows verwalten",
-		"ariaLabel": "Kilo Code Regeln",
+		"tooltip": "Operit Coder Regeln & Workflows verwalten",
+		"ariaLabel": "Operit Coder Regeln",
 		"tabs": {
 			"rules": "Regeln",
 			"workflows": "Workflows"
 		},
 		"description": {
-			"rules": "Regeln ermöglichen es dir, Kilo Code Anweisungen zu geben, die es in allen Modi und für alle Prompts befolgen soll. Sie sind eine dauerhafte Möglichkeit, Kontext und Präferenzen für alle Unterhaltungen in deinem Arbeitsbereich oder global einzubeziehen.",
-			"workflows": "Workflows sind eine vorbereitete Vorlage für eine Unterhaltung. Workflows ermöglichen es dir, Prompts zu definieren, die du häufig verwendest, und können eine Reihe von Schritten enthalten, um Kilo Code durch sich wiederholende Aufgaben zu führen, wie das Bereitstellen eines Dienstes oder das Einreichen einer PR. Um einen Workflow aufzurufen, tippe",
+			"rules": "Regeln ermöglichen es dir, Operit Coder Anweisungen zu geben, die es in allen Modi und für alle Prompts befolgen soll. Sie sind eine dauerhafte Möglichkeit, Kontext und Präferenzen für alle Unterhaltungen in deinem Arbeitsbereich oder global einzubeziehen.",
+			"workflows": "Workflows sind eine vorbereitete Vorlage für eine Unterhaltung. Workflows ermöglichen es dir, Prompts zu definieren, die du häufig verwendest, und können eine Reihe von Schritten enthalten, um Operit Coder durch sich wiederholende Aufgaben zu führen, wie das Bereitstellen eines Dienstes oder das Einreichen einer PR. Um einen Workflow aufzurufen, tippe",
 			"workflowsInChat": "im Chat."
 		},
 		"sections": {
@@ -221,11 +221,11 @@
 			"provider": "Provider",
 			"enableAutoTrigger": {
 				"label": "Pausieren zum Vervollständigen",
-				"description": "Wenn aktiviert, löst Kilo Code automatisch Autocomplete aus, wenn du aufhörst zu tippen. Dies kann für schnelle Korrekturen und Vorschläge nützlich sein."
+				"description": "Wenn aktiviert, löst Operit Coder automatisch Autocomplete aus, wenn du aufhörst zu tippen. Dies kann für schnelle Korrekturen und Vorschläge nützlich sein."
 			},
 			"autoTriggerDelay": {
 				"label": "Auto-Auslöseverzögerung",
-				"description": "Die Verzögerung in Sekunden, bevor Kilo Code Autocomplete auslöst, nachdem du aufgehört hast zu tippen. Eine kürzere Verzögerung bedeutet schnellere Vorschläge, kann aber ressourcenintensiver sein."
+				"description": "Die Verzögerung in Sekunden, bevor Operit Coder Autocomplete auslöst, nachdem du aufgehört hast zu tippen. Eine kürzere Verzögerung bedeutet schnellere Vorschläge, kann aber ressourcenintensiver sein."
 			},
 			"enableQuickInlineTaskKeybinding": {
 				"label": "Schnellaufgabe ({{keybinding}})",
@@ -240,7 +240,7 @@
 			"configureAutocompleteProfile": "Verwende ein beliebiges Modell, indem du zu Profilen gehst und ein Profil vom Profiltyp Autocomplete konfigurierst.",
 			"enableChatAutocomplete": {
 				"label": "Chat-Eingabe-Autovervollständigung",
-				"description": "Wenn aktiviert, wird Kilo Code Vervollständigungen vorschlagen, während Sie im Chat-Eingabefeld tippen. Drücken Sie Tab, um Vorschläge zu akzeptieren."
+				"description": "Wenn aktiviert, wird Operit Coder Vervollständigungen vorschlagen, während Sie im Chat-Eingabefeld tippen. Drücken Sie Tab, um Vorschläge zu akzeptieren."
 			},
 			"snooze": {
 				"label": "Autocomplete pausieren",
@@ -307,7 +307,7 @@
 		"shareModesNewBanner": "Neu: Modi teilen durch Erstellen einer Organisation"
 	},
 	"deviceAuth": {
-		"title": "Bei Kilo Code anmelden",
+		"title": "Bei Operit Coder anmelden",
 		"step1": "Öffne die folgende URL in deinem Browser",
 		"step2": "Überprüfe den Code und autorisiere dieses Gerät in deinem Browser",
 		"scanQr": "Oder scanne diesen QR-Code mit deinem Handy",
