@@ -46,20 +46,7 @@ export const SeeNewChangesButtons = ({ commitRange }: { commitRange: CommitRange
 						{t("kilocode:chat.cancelRevertChanges")}
 					</VSCodeButton>
 				</>
-			) : (
-				<>
-					<VSCodeButton className="w-full mt-2" appearance="secondary" onClick={seeNewChangesCallback}>
-						{t("kilocode:chat.seeNewChanges")}
-					</VSCodeButton>
-					<VSCodeButton
-						className="w-full mt-2"
-						appearance="secondary"
-						disabled={!commitRange.fromTimeStamp}
-						onClick={revertAllChangesCallback}>
-						{t("kilocode:chat.revertNewChanges")}
-					</VSCodeButton>
-				</>
-			)}
+			) : null}
 		</div>
 	)
 }

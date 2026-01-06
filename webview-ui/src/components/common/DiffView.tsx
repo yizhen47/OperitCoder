@@ -211,15 +211,15 @@ const DiffView = memo(({ source, filePath }: DiffViewProps) => {
 
 								return (
 									<tr key={globalIndex}>
-										{/* Old line number */}
+										{/* Old line number - only show for deletions */}
 										<td
 											className={`w-[45px] text-right pr-1 pl-1 select-none align-top whitespace-nowrap ${gutterBgClass}`}>
-											{line.oldLineNum || ""}
+											{line.type === "deletion" ? line.oldLineNum ?? "" : ""}
 										</td>
-										{/* New line number */}
+										{/* New line number - only show for additions and context */}
 										<td
 											className={`w-[45px] text-right pr-1 select-none align-top whitespace-nowrap ${gutterBgClass}`}>
-											{line.newLineNum || ""}
+											{line.type === "deletion" ? "" : line.newLineNum ?? ""}
 										</td>
 										{/* Narrow colored gutter */}
 										<td className={`w-[12px] ${gutterBgClass} align-top`} />

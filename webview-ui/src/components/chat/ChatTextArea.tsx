@@ -22,7 +22,11 @@ import {
 import { convertToMentionPath } from "@/utils/path-mentions"
 import { escapeHtml } from "@/utils/highlight" // kilocode_change - FIM autocomplete
 import { useChatGhostText } from "./hooks/useChatGhostText" // kilocode_change: FIM autocomplete
-import { DropdownOptionType, Button, StandardTooltip } from "@/components/ui"
+import { DropdownOptionType, Button, StandardTooltip, Popover, PopoverTrigger, PopoverContent } from "@/components/ui"
+import { CircularProgress } from "./CircularProgress"
+import { getModelMaxOutputTokens } from "@roo/api"
+import { formatLargeNumber } from "@src/utils/format"
+import { useSelectedModel } from "@/components/ui/hooks/useSelectedModel"
 
 import Thumbnails from "../common/Thumbnails"
 import { ModeSelector } from "./ModeSelector"
@@ -33,6 +37,7 @@ import ContextMenu from "./ContextMenu"
 import { ImageWarningBanner } from "./ImageWarningBanner"
 import { VolumeX, Pin, Check, WandSparkles, SendHorizontal, Paperclip, MessageSquareX } from "lucide-react"
 import { IndexingStatusBadge } from "./IndexingStatusBadge"
+import KiloRulesToggleModal from "../kilocode/rules/KiloRulesToggleModal"
 import { MicrophoneButton } from "./MicrophoneButton" // kilocode_change: STT microphone button
 import { VolumeVisualizer } from "./VolumeVisualizer" // kilocode_change: STT volume level visual
 import { VoiceRecordingCursor } from "./VoiceRecordingCursor" // kilocode_change: STT recording cursor
@@ -71,6 +76,7 @@ interface ChatTextAreaProps {
 	onCancel?: () => void
 	sendMessageOnEnter?: boolean // kilocode_change
 	showBrowserDockToggle?: boolean
+	contextTokens?: number // kilocode_change: context tokens for display
 }
 
 // kilocode_change start
@@ -141,6 +147,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			isEditMode = false,
 			onCancel,
 			sendMessageOnEnter = true,
+			contextTokens, // kilocode_change: context tokens for display
 		},
 		ref,
 	) => {
@@ -163,7 +170,10 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			language, // User's VSCode display language
 			experiments, // kilocode_change: For speechToText experiment flag
 			speechToTextStatus, // kilocode_change: Speech-to-text availability status with failure reason
+			apiConfiguration,
 		} = useExtensionState()
+
+		const { id: modelId, info: model } = useSelectedModel(apiConfiguration)
 
 		// kilocode_change start - autocomplete profile type system
 		// Filter out autocomplete profiles - only show chat profiles in the chat interface
@@ -293,10 +303,11 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		const [isDraggingOver, setIsDraggingOver] = useState(false)
 		// kilocode_change start: Slash commands state
 		const [showSlashCommandsMenu, setShowSlashCommandsMenu] = useState(false)
-		const [selectedSlashCommandsIndex, setSelectedSlashCommandsIndex] = useState(0)
-		const [slashCommandsQuery, setSlashCommandsQuery] = useState("")
-		const slashCommandsMenuContainerRef = useRef<HTMLDivElement>(null)
-		// kilocode_change end: Slash commands state
+	const [selectedSlashCommandsIndex, setSelectedSlashCommandsIndex] = useState(0)
+	const [slashCommandsQuery, setSlashCommandsQuery] = useState("")
+	const slashCommandsMenuContainerRef = useRef<HTMLDivElement>(null)
+	// kilocode_change end: Slash commands state
+	const [showContextPanel, setShowContextPanel] = useState(false)
 		const [textAreaBaseHeight, setTextAreaBaseHeight] = useState<number | undefined>(undefined)
 		const [showContextMenu, setShowContextMenu] = useState(false)
 		const [cursorPosition, setCursorPosition] = useState(0)
@@ -648,6 +659,15 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 
 		const handleKeyDown = useCallback(
 			(event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+				// Handle Ctrl+A / Cmd+A to select all text
+				if ((event.ctrlKey || event.metaKey) && event.key === "a") {
+					event.preventDefault()
+					if (textAreaRef.current) {
+						textAreaRef.current.select()
+					}
+					return
+				}
+				
 				// kilocode_change start: pull slash commands from Cline
 				if (showSlashCommandsMenu) {
 					// kilocode_change start: Slash command menu navigation
@@ -1326,7 +1346,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			}
 		})
 
-		const placeholderBottomText = `\n(${t("chat:addContext")}${shouldDisableImages ? `, ${t("chat:dragFiles")}` : `, ${t("chat:dragFilesImages")}`})`
+		const placeholderBottomText = ` (${t("chat:addContext")}${shouldDisableImages ? `, ${t("chat:dragFiles")}` : `, ${t("chat:dragFilesImages")}`})`
 
 		// Common mode selector handler
 		const handleModeChange = useCallback(
@@ -1549,8 +1569,8 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						onHeightChange?.(height)
 					}}
 					// kilocode_change: use regular placeholder, streaming text goes to actual input
-					placeholder={`${placeholderText}\n${placeholderBottomText}`}
-					minRows={3}
+					placeholder={`${placeholderText}${placeholderBottomText}`}
+					minRows={1}
 					maxRows={15}
 					autoFocus={true}
 					// kilocode_change start - isRecording active
@@ -1650,8 +1670,86 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					{isRecording && <VolumeVisualizer volume={volumeLevel} isActive={isRecording} />}
 					{/* kilocode_change end: Volume visualizer */}
 
+					{/* kilocode_change start: Rules button moved here */}
+					{!isEditMode && <KiloRulesToggleModal />}
+					{/* kilocode_change end */}
+
 					{/* kilocode_change start */}
 					{!isEditMode && <IndexingStatusBadge className={cn({ hidden: containerWidth < 235 })} />}
+
+					<Popover open={showContextPanel} onOpenChange={setShowContextPanel}>
+							<StandardTooltip content={t("chat:task.contextWindow")}>
+								<PopoverTrigger asChild>
+									<Button
+										variant="ghost"
+										size="sm"
+										aria-label={t("chat:task.contextWindow")}
+										className={cn(
+											"relative h-5 w-5 p-0",
+											"text-vscode-foreground opacity-60",
+											"hover:opacity-100 hover:bg-[rgba(255,255,255,0.03)]",
+											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
+										)}>
+										<CircularProgress
+											percentage={
+												model?.contextWindow
+													? ((contextTokens || 0) / model.contextWindow) * 100
+													: 0
+											}
+											size={20}
+											strokeWidth={2}
+										/>
+									</Button>
+								</PopoverTrigger>
+							</StandardTooltip>
+							<PopoverContent
+								className="bg-vscode-editor-background border border-vscode-panel-border rounded-md p-4 shadow-lg min-w-[280px]"
+								align="end"
+								alignOffset={0}
+								side="bottom"
+								sideOffset={5}>
+								<div className="flex items-center justify-between mb-3">
+									<span className="font-bold text-sm">{t("chat:task.contextWindow")}</span>
+								</div>
+								
+								{/* Input tokens section */}
+								<div className="flex items-center justify-between py-2 border-b border-vscode-panel-border">
+									<span className="text-xs text-vscode-descriptionForeground">Input Tokens</span>
+									<span className="text-sm font-medium text-vscode-foreground">
+										{formatLargeNumber(contextTokens || 0)}
+									</span>
+								</div>
+								
+								{/* Output tokens section */}
+								{model && (
+									<div className="flex items-center justify-between py-2 border-b border-vscode-panel-border">
+										<span className="text-xs text-vscode-descriptionForeground">Max Output Tokens</span>
+										<span className="text-sm font-medium text-vscode-foreground">
+											{formatLargeNumber(
+												getModelMaxOutputTokens({ modelId, model, settings: apiConfiguration }) || 0,
+											)}
+										</span>
+									</div>
+								)}
+								
+								{/* Total tokens section */}
+								<div className="flex items-center justify-between py-2">
+									<span className="text-xs text-vscode-descriptionForeground">Total Context Window</span>
+									<span className="text-sm font-medium text-vscode-foreground">
+										{formatLargeNumber(model?.contextWindow || 0)}
+									</span>
+								</div>
+								
+								{/* Condense context button */}
+								<Button
+									variant="ghost"
+									size="sm"
+									onClick={() => vscode.postMessage({ type: "condense" })}
+									className="w-full mt-3 text-xs hover:bg-[rgba(255,255,255,0.05)]">
+									{t("chat:task.condenseContext")}
+								</Button>
+							</PopoverContent>
+						</Popover>
 
 					<StandardTooltip content="Add Context (@)">
 						<button
@@ -1752,6 +1850,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					)}
 					{/* kilocode_change end */}
 				</div>
+
 
 				{!inputValue && (
 					<div
@@ -1877,19 +1976,19 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							}}
 							ref={containerRef}
 							// kilocode_change end
-							className={cn("flex", "justify-between", "items-center", "mt-auto")}>
-							<div className={cn("flex", "items-center", "gap-1", "min-w-0")}>
-								<div className="shrink-0">
-									{/* kilocode_change start: KiloModeSelector instead of ModeSelector */}
-									<KiloModeSelector
-										value={mode}
-										onChange={setMode}
-										modeShortcutText={modeShortcutText}
-										customModes={customModes}
-									/>
-									{/* kilocode_change end */}
-								</div>
+							className={cn("flex", "flex-nowrap", "items-center", "gap-1", "mt-auto")}>
+							<div className="shrink-0">
+								{/* kilocode_change start: KiloModeSelector instead of ModeSelector */}
+								<KiloModeSelector
+									value={mode}
+									onChange={setMode}
+									modeShortcutText={modeShortcutText}
+									customModes={customModes}
+								/>
+								{/* kilocode_change end */}
+							</div>
 
+							<div className="shrink-0">
 								<KiloProfileSelector
 									currentConfigId={currentConfigId}
 									currentApiConfigName={currentApiConfigName}

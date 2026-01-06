@@ -75,17 +75,17 @@ export const CheckpointSaved = ({ checkpoint, currentHash, ...props }: Checkpoin
 	}
 
 	return (
-		<div className="group flex items-center justify-between gap-2 pt-2 pb-3 ">
-			<div className="flex items-center gap-2 text-blue-400 whitespace-nowrap">
-				<GitCommitVertical className="w-4" />
-				<span className="font-semibold">{t("chat:checkpoint.regular")}</span>
+		<div className="group flex items-center justify-between gap-2 pt-1 pb-1">
+			<div className="flex items-center gap-2 text-vscode-descriptionForeground whitespace-nowrap text-xs">
+				<GitCommitVertical className="w-3" />
+				<span className="font-normal">{t("chat:checkpoint.regular")}</span>
 				{isCurrent && <span className="text-muted">({t("chat:checkpoint.current")})</span>}
 			</div>
 			<span
-				className="block w-full h-[2px] mt-[2px] text-xs"
+				className="block w-full h-[1px] mt-[2px] text-xs"
 				style={{
 					backgroundImage:
-						"linear-gradient(90deg, rgba(0, 188, 255, .65), rgba(0, 188, 255, .65) 80%, rgba(0, 188, 255, 0) 99%)",
+						"linear-gradient(90deg, rgba(0, 188, 255, .3), rgba(0, 188, 255, .3) 80%, rgba(0, 188, 255, 0) 99%)",
 				}}></span>
 
 			{/* Keep menu visible while popover is open or briefly after close to prevent jump */}

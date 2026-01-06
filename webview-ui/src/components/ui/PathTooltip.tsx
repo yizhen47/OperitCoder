@@ -48,7 +48,9 @@ export function PathTooltip({
 			className="[text-wrap:wrap]"
 			maxWidth="min(300px,100vw)"
 			asChild={asChild}>
-			{children}
+			<span className="inline-flex items-center whitespace-nowrap overflow-hidden text-ellipsis">
+				{children}
+			</span>
 		</StandardTooltip>
 	)
 }

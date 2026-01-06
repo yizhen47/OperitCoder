@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react"
+import { memo, useMemo, useCallback } from "react"
 import { VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react"
 import { type ToolProgressStatus } from "@roo-code/types"
 import { getLanguageFromPath } from "@src/utils/getLanguageFromPath"
@@ -8,6 +8,9 @@ import { ToolUseBlock, ToolUseBlockHeader } from "./ToolUseBlock"
 import CodeBlock from "../kilocode/common/CodeBlock" // kilocode_change
 import { PathTooltip } from "../ui/PathTooltip"
 import DiffView from "./DiffView"
+import { vscode } from "@src/utils/vscode"
+import { Undo } from "lucide-react"
+import { StandardTooltip } from "../ui"
 
 interface CodeAccordianProps {
 	path?: string
@@ -22,6 +25,9 @@ interface CodeAccordianProps {
 	onJumpToFile?: () => void
 	// New props for diff stats
 	diffStats?: { added: number; removed: number }
+	// kilocode_change: checkpoint restore props
+	checkpointTs?: number
+	commitHash?: string
 }
 
 const CodeAccordian = ({
@@ -36,10 +42,12 @@ const CodeAccordian = ({
 	header,
 	onJumpToFile,
 	diffStats,
+	checkpointTs,
+	commitHash,
 }: CodeAccordianProps) => {
 	const inferredLanguage = useMemo(() => language ?? (path ? getLanguageFromPath(path) : "txt"), [path, language])
 	const source = useMemo(() => String(code).trim() /*kilocode_change: coerce to string*/, [code])
-	const hasHeader = Boolean(path || isFeedback || header)
+	const hasHeader = Boolean(path || header)
 
 	// Use provided diff stats only (render-only)
 	const derivedStats = useMemo(() => {
@@ -49,10 +57,32 @@ const CodeAccordian = ({
 
 	const hasValidStats = Boolean(derivedStats && (derivedStats.added > 0 || derivedStats.removed > 0))
 
+	// kilocode_change: handle checkpoint restore
+	const handleRestore = useCallback(() => {
+		if (checkpointTs && commitHash) {
+			vscode.postMessage({
+				type: "checkpointRestore",
+				payload: { ts: checkpointTs, commitHash, mode: "restore" },
+			})
+		}
+	}, [checkpointTs, commitHash])
+
 	return (
 		<ToolUseBlock>
 			{hasHeader && (
 				<ToolUseBlockHeader onClick={onToggleExpand} className="group">
+					{/* kilocode_change: checkpoint restore button - positioned at far left */}
+					{checkpointTs && commitHash && (
+						<button
+							className="mr-2 hover:bg-vscode-toolbar-hoverBackground rounded transition-colors"
+							onClick={(e) => {
+								e.stopPropagation()
+								handleRestore()
+							}}
+							aria-label="撤回">
+							<Undo className="w-3 h-3" />
+						</button>
+					)}
 					{isLoading && <VSCodeProgressRing className="size-3 mr-2" />}
 					{header ? (
 						<div className="flex items-center">
@@ -61,22 +91,16 @@ const CodeAccordian = ({
 								<span className="whitespace-nowrap overflow-hidden text-ellipsis mr-2">{header}</span>
 							</PathTooltip>
 						</div>
-					) : isFeedback ? (
-						<div className="flex items-center">
-							<span className={`codicon codicon-${isFeedback ? "feedback" : "codicon-output"} mr-1.5`} />
-							<span className="whitespace-nowrap overflow-hidden text-ellipsis mr-2 rtl">
-								{isFeedback ? "User Edits" : "Console Logs"}
-							</span>
-						</div>
 					) : (
-						<>
+						<div className="flex items-center">
+							<span className="codicon codicon-file mr-1.5"></span>
 							{path?.startsWith(".") && <span>.</span>}
 							<PathTooltip content={formatPathTooltip(path)}>
 								<span className="whitespace-nowrap overflow-hidden text-ellipsis text-left mr-2 rtl">
 									{formatPathTooltip(path)}
 								</span>
 							</PathTooltip>
-						</>
+						</div>
 					)}
 					<div className="flex-grow-1" />
 					{/* Prefer diff stats over generic progress indicator if available */}
@@ -115,7 +139,7 @@ const CodeAccordian = ({
 					)}
 				</ToolUseBlockHeader>
 			)}
-			{(!hasHeader || isExpanded) && (
+			{(!hasHeader || isExpanded) && !isFeedback && (
 				<div className="overflow-x-auto overflow-y-auto max-h-[300px] max-w-full">
 					{inferredLanguage === "diff" ? (
 						<DiffView source={source} filePath={path} />

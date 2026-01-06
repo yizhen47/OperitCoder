@@ -47,19 +47,19 @@ export const ReasoningBlock = ({ content, isStreaming, isLast }: ReasoningBlockP
 	return (
 		<div className="group">
 			<div
-				className="flex items-center justify-between mb-2.5 pr-2 cursor-pointer select-none"
+				className="flex items-center justify-between pr-2 cursor-pointer select-none"
 				onClick={handleToggle}>
 				<div className="flex items-center gap-2">
-					<Lightbulb className="w-4" />
-					<span className="font-bold text-vscode-foreground">{t("chat:reasoning.thinking")}</span>
+					<Lightbulb className="w-3" />
+					<span className="font-normal text-xs text-vscode-descriptionForeground">{t("chat:reasoning.thinking")}</span>
 					{elapsed > 0 && (
-						<span className="text-sm text-vscode-descriptionForeground mt-0.5">{secondsLabel}</span>
+						<span className="text-xs text-vscode-descriptionForeground">{secondsLabel}</span>
 					)}
 				</div>
 				<div className="flex items-center gap-2">
 					<ChevronUp
 						className={cn(
-							"w-4 transition-all opacity-0 group-hover:opacity-100",
+							"w-3 transition-all opacity-0 group-hover:opacity-100",
 							isCollapsed && "-rotate-180",
 						)}
 					/>
@@ -68,7 +68,7 @@ export const ReasoningBlock = ({ content, isStreaming, isLast }: ReasoningBlockP
 			{(content?.trim()?.length ?? 0) > 0 && !isCollapsed && (
 				<div
 					ref={contentRef}
-					className="border-l border-vscode-descriptionForeground/20 ml-2 pl-4 pb-1 text-vscode-descriptionForeground">
+					className="border-l border-vscode-descriptionForeground/20 ml-2 pl-4 text-vscode-descriptionForeground text-xs">
 					<MarkdownBlock markdown={content} />
 				</div>
 			)}

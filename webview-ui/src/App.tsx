@@ -407,17 +407,15 @@ const App = () => {
 				/>
 			)}
 			{editMessageDialogState.hasCheckpoint ? (
-				<MemoizedCheckpointRestoreDialog
+				<MemoizedEditMessageDialog
 					open={editMessageDialogState.isOpen}
-					type="edit"
-					hasCheckpoint={editMessageDialogState.hasCheckpoint}
 					onOpenChange={(open: boolean) => setEditMessageDialogState((prev) => ({ ...prev, isOpen: open }))}
-					onConfirm={(restoreCheckpoint: boolean) => {
+					onConfirm={() => {
 						vscode.postMessage({
 							type: "editMessageConfirm",
 							messageTs: editMessageDialogState.messageTs,
 							text: editMessageDialogState.text,
-							restoreCheckpoint,
+							restoreCheckpoint: true,
 						})
 						setEditMessageDialogState((prev) => ({ ...prev, isOpen: false }))
 					}}

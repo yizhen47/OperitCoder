@@ -221,7 +221,9 @@
 		"wantsToInsertWithLineNumber": "Operit Coder wants to insert content into this file at line {{lineNumber}}",
 		"wantsToInsertAtEnd": "Operit Coder wants to append content to the end of this file",
 		"wantsToDelete": "Operit Coder wants to delete this file",
-		"wantsToDeleteDirectory": "Operit Coder wants to delete this directory"
+		"wantsToDeleteDirectory": "Operit Coder wants to delete this directory",
+		"listFiles": "Search content",
+		"searchFiles": "Search content"
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Operit Coder wants to view the top level files in this directory",

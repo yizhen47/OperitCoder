@@ -44,7 +44,7 @@ import BrowserSessionStatusRow from "./BrowserSessionStatusRow"
 import ChatRow from "./ChatRow"
 import { ChatTextArea } from "./ChatTextArea"
 // import TaskHeader from "./TaskHeader"// kilocode_change
-import KiloTaskHeader from "../kilocode/KiloTaskHeader" // kilocode_change
+// import KiloTaskHeader from "../kilocode/KiloTaskHeader" // kilocode_change
 import AutoApproveMenu from "./AutoApproveMenu"
 import BottomControls from "../kilocode/BottomControls" // kilocode_change
 import SystemPromptWarning from "./SystemPromptWarning"
@@ -299,7 +299,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							setClineAsk("api_req_failed")
 							setEnableButtons(true)
 							setPrimaryButtonText(t("chat:retry.title"))
-							setSecondaryButtonText(t("chat:startNewTask.title"))
+							setSecondaryButtonText(undefined)
 							break
 						case "mistake_limit_reached":
 							playSound("progress_loop")
@@ -307,7 +307,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							setClineAsk("mistake_limit_reached")
 							setEnableButtons(true)
 							setPrimaryButtonText(t("chat:proceedAnyways.title"))
-							setSecondaryButtonText(t("chat:startNewTask.title"))
+							setSecondaryButtonText(undefined)
 							break
 						case "followup":
 							setSendingDisabled(isPartial)
@@ -381,17 +381,17 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							setSecondaryButtonText(t("chat:reject.title"))
 							break
 						case "completion_result":
-							// Extension waiting for feedback, but we can just present a new task button.
-							// Only play celebration sound if there are no queued messages.
-							if (!isPartial && messageQueue.length === 0) {
-								playSound("celebration")
-							}
-							setSendingDisabled(isPartial)
-							setClineAsk("completion_result")
-							setEnableButtons(!isPartial)
-							setPrimaryButtonText(t("chat:startNewTask.title"))
-							setSecondaryButtonText(undefined)
-							break
+						// Extension waiting for feedback, but we can just present a new task button.
+						// Only play celebration sound if there are no queued messages.
+						if (!isPartial && messageQueue.length === 0) {
+							playSound("celebration")
+						}
+						setSendingDisabled(isPartial)
+						setClineAsk("completion_result")
+						setEnableButtons(false)
+						setPrimaryButtonText(undefined)
+						setSecondaryButtonText(undefined)
+						break
 						case "resume_task":
 							setSendingDisabled(false)
 							setClineAsk("resume_task")
@@ -406,19 +406,19 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 									(msg) => msg.ask === "completion_result" || msg.say === "completion_result",
 								)
 							if (isCompletedSubtask) {
-								setPrimaryButtonText(t("chat:startNewTask.title"))
+								setPrimaryButtonText(undefined)
 								setSecondaryButtonText(undefined)
 							} else {
-								setPrimaryButtonText(t("chat:resumeTask.title"))
-								setSecondaryButtonText(t("chat:terminate.title"))
+								setPrimaryButtonText(undefined)
+								setSecondaryButtonText(undefined)
 							}
 							setDidClickCancel(false) // special case where we reset the cancel button state
 							break
 						case "resume_completed_task":
 							setSendingDisabled(false)
 							setClineAsk("resume_completed_task")
-							setEnableButtons(true)
-							setPrimaryButtonText(t("chat:startNewTask.title"))
+							setEnableButtons(false)
+							setPrimaryButtonText(undefined)
 							setSecondaryButtonText(undefined)
 							setDidClickCancel(false)
 							break
@@ -480,7 +480,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				(msg) => msg.ask === "completion_result" || msg.say === "completion_result",
 			)
 			if (hasCompletionResult) {
-				setPrimaryButtonText(t("chat:startNewTask.title"))
+				setPrimaryButtonText(undefined)
 				setSecondaryButtonText(undefined)
 			}
 		}
@@ -980,16 +980,24 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				}
 			}
 
+			// Filter out all API request messages (kilocode_change)
+			if (
+				message.say === "api_req_started" ||
+				message.say === "api_req_finished" ||
+				message.say === "api_req_retried" ||
+				message.say === "api_req_deleted" ||
+				message.say === "api_req_retry_delayed" ||
+				message.ask === "api_req_failed"
+			) {
+				return false
+			}
+
 			if (everVisibleMessagesTsRef.current.has(message.ts)) {
 				const alwaysHiddenOnceProcessedAsk: ClineAsk[] = [
-					"api_req_failed",
 					"resume_task",
 					"resume_completed_task",
 				]
 				const alwaysHiddenOnceProcessedSay = [
-					"api_req_finished",
-					"api_req_retried",
-					"api_req_deleted",
 					"mcp_server_request_started",
 				]
 				if (message.ask && alwaysHiddenOnceProcessedAsk.includes(message.ask)) return false
@@ -1004,25 +1012,11 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				case "completion_result":
 					if (message.text === "") return false
 					break
-				case "api_req_failed":
 				case "resume_task":
 				case "resume_completed_task":
 					return false
 			}
 			switch (message.say) {
-				case "api_req_finished":
-				case "api_req_retried":
-				case "api_req_deleted":
-					return false
-				case "api_req_retry_delayed":
-					const last1 = modifiedMessages.at(-1)
-					const last2 = modifiedMessages.at(-2)
-					if (last1?.ask === "resume_task" && last2 === message) {
-						return true
-					} else if (message !== last1) {
-						return false
-					}
-					break
 				case "text":
 					if ((message.text ?? "") === "" && (message.images?.length ?? 0) === 0) return false
 					break
@@ -1490,7 +1484,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		vscode.postMessage({ type: "condenseTaskContextRequest", text: taskId })
 	}
 
-	const areButtonsVisible = showScrollToBottom || primaryButtonText || secondaryButtonText || isStreaming
+	const areButtonsVisible = primaryButtonText || secondaryButtonText || isStreaming
 
 	const showTelemetryBanner = telemetrySetting === "unset" // kilocode_change
 
@@ -1525,22 +1519,6 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 						handleCondenseContext={handleCondenseContext}
 						todos={latestTodos}
 					/> */}
-					<KiloTaskHeader
-						task={task}
-						tokensIn={apiMetrics.totalTokensIn}
-						tokensOut={apiMetrics.totalTokensOut}
-						cacheWrites={apiMetrics.totalCacheWrites}
-						cacheReads={apiMetrics.totalCacheReads}
-						totalCost={apiMetrics.totalCost}
-						contextTokens={apiMetrics.contextTokens}
-						buttonsDisabled={sendingDisabled}
-						handleCondenseContext={handleCondenseContext}
-						onClose={handleTaskCloseButtonClick}
-						groupedMessages={groupedMessages}
-						onMessageClick={handleMessageClick}
-						isTaskActive={sendingDisabled}
-						todos={latestTodos}
-					/>
 					{/* kilocode_change start */}
 
 					{hasSystemPromptOverride && (
@@ -1568,11 +1546,6 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 									className={`codicon  ${isExpanded ? "codicon-eye" : "codicon-eye-closed"} scale-90`}
 								/>
 							</div>
-						</div>
-					)}
-					{!showTelemetryBanner && (
-						<div>
-							<OrganizationSelector className="absolute top-2 right-3" />
 						</div>
 					)}
 					{/* kilocode_change start: changed the classes to support notifications */}
@@ -1674,85 +1647,77 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 						{/* kilocode_change: added settings toggle for this */}
 						{showAutoApproveMenu && <AutoApproveMenu />}
 					</div>
-					{areButtonsVisible && (
+					{/* kilocode_change: Floating scroll-to-bottom button - overlay style */}
+					{showScrollToBottom && (
+						<StandardTooltip content={t("chat:scrollToBottom")}>
+							<button
+								className="fixed bottom-32 right-6 w-10 h-10 rounded-full bg-vscode-editor-background/80 backdrop-blur-sm border border-vscode-widget-border hover:bg-vscode-editor-background/90 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl z-50"
+								onClick={() => {
+									// Engage sticky follow until user scrolls up
+									stickyFollowRef.current = true
+									// Pin immediately to avoid lag during fast streaming
+									scrollToBottomAuto()
+									// Hide button immediately to prevent flash
+									setShowScrollToBottom(false)
+								}}>
+								<span className="codicon codicon-chevron-down text-vscode-editor-foreground"></span>
+							</button>
+						</StandardTooltip>
+					)}
+					{areButtonsVisible && !showScrollToBottom && (
 						<div
 							className={`flex h-9 items-center mb-1 px-[15px] ${
-								showScrollToBottom
+								enableButtons || (isStreaming && !didClickCancel)
 									? "opacity-100"
-									: enableButtons || (isStreaming && !didClickCancel)
-										? "opacity-100"
-										: "opacity-50"
+									: "opacity-50"
 							}`}>
-							{showScrollToBottom ? (
-								<StandardTooltip content={t("chat:scrollToBottom")}>
+							{primaryButtonText && !isStreaming && (
+								<StandardTooltip
+									content={
+										primaryButtonText === t("chat:retry.title")
+											? t("chat:retry.tooltip")
+											: primaryButtonText === t("chat:save.title")
+												? t("chat:save.tooltip")
+												: primaryButtonText === t("chat:approve.title")
+													? t("chat:approve.tooltip")
+													: primaryButtonText === t("chat:runCommand.title")
+														? t("chat:runCommand.tooltip")
+														: primaryButtonText === t("chat:startNewTask.title")
+															? t("chat:startNewTask.tooltip")
+															: primaryButtonText ===
+																	t("chat:proceedAnyways.title")
+																? t("chat:proceedAnyways.tooltip")
+																: primaryButtonText ===
+																		t("chat:proceedWhileRunning.title")
+																	? t("chat:proceedWhileRunning.tooltip")
+																	: undefined
+									}>
 									<Button
-										className="flex-[2]"
-										onClick={() => {
-											// Engage sticky follow until user scrolls up
-											stickyFollowRef.current = true
-											// Pin immediately to avoid lag during fast streaming
-											scrollToBottomAuto()
-											// Hide button immediately to prevent flash
-											setShowScrollToBottom(false)
-										}}>
-										<span className="codicon codicon-chevron-down"></span>
+										disabled={!enableButtons}
+										className={secondaryButtonText ? "flex-1 mr-[6px]" : "flex-[2] mr-0"}
+										onClick={() => handlePrimaryButtonClick(inputValue, selectedImages)}>
+										{primaryButtonText}
 									</Button>
 								</StandardTooltip>
-							) : (
-								<>
-									{primaryButtonText && !isStreaming && (
-										<StandardTooltip
-											content={
-												primaryButtonText === t("chat:retry.title")
-													? t("chat:retry.tooltip")
-													: primaryButtonText === t("chat:save.title")
-														? t("chat:save.tooltip")
-														: primaryButtonText === t("chat:approve.title")
-															? t("chat:approve.tooltip")
-															: primaryButtonText === t("chat:runCommand.title")
-																? t("chat:runCommand.tooltip")
-																: primaryButtonText === t("chat:startNewTask.title")
-																	? t("chat:startNewTask.tooltip")
-																	: primaryButtonText === t("chat:resumeTask.title")
-																		? t("chat:resumeTask.tooltip")
-																		: primaryButtonText ===
-																			  t("chat:proceedAnyways.title")
-																			? t("chat:proceedAnyways.tooltip")
-																			: primaryButtonText ===
-																				  t("chat:proceedWhileRunning.title")
-																				? t("chat:proceedWhileRunning.tooltip")
-																				: undefined
-											}>
-											<Button
-												disabled={!enableButtons}
-												className={secondaryButtonText ? "flex-1 mr-[6px]" : "flex-[2] mr-0"}
-												onClick={() => handlePrimaryButtonClick(inputValue, selectedImages)}>
-												{primaryButtonText}
-											</Button>
-										</StandardTooltip>
-									)}
-									{(secondaryButtonText || isStreaming) && (
-										<StandardTooltip
-											content={
-												isStreaming
-													? t("chat:cancel.tooltip")
-													: secondaryButtonText === t("chat:startNewTask.title")
-														? t("chat:startNewTask.tooltip")
-														: secondaryButtonText === t("chat:reject.title")
-															? t("chat:reject.tooltip")
-															: secondaryButtonText === t("chat:terminate.title")
-																? t("chat:terminate.tooltip")
-																: undefined
-											}>
-											<Button
-												disabled={!enableButtons && !(isStreaming && !didClickCancel)}
-												className={isStreaming ? "flex-[2] ml-0" : "flex-1 ml-[6px]"}
-												onClick={() => handleSecondaryButtonClick(inputValue, selectedImages)}>
-												{isStreaming ? t("chat:cancel.title") : secondaryButtonText}
-											</Button>
-										</StandardTooltip>
-									)}
-								</>
+							)}
+							{(secondaryButtonText || isStreaming) && (
+								<StandardTooltip
+									content={
+										isStreaming
+											? t("chat:cancel.tooltip")
+											: secondaryButtonText === t("chat:startNewTask.title")
+												? t("chat:startNewTask.tooltip")
+												: secondaryButtonText === t("chat:reject.title")
+													? t("chat:reject.tooltip")
+													: undefined
+									}>
+									<Button
+										disabled={!enableButtons && !(isStreaming && !didClickCancel)}
+										className={isStreaming ? "flex-[2] ml-0" : "flex-1 ml-[6px]"}
+										onClick={() => handleSecondaryButtonClick(inputValue, selectedImages)}>
+										{isStreaming ? t("chat:cancel.title") : secondaryButtonText}
+									</Button>
+								</StandardTooltip>
 							)}
 						</div>
 					)}
@@ -1797,6 +1762,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				modeShortcutText={modeShortcutText}
 				sendMessageOnEnter={sendMessageOnEnter} // kilocode_change
 				showBrowserDockToggle={showBrowserDockToggle}
+				contextTokens={apiMetrics.contextTokens} // kilocode_change: pass context tokens to ChatTextArea
 			/>
 			{/* kilocode_change: added settings toggle the profile and model selection */}
 			<BottomControls showApiConfig />

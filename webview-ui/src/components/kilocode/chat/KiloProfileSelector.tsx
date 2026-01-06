@@ -33,11 +33,6 @@ export const KiloProfileSelector = ({
 }: KiloProfileSelectorProps) => {
 	const { t } = useAppTranslation()
 
-	// Hide if there is only one profile
-	if ((listApiConfigMeta?.length ?? 0) < 2) {
-		return null
-	}
-
 	return (
 		<div className={cn("flex-1", "min-w-0", "overflow-hidden")}>
 			<SelectDropdown
