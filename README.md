@@ -6,51 +6,61 @@
   <a href="https://www.reddit.com/r/kilocode/"><img src="https://img.shields.io/badge/Join%20r%2Fkilocode-D84315?style=flat&logo=reddit&logoColor=white" alt="Reddit"></a>
 </p>
 
-# 🚀 Kilo
+# 🚀 Operit Coder
 
-> Kilo is the all-in-one agentic engineering platform. Build, ship, and iterate faster with the most popular open source coding agent.
-> #1 on OpenRouter. 750k+ Operit Coderrs. 6.1 trillion tokens used per month.
+> Operit Coder 是从 [KiloCode](https://github.com/Kilo-Org/kilocode) fork 而来的 AI 编码助手。我们致力于简化、稳定性和更好的用户体验。
 
-- ✨ Generate code from natural language
-- ✅ Checks its own work
-- 🧪 Run terminal commands
-- 🌐 Automate the browser
-- 🤖 Latest AI models
-- 🎁 API keys optional
-- 💡 **Get $20 in bonus credits when you top-up for the first time** Credits can be used with 500+ models like Gemini 3 Pro, Claude 4.5 Sonnet & Opus, and GPT-5
+## 📝 Fork 说明
+
+本项目从 KiloCode fork，主要改进包括：
+
+- 🗑️ **移除冗余组件**：删除了 `apps` 和 `cloud` 目录，减少不必要的复杂性
+- 📦 **优化构建体积**：通过精简代码和依赖，显著减小了构建产物大小
+- 🎯 **简化架构**：专注于核心功能，提供更清晰、更易维护的代码结构
+- 🔒 **增强稳定性**：优化错误处理和边界情况，提升整体稳定性
+- 🎨 **美化 UI**：改进用户界面，提供更现代、更美观的交互体验
+
+## 主要特性
+
+- ✨ **从自然语言生成代码**：使用自然语言描述需求，AI 自动生成代码
+- ✅ **自我检查**：自动检查生成的代码，确保质量
+- 🧪 **运行终端命令**：直接在终端执行命令
+- 🌐 **自动化浏览器操作**：自动完成浏览器中的任务
+- 🤖 **最新 AI 模型**：支持 500+ 最新的 AI 模型
+- 🔑 **使用自己的 API 密钥**：完全控制您的 API 密钥，数据隐私更有保障
 
 <p align="center">
   <img src="https://media.githubusercontent.com/media/Kilo-Org/kilocode/main/kilo.gif" width="100%" />
 </p>
 
-- [VS Code Marketplace](https://kilo.ai/vscode-marketplace?utm_source=Readme) (download)
-- [Official Kilo.ai Home page](https://kilo.ai) (learn more)
+- [VS Code 插件市场](https://kilo.ai/vscode-marketplace?utm_source=Readme)（下载）
+- [官方 Kilo.ai 主页](https://kilo.ai)（了解更多）
 
-## Key Features
+## 核心功能
 
-- **Code Generation:** Kilo can generate code using natural language.
-- **Task Automation:** Kilo can automate repetitive coding tasks.
-- **Automated Refactoring:** Kilo can refactor and improve existing code.
-- **MCP Server Marketplace**: Kilo can easily find, and use MCP servers to extend the agent capabilities.
-- **Multi Mode**: Plan with Architect, Code with Coder, and Debug with Debugger, and make your own custom modes.
+- **代码生成**：Operit Coder 可以使用自然语言生成代码
+- **任务自动化**：可以自动执行重复性编码任务
+- **自动化重构**：可以重构和改进现有代码
+- **MCP 服务器市场**：轻松查找和使用 MCP 服务器来扩展代理能力
+- **多模式**：使用 Architect 进行规划，使用 Coder 进行编码，使用 Debugger 进行调试，还可以创建自定义模式
 
-## How to get started with Kilo
+## 如何开始使用 Operit Coder
 
-1. Install the Operit Coder extension from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=kilocode.Operit-Coder).
-2. Create your account to access 500+ cutting-edge AI models including Gemini 3 Pro, Claude 4.5 Sonnet & Opus, and GPT-5 – with transparent pricing that matches provider rates exactly.
-3. Start coding with AI that adapts to your workflow. Watch our quick-start guide to see Kilo in action:
+1. 从 [VS Code 插件市场](https://marketplace.visualstudio.com/items?itemName=kilocode.Operit-Coder)安装 Operit Coder 扩展
+2. 配置您自己的 API 密钥（支持 OpenAI、Anthropic、Google Gemini 等多种提供商）
+3. 开始使用适应您工作流程的 AI 进行编码。观看我们的快速入门指南，了解 Operit Coder 的实际操作：
 
-[![Watch the video](https://img.youtube.com/vi/pqGfYXgrhig/maxresdefault.jpg)](https://youtu.be/pqGfYXgrhig)
+[![观看视频](https://img.youtube.com/vi/pqGfYXgrhig/maxresdefault.jpg)](https://youtu.be/pqGfYXgrhig)
 
-## Extension Development
+## 扩展开发
 
-For details on building and developing the extension, see [DEVELOPMENT.md](/DEVELOPMENT.md)
+有关构建和开发扩展的详细信息，请参阅 [DEVELOPMENT.md](/DEVELOPMENT.md)
 
-## Contributing
+## 贡献
 
-Contributions are welcome, and they are greatly appreciated! Get started by reading our [Contributing Guide](CONTRIBUTING.md). Or join our [Discord](https://discord.gg/kilocode) to chat with the team and community.
+欢迎贡献，我们非常感谢！请阅读我们的[贡献指南](CONTRIBUTING.md)开始。或者加入我们的 [Discord](https://discord.gg/kilocode) 与团队和社区交流。
 
-Thanks to all the contributors who help make Kilo better!
+感谢所有帮助改进 Operit Coder 的贡献者！
 
 <table>
   <tr>
@@ -103,7 +113,7 @@ Thanks to all the contributors who help make Kilo better!
     </td>
     <td align="center">
       <a href="https://github.com/Kilo-Org/kilocode/graphs/contributors">
-        <b>more ...</b>
+        <b>更多 ...</b>
       </a>
     </td>
   </tr>
