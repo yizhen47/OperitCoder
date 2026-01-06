@@ -10,7 +10,7 @@ export const KiloLogo = () => {
 			width="100%"
 			height="100%"
 			style={{ display: "block" }}>
-			<g id="Kilo_Code_Branding" data-name="Kilo Code Branding">
+			<g id="Kilo_Code_Branding" data-name="Operit Coder Branding">
 				<path
 					id="Logo_Outline_-_White"
 					data-name="Logo Outline - White"

@@ -48,7 +48,7 @@ import { SessionTerminalManager } from "./SessionTerminalManager"
  * Each agent runs as a CLI process using `kilocode --auto --json`.
  */
 export class AgentManagerProvider implements vscode.Disposable {
-	public static readonly viewType = "kilo-code.AgentManagerPanel"
+	public static readonly viewType = "operit-coder.AgentManagerPanel"
 
 	private panel: vscode.WebviewPanel | undefined
 	private disposables: vscode.Disposable[] = []

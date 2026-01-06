@@ -1,4 +1,4 @@
-name: Code QA Kilo Code
+name: Code QA Operit Coder
 
 on:
     workflow_dispatch:

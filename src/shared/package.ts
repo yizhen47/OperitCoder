@@ -8,8 +8,8 @@ import { publisher, name, version } from "../package.json"
 // the build, so we still need this override mechanism.
 export const Package = {
 	publisher,
-	name: process.env.PKG_NAME || name,
+	name: process.env.PKG_NAME || "operit-coder", // kilocode_change - use operit-coder for command registration
 	version: process.env.PKG_VERSION || version,
-	outputChannel: process.env.PKG_OUTPUT_CHANNEL || "Kilo-Code",
+	outputChannel: process.env.PKG_OUTPUT_CHANNEL || "Operit-Coder",
 	sha: process.env.PKG_SHA,
 } as const

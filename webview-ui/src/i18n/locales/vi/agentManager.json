@@ -64,7 +64,7 @@
 		"apiRequest": "Yêu cầu API",
 		"taskCompleted": "Nhiệm vụ hoàn thành",
 		"error": "Lỗi",
-		"question": "Kilo Code có một câu hỏi",
+		"question": "Operit Coder có một câu hỏi",
 		"command": "Kilo muốn chạy một lệnh",
 		"tool": "Kilo muốn sử dụng một công cụ",
 		"usingTool": "Đang sử dụng công cụ: **{{tool}}** {{details}}",

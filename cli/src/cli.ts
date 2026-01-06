@@ -63,13 +63,13 @@ export class CLI {
 		}
 
 		try {
-			logs.info("Initializing Kilo Code CLI...", "CLI")
+			logs.info("Initializing Operit Coder CLI...", "CLI")
 			logs.info(`Version: ${Package.version}`, "CLI")
 
 			// Set terminal title - use process.cwd() in parallel mode to show original directory
 			const titleWorkspace = this.options.parallel ? process.cwd() : this.options.workspace || process.cwd()
 			const folderName = `${basename(titleWorkspace)}${(await isGitWorktree(this.options.workspace || "")) ? " (git worktree)" : ""}`
-			process.stdout.write(`\x1b]0;Kilo Code - ${folderName}\x07`)
+			process.stdout.write(`\x1b]0;Operit Coder - ${folderName}\x07`)
 
 			// Create Jotai store
 			this.store = createStore()
@@ -304,7 +304,7 @@ export class CLI {
 			}
 
 			this.isInitialized = true
-			logs.info("Kilo Code CLI initialized successfully", "CLI")
+			logs.info("Operit Coder CLI initialized successfully", "CLI")
 		} catch (error) {
 			logs.error("Failed to initialize CLI", "CLI", { error })
 			throw error
@@ -425,7 +425,7 @@ export class CLI {
 		let beforeExit = () => {}
 
 		try {
-			logs.info("Disposing Kilo Code CLI...", "CLI")
+			logs.info("Disposing Operit Coder CLI...", "CLI")
 
 			await this.sessionService?.doSync(true)
 
@@ -482,7 +482,7 @@ export class CLI {
 			this.store = null
 
 			this.isInitialized = false
-			logs.info("Kilo Code CLI disposed", "CLI")
+			logs.info("Operit Coder CLI disposed", "CLI")
 		} catch (error) {
 			logs.error("Error disposing CLI", "CLI", { error })
 

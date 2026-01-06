@@ -45,12 +45,12 @@ describe("Single-open-task invariant", () => {
 			setValues: vi.fn(),
 			getState: vi.fn().mockResolvedValue({
 				apiConfiguration: { apiProvider: "anthropic", consecutiveMistakeLimit: 0 },
-				organizationAllowList: "*",
+				// kilocode_change: organizationAllowList removed
 				diffEnabled: false,
 				enableCheckpoints: true,
 				checkpointTimeout: 60,
 				fuzzyMatchThreshold: 1.0,
-				cloudUserInfo: null,
+				// kilocode_change: cloudUserInfo removed
 				remoteControlEnabled: false,
 			}),
 			removeClineFromStack,
@@ -99,7 +99,7 @@ describe("Single-open-task invariant", () => {
 				checkpointTimeout: 60,
 				fuzzyMatchThreshold: 1.0,
 				experiments: {},
-				cloudUserInfo: null,
+				// kilocode_change: cloudUserInfo removed
 				taskSyncEnabled: false,
 			}),
 			// Methods used by createTaskWithHistoryItem for pending edit cleanup

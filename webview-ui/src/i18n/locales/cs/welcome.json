@@ -1,6 +1,6 @@
 {
-	"greeting": "Ahoj, jsem Kilo Code!",
-	"introduction": "<strong>Kilo Code je přední autonomní agent pro kódování.</strong> Připrav se na architekturu, kódování, ladění a zvýšení své produktivity jako nikdy předtím. Pro pokračování Kilo Code vyžaduje API klíč.",
+	"greeting": "Ahoj, jsem Operit Coder!",
+	"introduction": "<strong>Operit Coder je přední autonomní agent pro kódování.</strong> Připrav se na architekturu, kódování, ladění a zvýšení své produktivity jako nikdy předtím. Pro pokračování Operit Coder vyžaduje API klíč.",
 	"notice": "Pro začátek toto rozšíření potřebuje poskytovatele API.",
 	"start": "Pojďme na to!",
 	"routers": {
@@ -16,7 +16,7 @@
 			"incentive": "Vyzkoušej Roo zdarma"
 		}
 	},
-	"chooseProvider": "Aby mohl dělat svá kouzla, Kilo Code potřebuje API klíč.",
+	"chooseProvider": "Aby mohl dělat svá kouzla, Operit Coder potřebuje API klíč.",
 	"providerSignup": {
 		"rooCloudProvider": "Roo Code Cloud Provider",
 		"rooCloudDescription": "Nejjednodušší způsob použití Roo. Kurátorovaná směs bezplatných a placených modelů za nízkou cenu",
@@ -51,8 +51,8 @@
 	"rooCloudProviderCoder": "Coder Agent",
 	"rooCloudProviderCoderDesc": "Specializovaný agent pro psaní a refaktoring kódu",
 	"telemetry": {
-		"helpImprove": "Pomoz vylepšit Kilo Code",
-		"helpImproveMessage": "Kilo Code sbírá data o chybách a používání, aby nám pomohl opravit chyby a vylepšit rozšíření. Tato telemetrie nesbírá kód, prompts ani osobní informace. Můžeš to vypnout v <settingsLink>nastavení</settingsLink>.",
+		"helpImprove": "Pomoz vylepšit Operit Coder",
+		"helpImproveMessage": "Operit Coder sbírá data o chybách a používání, aby nám pomohl opravit chyby a vylepšit rozšíření. Tato telemetrie nesbírá kód, prompts ani osobní informace. Můžeš to vypnout v <settingsLink>nastavení</settingsLink>.",
 		"changeSettings": "Toto můžete později změnit v dolní části <settingsLink>nastavení</settingsLink>"
 	},
 	"importSettings": "Importovat Nastavení"

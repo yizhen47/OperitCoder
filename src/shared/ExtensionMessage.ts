@@ -509,14 +509,7 @@ export type ExtensionState = Pick<
 	sendMessageOnEnter?: boolean // kilocode_change
 	hideCostBelowThreshold?: number // kilocode_change
 
-	cloudUserInfo: CloudUserInfo | null
-	cloudIsAuthenticated: boolean
-	cloudApiUrl?: string
-	cloudOrganizations?: CloudOrganizationMembership[]
-	sharingEnabled: boolean
-	organizationAllowList: OrganizationAllowList
-	organizationSettingsVersion?: number
-
+	// kilocode_change: cloud features removed
 	isBrowserSessionActive: boolean // Actual browser session state
 
 	autoCondenseContext: boolean

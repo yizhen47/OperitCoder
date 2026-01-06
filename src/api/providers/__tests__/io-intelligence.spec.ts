@@ -60,7 +60,7 @@ vi.mock("../fetchers/io-intelligence", () => ({
 
 // Mock constants
 vi.mock("../constants", () => ({
-	DEFAULT_HEADERS: { "User-Agent": "kilo-code" },
+	DEFAULT_HEADERS: { "User-Agent": "operit-coder" },
 }))
 
 // Mock transform functions

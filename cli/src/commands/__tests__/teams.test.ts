@@ -247,7 +247,7 @@ describe("/teams command", () => {
 		})
 
 		it("should switch to organization by normalized name", async () => {
-			mockContext.args = ["select", "kilo-code"]
+			mockContext.args = ["select", "operit-coder"]
 			mockContext.currentProvider = {
 				id: "test-provider",
 				provider: "kilocode",
@@ -258,7 +258,7 @@ describe("/teams command", () => {
 				organizations: [
 					{
 						id: "org-456",
-						name: "Kilo Code",
+						name: "Operit Coder",
 						role: "admin",
 					},
 				],
@@ -277,7 +277,7 @@ describe("/teams command", () => {
 			expect(successMessage).toBeDefined()
 			if (successMessage) {
 				const msg = successMessage[0] as { content: string }
-				expect(msg.content).toContain("Kilo Code")
+				expect(msg.content).toContain("Operit Coder")
 			}
 		})
 

@@ -64,7 +64,7 @@
 		"apiRequest": "Permintaan API",
 		"taskCompleted": "Tugas Selesai",
 		"error": "Kesalahan",
-		"question": "Kilo Code memiliki pertanyaan",
+		"question": "Operit Coder memiliki pertanyaan",
 		"command": "Kilo ingin menjalankan perintah",
 		"tool": "Kilo ingin menggunakan alat",
 		"usingTool": "Menggunakan alat: **{{tool}}** {{details}}",

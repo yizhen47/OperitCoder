@@ -6,11 +6,11 @@ import { CompactLogger } from "../../utils/logging/CompactLogger"
 import { fetchWithRetries } from "../../shared/http"
 
 /**
- * Service for fetching and managing Kilo Code organization settings
+ * Service for fetching and managing Operit Coder organization settings
  */
 export class OrganizationService {
 	/**
-	 * Fetches organization details from the Kilo Code API
+	 * Fetches organization details from the Operit Coder API
 	 * @param kilocodeToken - The authentication token
 	 * @param organizationId - The organization ID
 	 * @param kilocodeTesterWarningsDisabledUntil - Timestamp for suppressing tester warnings

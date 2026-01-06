@@ -25,7 +25,7 @@ import { ArrowLeft, ArrowRight, BadgeInfo } from "lucide-react"
 type ProviderOption = "roo" | "custom"
 
 const WelcomeViewProvider = () => {
-	const { apiConfiguration, currentApiConfigName, setApiConfiguration, uriScheme, cloudIsAuthenticated } =
+	const { apiConfiguration, currentApiConfigName, setApiConfiguration, uriScheme } =
 		useExtensionState()
 	const { t } = useAppTranslation()
 	const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
@@ -38,21 +38,6 @@ const WelcomeViewProvider = () => {
 
 	// When auth completes during the provider signup flow, save the Roo config
 	// This will cause showWelcome to become false and navigate to chat
-	useEffect(() => {
-		if (cloudIsAuthenticated && authInProgress) {
-			// Auth completed from provider signup flow - save the config now
-			const rooConfig: ProviderSettings = {
-				apiProvider: "roo",
-			}
-			vscode.postMessage({
-				type: "upsertApiConfiguration",
-				text: currentApiConfigName,
-				apiConfiguration: rooConfig,
-			})
-			setAuthInProgress(false)
-			setShowManualEntry(false)
-		}
-	}, [cloudIsAuthenticated, authInProgress, currentApiConfigName])
 
 	// Focus the manual URL input when it becomes visible
 	useEffect(() => {

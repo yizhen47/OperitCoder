@@ -1,5 +1,5 @@
 /**
- * Ayu Dark theme for Kilo Code CLI
+ * Ayu Dark theme for Operit Coder CLI
  *
  * Based on the Ayu Dark color scheme
  */

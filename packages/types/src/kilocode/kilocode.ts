@@ -70,7 +70,7 @@ export function getKiloBaseUriFromToken(kilocodeToken?: string) {
 				return "http://localhost:3000"
 			}
 		} catch (_error) {
-			console.warn("Failed to get base URL from Kilo Code token")
+			console.warn("Failed to get base URL from Operit Coder token")
 		}
 	}
 	return "https://api.kilo.ai"

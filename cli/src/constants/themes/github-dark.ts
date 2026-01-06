@@ -1,5 +1,5 @@
 /**
- * GitHub Dark theme for Kilo Code CLI
+ * GitHub Dark theme for Operit Coder CLI
  *
  * Based on the GitHub Dark color scheme
  */

@@ -1,6 +1,6 @@
 {
-	"greeting": "Olá, eu sou o Kilo Code!",
-	"introduction": "<strong>Kilo Code é o principal agente de codificação autônomo.</strong> Prepare-se para arquitetar, codificar, depurar e aumentar sua produtividade como nunca antes. Para continuar, o Kilo Code necessita de uma chave API.",
+	"greeting": "Olá, eu sou o Operit Coder!",
+	"introduction": "<strong>Operit Coder é o principal agente de codificação autônomo.</strong> Prepare-se para arquitetar, codificar, depurar e aumentar sua produtividade como nunca antes. Para continuar, o Operit Coder necessita de uma chave API.",
 	"notice": "Para começar, esta extensão precisa de um provedor de API.",
 	"start": "Vamos lá!",
 	"routers": {
@@ -16,7 +16,7 @@
 			"incentive": "Experimente o Roo gratuitamente"
 		}
 	},
-	"chooseProvider": "Para fazer sua mágica, o Kilo Code precisa de uma chave API.",
+	"chooseProvider": "Para fazer sua mágica, o Operit Coder precisa de uma chave API.",
 	"providerSignup": {
 		"rooCloudProvider": "Provedor Roo Code Cloud",
 		"rooCloudDescription": "A maneira mais simples de usar o Roo. Uma combinação selecionada de modelos gratuitos e pagos a baixo custo",
@@ -38,8 +38,8 @@
 	"startRouter": "Recomendamos usar um roteador LLM:",
 	"startCustom": "Ou você pode trazer sua própria chave API:",
 	"telemetry": {
-		"helpImprove": "Ajude a melhorar o Kilo Code",
-		"helpImproveMessage": "O Kilo Code coleta dados de erros e uso para nos ajudar a corrigir bugs e melhorar a extensão. Esta telemetria não coleta código, prompts ou informações pessoais. Você pode desativar isso nas <settingsLink>configurações</settingsLink>."
+		"helpImprove": "Ajude a melhorar o Operit Coder",
+		"helpImproveMessage": "O Operit Coder coleta dados de erros e uso para nos ajudar a corrigir bugs e melhorar a extensão. Esta telemetria não coleta código, prompts ou informações pessoais. Você pode desativar isso nas <settingsLink>configurações</settingsLink>."
 	},
 	"importSettings": "Importar configurações"
 }

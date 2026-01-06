@@ -4,8 +4,6 @@ import { Copy, Check, CloudUploadIcon } from "lucide-react"
 import QRCode from "qrcode"
 
 import type { HistoryItem } from "@roo-code/types"
-
-import { useExtensionState } from "@/context/ExtensionStateContext"
 import { useCopyToClipboard } from "@/utils/clipboard"
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/components/ui"
 import { vscode } from "@/utils/vscode"
@@ -16,15 +14,19 @@ interface CloudTaskButtonProps {
 	disabled?: boolean
 }
 
+// kilocode_change: cloud features disabled
 export const CloudTaskButton = ({ item, disabled = false }: CloudTaskButtonProps) => {
 	const [dialogOpen, setDialogOpen] = useState(false)
 	const { t } = useTranslation()
-	const { cloudUserInfo, cloudApiUrl } = useExtensionState()
+	// kilocode_change: cloudUserInfo and cloudApiUrl removed
+	// const { cloudUserInfo, cloudApiUrl } = useExtensionState()
 	const { copyWithFeedback, showCopyFeedback } = useCopyToClipboard()
 	const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement | null>(null)
 
-	// Generate the cloud URL for the task
-	const cloudTaskUrl = item?.id ? `${cloudApiUrl}/task/${item.id}` : ""
+	// kilocode_change: cloudTaskUrl disabled
+	// Generate cloud URL for task
+	// const cloudTaskUrl = item?.id ? `${cloudApiUrl}/task/${item.id}` : ""
+	const cloudTaskUrl = ""
 
 	const generateQRCode = useCallback(
 		(canvas: HTMLCanvasElement, context: string) => {
@@ -78,7 +80,11 @@ export const CloudTaskButton = ({ item, disabled = false }: CloudTaskButtonProps
 		}
 	}, [dialogOpen, canvasElement, generateQRCode])
 
-	if (!cloudUserInfo?.extensionBridgeEnabled || !item?.id) {
+	// kilocode_change: cloud features disabled
+	// if (!cloudUserInfo?.extensionBridgeEnabled || !item?.id) {
+	// 	return null
+	// }
+	if (!item?.id) {
 		return null
 	}
 

@@ -33,6 +33,10 @@ async function main() {
 		banner: {
 			js: "const __importMetaUrl = typeof __filename !== 'undefined' ? require('url').pathToFileURL(__filename).href : undefined;",
 		},
+		// kilocode_change: use operit-coder for command registration
+		define: {
+			"process.env.PKG_NAME": '"operit-coder"',
+		},
 		// kilocode_change end
 	}
 

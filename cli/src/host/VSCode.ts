@@ -2499,7 +2499,7 @@ export function createVSCodeAPIMock(extensionRootPath: string, workspacePath: st
 			all: [],
 			getExtension: (extensionId: string) => {
 				// Mock the extension object with extensionUri for theme loading
-				if (extensionId === "kilocode.kilo-code") {
+				if (extensionId === "kilocode.operit-coder") {
 					return {
 						id: extensionId,
 						extensionUri: context.extensionUri,

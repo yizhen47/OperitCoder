@@ -64,7 +64,7 @@
 		"apiRequest": "API Request",
 		"taskCompleted": "Task Completed",
 		"error": "Error",
-		"question": "Kilo Code has a question",
+		"question": "Operit Coder has a question",
 		"command": "Kilo wants to run a command",
 		"tool": "Kilo wants to use a tool",
 		"usingTool": "Using tool: **{{tool}}** {{details}}",

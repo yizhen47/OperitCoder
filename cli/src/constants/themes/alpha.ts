@@ -1,5 +1,5 @@
 /**
- * Dark theme for Kilo Code CLI
+ * Dark theme for Operit Coder CLI
  *
  * The default dark theme using standard terminal colors for maximum compatibility.
  */
@@ -16,7 +16,7 @@ export const alphaTheme: Theme = {
 	type: "dark",
 
 	brand: {
-		primary: "#faf74f", // Kilo Code yellow
+		primary: "#faf74f", // Operit Coder yellow
 		secondary: "cyan",
 	},
 

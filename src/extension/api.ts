@@ -52,7 +52,7 @@ export class API extends EventEmitter<RooCodeEvents> implements RooCodeAPI {
 				console.log(args)
 			}
 
-			this.logfile = path.join(os.tmpdir(), "kilo-code-messages.log")
+			this.logfile = path.join(os.tmpdir(), "operit-coder-messages.log")
 		} else {
 			this.log = () => {}
 		}

@@ -81,7 +81,7 @@ describe("ExtensionHost Race Condition Fix", () => {
 				handleCLIMessage: vi.fn(),
 			}
 			;(extensionHost as unknown as ExtensionHostInternal).webviewProviders.set(
-				"kilo-code.SidebarProvider",
+				"operit-coder.SidebarProvider",
 				mockProvider,
 			)
 
@@ -117,7 +117,7 @@ describe("ExtensionHost Race Condition Fix", () => {
 				handleCLIMessage: vi.fn(),
 			}
 			;(extensionHost as unknown as ExtensionHostInternal).webviewProviders.set(
-				"kilo-code.SidebarProvider",
+				"operit-coder.SidebarProvider",
 				mockProvider,
 			)
 
@@ -154,7 +154,7 @@ describe("ExtensionHost Race Condition Fix", () => {
 				}),
 			}
 			;(extensionHost as unknown as ExtensionHostInternal).webviewProviders.set(
-				"kilo-code.SidebarProvider",
+				"operit-coder.SidebarProvider",
 				mockProvider,
 			)
 
@@ -218,7 +218,7 @@ describe("ExtensionHost Race Condition Fix", () => {
 				handleCLIMessage: vi.fn(),
 			}
 			;(extensionHost as unknown as ExtensionHostInternal).webviewProviders.set(
-				"kilo-code.SidebarProvider",
+				"operit-coder.SidebarProvider",
 				mockProvider,
 			)
 
@@ -260,7 +260,7 @@ describe("ExtensionHost Race Condition Fix", () => {
 				}),
 			}
 			;(extensionHost as unknown as ExtensionHostInternal).webviewProviders.set(
-				"kilo-code.SidebarProvider",
+				"operit-coder.SidebarProvider",
 				mockProvider,
 			)
 
@@ -307,7 +307,7 @@ describe("ExtensionHost Race Condition Fix", () => {
 				}),
 			}
 			;(extensionHost as unknown as ExtensionHostInternal).webviewProviders.set(
-				"kilo-code.SidebarProvider",
+				"operit-coder.SidebarProvider",
 				mockProvider,
 			)
 

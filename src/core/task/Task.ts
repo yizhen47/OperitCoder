@@ -51,7 +51,6 @@ import {
 	TOOL_PROTOCOL,
 } from "@roo-code/types"
 import { TelemetryService } from "@roo-code/telemetry"
-import { CloudService, BridgeOrchestrator } from "@roo-code/cloud"
 import { resolveToolProtocol } from "../../utils/resolveToolProtocol"
 
 // api
@@ -989,14 +988,6 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		await this.saveClineMessages()
 
 		// kilocode_change start: no cloud service
-		// const shouldCaptureMessage = message.partial !== true && CloudService.isEnabled()
-
-		// if (shouldCaptureMessage) {
-		// 	CloudService.instance.captureEvent({
-		// 		event: TelemetryEventName.TASK_MESSAGE,
-		// 		properties: { taskId: this.taskId, message },
-		// 	})
-		// }
 		// kilocode_change end
 	}
 
@@ -1020,19 +1011,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		await provider?.postMessageToWebview({ type: "messageUpdated", clineMessage: message })
 		this.emit(RooCodeEventName.Message, { action: "updated", message })
 
-		// Check if we should sync to cloud and haven't already synced this message
-		const shouldCaptureMessage = message.partial !== true && CloudService.isEnabled()
-		const hasNotBeenSynced = !this.cloudSyncedMessageTimestamps.has(message.ts)
-
-		// kilocode_change start: no cloud service
-		// if (shouldCaptureMessage && hasNotBeenSynced) {
-		// 	CloudService.instance.captureEvent({
-		// 		event: TelemetryEventName.TASK_MESSAGE,
-		// 		properties: { taskId: this.taskId, message },
-		// 	})
-		// 	// Track that this message has been synced to cloud
-		// 	this.cloudSyncedMessageTimestamps.add(message.ts)
-		// }
+		// kilocode_change: cloud sync removed
 		// kilocode_change end
 	}
 
@@ -1617,7 +1596,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		contextTruncation?: ContextTruncation,
 	): Promise<undefined> {
 		if (this.abort) {
-			throw new Error(`[Kilo Code#say] task ${this.taskId}.${this.instanceId} aborted`)
+			throw new Error(`[Operit Coder#say] task ${this.taskId}.${this.instanceId} aborted`)
 		}
 
 		if (partial !== undefined) {
@@ -1742,7 +1721,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		})()
 		await this.say(
 			"error",
-			`Kilo Code tried to use ${toolName}${
+			`Operit Coder tried to use ${toolName}${
 				relPath ? ` for '${relPath.toPosix()}'` : ""
 			} without value for required parameter '${paramName}'. ${kilocodeExtraText}Retrying...`,
 		)
@@ -1756,16 +1735,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 	// Start / Resume / Abort / Dispose
 
 	private async startTask(task?: string, images?: string[]): Promise<void> {
-		if (this.enableBridge) {
-			try {
-				await BridgeOrchestrator.subscribeToTask(this)
-			} catch (error) {
-				console.error(
-					`[Task#startTask] BridgeOrchestrator.subscribeToTask() failed: ${error instanceof Error ? error.message : String(error)}`,
-				)
-			}
-		}
-
+		// kilocode_change: bridge orchestrator removed
 		// `conversationHistory` (for API) and `clineMessages` (for webview)
 		// need to be in sync.
 		// If the extension process were killed, then on restart the
@@ -1804,16 +1774,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 	}
 
 	private async resumeTaskFromHistory() {
-		if (this.enableBridge) {
-			try {
-				await BridgeOrchestrator.subscribeToTask(this)
-			} catch (error) {
-				console.error(
-					`[Task#resumeTaskFromHistory] BridgeOrchestrator.subscribeToTask() failed: ${error instanceof Error ? error.message : String(error)}`,
-				)
-			}
-		}
-
+		// kilocode_change: bridge orchestrator removed
 		const modifiedClineMessages = await this.getSavedClineMessages()
 
 		// Remove any resume messages that may have been added before.
@@ -2173,16 +2134,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 			console.error("Error removing event listeners:", error)
 		}
 
-		if (this.enableBridge) {
-			BridgeOrchestrator.getInstance()
-				?.unsubscribeFromTask(this.taskId)
-				.catch((error) =>
-					console.error(
-						`[Task#dispose] BridgeOrchestrator#unsubscribeFromTask() failed: ${error instanceof Error ? error.message : String(error)}`,
-					),
-				)
-		}
-
+		// kilocode_change: bridge orchestrator removed
 		// Release any terminals associated with this task.
 		try {
 			// Release any terminals associated with this task.

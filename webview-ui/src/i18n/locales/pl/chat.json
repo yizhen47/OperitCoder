@@ -1,5 +1,5 @@
 {
-	"greeting": "Co Kilo Code może dla Ciebie zrobić?",
+	"greeting": "Co Operit Coder może dla Ciebie zrobić?",
 	"task": {
 		"title": "Zadanie",
 		"expand": "Rozwiń zadanie",
@@ -21,7 +21,7 @@
 		"sharePublicly": "Udostępnij publicznie",
 		"sharePubliclyDescription": "Każdy z linkiem może uzyskać dostęp",
 		"connectToCloud": "Połącz z chmurą",
-		"connectToCloudDescription": "Zaloguj się do Kilo Code Cloud, aby udostępniać zadania",
+		"connectToCloudDescription": "Zaloguj się do Operit Coder Cloud, aby udostępniać zadania",
 		"sharingDisabledByOrganization": "Udostępnianie wyłączone przez organizację",
 		"shareSuccessOrganization": "Link organizacji skopiowany do schowka",
 		"shareSuccessPublic": "Link publiczny skopiowany do schowka",
@@ -95,7 +95,7 @@
 	"scrollToBottom": "Przewiń do dołu czatu",
 	"about": "Generuj, refaktoryzuj i debuguj kod z pomocą sztucznej inteligencji. Sprawdź naszą <DocsLink>dokumentację</DocsLink>, żeby dowiedzieć się więcej.",
 	"docs": "Sprawdź naszą <DocsLink>dokumentację</DocsLink>, aby dowiedzieć się więcej.",
-	"onboarding": "<strong>Twoja lista zadań w tym obszarze roboczym jest pusta.</strong> Zacznij od wpisania zadania poniżej. Nie wiesz, jak zacząć? Przeczytaj więcej o tym, co Kilo Code może dla Ciebie zrobić w <DocsLink>dokumentacji</DocsLink>.",
+	"onboarding": "<strong>Twoja lista zadań w tym obszarze roboczym jest pusta.</strong> Zacznij od wpisania zadania poniżej. Nie wiesz, jak zacząć? Przeczytaj więcej o tym, co Operit Coder może dla Ciebie zrobić w <DocsLink>dokumentacji</DocsLink>.",
 	"rooTips": {
 		"customizableModes": {
 			"title": "Konfigurowalne tryby",
@@ -124,7 +124,7 @@
 		"title": "Tryby",
 		"marketplace": "Marketplace Trybów",
 		"settings": "Ustawienia Trybów",
-		"description": "Wyspecjalizowane persony, które dostosowują zachowanie Kilo Code.",
+		"description": "Wyspecjalizowane persony, które dostosowują zachowanie Operit Coder.",
 		"searchPlaceholder": "Szukaj trybów...",
 		"noResults": "Nie znaleziono wyników",
 		"organizationModes": "Tryby organizacji"
@@ -139,7 +139,7 @@
 	"diffError": {
 		"title": "Edycja nieudana"
 	},
-	"troubleMessage": "Kilo Code ma problemy...",
+	"troubleMessage": "Operit Coder ma problemy...",
 	"apiRequest": {
 		"title": "Zapytanie API",
 		"failed": "Zapytanie API nie powiodło się",
@@ -179,48 +179,48 @@
 		"current": "Bieżący"
 	},
 	"instructions": {
-		"wantsToFetch": "Kilo Code chce pobrać szczegółowe instrukcje, aby pomóc w bieżącym zadaniu"
+		"wantsToFetch": "Operit Coder chce pobrać szczegółowe instrukcje, aby pomóc w bieżącym zadaniu"
 	},
 	"fileOperations": {
-		"wantsToRead": "Kilo Code chce przeczytać ten plik",
-		"wantsToReadOutsideWorkspace": "Kilo Code chce przeczytać ten plik poza obszarem roboczym",
-		"didRead": "Kilo Code przeczytał ten plik",
-		"wantsToEdit": "Kilo Code chce edytować ten plik",
-		"wantsToEditOutsideWorkspace": "Kilo Code chce edytować ten plik poza obszarem roboczym",
-		"wantsToEditProtected": "Kilo Code chce edytować chroniony plik konfiguracyjny",
-		"wantsToCreate": "Kilo Code chce utworzyć nowy plik",
-		"wantsToDelete": "Kilo Code chce usunąć ten plik",
-		"wantsToDeleteDirectory": "Kilo Code chce usunąć ten katalog",
-		"wantsToSearchReplace": "Kilo Code chce wykonać wyszukiwanie i zamianę w tym pliku",
-		"didSearchReplace": "Kilo Code wykonał wyszukiwanie i zamianę w tym pliku",
-		"wantsToInsert": "Kilo Code chce wstawić zawartość do tego pliku",
-		"wantsToInsertWithLineNumber": "Kilo Code chce wstawić zawartość do tego pliku w linii {{lineNumber}}",
-		"wantsToInsertAtEnd": "Kilo Code chce dodać zawartość na końcu tego pliku",
-		"wantsToReadAndXMore": "Kilo Code chce przeczytać ten plik i {{count}} więcej",
-		"wantsToReadMultiple": "Kilo Code chce odczytać wiele plików",
-		"wantsToApplyBatchChanges": "Kilo Code chce zastosować zmiany do wielu plików",
-		"wantsToGenerateImage": "Kilo Code chce wygenerować obraz",
-		"wantsToGenerateImageOutsideWorkspace": "Kilo Code chce wygenerować obraz poza obszarem roboczym",
-		"wantsToGenerateImageProtected": "Kilo Code chce wygenerować obraz w chronionym miejscu",
-		"didGenerateImage": "Kilo Code wygenerował obraz"
+		"wantsToRead": "Operit Coder chce przeczytać ten plik",
+		"wantsToReadOutsideWorkspace": "Operit Coder chce przeczytać ten plik poza obszarem roboczym",
+		"didRead": "Operit Coder przeczytał ten plik",
+		"wantsToEdit": "Operit Coder chce edytować ten plik",
+		"wantsToEditOutsideWorkspace": "Operit Coder chce edytować ten plik poza obszarem roboczym",
+		"wantsToEditProtected": "Operit Coder chce edytować chroniony plik konfiguracyjny",
+		"wantsToCreate": "Operit Coder chce utworzyć nowy plik",
+		"wantsToDelete": "Operit Coder chce usunąć ten plik",
+		"wantsToDeleteDirectory": "Operit Coder chce usunąć ten katalog",
+		"wantsToSearchReplace": "Operit Coder chce wykonać wyszukiwanie i zamianę w tym pliku",
+		"didSearchReplace": "Operit Coder wykonał wyszukiwanie i zamianę w tym pliku",
+		"wantsToInsert": "Operit Coder chce wstawić zawartość do tego pliku",
+		"wantsToInsertWithLineNumber": "Operit Coder chce wstawić zawartość do tego pliku w linii {{lineNumber}}",
+		"wantsToInsertAtEnd": "Operit Coder chce dodać zawartość na końcu tego pliku",
+		"wantsToReadAndXMore": "Operit Coder chce przeczytać ten plik i {{count}} więcej",
+		"wantsToReadMultiple": "Operit Coder chce odczytać wiele plików",
+		"wantsToApplyBatchChanges": "Operit Coder chce zastosować zmiany do wielu plików",
+		"wantsToGenerateImage": "Operit Coder chce wygenerować obraz",
+		"wantsToGenerateImageOutsideWorkspace": "Operit Coder chce wygenerować obraz poza obszarem roboczym",
+		"wantsToGenerateImageProtected": "Operit Coder chce wygenerować obraz w chronionym miejscu",
+		"didGenerateImage": "Operit Coder wygenerował obraz"
 	},
 	"directoryOperations": {
-		"wantsToViewTopLevel": "Kilo Code chce zobaczyć pliki najwyższego poziomu w tym katalogu",
-		"didViewTopLevel": "Kilo Code zobaczył pliki najwyższego poziomu w tym katalogu",
-		"wantsToViewRecursive": "Kilo Code chce rekurencyjnie zobaczyć wszystkie pliki w tym katalogu",
-		"didViewRecursive": "Kilo Code rekurencyjnie zobaczył wszystkie pliki w tym katalogu",
-		"wantsToViewDefinitions": "Kilo Code chce zobaczyć nazwy definicji kodu źródłowego używane w tym katalogu",
-		"didViewDefinitions": "Kilo Code zobaczył nazwy definicji kodu źródłowego używane w tym katalogu",
-		"wantsToSearch": "Kilo Code chce przeszukać ten katalog w poszukiwaniu <code>{{regex}}</code>",
-		"didSearch": "Kilo Code przeszukał ten katalog w poszukiwaniu <code>{{regex}}</code>",
-		"wantsToSearchOutsideWorkspace": "Kilo Code chce przeszukać ten katalog (poza obszarem roboczym) w poszukiwaniu <code>{{regex}}</code>",
-		"didSearchOutsideWorkspace": "Kilo Code przeszukał ten katalog (poza obszarem roboczym) w poszukiwaniu <code>{{regex}}</code>",
-		"wantsToViewTopLevelOutsideWorkspace": "Kilo Code chce zobaczyć pliki najwyższego poziomu w tym katalogu (poza obszarem roboczym)",
-		"didViewTopLevelOutsideWorkspace": "Kilo Code zobaczył pliki najwyższego poziomu w tym katalogu (poza obszarem roboczym)",
-		"wantsToViewRecursiveOutsideWorkspace": "Kilo Code chce rekurencyjnie zobaczyć wszystkie pliki w tym katalogu (poza obszarem roboczym)",
-		"didViewRecursiveOutsideWorkspace": "Kilo Code rekurencyjnie zobaczył wszystkie pliki w tym katalogu (poza obszarem roboczym)",
-		"wantsToViewDefinitionsOutsideWorkspace": "Kilo Code chce zobaczyć nazwy definicji kodu źródłowego używane w tym katalogu (poza obszarem roboczym)",
-		"didViewDefinitionsOutsideWorkspace": "Kilo Code zobaczył nazwy definicji kodu źródłowego używane w tym katalogu (poza obszarem roboczym)"
+		"wantsToViewTopLevel": "Operit Coder chce zobaczyć pliki najwyższego poziomu w tym katalogu",
+		"didViewTopLevel": "Operit Coder zobaczył pliki najwyższego poziomu w tym katalogu",
+		"wantsToViewRecursive": "Operit Coder chce rekurencyjnie zobaczyć wszystkie pliki w tym katalogu",
+		"didViewRecursive": "Operit Coder rekurencyjnie zobaczył wszystkie pliki w tym katalogu",
+		"wantsToViewDefinitions": "Operit Coder chce zobaczyć nazwy definicji kodu źródłowego używane w tym katalogu",
+		"didViewDefinitions": "Operit Coder zobaczył nazwy definicji kodu źródłowego używane w tym katalogu",
+		"wantsToSearch": "Operit Coder chce przeszukać ten katalog w poszukiwaniu <code>{{regex}}</code>",
+		"didSearch": "Operit Coder przeszukał ten katalog w poszukiwaniu <code>{{regex}}</code>",
+		"wantsToSearchOutsideWorkspace": "Operit Coder chce przeszukać ten katalog (poza obszarem roboczym) w poszukiwaniu <code>{{regex}}</code>",
+		"didSearchOutsideWorkspace": "Operit Coder przeszukał ten katalog (poza obszarem roboczym) w poszukiwaniu <code>{{regex}}</code>",
+		"wantsToViewTopLevelOutsideWorkspace": "Operit Coder chce zobaczyć pliki najwyższego poziomu w tym katalogu (poza obszarem roboczym)",
+		"didViewTopLevelOutsideWorkspace": "Operit Coder zobaczył pliki najwyższego poziomu w tym katalogu (poza obszarem roboczym)",
+		"wantsToViewRecursiveOutsideWorkspace": "Operit Coder chce rekurencyjnie zobaczyć wszystkie pliki w tym katalogu (poza obszarem roboczym)",
+		"didViewRecursiveOutsideWorkspace": "Operit Coder rekurencyjnie zobaczył wszystkie pliki w tym katalogu (poza obszarem roboczym)",
+		"wantsToViewDefinitionsOutsideWorkspace": "Operit Coder chce zobaczyć nazwy definicji kodu źródłowego używane w tym katalogu (poza obszarem roboczym)",
+		"didViewDefinitionsOutsideWorkspace": "Operit Coder zobaczył nazwy definicji kodu źródłowego używane w tym katalogu (poza obszarem roboczym)"
 	},
 	"commandOutput": "Wyjście polecenia",
 	"commandExecution": {
@@ -248,18 +248,18 @@
 		"youSaid": "Powiedziałeś"
 	},
 	"mcp": {
-		"wantsToUseTool": "Kilo Code chce użyć narzędzia na serwerze MCP {{serverName}}",
-		"wantsToAccessResource": "Kilo Code chce uzyskać dostęp do zasobu na serwerze MCP {{serverName}}"
+		"wantsToUseTool": "Operit Coder chce użyć narzędzia na serwerze MCP {{serverName}}",
+		"wantsToAccessResource": "Operit Coder chce uzyskać dostęp do zasobu na serwerze MCP {{serverName}}"
 	},
 	"modes": {
-		"wantsToSwitch": "Kilo Code chce przełączyć się na tryb <code>{{mode}}</code>",
-		"wantsToSwitchWithReason": "Kilo Code chce przełączyć się na tryb <code>{{mode}}</code> ponieważ: {{reason}}",
-		"didSwitch": "Kilo Code przełączył się na tryb <code>{{mode}}</code>",
-		"didSwitchWithReason": "Kilo Code przełączył się na tryb <code>{{mode}}</code> ponieważ: {{reason}}"
+		"wantsToSwitch": "Operit Coder chce przełączyć się na tryb <code>{{mode}}</code>",
+		"wantsToSwitchWithReason": "Operit Coder chce przełączyć się na tryb <code>{{mode}}</code> ponieważ: {{reason}}",
+		"didSwitch": "Operit Coder przełączył się na tryb <code>{{mode}}</code>",
+		"didSwitchWithReason": "Operit Coder przełączył się na tryb <code>{{mode}}</code> ponieważ: {{reason}}"
 	},
 	"subtasks": {
-		"wantsToCreate": "Kilo Code chce utworzyć nowe podzadanie w trybie <code>{{mode}}</code>",
-		"wantsToFinish": "Kilo Code chce zakończyć to podzadanie",
+		"wantsToCreate": "Operit Coder chce utworzyć nowe podzadanie w trybie <code>{{mode}}</code>",
+		"wantsToFinish": "Operit Coder chce zakończyć to podzadanie",
 		"newTaskContent": "Instrukcje podzadania",
 		"completionContent": "Podzadanie zakończone",
 		"resultContent": "Wyniki podzadania",
@@ -267,7 +267,7 @@
 		"completionInstructions": "Podzadanie zakończone! Możesz przejrzeć wyniki i zasugerować poprawki lub następne kroki. Jeśli wszystko wygląda dobrze, potwierdź, aby zwrócić wynik do zadania nadrzędnego."
 	},
 	"questions": {
-		"hasQuestion": "Kilo Code ma pytanie"
+		"hasQuestion": "Operit Coder ma pytanie"
 	},
 	"taskCompleted": "Zadanie zakończone",
 	"errorDetails": {
@@ -345,7 +345,7 @@
 	},
 	"browser": {
 		"session": "Sesja przeglądarki",
-		"rooWantsToUse": "Kilo Code chce użyć przeglądarki",
+		"rooWantsToUse": "Operit Coder chce użyć przeglądarki",
 		"consoleLogs": "Logi konsoli",
 		"noNewLogs": "(Brak nowych logów)",
 		"screenshot": "Zrzut ekranu przeglądarki",
@@ -393,24 +393,24 @@
 	"profileViolationWarning": "Bieżący profil nie jest kompatybilny z ustawieniami Twojej organizacji",
 	"shellIntegration": {
 		"title": "Ostrzeżenie wykonania polecenia",
-		"description": "Twoje polecenie jest wykonywane bez integracji powłoki terminala VSCode. Aby ukryć to ostrzeżenie, możesz wyłączyć integrację powłoki w sekcji <strong>Terminal</strong> w <settingsLink>ustawieniach Kilo Code</settingsLink> lub rozwiązać problemy z integracją terminala VSCode korzystając z poniższego linku.",
+		"description": "Twoje polecenie jest wykonywane bez integracji powłoki terminala VSCode. Aby ukryć to ostrzeżenie, możesz wyłączyć integrację powłoki w sekcji <strong>Terminal</strong> w <settingsLink>ustawieniach Operit Coder</settingsLink> lub rozwiązać problemy z integracją terminala VSCode korzystając z poniższego linku.",
 		"troubleshooting": "Kliknij tutaj, aby zobaczyć dokumentację integracji powłoki."
 	},
 	"ask": {
 		"autoApprovedRequestLimitReached": {
 			"title": "Osiągnięto limit automatycznie zatwierdzonych żądań",
-			"description": "Kilo Code osiągnął automatycznie zatwierdzony limit {{count}} żądania/żądań API. Czy chcesz zresetować licznik i kontynuować zadanie?",
+			"description": "Operit Coder osiągnął automatycznie zatwierdzony limit {{count}} żądania/żądań API. Czy chcesz zresetować licznik i kontynuować zadanie?",
 			"button": "Zresetuj i kontynuuj"
 		},
 		"autoApprovedCostLimitReached": {
 			"button": "Zresetuj i Kontynuuj",
 			"title": "Osiągnięto limit kosztów z automatycznym zatwierdzaniem",
-			"description": "Kilo Code osiągnął automatycznie zatwierdzony limit kosztów wynoszący ${{count}}. Czy chcesz zresetować koszt i kontynuować zadanie?"
+			"description": "Operit Coder osiągnął automatycznie zatwierdzony limit kosztów wynoszący ${{count}}. Czy chcesz zresetować koszt i kontynuować zadanie?"
 		}
 	},
 	"codebaseSearch": {
-		"wantsToSearch": "Kilo Code chce przeszukać bazę kodu w poszukiwaniu <code>{{query}}</code>",
-		"wantsToSearchWithPath": "Kilo Code chce przeszukać bazę kodu w poszukiwaniu <code>{{query}}</code> w <code>{{path}}</code>",
+		"wantsToSearch": "Operit Coder chce przeszukać bazę kodu w poszukiwaniu <code>{{query}}</code>",
+		"wantsToSearchWithPath": "Operit Coder chce przeszukać bazę kodu w poszukiwaniu <code>{{query}}</code> w <code>{{path}}</code>",
 		"didSearch_one": "Znaleziono 1 wynik",
 		"didSearch_other": "Znaleziono {{count}} wyników",
 		"resultTooltip": "Wynik podobieństwa: {{score}} (kliknij, aby otworzyć plik)"
@@ -475,8 +475,8 @@
 		"clickToEdit": "Kliknij, aby edytować wiadomość"
 	},
 	"slashCommand": {
-		"wantsToRun": "Kilo Code chce uruchomić komendę slash",
-		"didRun": "Kilo Code uruchomił komendę slash"
+		"wantsToRun": "Operit Coder chce uruchomić komendę slash",
+		"didRun": "Operit Coder uruchomił komendę slash"
 	},
 	"todo": {
 		"partial": "Ukończono {{completed}} z {{total}} zadań do wykonania",

@@ -1,7 +1,7 @@
 {
 	"welcome": {
-		"greeting": "Vítej v Kilo Code!",
-		"introText1": "Kilo Code je bezplatný open source AI coding agent.",
+		"greeting": "Vítej v Operit Coder!",
+		"introText1": "Operit Coder je bezplatný open source AI coding agent.",
 		"introText2": "Funguje s nejnovějšími AI modely jako Claude Sonnet 4.5, Gemini 2.5 Pro, GPT-5 a více než 450 dalšími.",
 		"introText3": "Vytvoř si bezplatný účet a získej $20 bonusových kreditů při prvním dobití.",
 		"ctaButton": "Začít",
@@ -11,7 +11,7 @@
 	},
 	"lowCreditWarning": {
 		"addCredit": "Přidat kredit",
-		"lowBalance": "Tvůj Kilo Code zůstatek je nízký",
+		"lowBalance": "Tvůj Operit Coder zůstatek je nízký",
 		"newOrganization": "Používáš Kilo pro práci?"
 	},
 	"pagination": {
@@ -41,16 +41,16 @@
 			"mcp": "MCP servery"
 		},
 		"provider": {
-			"account": "Účet Kilo Code",
-			"apiKey": "Kilo Code API Key",
-			"login": "Přihlásit se do Kilo Code",
-			"logout": "Odhlásit se z Kilo Code",
-			"automaticFetch": "Nejnovější modely jsou v Kilo Code automaticky dostupné. Pokud si nejste jisti, který model zvolit, Kilo Code funguje nejlépe s doporučenými modely uvedenými nahoře <strong>tučně</strong>.",
+			"account": "Účet Operit Coder",
+			"apiKey": "Operit Coder API Key",
+			"login": "Přihlásit se do Operit Coder",
+			"logout": "Odhlásit se z Operit Coder",
+			"automaticFetch": "Nejnovější modely jsou v Operit Coder automaticky dostupné. Pokud si nejste jisti, který model zvolit, Operit Coder funguje nejlépe s doporučenými modely uvedenými nahoře <strong>tučně</strong>.",
 			"providerRouting": {
 				"title": "Směrování poskytovatelů",
 				"managedByOrganization": "Spravovat směrování poskytovatelů na úrovni organizace",
 				"createOrganization": "Vytvořit organizaci pro správu směrování poskytovatelů",
-				"description": "Kilo Code směruje požadavky na nejlepší dostupné poskytovatele pro váš model. Ve výchozím nastavení jsou požadavky rozloženy mezi nejlepší poskytovatele, aby se maximalizovala doba provozu. Můžete si však vybrat konkrétního poskytovatele, kterého chcete pro tento model použít.",
+				"description": "Operit Coder směruje požadavky na nejlepší dostupné poskytovatele pro váš model. Ve výchozím nastavení jsou požadavky rozloženy mezi nejlepší poskytovatele, aby se maximalizovala doba provozu. Můžete si však vybrat konkrétního poskytovatele, kterého chcete pro tento model použít.",
 				"sorting": {
 					"default": "Výchozí řazení poskytovatelů",
 					"price": "Upřednostnit poskytovatele s nižší cenou",
@@ -69,7 +69,7 @@
 		"modelInfo": {
 			"contextWindow": "Kontextové okno",
 			"providerBreakdown": "Rozpis cen a schopností poskytovatelů",
-			"averageKiloCodeCost": "Toto jsou průměrné skutečné náklady za použití tohoto modelu v Kilo Code za poslední týden. Může být nižší než uvedená cena díky využití cache pro prompty.",
+			"averageKiloCodeCost": "Toto jsou průměrné skutečné náklady za použití tohoto modelu v Operit Coder za poslední týden. Může být nižší než uvedená cena díky využití cache pro prompty.",
 			"table": {
 				"provider": "Poskytovatel",
 				"context": "Endpoint může zpracovat tento počet tokenů (vstup + výstup).",
@@ -82,15 +82,15 @@
 		"contextManagement": {
 			"allowVeryLargeReads": {
 				"label": "Povolit čtení velmi velkých souborů",
-				"description": "Když je povoleno, Kilo Code provede čtení velmi velkých souborů nebo výstupů MCP i když existuje vysoká pravděpodobnost přetečení kontextového okna (velikost obsahu >80% kontextového okna)."
+				"description": "Když je povoleno, Operit Coder provede čtení velmi velkých souborů nebo výstupů MCP i když existuje vysoká pravděpodobnost přetečení kontextového okna (velikost obsahu >80% kontextového okna)."
 			}
 		},
 		"systemNotifications": {
 			"label": "Povolit systémová oznámení",
-			"description": "Když je povoleno, Kilo Code bude odesílat systémová oznámení pro důležité události jako dokončení úkolu nebo chyby.",
+			"description": "Když je povoleno, Operit Coder bude odesílat systémová oznámení pro důležité události jako dokončení úkolu nebo chyby.",
 			"testButton": "Otestovat oznámení",
-			"testTitle": "Kilo Code",
-			"testMessage": "Toto je testovací oznámení z Kilo Code."
+			"testTitle": "Operit Coder",
+			"testMessage": "Toto je testovací oznámení z Operit Coder."
 		},
 		"terminal": {
 			"commandGenerator": {
@@ -111,7 +111,7 @@
 	},
 	"chat": {
 		"condense": {
-			"wantsToCondense": "Kilo Code chce zkrátit tvou konverzaci",
+			"wantsToCondense": "Operit Coder chce zkrátit tvou konverzaci",
 			"condenseConversation": "Zkrátit konverzaci"
 		},
 		"seeNewChanges": "Zobrazit nové změny",
@@ -142,15 +142,15 @@
 	},
 	"docs": "Dokumentace",
 	"rules": {
-		"tooltip": "Spravovat Kilo Code Rules a Workflows",
-		"ariaLabel": "Kilo Code Rules",
+		"tooltip": "Spravovat Operit Coder Rules a Workflows",
+		"ariaLabel": "Operit Coder Rules",
 		"tabs": {
 			"rules": "Pravidla",
 			"workflows": "Pracovní postupy"
 		},
 		"description": {
-			"rules": "Pravidla ti umožňují poskytnout Kilo Code pokyny, které by měl dodržovat ve všech režimech a pro všechny prompty. Je to trvalý způsob, jak zahrnout kontext a preference pro všechny konverzace ve tvém pracovním prostoru nebo globálně.",
-			"workflows": "Pracovní postupy jsou připravená šablona pro konverzaci. Pracovní postupy ti mohou umožnit definovat prompty, které často používáš, a mohou zahrnovat řadu kroků k vedení Kilo Code přes opakující se úkoly, jako je nasazení služby nebo odeslání PR. Pro vyvolání pracovního postupu napiš",
+			"rules": "Pravidla ti umožňují poskytnout Operit Coder pokyny, které by měl dodržovat ve všech režimech a pro všechny prompty. Je to trvalý způsob, jak zahrnout kontext a preference pro všechny konverzace ve tvém pracovním prostoru nebo globálně.",
+			"workflows": "Pracovní postupy jsou připravená šablona pro konverzaci. Pracovní postupy ti mohou umožnit definovat prompty, které často používáš, a mohou zahrnovat řadu kroků k vedení Operit Coder přes opakující se úkoly, jako je nasazení služby nebo odeslání PR. Pro vyvolání pracovního postupu napiš",
 			"workflowsInChat": "v chatu."
 		},
 		"sections": {
@@ -227,11 +227,11 @@
 			"keybindingDescription": "Funkce Autocomplete lze spustit pomocí příkazů. Můžeš nakonfigurovat <DocsLink>Klávesové Zkratky zde</DocsLink>.",
 			"enableAutoTrigger": {
 				"label": "Povolit Autocomplete",
-				"description": "Když je povoleno, Kilo Code automaticky spustí Autocomplete, když přestaneš psát. To může být užitečné pro rychlé opravy a návrhy."
+				"description": "Když je povoleno, Operit Coder automaticky spustí Autocomplete, když přestaneš psát. To může být užitečné pro rychlé opravy a návrhy."
 			},
 			"autoTriggerDelay": {
 				"label": "Zpoždění Automatického Spuštění",
-				"description": "Zpoždění v sekundách před tím, než Kilo Code spustí Autocomplete poté, co přestaneš psát. Kratší zpoždění znamená rychlejší návrhy, ale může být náročnější na zdroje."
+				"description": "Zpoždění v sekundách před tím, než Operit Coder spustí Autocomplete poté, co přestaneš psát. Kratší zpoždění znamená rychlejší návrhy, ale může být náročnější na zdroje."
 			},
 			"enableQuickInlineTaskKeybinding": {
 				"label": "Rychlý úkol ({{keybinding}})",
@@ -248,7 +248,7 @@
 			"provider": "Poskytovatel",
 			"enableChatAutocomplete": {
 				"label": "Automatické doplňování při psaní zpráv",
-				"description": "Když je tato funkce povolena, Kilo Code bude navrhovat dokončování textu během psaní ve vstupním poli chatu. Stisknutím klávesy Tab přijmete návrhy."
+				"description": "Když je tato funkce povolena, Operit Coder bude navrhovat dokončování textu během psaní ve vstupním poli chatu. Stisknutím klávesy Tab přijmete návrhy."
 			},
 			"snooze": {
 				"label": "Pozastavit Autocomplete",
@@ -308,7 +308,7 @@
 		"shareModesNewBanner": "Novinka: Sdílejte režimy vytvořením organizace"
 	},
 	"deviceAuth": {
-		"title": "Přihlásit se do Kilo Code",
+		"title": "Přihlásit se do Operit Coder",
 		"step1": "Otevři následující URL ve svém prohlížeči",
 		"step2": "Ověř kód a autorizuj toto zařízení ve svém prohlížeči",
 		"scanQr": "Nebo naskenuj tento QR kód svým telefonem",

@@ -1,5 +1,5 @@
 /**
- * Light theme for Kilo Code CLI
+ * Light theme for Operit Coder CLI
  *
  * Colors matched to VSCode extension's light theme for consistency.
  */

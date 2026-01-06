@@ -1,7 +1,7 @@
 {
 	"name": "@kilocode/cli",
 	"version": "0.18.1",
-	"description": "Terminal User Interface for Kilo Code",
+	"description": "Terminal User Interface for Operit Coder",
 	"type": "module",
 	"main": "dist/index.js",
 	"bin": {
@@ -178,7 +178,7 @@
 		"terminal",
 		"ai",
 		"assistant",
-		"kilo-code",
+		"operit-coder",
 		"ink",
 		"react"
 	]

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useContext } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Tab, TabContent, TabHeader } from "../common/Tab"
 import { MarketplaceViewStateManager } from "./MarketplaceViewStateManager"
@@ -8,7 +8,6 @@ import { vscode } from "@/utils/vscode"
 import { MarketplaceListView } from "./MarketplaceListView"
 import { cn } from "@/lib/utils"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { ExtensionStateContext } from "@/context/ExtensionStateContext"
 
 interface MarketplaceViewProps {
 	onDone?: () => void
@@ -20,20 +19,21 @@ export function MarketplaceView({ stateManager, onDone, targetTab, hideHeader = 
 	const { t } = useAppTranslation()
 	const [state, manager] = useStateManager(stateManager)
 	const [hasReceivedInitialState, setHasReceivedInitialState] = useState(false)
-	const extensionState = useContext(ExtensionStateContext)
-	const [lastOrganizationSettingsVersion, setLastOrganizationSettingsVersion] = useState<number>(
-		extensionState?.organizationSettingsVersion ?? -1,
-	)
+	// kilocode_change: organizationSettingsVersion removed
+	// const [lastOrganizationSettingsVersion, setLastOrganizationSettingsVersion] = useState<number>(
+	// 	extensionState?.organizationSettingsVersion ?? -1,
+	// )
 
-	useEffect(() => {
-		const currentVersion = extensionState?.organizationSettingsVersion ?? -1
-		if (currentVersion !== lastOrganizationSettingsVersion) {
-			vscode.postMessage({
-				type: "fetchMarketplaceData",
-			})
-		}
-		setLastOrganizationSettingsVersion(currentVersion)
-	}, [extensionState?.organizationSettingsVersion, lastOrganizationSettingsVersion])
+	// kilocode_change: organizationSettingsVersion removed - auto-fetch disabled
+	// useEffect(() => {
+	// 	const currentVersion = extensionState?.organizationSettingsVersion ?? -1
+	// 	if (currentVersion !== lastOrganizationSettingsVersion) {
+	// 		vscode.postMessage({
+	// 			type: "fetchMarketplaceData",
+	// 		})
+	// 	}
+	// 	setLastOrganizationSettingsVersion(currentVersion)
+	// }, [extensionState?.organizationSettingsVersion, lastOrganizationSettingsVersion])
 
 	// Track when we receive the initial state
 	useEffect(() => {

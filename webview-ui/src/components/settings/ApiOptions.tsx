@@ -169,7 +169,10 @@ const ApiOptions = ({
 	currentApiConfigName, // kilocode_change
 }: ApiOptionsProps) => {
 	const { t } = useAppTranslation()
-	const { organizationAllowList, kilocodeDefaultModel, cloudIsAuthenticated } = useExtensionState()
+	// kilocode_change - cloud features disabled
+	const { kilocodeDefaultModel } = useExtensionState()
+	const organizationAllowList = { allowAll: true, providers: {} }
+	const cloudIsAuthenticated = false
 
 	const [customHeaders, setCustomHeaders] = useState<[string, string][]>(() => {
 		const headers = apiConfiguration?.openAiHeaders || {}

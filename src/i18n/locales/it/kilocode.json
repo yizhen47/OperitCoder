@@ -51,7 +51,7 @@
 		}
 	},
 	"commitMessage": {
-		"activated": "Generatore di messaggi di commit Kilo Code attivato",
+		"activated": "Generatore di messaggi di commit Operit Coder attivato",
 		"gitNotFound": "⚠️ Repository Git non trovato o git non disponibile",
 		"gitInitError": "⚠️ Errore di inizializzazione Git: {{error}}",
 		"generating": "Kilo: Generazione messaggio di commit...",
@@ -63,7 +63,7 @@
 		"providerRegistered": "Kilo: Provider di messaggi di commit registrato",
 		"errors": {
 			"noProject": "Nessun progetto disponibile",
-			"connectionFailed": "Impossibile connettersi all'estensione Kilo Code",
+			"connectionFailed": "Impossibile connettersi all'estensione Operit Coder",
 			"invalidResponse": "Formato di risposta non valido ricevuto dall'estensione",
 			"timeout": "Richiesta scaduta dopo 30 secondi",
 			"noChanges": "Nessuna modifica da confermare",
@@ -86,7 +86,7 @@
 			"title": "Messaggio di Commit AI"
 		},
 		"progress": {
-			"connecting": "Connessione a Kilo Code in corso...",
+			"connecting": "Connessione a Operit Coder in corso...",
 			"title": "Generazione del messaggio di commit",
 			"analyzing": "Analizzando le modifiche...",
 			"generating": "Generazione del messaggio di commit..."
@@ -102,8 +102,8 @@
 			"snoozed": "in pausa",
 			"warning": "$(warning) Autocomplete",
 			"tooltip": {
-				"basic": "Kilo Code Autocomplete",
-				"disabled": "Kilo Code Autocomplete (disabilitato)",
+				"basic": "Operit Coder Autocomplete",
+				"disabled": "Operit Coder Autocomplete (disabilitato)",
 				"tokenError": "Deve essere impostato un token valido per usare Autocomplete",
 				"sessionTotal": "Costo totale della sessione:",
 				"provider": "Provider:",
@@ -118,36 +118,36 @@
 				"lessThanCent": "<$0.01"
 			}
 		},
-		"toggleMessage": "Kilo Code Autocomplete {{status}}",
+		"toggleMessage": "Operit Coder Autocomplete {{status}}",
 		"progress": {
-			"title": "Kilo Code",
+			"title": "Operit Coder",
 			"analyzing": "Analizzando il tuo codice...",
 			"generating": "Generando modifiche suggerite...",
 			"processing": "Elaborando modifiche suggerite...",
 			"showing": "Mostrando modifiche suggerite..."
 		},
 		"input": {
-			"title": "Kilo Code: Attività Rapida",
+			"title": "Operit Coder: Attività Rapida",
 			"placeholder": "es., 'refactorizza questa funzione per renderla più efficiente'"
 		},
 		"commands": {
-			"generateSuggestions": "Kilo Code: Genera Modifiche Suggerite",
+			"generateSuggestions": "Operit Coder: Genera Modifiche Suggerite",
 			"displaySuggestions": "Mostra Modifiche Suggerite",
 			"cancelSuggestions": "Annulla Modifiche Suggerite",
 			"applyCurrentSuggestion": "Applica Modifica Suggerita Corrente",
 			"applyAllSuggestions": "Applica Tutte le Modifiche Suggerite",
-			"category": "Kilo Code"
+			"category": "Operit Coder"
 		},
 		"codeAction": {
-			"title": "Kilo Code: Modifiche Suggerite"
+			"title": "Operit Coder: Modifiche Suggerite"
 		},
 		"chatParticipant": {
-			"fullName": "Kilo Code Agent",
+			"fullName": "Operit Coder Agent",
 			"name": "Agent",
 			"description": "Posso aiutarti con attività rapide e modifiche suggerite."
 		},
 		"incompatibilityExtensionPopup": {
-			"message": "Il Kilo Code Autocomplete è bloccato da un conflitto con GitHub Copilot. Per risolvere questo problema, devi disabilitare i suggerimenti in linea di Copilot.",
+			"message": "Il Operit Coder Autocomplete è bloccato da un conflitto con GitHub Copilot. Per risolvere questo problema, devi disabilitare i suggerimenti in linea di Copilot.",
 			"disableCopilot": "Disabilita Copilot",
 			"disableInlineAssist": "Disabilita Autocomplete"
 		}

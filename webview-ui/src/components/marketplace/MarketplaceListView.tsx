@@ -35,7 +35,9 @@ export function MarketplaceListView({
 }: MarketplaceListViewProps) {
 	const [state, manager] = useStateManager(stateManager)
 	const { t } = useAppTranslation()
-	const { marketplaceInstalledMetadata, cloudUserInfo } = useExtensionState()
+	// kilocode_change: cloudUserInfo removed
+	// const { marketplaceInstalledMetadata, cloudUserInfo } = useExtensionState()
+	const { marketplaceInstalledMetadata } = useExtensionState()
 	const [isTagPopoverOpen, setIsTagPopoverOpen] = React.useState(false)
 	const [tagSearch, setTagSearch] = React.useState("")
 	const allItems = state.displayItems || []
@@ -258,8 +260,10 @@ export function MarketplaceListView({
 							<div className="flex items-center gap-2 mb-3 px-1">
 								<span className="codicon codicon-organization text-lg"></span>
 								<h3 className="text-sm font-semibold text-vscode-foreground">
+									{/* kilocode_change: cloudUserInfo removed */}
 									{t("marketplace:sections.organizationMcps", {
-										organization: cloudUserInfo?.organizationName,
+										// organization: cloudUserInfo?.organizationName,
+										organization: "",
 									})}
 								</h3>
 								<div className="flex-1 h-px bg-vscode-input-border"></div>

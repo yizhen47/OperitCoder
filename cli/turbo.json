@@ -14,7 +14,7 @@
 		"copy:kilocode": {
 			"outputs": ["dist/kilocode/**"],
 			"inputs": ["../bin-unpacked/extension/**"],
-			"dependsOn": ["clean:kilocode", "kilo-code#vsix:unpacked"]
+			"dependsOn": ["clean:kilocode", "operit-coder#vsix:unpacked"]
 		},
 		"build": {
 			"cache": false,

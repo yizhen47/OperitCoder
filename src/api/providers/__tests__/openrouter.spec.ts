@@ -86,9 +86,9 @@ describe("OpenRouterHandler", () => {
 			apiKey: mockOptions.openRouterApiKey,
 			defaultHeaders: {
 				"HTTP-Referer": "https://kilocode.ai",
-				"X-Title": "Kilo Code",
+				"X-Title": "Operit Coder",
 				"X-KiloCode-Version": Package.version,
-				"User-Agent": `Kilo-Code/${Package.version}`,
+				"User-Agent": `Operit-Coder/${Package.version}`,
 			},
 		})
 	})

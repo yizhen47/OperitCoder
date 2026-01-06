@@ -34,7 +34,7 @@ import {
 	Experiments,
 	ExperimentId,
 } from "@roo-code/types"
-import { CloudService } from "@roo-code/cloud"
+
 import { TelemetryService } from "@roo-code/telemetry"
 
 import { type ApiMessage } from "../task-persistence/apiMessages"
@@ -713,48 +713,6 @@ export const webviewMessageHandler = async (
 			break
 		case "shareCurrentTask":
 			const shareTaskId = provider.getCurrentTask()?.taskId
-			const clineMessages = provider.getCurrentTask()?.clineMessages
-
-			if (!shareTaskId) {
-				vscode.window.showErrorMessage(t("common:errors.share_no_active_task"))
-				break
-			}
-
-			try {
-				const visibility = message.visibility || "organization"
-				const result = await CloudService.instance.shareTask(shareTaskId, visibility)
-
-				if (result.success && result.shareUrl) {
-					// Show success notification
-					const messageKey =
-						visibility === "public"
-							? "common:info.public_share_link_copied"
-							: "common:info.organization_share_link_copied"
-					vscode.window.showInformationMessage(t(messageKey))
-
-					// Send success feedback to webview for inline display
-					await provider.postMessageToWebview({
-						type: "shareTaskSuccess",
-						visibility,
-						text: result.shareUrl,
-					})
-				} else {
-					// Handle error
-					const errorMessage = result.error || "Failed to create share link"
-					if (errorMessage.includes("Authentication")) {
-						vscode.window.showErrorMessage(t("common:errors.share_auth_required"))
-					} else if (errorMessage.includes("sharing is not enabled")) {
-						vscode.window.showErrorMessage(t("common:errors.share_not_enabled"))
-					} else if (errorMessage.includes("not found")) {
-						vscode.window.showErrorMessage(t("common:errors.share_task_not_found"))
-					} else {
-						vscode.window.showErrorMessage(errorMessage)
-					}
-				}
-			} catch (error) {
-				provider.log(`[shareCurrentTask] Unexpected error: ${error}`)
-				vscode.window.showErrorMessage(t("common:errors.share_task_failed"))
-			}
 			break
 		case "showTaskWithId":
 			provider.showTaskWithId(message.text!)
@@ -957,16 +915,6 @@ export const webviewMessageHandler = async (
 				},
 				{ key: "synthetic", options: { provider: "synthetic", apiKey: apiConfiguration.syntheticApiKey } }, // kilocode_change
 				{
-					key: "roo",
-					options: {
-						provider: "roo",
-						baseUrl: process.env.ROO_CODE_PROVIDER_URL ?? "https://api.roocode.com/proxy",
-						apiKey: CloudService.hasInstance()
-							? CloudService.instance.authService?.getSessionToken()
-							: undefined,
-					},
-				},
-				{
 					key: "chutes",
 					options: { provider: "chutes", apiKey: apiConfiguration.chutesApiKey },
 				},
@@ -1083,63 +1031,6 @@ export const webviewMessageHandler = async (
 			} catch (error) {
 				// Silently fail - user hasn't configured LM Studio yet.
 				console.debug("LM Studio models fetch failed:", error)
-			}
-			break
-		}
-		case "requestRooModels": {
-			// Specific handler for Roo models only - flushes cache to ensure fresh auth token is used
-			try {
-				// Flush cache and refresh to ensure fresh models with current auth state
-				await flushModels("roo", true)
-
-				const rooModels = await getModels({
-					provider: "roo",
-					baseUrl: process.env.ROO_CODE_PROVIDER_URL ?? "https://api.roocode.com/proxy",
-					apiKey: CloudService.hasInstance()
-						? CloudService.instance.authService?.getSessionToken()
-						: undefined,
-				})
-
-				// Always send a response, even if no models are returned
-				provider.postMessageToWebview({
-					type: "singleRouterModelFetchResponse",
-					success: true,
-					values: { provider: "roo", models: rooModels },
-				})
-			} catch (error) {
-				// Send error response
-				const errorMessage = error instanceof Error ? error.message : String(error)
-				provider.postMessageToWebview({
-					type: "singleRouterModelFetchResponse",
-					success: false,
-					error: errorMessage,
-					values: { provider: "roo" },
-				})
-			}
-			break
-		}
-		case "requestRooCreditBalance": {
-			// Fetch Roo credit balance using CloudAPI
-			const requestId = message.requestId
-			try {
-				if (!CloudService.hasInstance() || !CloudService.instance.cloudAPI) {
-					throw new Error("Cloud service not available")
-				}
-
-				const balance = await CloudService.instance.cloudAPI.creditBalance()
-
-				provider.postMessageToWebview({
-					type: "rooCreditBalance",
-					requestId,
-					values: { balance },
-				})
-			} catch (error) {
-				const errorMessage = error instanceof Error ? error.message : String(error)
-				provider.postMessageToWebview({
-					type: "rooCreditBalance",
-					requestId,
-					values: { error: errorMessage },
-				})
 			}
 			break
 		}
@@ -1569,7 +1460,7 @@ export const webviewMessageHandler = async (
 			break
 		// kilocode_change begin
 		case "openGlobalKeybindings":
-			vscode.commands.executeCommand("workbench.action.openGlobalKeybindings", message.text ?? "kilo-code.")
+			vscode.commands.executeCommand("workbench.action.openGlobalKeybindings", message.text ?? "operit-coder.")
 			break
 		case "showSystemNotification":
 			const isSystemNotificationsEnabled = getGlobalState("systemNotificationsEnabled") ?? true
@@ -1593,7 +1484,7 @@ export const webviewMessageHandler = async (
 		// kilocode_change end
 		case "remoteControlEnabled":
 			try {
-				await CloudService.instance.updateUserSettings({ extensionBridgeEnabled: message.bool ?? false })
+				await undefined
 			} catch (error) {
 				provider.log(
 					`CloudService#updateUserSettings failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -1611,7 +1502,7 @@ export const webviewMessageHandler = async (
 			}
 
 			try {
-				await CloudService.instance.updateUserSettings(updatedSettings)
+				await undefined
 			} catch (error) {
 				provider.log(`Failed to update cloud settings for task sync: ${error}`)
 			}
@@ -1892,7 +1783,7 @@ export const webviewMessageHandler = async (
 			const ghostServiceSettings = ghostServiceSettingsSchema.parse(message.values)
 			await updateGlobalState("ghostServiceSettings", ghostServiceSettings)
 			await provider.postStateToWebview()
-			vscode.commands.executeCommand("kilo-code.ghost.reload")
+			vscode.commands.executeCommand("operit-coder.ghost.reload")
 			break
 		case "snoozeAutocomplete":
 			if (typeof message.value === "number" && message.value > 0) {
@@ -2096,7 +1987,7 @@ export const webviewMessageHandler = async (
 					await provider.providerSettingsManager.saveConfig(message.text, message.apiConfiguration)
 					const listApiConfig = await provider.providerSettingsManager.listConfig()
 					await updateGlobalState("listApiConfigMeta", listApiConfig)
-					vscode.commands.executeCommand("kilo-code.ghost.reload") // kilocode_change: Reload ghost model when API provider settings change
+					vscode.commands.executeCommand("operit-coder.ghost.reload") // kilocode_change: Reload ghost model when API provider settings change
 				} catch (error) {
 					provider.log(
 						`Error save api configuration: ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`,
@@ -2152,7 +2043,7 @@ export const webviewMessageHandler = async (
 				const currentApiConfigName = getGlobalState("currentApiConfigName")
 				const isActiveProfile = message.text === currentApiConfigName
 				await provider.upsertProviderProfile(message.text, configToSave, isActiveProfile) // Activate if it's the current active profile
-				vscode.commands.executeCommand("kilo-code.ghost.reload")
+				vscode.commands.executeCommand("operit-coder.ghost.reload")
 				// kilocode_change end
 
 				// Ensure state is posted to webview after profile update to reflect organization mode changes
@@ -2161,7 +2052,7 @@ export const webviewMessageHandler = async (
 				}
 
 				// kilocode_change: Reload ghost model when API provider settings change
-				vscode.commands.executeCommand("kilo-code.ghost.reload")
+				vscode.commands.executeCommand("operit-coder.ghost.reload")
 			}
 			// kilocode_change end: check for kilocodeToken change to remove organizationId and fetch organization modes
 			break
@@ -2188,7 +2079,7 @@ export const webviewMessageHandler = async (
 					await provider.activateProviderProfile({ name: newName })
 
 					// kilocode_change: Reload ghost model when API provider settings change
-					vscode.commands.executeCommand("kilo-code.ghost.reload")
+					vscode.commands.executeCommand("operit-coder.ghost.reload")
 				} catch (error) {
 					provider.log(
 						`Error rename api configuration: ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`,
@@ -2265,7 +2156,7 @@ export const webviewMessageHandler = async (
 					await provider.activateProviderProfile({ name: newName })
 
 					// kilocode_change: Reload ghost model when API provider settings change
-					vscode.commands.executeCommand("kilo-code.ghost.reload")
+					vscode.commands.executeCommand("operit-coder.ghost.reload")
 				} catch (error) {
 					provider.log(
 						`Error delete api configuration: ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`,
@@ -2956,7 +2847,7 @@ export const webviewMessageHandler = async (
 			try {
 				TelemetryService.instance.captureEvent(TelemetryEventName.AUTHENTICATION_INITIATED)
 				// Use provider signup flow if useProviderSignup is explicitly true
-				await CloudService.instance.login(undefined, message.useProviderSignup ?? false)
+				await undefined
 			} catch (error) {
 				provider.log(`AuthService#login failed: ${error}`)
 				vscode.window.showErrorMessage("Sign in failed.")
@@ -2968,7 +2859,7 @@ export const webviewMessageHandler = async (
 			try {
 				const landingPageSlug = message.text || "supernova"
 				TelemetryService.instance.captureEvent(TelemetryEventName.AUTHENTICATION_INITIATED)
-				await CloudService.instance.login(landingPageSlug)
+				await undefined
 			} catch (error) {
 				provider.log(`CloudService#login failed: ${error}`)
 				vscode.window.showErrorMessage("Sign in failed.")
@@ -2977,7 +2868,7 @@ export const webviewMessageHandler = async (
 		}
 		case "rooCloudSignOut": {
 			try {
-				await CloudService.instance.logout()
+				await undefined
 				await provider.postStateToWebview()
 				provider.postMessageToWebview({ type: "authenticatedUser", userInfo: undefined })
 			} catch (error) {
@@ -3012,11 +2903,7 @@ export const webviewMessageHandler = async (
 				}
 
 				// Reuse the existing authentication flow
-				await CloudService.instance.handleAuthCallback(
-					code,
-					state,
-					organizationId === "null" ? null : organizationId,
-				)
+				await undefined
 
 				await provider.postStateToWebview()
 			} catch (error) {
@@ -3034,7 +2921,7 @@ export const webviewMessageHandler = async (
 				const organizationId = message.organizationId ?? null
 
 				// Switch to the new organization context
-				await CloudService.instance.switchOrganization(organizationId)
+				await undefined
 
 				// Refresh the state to update UI
 				await provider.postStateToWebview()
@@ -4279,3 +4166,7 @@ export const webviewMessageHandler = async (
 		}
 	}
 }
+
+
+
+

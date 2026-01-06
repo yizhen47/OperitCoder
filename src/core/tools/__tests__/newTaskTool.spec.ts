@@ -14,10 +14,10 @@ vi.mock("vscode", () => ({
 // Mock Package module
 vi.mock("../../../shared/package", () => ({
 	Package: {
-		name: "kilo-code",
+		name: "operit-coder",
 		publisher: "Kilo-Org",
 		version: "1.0.0",
-		outputChannel: "Kilo-Code",
+		outputChannel: "Operit-Coder",
 	},
 }))
 
@@ -581,7 +581,7 @@ describe("newTaskTool", () => {
 			})
 
 			// Verify that VSCode configuration was accessed correctly
-			expect(mockGetConfiguration).toHaveBeenCalledWith("kilo-code")
+			expect(mockGetConfiguration).toHaveBeenCalledWith("operit-coder")
 			expect(mockGet).toHaveBeenCalledWith("newTaskRequireTodos", false)
 		})
 

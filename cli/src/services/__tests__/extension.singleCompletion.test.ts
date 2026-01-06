@@ -163,7 +163,7 @@ describe("ExtensionService - requestSingleCompletion", () => {
 					const mockProvider = {
 						handleCLIMessage: vi.fn(async () => {}),
 					}
-					global.__extensionHost.registerWebviewProvider("kilo-code.SidebarProvider", mockProvider)
+					global.__extensionHost.registerWebviewProvider("operit-coder.SidebarProvider", mockProvider)
 				}
 
 				return {
