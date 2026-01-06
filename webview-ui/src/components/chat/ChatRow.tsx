@@ -143,25 +143,11 @@ const ChatRow = memo(
 		// This allows us to detect changes without causing re-renders
 		const prevHeightRef = useRef(0)
 
-		// kilocode_change: Filter out checkpoint_saved messages to prevent blank rows
-		if (message.say === "checkpoint_saved" as any) {
-			return null
-		}
-
-		// kilocode_change: Filter out user_feedback_diff messages
-		if (message.say === ("user_feedback_diff" as any)) {
-			return null
-		}
-
-		// kilocode_change: reduce padding for checkpoint messages
-		const isCheckpointMessage = message.say === "checkpoint_saved"
-		const paddingClass = isCheckpointMessage ? "py-[2px]" : "py-[4px]"
-
 		const [chatrow, { height }] = useSize(
 			<div
 				// kilocode_change: add highlighted className
 				className={cn(
-					`px-[15px] ${paddingClass} pr-[6px] relative ${highlighted ? "animate-message-highlight" : ""}`,
+					`px-[15px] py-[4px] pr-[6px] relative ${highlighted ? "animate-message-highlight" : ""}`,
 				)}>
 				{showTaskTimeline && <KiloChatRowGutterBar message={message} />}
 				<ChatRowContent {...props} />
