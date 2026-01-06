@@ -248,12 +248,12 @@ describe("mergeExtensionState", () => {
 			renderContext: "sidebar",
 			maxReadFileLine: 500,
 			showAutoApproveMenu: false,
-			cloudUserInfo: null,
-			organizationAllowList: { allowAll: true, providers: {} },
+			// kilocode_change: cloudUserInfo removed
+			// kilocode_change: organizationAllowList removed
 			autoCondenseContext: true,
 			autoCondenseContextPercent: 100,
-			cloudIsAuthenticated: false,
-			sharingEnabled: false,
+			// kilocode_change: cloudIsAuthenticated removed
+			// kilocode_change: sharingEnabled removed
 			profileThresholds: {},
 			hasOpenedModeSelector: false, // Add the new required property
 			maxImageFileSize: 5,

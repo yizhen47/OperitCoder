@@ -6,9 +6,10 @@ import { type HistoryItem, type ShareVisibility, TelemetryEventName } from "@roo
 
 import { vscode } from "@/utils/vscode"
 import { telemetryClient } from "@/utils/TelemetryClient"
+// kilocode_change: cloud features disabled
 import { useExtensionState } from "@/context/ExtensionStateContext"
-import { useCloudUpsell } from "@/hooks/useCloudUpsell"
-import { CloudUpsellDialog } from "@/components/cloud/CloudUpsellDialog"
+// import { useCloudUpsell } from "@/hooks/useCloudUpsell"
+// import { CloudUpsellDialog } from "@/components/cloud/CloudUpsellDialog"
 import {
 	Popover,
 	PopoverContent,
@@ -31,31 +32,31 @@ export const ShareButton = ({ item, disabled = false }: ShareButtonProps) => {
 	const [shareSuccess, setShareSuccess] = useState<{ visibility: ShareVisibility; url: string } | null>(null)
 	const [wasConnectInitiatedFromShare, setWasConnectInitiatedFromShare] = useState(false)
 	const { t } = useTranslation()
-	const { cloudUserInfo } = useExtensionState()
+	// kilocode_change: cloud features disabled
+	// const { cloudUserInfo } = useExtensionState()
 
+	// kilocode_change: cloud features disabled - useCloudUpsell removed
 	// Use enhanced cloud upsell hook with auto-open on auth success
-	const {
-		isOpen: connectModalOpen,
-		openUpsell,
-		closeUpsell,
-		handleConnect,
-		isAuthenticated: cloudIsAuthenticated,
-		sharingEnabled,
-	} = useCloudUpsell({
-		onAuthSuccess: () => {
-			// Auto-open share dropdown after successful authentication
-			setShareDropdownOpen(true)
-			setWasConnectInitiatedFromShare(false)
-		},
-	})
+	const cloudIsAuthenticated = false
+	const sharingEnabled = false
+	const connectModalOpen = false
+	const openUpsell = () => {}
+	const closeUpsell = () => {}
+	const handleConnect = () => {}
+	const onAuthSuccess = () => {
+		// Auto-open share dropdown after successful authentication
+		setShareDropdownOpen(true)
+		setWasConnectInitiatedFromShare(false)
+	}
 
+	// kilocode_change: cloud features disabled
 	// Auto-open popover when user becomes authenticated after clicking Connect from share button
-	useEffect(() => {
-		if (wasConnectInitiatedFromShare && cloudIsAuthenticated) {
-			setShareDropdownOpen(true)
-			setWasConnectInitiatedFromShare(false)
-		}
-	}, [wasConnectInitiatedFromShare, cloudIsAuthenticated])
+	// useEffect(() => {
+	// 	if (wasConnectInitiatedFromShare && cloudIsAuthenticated) {
+	// 		setShareDropdownOpen(true)
+	// 		setWasConnectInitiatedFromShare(false)
+	// 	}
+	// }, [wasConnectInitiatedFromShare, cloudIsAuthenticated])
 
 	// Listen for share success messages from the extension
 	useEffect(() => {
@@ -116,27 +117,33 @@ export const ShareButton = ({ item, disabled = false }: ShareButtonProps) => {
 		}
 	}
 
+	// kilocode_change: cloud features disabled - always return disabled
 	// Determine share button state
 	const getShareButtonState = () => {
-		if (!cloudIsAuthenticated) {
-			return {
-				disabled: false,
-				title: t("chat:task.share"),
-				showPopover: false, // We'll show modal instead
-			}
-		} else if (!sharingEnabled) {
-			return {
-				disabled: true,
-				title: t("chat:task.sharingDisabledByOrganization"),
-				showPopover: false,
-			}
-		} else {
-			return {
-				disabled: false,
-				title: t("chat:task.share"),
-				showPopover: true,
-			}
+		return {
+			disabled: true,
+			title: t("chat:task.share"),
+			showPopover: false,
 		}
+		// if (!cloudIsAuthenticated) {
+		// 	return {
+		// 		disabled: false,
+		// 		title: t("chat:task.share"),
+		// 		showPopover: false, // We'll show modal instead
+		// 	}
+		// } else if (!sharingEnabled) {
+		// 	return {
+		// 		disabled: true,
+		// 		title: t("chat:task.sharingDisabledByOrganization"),
+		// 		showPopover: false,
+		// 	}
+		// } else {
+		// 	return {
+		// 		disabled: false,
+		// 		title: t("chat:task.share"),
+		// 		showPopover: true,
+		// 	}
+		// }
 	}
 
 	const shareButtonState = getShareButtonState()
@@ -185,7 +192,8 @@ export const ShareButton = ({ item, disabled = false }: ShareButtonProps) => {
 							<Command>
 								<CommandList>
 									<CommandGroup>
-										{cloudUserInfo?.organizationName && (
+										{/* kilocode_change: cloud features disabled */}
+										{/* {cloudUserInfo?.organizationName && (
 											<CommandItem
 												onSelect={() => handleShare("organization")}
 												className="cursor-pointer">
@@ -201,7 +209,7 @@ export const ShareButton = ({ item, disabled = false }: ShareButtonProps) => {
 													</div>
 												</div>
 											</CommandItem>
-										)}
+										)} */}
 										<CommandItem onSelect={() => handleShare("public")} className="cursor-pointer">
 											<div className="flex items-center gap-2">
 												<span className="codicon codicon-globe text-sm"></span>
@@ -228,8 +236,9 @@ export const ShareButton = ({ item, disabled = false }: ShareButtonProps) => {
 					data-testid="share-button"></LucideIconButton>
 			)}
 
+			{/* kilocode_change: cloud features disabled */}
 			{/* Connect to Cloud Modal */}
-			<CloudUpsellDialog open={connectModalOpen} onOpenChange={closeUpsell} onConnect={handleConnectToCloud} />
+			{/* <CloudUpsellDialog open={connectModalOpen} onOpenChange={closeUpsell} onConnect={handleConnectToCloud} /> */}
 		</>
 	)
 }

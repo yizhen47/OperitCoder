@@ -78,11 +78,11 @@ export interface ExtensionStateContextType extends ExtensionState {
 	localWorkflows: ClineRulesToggles
 	// kilocode_change start
 	commands: Command[]
-	organizationAllowList: OrganizationAllowList
-	organizationSettingsVersion: number
-	cloudIsAuthenticated: boolean
-	cloudOrganizations?: CloudOrganizationMembership[]
-	sharingEnabled: boolean
+	// kilocode_change: organizationAllowList removed
+	// kilocode_change: organizationSettingsVersion removed
+	// kilocode_change: cloudIsAuthenticated removed
+	// kilocode_change: cloudOrganizations removed
+	// kilocode_change: sharingEnabled removed
 	maxConcurrentFileReads?: number
 	allowVeryLargeReads?: boolean // kilocode_change
 	mdmCompliant?: boolean
@@ -318,12 +318,12 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		kilocodeDefaultModel: openRouterDefaultModelId,
 		reasoningBlockCollapsed: true, // Default to collapsed
 		enterBehavior: "send", // Default: Enter sends, Shift+Enter creates newline
-		cloudUserInfo: null,
-		cloudIsAuthenticated: false,
-		cloudOrganizations: [],
-		sharingEnabled: false,
-		organizationAllowList: ORGANIZATION_ALLOW_ALL,
-		organizationSettingsVersion: -1,
+		// kilocode_change: cloudUserInfo removed
+		// kilocode_change: cloudIsAuthenticated removed
+		// kilocode_change: cloudOrganizations removed
+		// kilocode_change: sharingEnabled removed
+		// kilocode_change: organizationAllowList removed
+		// kilocode_change: organizationSettingsVersion removed
 		autoCondenseContext: true,
 		autoCondenseContextPercent: 100,
 		profileThresholds: {},
@@ -540,16 +540,17 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		vscode.postMessage({ type: "webviewDidLaunch" })
 	}, [])
 
+	// kilocode_change: cloudIsAuthenticated removed - authentication state changes disabled
 	// Watch for authentication state changes and refresh Roo models
-	useEffect(() => {
-		const currentAuth = state.cloudIsAuthenticated ?? false
-		const currentProvider = state.apiConfiguration?.apiProvider
-		if (!prevCloudIsAuthenticated && currentAuth && currentProvider === "roo") {
-			// User just authenticated and Roo is the active provider - refresh Roo models
-			vscode.postMessage({ type: "requestRooModels" })
-		}
-		setPrevCloudIsAuthenticated(currentAuth)
-	}, [state.cloudIsAuthenticated, prevCloudIsAuthenticated, state.apiConfiguration?.apiProvider])
+	// useEffect(() => {
+	// 	const currentAuth = state.cloudIsAuthenticated ?? false
+	// 	const currentProvider = state.apiConfiguration?.apiProvider
+	// 	if (!prevCloudIsAuthenticated && currentAuth && currentProvider === "roo") {
+	// 		// User just authenticated and Roo is the active provider - refresh Roo models
+	// 		vscode.postMessage({ type: "requestRooModels" })
+	// 	}
+	// 	setPrevCloudIsAuthenticated(currentAuth)
+	// }, [state.cloudIsAuthenticated, prevCloudIsAuthenticated, state.apiConfiguration?.apiProvider])
 
 	const contextValue: ExtensionStateContextType = {
 		...state,
@@ -575,9 +576,9 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		writeDelayMs: state.writeDelayMs,
 		screenshotQuality: state.screenshotQuality,
 		routerModels: extensionRouterModels,
-		cloudIsAuthenticated: state.cloudIsAuthenticated ?? false,
-		cloudOrganizations: state.cloudOrganizations ?? [],
-		organizationSettingsVersion: state.organizationSettingsVersion ?? -1,
+		// kilocode_change: cloudIsAuthenticated removed
+		// kilocode_change: cloudOrganizations removed
+		// kilocode_change: organizationSettingsVersion removed
 		marketplaceItems,
 		marketplaceInstalledMetadata,
 		profileThresholds: state.profileThresholds ?? {},

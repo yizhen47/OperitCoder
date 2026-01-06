@@ -21,7 +21,6 @@ import { combineCommandSequences } from "@roo/combineCommandSequences"
 import { getApiMetrics } from "@roo/getApiMetrics"
 import { AudioType } from "@roo/WebviewMessage"
 import { getAllModes } from "@roo/modes"
-import { ProfileValidator } from "@roo/ProfileValidator"
 import { getLatestTodo } from "@roo/todo"
 
 import { vscode } from "@src/utils/vscode"
@@ -95,7 +94,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		taskHistoryFullLength, // kilocode_change
 		taskHistoryVersion, // kilocode_change
 		apiConfiguration,
-		organizationAllowList,
+		// kilocode_change: organizationAllowList removed
 		mode,
 		setMode,
 		alwaysAllowModeSwitch,
@@ -241,10 +240,8 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		}
 	}, [])
 
-	const isProfileDisabled = useMemo(
-		() => !!apiConfiguration && !ProfileValidator.isProfileAllowed(apiConfiguration, organizationAllowList),
-		[apiConfiguration, organizationAllowList],
-	)
+	// kilocode_change: organizationAllowList check removed - profile validation disabled
+	const isProfileDisabled = useMemo(() => false, [])
 
 	// UI layout depends on the last 2 messages (since it relies on the content
 	// of these messages, we are deep comparing) i.e. the button state after

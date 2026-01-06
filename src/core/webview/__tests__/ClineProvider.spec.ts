@@ -607,12 +607,12 @@ describe("ClineProvider", () => {
 			showAutoApproveMenu: false, // kilocode_change
 			maxImageFileSize: 5,
 			maxTotalImageSize: 20,
-			cloudUserInfo: null,
-			organizationAllowList: ORGANIZATION_ALLOW_ALL,
+			// kilocode_change: cloudUserInfo removed
+			// kilocode_change: organizationAllowList removed
 			autoCondenseContext: true,
 			autoCondenseContextPercent: 100,
-			cloudIsAuthenticated: false,
-			sharingEnabled: false,
+			// kilocode_change: cloudIsAuthenticated removed
+			// kilocode_change: sharingEnabled removed
 			profileThresholds: {},
 			hasOpenedModeSelector: false,
 			diagnosticsEnabled: true,

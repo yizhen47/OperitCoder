@@ -26,8 +26,10 @@ export const OrganizationIndexingTab: React.FC<OrganizationIndexingTabProps> = (
 	onCancelIndexing,
 }) => {
 	const { t } = useAppTranslation()
-	const { cloudUserInfo } = useExtensionState()
-	const organizationId = cloudUserInfo?.organizationId
+	// kilocode_change: cloudUserInfo removed - organizationId disabled
+	// const { cloudUserInfo } = useExtensionState()
+	// const organizationId = cloudUserInfo?.organizationId
+	const organizationId = undefined
 
 	const progressPercentage = useMemo(
 		() =>
