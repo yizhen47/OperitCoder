@@ -1,5 +1,5 @@
 {
-	"name": "kilo-code",
+	"name": "operit-coder",
 	"displayName": "%extension.displayName%",
 	"description": "%extension.description%",
 	"publisher": "kilocode",
@@ -109,7 +109,7 @@
 		"viewsContainers": {
 			"activitybar": [
 				{
-					"id": "kilo-code-ActivityBar",
+					"id": "operit-coder-ActivityBar",
 					"title": "%views.activitybar.title%",
 					"icon": "assets/icons/kilo.png",
 					"darkIcon": "assets/icons/kilo-dark.png"
@@ -117,10 +117,10 @@
 			]
 		},
 		"views": {
-			"kilo-code-ActivityBar": [
+			"operit-coder-ActivityBar": [
 				{
 					"type": "webview",
-					"id": "kilo-code.SidebarProvider",
+					"id": "operit-coder.SidebarProvider",
 					"name": "%views.sidebar.name%",
 					"icon": "assets/icons/kilo.png",
 					"darkIcon": "assets/icons/kilo-dark.png"
@@ -349,79 +349,79 @@
 				{
 					"command": "operit-coder.plusButtonClicked",
 					"group": "navigation@0",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.agentManagerOpen",
 					"group": "navigation@1",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.mcpButtonClicked",
 					"group": "navigation@2",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.marketplaceButtonClicked",
 					"group": "navigation@3",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.historyButtonClicked",
 					"group": "navigation@4",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.profileButtonClicked",
 					"group": "navigation@5",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.settingsButtonClicked",
 					"group": "navigation@6",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.popoutButtonClicked",
 					"group": "navigation@7",
-					"when": "view == kilo-code.SidebarProvider"
+					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
 					"command": "operit-coder.helpButtonClicked",
 					"group": "navigation@8",
-					"when": "false && view == kilo-code.SidebarProvider"
+					"when": "false && view == operit-coder.SidebarProvider"
 				}
 			],
 			"editor/title": [
 				{
 					"command": "operit-coder.plusButtonClicked",
 					"group": "navigation@1",
-					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
+					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{
 					"command": "operit-coder.mcpButtonClicked",
 					"group": "navigation@2",
-					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
+					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{
 					"command": "operit-coder.historyButtonClicked",
 					"group": "navigation@3",
-					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
+					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{
 					"command": "operit-coder.popoutButtonClicked",
 					"group": "navigation@4",
-					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
+					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{
 					"command": "operit-coder.settingsButtonClicked",
 					"group": "navigation@5",
-					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
+					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{
 					"command": "operit-coder.helpButtonClicked",
 					"group": "navigation@6",
-					"when": "activeWebviewPanelId == kilo-code.TabPanelProvider"
+					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				}
 			],
 			"scm/input": [
@@ -654,14 +654,14 @@
 	"scripts": {
 		"lint": "eslint . --ext=ts --max-warnings=0",
 		"check-types": "tsc --noEmit",
-		"pretest": "turbo run kilo-code#bundle --cwd ..",
+		"pretest": "turbo run operit-coder#bundle --cwd ..",
 		"test": "vitest run",
 		"format": "prettier --write .",
 		"bundle": "node esbuild.mjs",
 		"vscode:prepublish": "pnpm bundle --production",
 		"vsix:clean": "rimraf ../bin",
 		"vsix": "mkdirp ../bin && vsce package --no-dependencies --out ../bin",
-		"vsix:unpacked": "mkdirp ../bin-unpacked && unzip -q -o ../bin/kilo-code-*.vsix -d ../bin-unpacked",
+		"vsix:unpacked": "mkdirp ../bin-unpacked && unzip -q -o ../bin/operit-coder-*.vsix -d ../bin-unpacked",
 		"publish:marketplace": "vsce publish --no-dependencies && ovsx publish --no-dependencies",
 		"watch:bundle": "pnpm bundle --watch",
 		"watch:tsc": "cd .. && tsc --noEmit --watch --project src/tsconfig.json",

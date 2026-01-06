@@ -27,12 +27,12 @@ echo "This probably doesn't work while VS Code is running."
 # Reset the secrets:
 sqlite3 "$VSCODE_DIR/User/globalStorage/state.vscdb" \
 "DELETE FROM ItemTable WHERE \
-    key = 'kilocode.kilo-code' OR \
-    key LIKE 'workbench.view.extension.kilo-code%' OR \
-    key LIKE 'secret://{\"extensionId\":\"kilocode.kilo-code\",%';"
+    key = 'kilocode.operit-coder' OR \
+    key LIKE 'workbench.view.extension.operit-coder%' OR \
+    key LIKE 'secret://{\"extensionId\":\"kilocode.operit-coder\",%';"
 
 # delete all kilocode state files:
-rm -rf "$VSCODE_DIR/User/globalStorage/kilocode.kilo-code/"
+rm -rf "$VSCODE_DIR/User/globalStorage/kilocode.operit-coder/"
 
 # clear some of the vscode cache that I've observed contains kilocode related entries:
 rm -f "$VSCODE_DIR/CachedProfilesData/__default__profile__/extensions.user.cache"

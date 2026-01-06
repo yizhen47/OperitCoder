@@ -7,7 +7,7 @@ import type { UserOrganization } from "../state/atoms/profile.js"
 
 /**
  * Normalize team name to lowercase with dashes
- * Example: "Operit Coder" -> "kilo-code"
+ * Example: "Operit Coder" -> "operit-coder"
  */
 function normalizeTeamName(name: string): string {
 	return name
@@ -260,7 +260,7 @@ export const teamsCommand: Command = {
 	aliases: ["team", "org", "orgs"],
 	description: "Manage team/organization selection",
 	usage: "/teams [subcommand] [args]",
-	examples: ["/teams", "/teams list", "/teams select personal", "/teams select kilo-code", "/teams select my-team"],
+	examples: ["/teams", "/teams list", "/teams select personal", "/teams select operit-coder", "/teams select my-team"],
 	category: "settings",
 	priority: 10,
 	arguments: [
@@ -276,7 +276,7 @@ export const teamsCommand: Command = {
 		{
 			name: "team-name",
 			description:
-				"Team name in lowercase with dashes (e.g., 'kilo-code' for 'Operit Coder') or 'personal' (for select subcommand)",
+				"Team name in lowercase with dashes (e.g., 'operit-coder' for 'Operit Coder') or 'personal' (for select subcommand)",
 			required: false,
 			conditionalProviders: [
 				{

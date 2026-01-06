@@ -28,7 +28,7 @@ describe("getApiRequestTimeout", () => {
 
 		const timeout = getApiRequestTimeout()
 
-		expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith("kilo-code")
+		expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith("operit-coder")
 		expect(mockGetConfig).toHaveBeenCalledWith("apiRequestTimeout", 600)
 		expect(timeout).toBe(600000) // 600 seconds in milliseconds
 	})

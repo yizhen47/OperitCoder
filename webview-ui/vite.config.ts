@@ -199,6 +199,7 @@ export default defineConfig(({ mode }) => {
 			include: [
 				"mermaid",
 				"dagre", // Explicitly include dagre for pre-bundling
+				"styled-components", // kilocode_change - prevent multiple instances
 				// Add other known large mermaid dependencies if identified
 			],
 			exclude: ["@vscode/codicons", "vscode-oniguruma", "shiki", "vscode" /*kilocode_change*/],

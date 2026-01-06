@@ -2,8 +2,8 @@
 
 build_extension() {
   echo "🔨 Building the Operit Coder extension..."
-  pnpm -w vsix -- --out ../bin/kilo-code-$(git rev-parse --short HEAD).vsix || exit 1
-  code --install-extension ../../bin/kilo-code-$(git rev-parse --short HEAD).vsix || exit 1
+  pnpm -w vsix -- --out ../bin/operit-coder-$(git rev-parse --short HEAD).vsix || exit 1
+  code --install-extension ../../bin/operit-coder-$(git rev-parse --short HEAD).vsix || exit 1
   cd evals
 }
 

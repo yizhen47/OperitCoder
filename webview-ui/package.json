@@ -5,7 +5,7 @@
 	"scripts": {
 		"lint": "eslint src --ext=ts,tsx --max-warnings=0",
 		"check-types": "tsc",
-		"pretest": "turbo run kilo-code#bundle --cwd ..",
+		"pretest": "turbo run operit-coder#bundle --cwd ..",
 		"test": "vitest run",
 		"format": "prettier --write src",
 		"dev": "vite",
@@ -41,6 +41,7 @@
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"cmdk": "^1.0.0",
+		"dagre": "^0.8.5",
 		"date-fns": "^4.1.0",
 		"debounce": "^2.1.1",
 		"diff": "^5.2.0",

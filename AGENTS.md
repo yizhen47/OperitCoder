@@ -20,7 +20,7 @@ Format (in `.changeset/<random-name>.md`):
 
 ```md
 ---
-"kilo-code": patch
+"operit-coder": patch
 ---
 
 Brief description of the change

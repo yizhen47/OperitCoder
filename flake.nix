@@ -13,7 +13,7 @@
     mkDevShell = system: let
       pkgs = import nixpkgs { inherit system; };
     in pkgs.mkShell {
-      name = "kilo-code";
+      name = "operit-coder";
 
       packages = with pkgs; [
         nodejs_20

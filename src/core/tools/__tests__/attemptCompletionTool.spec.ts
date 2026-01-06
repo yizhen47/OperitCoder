@@ -26,7 +26,7 @@ vi.mock("vscode", () => ({
 // Mock Package module
 vi.mock("../../../shared/package", () => ({
 	Package: {
-		name: "kilo-code",
+		name: "operit-coder",
 	},
 }))
 

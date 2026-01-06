@@ -247,7 +247,7 @@ describe("/teams command", () => {
 		})
 
 		it("should switch to organization by normalized name", async () => {
-			mockContext.args = ["select", "kilo-code"]
+			mockContext.args = ["select", "operit-coder"]
 			mockContext.currentProvider = {
 				id: "test-provider",
 				provider: "kilocode",

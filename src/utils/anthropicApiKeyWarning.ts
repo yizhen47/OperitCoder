@@ -12,7 +12,7 @@ export function checkAnthropicApiKeyConflict(): void {
 		return
 	}
 
-	const config = vscode.workspace.getConfiguration("kilo-code")
+	const config = vscode.workspace.getConfiguration("operit-coder")
 	const provider = config.get<string>("apiProvider")
 
 	if (provider === "claude-code") {

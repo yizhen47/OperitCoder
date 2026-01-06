@@ -49,7 +49,7 @@ export async function reportBugTool(
 			// Derive system information values algorithmically
 			const operatingSystem = os.platform() + " " + os.release()
 			const kilocodeVersion =
-				vscode.extensions.getExtension("kilocode.kilo-code")?.packageJSON.version || "Unknown"
+				vscode.extensions.getExtension("kilocode.operit-coder")?.packageJSON.version || "Unknown"
 			const systemInfo = `VSCode: ${vscode.version}, Node.js: ${process.version}, Architecture: ${os.arch()}`
 			const providerAndModel = `${(await cline.providerRef.deref()?.contextProxy.getGlobalState("apiProvider")) as string} / ${cline.api.getModel().id}`
 

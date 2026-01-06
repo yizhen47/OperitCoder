@@ -145,7 +145,7 @@ export const importSettingsFromFile = async (
 export const exportSettings = async ({ providerSettingsManager, contextProxy }: ExportOptions) => {
 	const uri = await vscode.window.showSaveDialog({
 		filters: { JSON: ["json"] },
-		defaultUri: vscode.Uri.file(path.join(os.homedir(), "Documents", "kilo-code-settings.json")),
+		defaultUri: vscode.Uri.file(path.join(os.homedir(), "Documents", "operit-coder-settings.json")),
 	})
 
 	if (!uri) {

@@ -61,7 +61,7 @@
 		{
 			"label": "install-dev-extension",
 			"type": "shell",
-			"command": "pnpm i && pnpm run build && code --force --install-extension \"$(ls -1v bin/kilo-code-*.vsix | tail -n1)\"",
+			"command": "pnpm i && pnpm run build && code --force --install-extension \"$(ls -1v bin/operit-coder-*.vsix | tail -n1)\"",
 			"group": "build",
 			"presentation": {
 				"echo": true,

@@ -182,7 +182,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	if (!context.globalState.get("firstInstallCompleted")) {
 		outputChannel.appendLine("First installation detected, opening Operit Coder sidebar!")
 		try {
-			await vscode.commands.executeCommand("kilo-code.SidebarProvider.focus")
+			await vscode.commands.executeCommand("operit-coder.SidebarProvider.focus")
 
 			outputChannel.appendLine("Opening Operit Coder walkthrough")
 
@@ -190,7 +190,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			// https://discord.com/channels/1349288496988160052/1395865796026040470
 			await vscode.commands.executeCommand(
 				"workbench.action.openWalkthrough",
-				"kilocode.kilo-code#kiloCodeWalkthrough",
+				"kilocode.operit-coder#kiloCodeWalkthrough",
 				false,
 			)
 

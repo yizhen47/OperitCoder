@@ -29,7 +29,7 @@ function getGlobalModesPath(): string {
 			"Code",
 			"User",
 			"globalStorage",
-			"kilocode.kilo-code",
+			"kilocode.operit-coder",
 			"settings",
 			"custom_modes.yaml",
 		)
@@ -42,7 +42,7 @@ function getGlobalModesPath(): string {
 			"Code",
 			"User",
 			"globalStorage",
-			"kilocode.kilo-code",
+			"kilocode.operit-coder",
 			"settings",
 			"custom_modes.yaml",
 		)
@@ -54,7 +54,7 @@ function getGlobalModesPath(): string {
 			"Code",
 			"User",
 			"globalStorage",
-			"kilocode.kilo-code",
+			"kilocode.operit-coder",
 			"settings",
 			"custom_modes.yaml",
 		)
