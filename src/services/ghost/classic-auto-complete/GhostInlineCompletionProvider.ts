@@ -142,7 +142,7 @@ export function applyFirstLineOnly(
  * Command ID for tracking inline completion acceptance.
  * This command is executed after the user accepts an inline completion.
  */
-export const INLINE_COMPLETION_ACCEPTED_COMMAND = "kilocode.ghost.inline-completion.accepted"
+export const INLINE_COMPLETION_ACCEPTED_COMMAND = "operit-coder.ghost.inline-completion.accepted"
 
 /**
  * Counts the number of lines in a text string.
@@ -276,9 +276,14 @@ export class GhostInlineCompletionProvider implements vscode.InlineCompletionIte
 		this.recentlyVisitedRangesService = new RecentlyVisitedRangesService(ide)
 		this.recentlyEditedTracker = new RecentlyEditedTracker(ide)
 
-		this.acceptedCommand = vscode.commands.registerCommand(INLINE_COMPLETION_ACCEPTED_COMMAND, () =>
-			this.telemetry?.captureAcceptSuggestion(),
-		)
+		// Register command with try-catch to handle duplicate registration
+		try {
+			this.acceptedCommand = vscode.commands.registerCommand(INLINE_COMPLETION_ACCEPTED_COMMAND, () =>
+				this.telemetry?.captureAcceptSuggestion(),
+			)
+		} catch (error) {
+			console.warn(`[GhostInlineCompletionProvider] Command ${INLINE_COMPLETION_ACCEPTED_COMMAND} already registered, skipping`)
+		}
 	}
 
 	public updateSuggestions(fillInAtCursor: FillInAtCursorSuggestion): void {
