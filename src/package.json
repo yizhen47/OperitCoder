@@ -249,12 +249,6 @@
 				"category": "%configuration.title%"
 			},
 			{
-				"command": "operit-coder.profileButtonClicked",
-				"title": "%command.profile.title%",
-				"icon": "$(account)",
-				"category": "%configuration.title%"
-			},
-			{
 				"command": "operit-coder.vsc.generateCommitMessage",
 				"title": "%command.generateCommitMessage.title%",
 				"icon": {
@@ -372,23 +366,18 @@
 					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "operit-coder.profileButtonClicked",
+					"command": "operit-coder.settingsButtonClicked",
 					"group": "navigation@5",
 					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "operit-coder.settingsButtonClicked",
+					"command": "operit-coder.popoutButtonClicked",
 					"group": "navigation@6",
 					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "operit-coder.popoutButtonClicked",
-					"group": "navigation@7",
-					"when": "view == operit-coder.SidebarProvider"
-				},
-				{
 					"command": "operit-coder.helpButtonClicked",
-					"group": "navigation@8",
+					"group": "navigation@7",
 					"when": "false && view == operit-coder.SidebarProvider"
 				}
 			],

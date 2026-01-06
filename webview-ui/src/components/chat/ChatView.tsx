@@ -154,7 +154,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		return getLatestTodo(messages)
 	}, [messages, currentTaskTodos])
 
-	const modifiedMessages = useMemo(() => combineApiRequests(combineCommandSequences(messages.slice(1))), [messages])
+	const modifiedMessages = useMemo(() => combineApiRequests(combineCommandSequences(messages)), [messages])
 
 	// Has to be after api_req_finished are all reduced into api_req_started messages.
 	const apiMetrics = useMemo(() => getApiMetrics(modifiedMessages), [modifiedMessages])
@@ -963,21 +963,14 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		// Remove the 500-message limit to prevent array index shifting
 		// Virtuoso is designed to efficiently handle large lists through virtualization
 		const newVisibleMessages = modifiedMessages.filter((message) => {
-			// Filter out checkpoint_saved messages that should be suppressed
+			// Filter out ALL checkpoint_saved messages (kilocode_change: prevent zero-height elements in virtuoso)
 			if (message.say === "checkpoint_saved") {
-				// Check if this checkpoint has the suppressMessage flag set
-				if (
-					message.checkpoint &&
-					typeof message.checkpoint === "object" &&
-					"suppressMessage" in message.checkpoint &&
-					message.checkpoint.suppressMessage
-				) {
-					return false
-				}
-				// Also filter out checkpoint messages associated with user messages (legacy behavior)
-				if (message.text && userMessageCheckpointHashes.has(message.text)) {
-					return false
-				}
+				return false
+			}
+
+			// Filter out user_feedback_diff messages (kilocode_change: prevent zero-height elements in virtuoso)
+			if (message.say === "user_feedback_diff") {
+				return false
 			}
 
 			// Filter out all API request messages (kilocode_change)
@@ -1640,6 +1633,38 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 								}}
 								atBottomThreshold={10}
 								initialTopMostItemIndex={groupedMessages.length - 1}
+								components={{
+									Footer: () => (
+										<div className="flex items-center justify-center py-4 animate-fade-in">
+											{isStreaming && (
+												<div className="flex items-center gap-2 text-sm text-vscode-descriptionForeground">
+													<div className="w-4 h-4">
+														<svg
+															className="animate-spin"
+															xmlns="http://www.w3.org/2000/svg"
+															fill="none"
+															viewBox="0 0 24 24">
+															<circle
+																className="opacity-25"
+																cx="12"
+																cy="12"
+																r="10"
+																stroke="currentColor"
+																strokeWidth="4"
+															/>
+															<path
+																className="opacity-75"
+																fill="currentColor"
+																d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+															/>
+														</svg>
+													</div>
+													<span>{t("chat:loading")}</span>
+												</div>
+											)}
+										</div>
+									),
+								}}
 							/>
 						</div>
 					</div>
@@ -1651,7 +1676,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 					{showScrollToBottom && (
 						<StandardTooltip content={t("chat:scrollToBottom")}>
 							<button
-								className="fixed bottom-32 right-6 w-10 h-10 rounded-full bg-vscode-editor-background/80 backdrop-blur-sm border border-vscode-widget-border hover:bg-vscode-editor-background/90 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl z-50"
+								className="fixed bottom-32 right-6 w-10 h-10 rounded-full bg-vscode-editor-background/80 backdrop-blur-sm border border-vscode-widget-border hover:bg-vscode-editor-background/90 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl z-50 animate-fade-in"
 								onClick={() => {
 									// Engage sticky follow until user scrolls up
 									stickyFollowRef.current = true
@@ -1661,6 +1686,16 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 									setShowScrollToBottom(false)
 								}}>
 								<span className="codicon codicon-chevron-down text-vscode-editor-foreground"></span>
+							</button>
+						</StandardTooltip>
+					)}
+					{/* kilocode_change: Floating cancel button - overlay style */}
+					{isStreaming && !didClickCancel && (
+						<StandardTooltip content={t("chat:cancel.tooltip")}>
+							<button
+								className="fixed bottom-44 right-6 w-10 h-10 rounded-full bg-vscode-editor-background/80 backdrop-blur-sm border border-vscode-widget-border hover:bg-vscode-editor-background/90 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl z-50 animate-fade-in"
+								onClick={() => handleSecondaryButtonClick(inputValue, selectedImages)}>
+								<span className="codicon codicon-x text-vscode-editor-foreground"></span>
 							</button>
 						</StandardTooltip>
 					)}
@@ -1700,22 +1735,20 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 									</Button>
 								</StandardTooltip>
 							)}
-							{(secondaryButtonText || isStreaming) && (
+							{secondaryButtonText && !isStreaming && (
 								<StandardTooltip
 									content={
-										isStreaming
-											? t("chat:cancel.tooltip")
-											: secondaryButtonText === t("chat:startNewTask.title")
-												? t("chat:startNewTask.tooltip")
-												: secondaryButtonText === t("chat:reject.title")
-													? t("chat:reject.tooltip")
-													: undefined
+										secondaryButtonText === t("chat:startNewTask.title")
+											? t("chat:startNewTask.tooltip")
+											: secondaryButtonText === t("chat:reject.title")
+												? t("chat:reject.tooltip")
+												: undefined
 									}>
 									<Button
-										disabled={!enableButtons && !(isStreaming && !didClickCancel)}
-										className={isStreaming ? "flex-[2] ml-0" : "flex-1 ml-[6px]"}
+										disabled={!enableButtons}
+										className="flex-1 ml-[6px]"
 										onClick={() => handleSecondaryButtonClick(inputValue, selectedImages)}>
-										{isStreaming ? t("chat:cancel.title") : secondaryButtonText}
+										{secondaryButtonText}
 									</Button>
 								</StandardTooltip>
 							)}

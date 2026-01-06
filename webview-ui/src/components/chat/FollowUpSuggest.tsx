@@ -122,7 +122,7 @@ export const FollowUpSuggest = ({
 									countdown !== null &&
 									!suggestionSelected &&
 									!isAnswered &&
-									"border-vscode-foreground/60 rounded-b-none -mb-1",
+									"border-vscode-foreground/60 rounded-b-none",
 							)}
 							onClick={(event) => handleSuggestionClick(suggestion, event)}
 							aria-label={suggestion.answer}>

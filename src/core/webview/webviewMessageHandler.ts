@@ -412,7 +412,7 @@ export const webviewMessageHandler = async (
 			// Delete the original (user) message and all subsequent messages using MessageManager
 			const rewindTs = currentCline.clineMessages[deleteFromMessageIndex]?.ts
 			if (rewindTs) {
-				await currentCline.messageManager.rewindToTimestamp(rewindTs, { includeTargetMessage: false })
+				await currentCline.messageManager.rewindToTimestamp(rewindTs, { includeTargetMessage: true })
 			}
 
 			// Restore checkpoint associations for preserved messages
@@ -430,9 +430,7 @@ export const webviewMessageHandler = async (
 				globalStoragePath: provider.contextProxy.globalStorageUri.fsPath,
 			})
 
-			// Update the UI to reflect the deletion
-			await provider.postStateToWebview()
-
+			// Submit the new edited message (this will automatically update the UI)
 			await currentCline.submitUserMessage(editedContent, images)
 		} catch (error) {
 			console.error("Error in edit message:", error)

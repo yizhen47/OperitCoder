@@ -38,16 +38,6 @@ export const handleUri = async (uri: vscode.Uri) => {
 			break
 		}
 		// kilocode_change start
-		case "/kilocode/profile": {
-			await visibleProvider.postMessageToWebview({
-				type: "action",
-				action: "profileButtonClicked",
-			})
-			await visibleProvider.postMessageToWebview({
-				type: "updateProfileData",
-			})
-			break
-		}
 		case "/kilocode/fork": {
 			const id = query.get("id")
 			if (id) {

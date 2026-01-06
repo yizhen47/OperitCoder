@@ -15,7 +15,6 @@ import ChatView, { ChatViewRef } from "./components/chat/ChatView"
 import HistoryView from "./components/history/HistoryView"
 import SettingsView, { SettingsViewRef } from "./components/settings/SettingsView"
 import WelcomeView from "./components/kilocode/welcome/WelcomeView" // kilocode_change
-import ProfileView from "./components/kilocode/profile/ProfileView" // kilocode_change
 import McpView from "./components/mcp/McpView" // kilocode_change
 import AuthView from "./components/kilocode/auth/AuthView" // kilocode_change
 import { MarketplaceView } from "./components/marketplace/MarketplaceView"
@@ -33,7 +32,7 @@ import { STANDARD_TOOLTIP_DELAY } from "./components/ui/standard-tooltip"
 import { useKiloIdentity } from "./utils/kilocode/useKiloIdentity"
 import { MemoryWarningBanner } from "./kilocode/MemoryWarningBanner"
 
-type Tab = "settings" | "history" | "mcp" | "modes" | "chat" | "marketplace" | "account" | "cloud" | "profile" | "auth" // kilocode_change: add "profile" and "auth"
+type Tab = "settings" | "history" | "mcp" | "modes" | "chat" | "marketplace" | "account" | "cloud" | "auth" // kilocode_change: add "auth"
 
 interface HumanRelayDialogState {
 	isOpen: boolean
@@ -65,7 +64,6 @@ const tabsByMessageAction: Partial<Record<NonNullable<ExtensionMessage["action"]
 	chatButtonClicked: "chat",
 	settingsButtonClicked: "settings",
 	historyButtonClicked: "history",
-	profileButtonClicked: "profile",
 	marketplaceButtonClicked: "marketplace",
 	promptsButtonClicked: "settings", // kilocode_change: Navigate to settings with modes section
 	mcpButtonClicked: "mcp", // kilocode_change
@@ -241,12 +239,13 @@ const App = () => {
 			}
 
 			if (message.type === "showEditMessageDialog" && message.messageTs && message.text) {
-				setEditMessageDialogState({
-					isOpen: true,
+				// kilocode_change: Auto-confirm edit message without showing dialog
+				vscode.postMessage({
+					type: "editMessageConfirm",
 					messageTs: message.messageTs,
 					text: message.text,
-					hasCheckpoint: message.hasCheckpoint || false,
 					images: message.images || [],
+					restoreCheckpoint: message.hasCheckpoint || false,
 				})
 			}
 
@@ -340,8 +339,7 @@ const App = () => {
 					editingProfile={settingsEditingProfile}
 				/>
 			)}
-			{/* kilocode_change: add profileview and authview */}
-			{tab === "profile" && <ProfileView onDone={() => switchTab("chat")} />}
+			{/* kilocode_change: add authview */}
 			{tab === "auth" && <AuthView returnTo={authReturnTo} profileName={authProfileName} />}
 			{tab === "marketplace" && (
 				<MarketplaceView
@@ -403,35 +401,6 @@ const App = () => {
 							messageTs: deleteMessageDialogState.messageTs,
 						})
 						setDeleteMessageDialogState((prev) => ({ ...prev, isOpen: false }))
-					}}
-				/>
-			)}
-			{editMessageDialogState.hasCheckpoint ? (
-				<MemoizedEditMessageDialog
-					open={editMessageDialogState.isOpen}
-					onOpenChange={(open: boolean) => setEditMessageDialogState((prev) => ({ ...prev, isOpen: open }))}
-					onConfirm={() => {
-						vscode.postMessage({
-							type: "editMessageConfirm",
-							messageTs: editMessageDialogState.messageTs,
-							text: editMessageDialogState.text,
-							restoreCheckpoint: true,
-						})
-						setEditMessageDialogState((prev) => ({ ...prev, isOpen: false }))
-					}}
-				/>
-			) : (
-				<MemoizedEditMessageDialog
-					open={editMessageDialogState.isOpen}
-					onOpenChange={(open: boolean) => setEditMessageDialogState((prev) => ({ ...prev, isOpen: open }))}
-					onConfirm={() => {
-						vscode.postMessage({
-							type: "editMessageConfirm",
-							messageTs: editMessageDialogState.messageTs,
-							text: editMessageDialogState.text,
-							images: editMessageDialogState.images,
-						})
-						setEditMessageDialogState((prev) => ({ ...prev, isOpen: false }))
 					}}
 				/>
 			)}

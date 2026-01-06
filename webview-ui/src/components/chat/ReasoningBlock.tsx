@@ -18,14 +18,16 @@ export const ReasoningBlock = ({ content, isStreaming, isLast }: ReasoningBlockP
 	const { t } = useTranslation()
 	const { reasoningBlockCollapsed } = useExtensionState()
 
-	const [isCollapsed, setIsCollapsed] = useState(reasoningBlockCollapsed)
+	// Default to expanded (false = not collapsed)
+	const [isCollapsed, setIsCollapsed] = useState(false)
 
 	const startTimeRef = useRef<number>(Date.now())
 	const [elapsed, setElapsed] = useState<number>(0)
 	const contentRef = useRef<HTMLDivElement>(null)
+	const wasStreamingRef = useRef(isStreaming)
 
 	useEffect(() => {
-		setIsCollapsed(reasoningBlockCollapsed)
+		setIsCollapsed(reasoningBlockCollapsed ?? false)
 	}, [reasoningBlockCollapsed])
 
 	useEffect(() => {
@@ -36,6 +38,14 @@ export const ReasoningBlock = ({ content, isStreaming, isLast }: ReasoningBlockP
 			return () => clearInterval(id)
 		}
 	}, [isLast, isStreaming])
+
+	// Auto-collapse when streaming ends
+	useEffect(() => {
+		if (wasStreamingRef.current && !isStreaming) {
+			setIsCollapsed(true)
+		}
+		wasStreamingRef.current = isStreaming
+	}, [isStreaming])
 
 	const seconds = Math.floor(elapsed / 1000)
 	const secondsLabel = t("chat:reasoning.seconds", { count: seconds })

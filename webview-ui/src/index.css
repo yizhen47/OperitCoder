@@ -550,3 +550,18 @@ input[cmdk-input]:focus {
 	opacity: 0.7;
 }
 /* kilocode_change end - STT preview text styling */
+
+/* kilocode_change start - Loading spinner animation */
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.animate-spin {
+	animation: spin 1s linear infinite;
+}
+/* kilocode_change end - Loading spinner animation */
