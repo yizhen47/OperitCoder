@@ -196,15 +196,6 @@ export const ChatRowContent = ({
 	const { mcpServers, alwaysAllowMcp, currentCheckpoint, mode, apiConfiguration, clineMessages, showTimestamps } =
 		useExtensionState()
 
-	// kilocode_change: Filter out checkpoint_saved messages to prevent blank rows
-	if (message.say === "checkpoint_saved") {
-		return null
-	}
-
-	// kilocode_change: Filter out user_feedback_diff messages
-	if (message.say === ("user_feedback_diff" as ClineSay)) {
-		return null
-	}
 	const { info: model } = useSelectedModel(apiConfiguration)
 	const [isEditing, setIsEditing] = useState(false)
 	const [editedContent, setEditedContent] = useState("")
