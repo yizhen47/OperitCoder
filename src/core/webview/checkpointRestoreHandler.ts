@@ -5,6 +5,7 @@ import * as vscode from "vscode"
 import pWaitFor from "p-wait-for"
 import { t } from "../../i18n"
 
+/*检查点恢复 接口，处理 删除/编辑*/
 export interface CheckpointRestoreConfig {
 	provider: ClineProvider
 	currentCline: Task
@@ -93,7 +94,7 @@ export async function handleCheckpointRestoreOperation(config: CheckpointRestore
  */
 export async function waitForClineInitialization(provider: ClineProvider, timeoutMs: number = 3000): Promise<boolean> {
 	try {
-		await pWaitFor(() => provider.getCurrentTask()?.isInitialized === true, {
+		await pWaitFor(() => provider.getCurrentTask()?.isInitialized/*这里初始化检查点*/ === true, {
 			timeout: timeoutMs,
 		})
 		return true

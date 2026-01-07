@@ -1062,21 +1062,6 @@ export const ChatRowContent = ({
 						</div>
 					)
 				case "user_feedback":
-					// Check if this is the first message (initial task)
-					const isFirstMessage = clineMessages.length > 0 && message.ts === clineMessages[0].ts
-					
-					// Render first message with simple style, others with user feedback style
-					if (isFirstMessage) {
-						return (
-							<div className="pl-0">
-								<Markdown markdown={message.text} partial={message.partial} />
-								{message.images && message.images.length > 0 && (
-									<Thumbnails images={message.images} style={{ marginTop: "8px" }} />
-								)}
-							</div>
-						)
-					}
-					
 					return (
 						<div className="group">
 							<div

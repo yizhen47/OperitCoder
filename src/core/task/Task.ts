@@ -1750,7 +1750,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 
 		await this.providerRef.deref()?.postStateToWebview()
 
-		await this.say("text", task, images)
+		await this.say("user_feedback", task, images)
 		this.isInitialized = true
 
 		let imageBlocks: Anthropic.ImageBlockParam[] = formatResponse.imageBlocks(images)
