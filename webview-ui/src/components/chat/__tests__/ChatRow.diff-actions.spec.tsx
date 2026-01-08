@@ -7,9 +7,13 @@ import { ChatRowContent } from "../ChatRow"
 // Mock i18n
 vi.mock("react-i18next", () => ({
 	useTranslation: () => ({
-		t: (key: string) => {
+		t: (key: string, options?: any) => {
 			const map: Record<string, string> = {
 				"chat:fileOperations.wantsToEdit": "Roo wants to edit this file",
+				"chat:reasoning.thinking": "Thinking",
+			}
+			if (key === "chat:reasoning.seconds") {
+				return `${options?.count ?? 0}s`
 			}
 			return map[key] || key
 		},
@@ -135,5 +139,40 @@ describe("ChatRow - inline diff stats and actions", () => {
 		// Trailing newline should not increase the added count
 		expect(screen.getByText("+3")).toBeInTheDocument()
 		expect(screen.getByText("-0")).toBeInTheDocument()
+	})
+
+	it("shows reasoning duration label for completed reasoning messages", () => {
+		const now = Date.now()
+		const message: any = {
+			type: "say",
+			say: "reasoning",
+			ts: now,
+			partial: false,
+			text: "Reasoning text",
+			metadata: {
+				reasoningDurationMs: 12_000,
+				reasoningStartedAtMs: now - 12_000,
+			},
+		}
+
+		renderChatRow(message)
+
+		// Should show seconds label even when not streaming
+		expect(screen.getByText("12s")).toBeInTheDocument()
+	})
+
+	it("keeps reasoning seconds label visible while message is partial (refresh scenario)", () => {
+		const message: any = {
+			type: "say",
+			say: "reasoning",
+			ts: Date.now(),
+			partial: true,
+			text: "Reasoning text",
+		}
+
+		renderChatRow(message)
+
+		// Should show a seconds label immediately (even if 0s)
+		expect(screen.getByText(/\d+s/)).toBeInTheDocument()
 	})
 })

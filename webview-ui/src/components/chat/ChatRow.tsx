@@ -923,8 +923,8 @@ export const ChatRowContent = ({
 						<ReasoningBlock
 							content={message.text || ""}
 							ts={message.ts}
-							isStreaming={isStreaming}
-							isLast={isLast}
+							isPartial={message.partial === true}
+							metadata={(message as any).metadata}
 						/>
 					)
 				case "api_req_started":

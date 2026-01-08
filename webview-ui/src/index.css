@@ -253,6 +253,10 @@ body {
 	line-height: 1.25;
 }
 
+.reasoning-small {
+	font-size: var(--text-xs);
+}
+
 body.scrollable,
 .scrollable,
 body.code-block-scrollable,

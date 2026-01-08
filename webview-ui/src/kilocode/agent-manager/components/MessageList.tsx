@@ -70,6 +70,34 @@ export function MessageList({ sessionId }: MessageListProps) {
 	// Combine command and command_output messages into single entries
 	const combinedMessages = useMemo(() => combineCommandSequences(messages), [messages])
 
+	const visibleCombinedMessages = useMemo(() => {
+		return combinedMessages.filter((msg) => {
+			if (msg.type === "say") {
+				if (
+					msg.say === "api_req_started" ||
+					msg.say === "api_req_finished" ||
+					msg.say === "checkpoint_saved" ||
+					msg.say === "command_output"
+				) {
+					return false
+				}
+				return true
+			}
+
+		if (msg.type === "ask") {
+			if (msg.ask === "command_output") return false
+			if (msg.ask === "tool") {
+				const metadata = msg.metadata as { tool?: string } | undefined
+				const toolInfo = metadata?.tool ? metadata : safeJsonParse<{ tool?: string }>(msg.text || "")
+				if (toolInfo?.tool === "updateTodoList") return false
+			}
+			return true
+		}
+
+		return true
+	})
+	}, [combinedMessages])
+
 	const commandExecutionByTs = useMemo(() => {
 		const info = new Map<number, { exitCode?: number; status?: string; isRunning?: boolean }>()
 
@@ -94,15 +122,20 @@ export function MessageList({ sessionId }: MessageListProps) {
 		return info
 	}, [messages])
 
+	// Combine messages and queued messages for virtualization
+	const allItems = useMemo(() => {
+		return [...visibleCombinedMessages, ...queue.map((q) => ({ type: "queued" as const, data: q }))]
+	}, [visibleCombinedMessages, queue])
+
 	// Auto-scroll to bottom when new messages arrive using Virtuoso API
 	useEffect(() => {
-		if (combinedMessages.length > 0) {
+		if (allItems.length > 0) {
 			virtuosoRef.current?.scrollToIndex({
-				index: combinedMessages.length - 1,
+				index: allItems.length - 1,
 				behavior: "smooth",
 			})
 		}
-	}, [combinedMessages.length])
+	}, [allItems.length])
 
 	const handleSuggestionClick = useCallback(
 		(suggestion: SuggestionItem) => {
@@ -136,10 +169,15 @@ export function MessageList({ sessionId }: MessageListProps) {
 		[removeFromQueue],
 	)
 
-	// Combine messages and queued messages for virtualization
-	const allItems = useMemo(() => {
-		return [...combinedMessages, ...queue.map((q) => ({ type: "queued" as const, data: q }))]
-	}, [combinedMessages, queue])
+	const computeItemKey = useCallback(
+		(_index: number, item: ClineMessage | { type: "queued"; data: QueuedMessage }) => {
+			if ("type" in item && item.type === "queued") {
+				return `queued-${item.data.id}`
+			}
+			return (item as ClineMessage).ts
+		},
+		[],
+	)
 
 	// Item content renderer for Virtuoso
 	const itemContent = useCallback(
@@ -161,7 +199,7 @@ export function MessageList({ sessionId }: MessageListProps) {
 			// Regular message
 			const msg = item as ClineMessage
 			// isLastCombinedMessage: true for the last regular message, excluding queued user messages
-			const isLastCombinedMessage = index === combinedMessages.length - 1
+			const isLastCombinedMessage = index === visibleCombinedMessages.length - 1
 			return (
 				<MessageItem
 					key={msg.ts || index}
@@ -174,7 +212,7 @@ export function MessageList({ sessionId }: MessageListProps) {
 			)
 		},
 		[
-			combinedMessages.length,
+			visibleCombinedMessages.length,
 			commandExecutionByTs,
 			handleSuggestionClick,
 			handleCopyToInput,
@@ -198,6 +236,7 @@ export function MessageList({ sessionId }: MessageListProps) {
 			<Virtuoso
 				ref={virtuosoRef}
 				data={allItems}
+				computeItemKey={computeItemKey}
 				itemContent={itemContent}
 				followOutput="smooth"
 				increaseViewportBy={{ top: 400, bottom: 400 }}

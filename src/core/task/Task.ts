@@ -994,6 +994,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 	public async overwriteClineMessages(newMessages: ClineMessage[]) {
 		this.clineMessages = newMessages
 		restoreTodoListForTask(this)
+		await this.providerRef.deref()?.postStateToWebview() // kilocode_change
 		await this.saveClineMessages()
 
 		// When overwriting messages (e.g., during task resume), repopulate the cloud sync tracking Set
@@ -1630,6 +1631,12 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 						partial,
 						contextCondense,
 						contextTruncation,
+						// kilocode_change start
+						metadata:
+							type === "reasoning"
+								? Object.assign({ reasoningStartedAtMs: Date.now() }, options.metadata ?? {})
+								: options.metadata,
+						// kilocode_change end
 					})
 				}
 			} else {
@@ -1648,6 +1655,14 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 					// kilocode_change start
 					if (options.metadata) {
 						lastMessage.metadata = Object.assign(lastMessage.metadata ?? {}, options.metadata)
+					}
+					if (type === "reasoning") {
+						const startedAt = (lastMessage.metadata as any)?.reasoningStartedAtMs
+						if (typeof startedAt === "number") {
+							lastMessage.metadata = Object.assign(lastMessage.metadata ?? {}, {
+								reasoningDurationMs: Math.max(0, Date.now() - startedAt),
+							})
+						}
 					}
 					// kilocode_change end
 
@@ -2047,7 +2062,6 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		if (this.currentRequestAbortController) {
 			console.log(`[Task#${this.taskId}.${this.instanceId}] Aborting current HTTP request`)
 			this.currentRequestAbortController.abort()
-			this.currentRequestAbortController = undefined
 		}
 	}
 
@@ -3290,8 +3304,16 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 					)
 
 					if (lastReasoningIndex !== -1 && this.clineMessages[lastReasoningIndex].partial) {
-						this.clineMessages[lastReasoningIndex].partial = false
-						await this.updateClineMessage(this.clineMessages[lastReasoningIndex])
+						// kilocode_change start
+						const reasoningMsg = this.clineMessages[lastReasoningIndex]
+						const startedAt = (reasoningMsg.metadata as any)?.reasoningStartedAtMs ?? reasoningMsg.ts
+						reasoningMsg.metadata = Object.assign(reasoningMsg.metadata ?? {}, {
+							reasoningStartedAtMs: startedAt,
+							reasoningDurationMs: Math.max(0, Date.now() - startedAt),
+						})
+						reasoningMsg.partial = false
+						await this.updateClineMessage(reasoningMsg)
+						// kilocode_change end
 					}
 				}
 
@@ -4101,6 +4123,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		// Create an AbortController to allow cancelling the request mid-stream
 		this.currentRequestAbortController = new AbortController()
 		const abortSignal = this.currentRequestAbortController.signal
+		metadata.abortSignal = abortSignal
 		// Reset the flag after using it
 		this.skipPrevResponseIdOnce = false
 
@@ -4116,7 +4139,6 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		// to avoid accumulating listeners on the AbortSignal
 		const abortCleanupListener = () => {
 			console.log(`[Task#${this.taskId}.${this.instanceId}] AbortSignal triggered for current request`)
-			this.currentRequestAbortController = undefined
 		}
 		abortSignal.addEventListener("abort", abortCleanupListener)
 

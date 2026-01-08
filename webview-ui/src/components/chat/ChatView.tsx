@@ -187,6 +187,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		{ type: "WAIT_TIMEOUT" | "INIT_TIMEOUT"; timeout: number } | undefined
 	>(undefined)
 	const [isCondensing, setIsCondensing] = useState<boolean>(false)
+	const condensingMessageTsRef = useRef<number | null>(null) // kilocode_change
 	const [showAnnouncementModal, setShowAnnouncementModal] = useState(false)
 	const everVisibleMessagesTsRef = useRef<LRUCache<number, boolean>>(
 		new LRUCache({
@@ -194,6 +195,19 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 			ttl: 1000 * 60 * 5,
 		}),
 	)
+
+	// kilocode_change start
+	const condensingMessageTs = useMemo(() => {
+		if (!isCondensing) {
+			condensingMessageTsRef.current = null
+			return null
+		}
+		if (condensingMessageTsRef.current === null) {
+			condensingMessageTsRef.current = Date.now()
+		}
+		return condensingMessageTsRef.current
+	}, [isCondensing])
+	// kilocode_change end
 	const autoApproveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const userRespondedRef = useRef<boolean>(false)
 	const [currentFollowUpTs, setCurrentFollowUpTs] = useState<number | null>(null)
@@ -237,6 +251,22 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		isMountedRef.current = true
 		return () => {
 			isMountedRef.current = false
+		}
+	}, [])
+
+	useEffect(() => {
+		// kilocode_change: suppress ResizeObserver loop warnings (dev-only noise, common with virtualization)
+		const originalConsoleError = console.error
+		console.error = (...args: unknown[]) => {
+			const first = args[0]
+			if (typeof first === "string") {
+				if (first.includes("ResizeObserver loop limit exceeded")) return
+				if (first.includes("ResizeObserver loop completed with undelivered notifications")) return
+			}
+			originalConsoleError(...(args as Parameters<typeof originalConsoleError>))
+		}
+		return () => {
+			console.error = originalConsoleError
 		}
 	}, [])
 
@@ -1130,20 +1160,27 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 			result.push({
 				type: "say",
 				say: "condense_context",
-				ts: Date.now(),
+				ts: condensingMessageTs as number,
 				partial: true,
 			} as any)
 		}
 		return result
-	}, [isCondensing, visibleMessages, isBrowserSessionMessage])
+	}, [isCondensing, visibleMessages, isBrowserSessionMessage, condensingMessageTs])
 
 	// scrolling
 
 	const scrollToBottomSmooth = useMemo(
 		() =>
-			debounce(() => virtuosoRef.current?.scrollTo({ top: Number.MAX_SAFE_INTEGER, behavior: "smooth" }), 10, {
-				immediate: true,
-			}),
+			debounce(
+				() =>
+					requestAnimationFrame(() =>
+						virtuosoRef.current?.scrollTo({ top: Number.MAX_SAFE_INTEGER, behavior: "smooth" }),
+					),
+				10,
+				{
+					immediate: true,
+				},
+			),
 		[],
 	)
 
@@ -1156,9 +1193,11 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 	}, [scrollToBottomSmooth])
 
 	const scrollToBottomAuto = useCallback(() => {
-		virtuosoRef.current?.scrollTo({
-			top: Number.MAX_SAFE_INTEGER,
-			behavior: "auto", // Instant causes crash.
+		requestAnimationFrame(() => {
+			virtuosoRef.current?.scrollTo({
+				top: Number.MAX_SAFE_INTEGER,
+				behavior: "auto", // Instant causes crash.
+			})
 		})
 	}, [])
 
@@ -1624,6 +1663,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 								className="scrollable grow overflow-y-scroll mb-1"
 								increaseViewportBy={{ top: 400, bottom: 400 }} // kilocode_change: use more modest numbers to see if they reduce gray screen incidence
 								data={groupedMessages}
+								computeItemKey={(_index: number, item: ClineMessage) => item.ts} // kilocode_change
 								itemContent={itemContent}
 								followOutput={(isAtBottom: boolean) => isAtBottom || stickyFollowRef.current}
 								atBottomStateChange={(isAtBottom: boolean) => {

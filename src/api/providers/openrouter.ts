@@ -318,6 +318,9 @@ export class OpenRouterHandler extends BaseProvider implements SingleCompletionH
 			requestOptions.headers["x-anthropic-beta"] =
 				"fine-grained-tool-streaming-2025-05-14,structured-outputs-2025-11-13"
 		}
+		if (metadata?.abortSignal) {
+			;(requestOptions as OpenAI.RequestOptions).signal = metadata.abortSignal
+		}
 		// kilocode_change end
 
 		let stream

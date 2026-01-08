@@ -1035,6 +1035,8 @@ ${prompt}
 							)
 						}
 
+						await this.postStateToWebview() // kilocode_change
+
 						// Process the edited message
 						await task.handleWebviewAskResponse(
 							"messageResponse",

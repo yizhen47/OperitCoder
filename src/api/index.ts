@@ -116,6 +116,7 @@ export interface ApiHandlerCreateMessageMetadata {
 	 * Only applies when toolProtocol is "native".
 	 */
 	parallelToolCalls?: boolean
+	abortSignal?: AbortSignal // kilocode_change
 }
 
 export interface ApiHandler {
