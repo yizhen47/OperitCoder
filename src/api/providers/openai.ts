@@ -174,12 +174,16 @@ export class OpenAiHandler extends BaseProvider implements SingleCompletionHandl
 			// Add max_tokens if needed
 			this.addMaxTokensIfNeeded(requestOptions, modelInfo)
 
+			// kilocode_change start
+			const clientRequestOptions: OpenAI.RequestOptions = {
+				...(isAzureAiInference ? { path: OPENAI_AZURE_AI_INFERENCE_PATH } : {}),
+				...(metadata?.abortSignal ? { signal: metadata.abortSignal } : {}),
+			}
+			// kilocode_change end
+
 			let stream
 			try {
-				stream = await this.client.chat.completions.create(
-					requestOptions,
-					isAzureAiInference ? { path: OPENAI_AZURE_AI_INFERENCE_PATH } : {},
-				)
+				stream = await this.client.chat.completions.create(requestOptions, clientRequestOptions)
 			} catch (error) {
 				throw handleOpenAIError(error, this.providerName)
 			}
@@ -261,12 +265,16 @@ export class OpenAiHandler extends BaseProvider implements SingleCompletionHandl
 			// Add max_tokens if needed
 			this.addMaxTokensIfNeeded(requestOptions, modelInfo)
 
+			// kilocode_change start
+			const clientRequestOptions: OpenAI.RequestOptions = {
+				...(this._isAzureAiInference(modelUrl) ? { path: OPENAI_AZURE_AI_INFERENCE_PATH } : {}),
+				...(metadata?.abortSignal ? { signal: metadata.abortSignal } : {}),
+			}
+			// kilocode_change end
+
 			let response
 			try {
-				response = await this.client.chat.completions.create(
-					requestOptions,
-					this._isAzureAiInference(modelUrl) ? { path: OPENAI_AZURE_AI_INFERENCE_PATH } : {},
-				)
+				response = await this.client.chat.completions.create(requestOptions, clientRequestOptions)
 			} catch (error) {
 				throw handleOpenAIError(error, this.providerName)
 			}
@@ -399,12 +407,16 @@ export class OpenAiHandler extends BaseProvider implements SingleCompletionHandl
 			// This allows O3 models to limit response length when includeMaxTokens is enabled
 			this.addMaxTokensIfNeeded(requestOptions, modelInfo)
 
+			// kilocode_change start
+			const clientRequestOptions: OpenAI.RequestOptions = {
+				...(methodIsAzureAiInference ? { path: OPENAI_AZURE_AI_INFERENCE_PATH } : {}),
+				...(metadata?.abortSignal ? { signal: metadata.abortSignal } : {}),
+			}
+			// kilocode_change end
+
 			let stream
 			try {
-				stream = await this.client.chat.completions.create(
-					requestOptions,
-					methodIsAzureAiInference ? { path: OPENAI_AZURE_AI_INFERENCE_PATH } : {},
-				)
+				stream = await this.client.chat.completions.create(requestOptions, clientRequestOptions)
 			} catch (error) {
 				throw handleOpenAIError(error, this.providerName)
 			}
@@ -434,12 +446,16 @@ export class OpenAiHandler extends BaseProvider implements SingleCompletionHandl
 			// This allows O3 models to limit response length when includeMaxTokens is enabled
 			this.addMaxTokensIfNeeded(requestOptions, modelInfo)
 
+			// kilocode_change start
+			const clientRequestOptions: OpenAI.RequestOptions = {
+				...(methodIsAzureAiInference ? { path: OPENAI_AZURE_AI_INFERENCE_PATH } : {}),
+				...(metadata?.abortSignal ? { signal: metadata.abortSignal } : {}),
+			}
+			// kilocode_change end
+
 			let response
 			try {
-				response = await this.client.chat.completions.create(
-					requestOptions,
-					methodIsAzureAiInference ? { path: OPENAI_AZURE_AI_INFERENCE_PATH } : {},
-				)
+				response = await this.client.chat.completions.create(requestOptions, clientRequestOptions)
 			} catch (error) {
 				throw handleOpenAIError(error, this.providerName)
 			}

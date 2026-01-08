@@ -2062,6 +2062,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		if (this.currentRequestAbortController) {
 			console.log(`[Task#${this.taskId}.${this.instanceId}] Aborting current HTTP request`)
 			this.currentRequestAbortController.abort()
+			// kilocode_change: do not clear currentRequestAbortController here; streaming loop may still need its signal
 		}
 	}
 
@@ -4123,7 +4124,9 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		// Create an AbortController to allow cancelling the request mid-stream
 		this.currentRequestAbortController = new AbortController()
 		const abortSignal = this.currentRequestAbortController.signal
+		// kilocode_change start
 		metadata.abortSignal = abortSignal
+		// kilocode_change end
 		// Reset the flag after using it
 		this.skipPrevResponseIdOnce = false
 
@@ -4138,6 +4141,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		// Set up abort handling - store listener reference for cleanup
 		// to avoid accumulating listeners on the AbortSignal
 		const abortCleanupListener = () => {
+			// kilocode_change: do not clear currentRequestAbortController on abort; cleanup happens in finally blocks
 			console.log(`[Task#${this.taskId}.${this.instanceId}] AbortSignal triggered for current request`)
 		}
 		abortSignal.addEventListener("abort", abortCleanupListener)

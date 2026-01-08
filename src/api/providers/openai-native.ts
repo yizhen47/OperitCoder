@@ -329,6 +329,18 @@ export class OpenAiNativeHandler extends BaseProvider implements SingleCompletio
 	): ApiStream {
 		// Create AbortController for cancellation
 		this.abortController = new AbortController()
+		// kilocode_change start
+		const outerAbortSignal = metadata?.abortSignal
+		let outerAbortListener: (() => void) | undefined
+		if (outerAbortSignal) {
+			if (outerAbortSignal.aborted) {
+				this.abortController.abort()
+			} else {
+				outerAbortListener = () => this.abortController?.abort()
+				outerAbortSignal.addEventListener("abort", outerAbortListener)
+			}
+		}
+		// kilocode_change end
 
 		try {
 			// Use the official SDK
@@ -356,6 +368,11 @@ export class OpenAiNativeHandler extends BaseProvider implements SingleCompletio
 			// For errors, fallback to manual SSE via fetch
 			yield* this.makeResponsesApiRequest(requestBody, model, metadata, systemPrompt, messages)
 		} finally {
+			// kilocode_change start
+			if (outerAbortSignal && outerAbortListener) {
+				outerAbortSignal.removeEventListener("abort", outerAbortListener)
+			}
+			// kilocode_change end
 			this.abortController = undefined
 		}
 	}
@@ -474,6 +491,18 @@ export class OpenAiNativeHandler extends BaseProvider implements SingleCompletio
 
 		// Create AbortController for cancellation
 		this.abortController = new AbortController()
+		// kilocode_change start
+		const outerAbortSignal = metadata?.abortSignal
+		let outerAbortListener: (() => void) | undefined
+		if (outerAbortSignal) {
+			if (outerAbortSignal.aborted) {
+				this.abortController.abort()
+			} else {
+				outerAbortListener = () => this.abortController?.abort()
+				outerAbortSignal.addEventListener("abort", outerAbortListener)
+			}
+		}
+		// kilocode_change end
 
 		try {
 			const response = await fetch(url, {
@@ -561,6 +590,11 @@ export class OpenAiNativeHandler extends BaseProvider implements SingleCompletio
 			// Handle non-Error objects
 			throw new Error(`Unexpected error connecting to Responses API`)
 		} finally {
+			// kilocode_change start
+			if (outerAbortSignal && outerAbortListener) {
+				outerAbortSignal.removeEventListener("abort", outerAbortListener)
+			}
+			// kilocode_change end
 			this.abortController = undefined
 		}
 	}

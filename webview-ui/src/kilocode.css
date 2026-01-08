@@ -43,6 +43,20 @@
 .animate-fade-in {
 	animation: fade-in 0.2s ease-out forwards;
 }
+@keyframes streaming-reveal {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.animate-streaming-reveal {
+	opacity: 0;
+	animation: streaming-reveal 0.2s ease-out forwards;
+	animation-delay: var(--streaming-reveal-delay, 0ms);
+}
 
 /* Message highlight animation for timeline clicks */
 @keyframes message-highlight {

@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import { telemetryClient } from "@src/utils/TelemetryClient"
 import { withTranslation, WithTranslation } from "react-i18next"
 import { enhanceErrorWithSourceMaps } from "@src/utils/sourceMapUtils"
+import { ExtensionStateContext } from "../context/ExtensionStateContext" // kilocode_change
 
 type ErrorProps = {
 	children: React.ReactNode
@@ -14,6 +15,9 @@ type ErrorState = {
 }
 
 class ErrorBoundary extends Component<ErrorProps, ErrorState> {
+	static contextType = ExtensionStateContext // kilocode_change
+	declare context: React.ContextType<typeof ExtensionStateContext> // kilocode_change
+
 	constructor(props: ErrorProps) {
 		super(props)
 		this.state = {}
@@ -62,7 +66,8 @@ class ErrorBoundary extends Component<ErrorProps, ErrorState> {
 		const errorDisplay = this.state.error
 		const componentStackDisplay = this.state.componentStack
 
-		const version = process.env.PKG_VERSION || "unknown"
+		const version = this.context?.version || process.env.PKG_VERSION || "unknown" // kilocode_change
+		const issueUrl = "https://github.com/yizhen47/OperitCoder/issues" // kilocode_change
 
 		return (
 			<div>
@@ -71,7 +76,7 @@ class ErrorBoundary extends Component<ErrorProps, ErrorState> {
 				</h2>
 				<p className="mb-4">
 					{t("errorBoundary.reportText")}{" "}
-					<a href="https://github.com/Kilo-Org/kilocode/issues" target="_blank" rel="noreferrer">
+					<a href={issueUrl} target="_blank" rel="noreferrer">
 						{t("errorBoundary.githubText")}
 					</a>
 				</p>

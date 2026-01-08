@@ -1083,10 +1083,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 					{/* kilocode_change start display section */}
 					{activeTab === "display" && (
 						<DisplaySettings
-							reasoningBlockCollapsed={reasoningBlockCollapsed ?? true}
-							showTaskTimeline={showTaskTimeline}
-							sendMessageOnEnter={sendMessageOnEnter}
-							showTimestamps={cachedState.showTimestamps} // kilocode_change
 							hideCostBelowThreshold={hideCostBelowThreshold}
 							setCachedStateField={setCachedStateField}
 						/>

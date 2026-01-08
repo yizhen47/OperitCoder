@@ -1845,8 +1845,8 @@ describe("Cline", () => {
 				// Verify abort was called on the controller
 				expect(abortSpy).toHaveBeenCalled()
 
-				// Verify the controller was cleared
-				expect(task.currentRequestAbortController).toBeUndefined()
+				// Verify the controller is still present (cleanup happens when the request lifecycle finishes)
+				expect(task.currentRequestAbortController).toBe(mockAbortController)
 
 				// Verify logging
 				expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining("Aborting current HTTP request"))

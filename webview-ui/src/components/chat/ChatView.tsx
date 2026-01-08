@@ -174,6 +174,9 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 	const [primaryButtonText, setPrimaryButtonText] = useState<string | undefined>(undefined)
 	const [secondaryButtonText, setSecondaryButtonText] = useState<string | undefined>(undefined)
 	const [didClickCancel, setDidClickCancel] = useState(false)
+	const [isScrollSeeking, setIsScrollSeeking] = useState(false)
+	const [olderMessagesCollapsed, setOlderMessagesCollapsed] = useState(false)
+	const userExpandedOlderMessagesRef = useRef(false)
 	const virtuosoRef = useRef<VirtuosoHandle>(null)
 	const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({})
 	const prevExpandedRowsRef = useRef<Record<number, boolean>>()
@@ -210,6 +213,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 	// kilocode_change end
 	const autoApproveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const userRespondedRef = useRef<boolean>(false)
+	const lastSendSignatureRef = useRef<{ signature: string; ts: number } | null>(null) // kilocode_change
 	const [currentFollowUpTs, setCurrentFollowUpTs] = useState<number | null>(null)
 
 	const clineAskRef = useRef(clineAsk)
@@ -611,10 +615,19 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				lastApiReqStarted.text !== undefined &&
 				lastApiReqStarted.say === "api_req_started"
 			) {
-				const cost = JSON.parse(lastApiReqStarted.text).cost
+				let cost: unknown
+				try {
+					cost = JSON.parse(lastApiReqStarted.text).cost
+				} catch {
+					cost = undefined
+				}
 
 				if (cost === undefined) {
-					return true // API request has not finished yet.
+					const last = modifiedMessages.at(-1)
+					if (last?.say === "api_req_started" || last?.say === "api_req_retry_delayed") {
+						return true
+					}
+					return false
 				}
 			}
 		}
@@ -659,6 +672,14 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 			text = text.trim()
 
 			if (text || images.length > 0) {
+				const now = Date.now() // kilocode_change
+				const signature = `${text}\n${images.length}:${images.map((img) => `${img.length}:${img.slice(0, 32)}`).join("|")}` // kilocode_change
+				const last = lastSendSignatureRef.current // kilocode_change
+				if (last && last.signature === signature && now - last.ts < 750) {
+					return
+				}
+				lastSendSignatureRef.current = { signature, ts: now }
+
 				// Queue message if:
 				// - Task is busy (sendingDisabled)
 				// - API request in progress (isStreaming)
@@ -1057,6 +1078,26 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		return newVisibleMessages
 	}, [modifiedMessages])
 
+	// kilocode_change start
+	const OLDER_MESSAGES_AUTO_COLLAPSE_THRESHOLD = 200
+	const OLDER_MESSAGES_COLLAPSED_TAIL_COUNT = 120
+	const COLLAPSED_OLDER_MESSAGES_TS = Number.MIN_SAFE_INTEGER + 4242
+
+	useEffect(() => {
+		// Reset for each new task
+		userExpandedOlderMessagesRef.current = false
+		setOlderMessagesCollapsed(false)
+	}, [task?.ts])
+
+	useEffect(() => {
+		if (!task) return
+		const shouldAutoCollapse = isCondensing || visibleMessages.length > OLDER_MESSAGES_AUTO_COLLAPSE_THRESHOLD
+		if (shouldAutoCollapse && !userExpandedOlderMessagesRef.current) {
+			setOlderMessagesCollapsed(true)
+		}
+	}, [task, isCondensing, visibleMessages.length])
+	// kilocode_change end
+
 	useEffect(() => {
 		const cleanupInterval = setInterval(() => {
 			const cache = everVisibleMessagesTsRef.current
@@ -1154,18 +1195,52 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 
 	const groupedMessages = useMemo(() => {
 		// Only filter out the launch ask and result messages - browser actions appear in chat
-		const result: ClineMessage[] = visibleMessages.filter((msg) => !isBrowserSessionMessage(msg))
+		const base: ClineMessage[] = visibleMessages.filter((msg) => !isBrowserSessionMessage(msg))
+
+		let result: ClineMessage[] = base
+
+		if (olderMessagesCollapsed && base.length > OLDER_MESSAGES_AUTO_COLLAPSE_THRESHOLD) {
+			const head = base[0] ? [base[0]] : []
+			const tailStart = Math.max(1, base.length - OLDER_MESSAGES_COLLAPSED_TAIL_COUNT)
+			const tail = base.slice(tailStart)
+			const hiddenCount = Math.max(0, base.length - head.length - tail.length)
+
+			if (hiddenCount > 0) {
+				result = [
+					...head,
+					{
+						type: "say",
+						say: "collapsed_older_messages",
+						ts: COLLAPSED_OLDER_MESSAGES_TS,
+						text: JSON.stringify({ hiddenCount }),
+					} as any,
+					...tail,
+				]
+			}
+		}
 
 		if (isCondensing) {
-			result.push({
-				type: "say",
-				say: "condense_context",
-				ts: condensingMessageTs as number,
-				partial: true,
-			} as any)
+			result = [
+				...result,
+				{
+					type: "say",
+					say: "condense_context",
+					ts: condensingMessageTs as number,
+					partial: true,
+				} as any,
+			]
 		}
 		return result
-	}, [isCondensing, visibleMessages, isBrowserSessionMessage, condensingMessageTs])
+	}, [
+		isCondensing,
+		visibleMessages,
+		isBrowserSessionMessage,
+		condensingMessageTs,
+		olderMessagesCollapsed,
+		OLDER_MESSAGES_AUTO_COLLAPSE_THRESHOLD,
+		OLDER_MESSAGES_COLLAPSED_TAIL_COUNT,
+		COLLAPSED_OLDER_MESSAGES_TS,
+	])
 
 	// scrolling
 
@@ -1353,9 +1428,43 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		vscode.postMessage({ type: "askResponse", askResponse: "objectResponse", text: JSON.stringify(response) })
 	}, [])
 
+	const handleShowOlderMessages = useCallback(() => {
+		userExpandedOlderMessagesRef.current = true
+		setOlderMessagesCollapsed(false)
+		requestAnimationFrame(() => {
+			virtuosoRef.current?.scrollToIndex({ index: 0, align: "start", behavior: "auto" })
+		})
+	}, [])
+
+	const handleCollapseOlderMessages = useCallback(() => {
+		setOlderMessagesCollapsed(true)
+		requestAnimationFrame(() => {
+			scrollToBottomAuto()
+		})
+	}, [scrollToBottomAuto])
+
 	const itemContent = useCallback(
 		(index: number, messageOrGroup: ClineMessage) => {
 			const hasCheckpoint = modifiedMessages.some((message) => message.say === "checkpoint_saved")
+
+			// kilocode_change: collapsed older messages marker row
+			if (messageOrGroup.type === "say" && (messageOrGroup as any).say === "collapsed_older_messages") {
+				let hiddenCount = 0
+				try {
+					hiddenCount = JSON.parse(messageOrGroup.text || "{}").hiddenCount ?? 0
+				} catch {
+					// ignore
+				}
+				return (
+					<div key={messageOrGroup.ts} data-testid="collapsed-older-messages" className="px-4 py-3">
+						<button
+							className="w-full rounded-md border border-vscode-widget-border bg-vscode-editor-background/60 hover:bg-vscode-editor-background/80 transition-colors duration-150 px-3 py-2 text-sm text-vscode-editor-foreground"
+							onClick={handleShowOlderMessages}>
+							{t("chat:task.seeMore")} ({hiddenCount})
+						</button>
+					</div>
+				)
+			}
 
 			// Check if this is a browser action message
 			if (messageOrGroup.type === "say" && messageOrGroup.say === "browser_action") {
@@ -1440,6 +1549,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 			alwaysAllowUpdateTodoList,
 			enableButtons,
 			primaryButtonText,
+			handleShowOlderMessages,
 		],
 	)
 

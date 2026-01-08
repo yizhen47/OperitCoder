@@ -4,6 +4,7 @@ import {
 	ProviderSettings,
 	ExperimentId,
 	openRouterDefaultModelId, // kilocode_change
+	type ClineMessage,
 	DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
 } from "@roo-code/types"
 
@@ -36,6 +37,17 @@ const TestComponent = () => {
 			<button data-testid="toggle-rooignore-button" onClick={() => setShowRooIgnoredFiles(!showRooIgnoredFiles)}>
 				Update Commands
 			</button>
+		</div>
+	)
+}
+
+const StreamingMessageUpdatedTestComponent = () => {
+	const { clineMessages } = useExtensionState()
+	const last = clineMessages.at(-1)
+	return (
+		<div>
+			<div data-testid="last-message-text">{last?.text ?? ""}</div>
+			<div data-testid="last-message-partial">{String(last?.partial === true)}</div>
 		</div>
 	)
 }
@@ -221,6 +233,157 @@ describe("ExtensionStateContext", () => {
 				modelTemperature: 0.7, // Should add this from partial update
 			}),
 		)
+	})
+
+	it("delays messageUpdated for streaming text partials by 200ms", async () => {
+		vi.useFakeTimers()
+
+		render(
+			<ExtensionStateContextProvider>
+				<StreamingMessageUpdatedTestComponent />
+			</ExtensionStateContextProvider>,
+		)
+
+		act(() => {
+			window.dispatchEvent(
+				new MessageEvent("message", {
+					data: {
+						type: "state",
+						state: {
+							apiConfiguration: {},
+							clineMessages: [
+								{
+									ts: 1,
+									type: "say",
+									say: "text",
+									text: "a",
+									partial: true,
+								} satisfies ClineMessage,
+							],
+						},
+					},
+				}),
+			)
+		})
+
+		expect(screen.getByTestId("last-message-text").textContent).toBe("a")
+		expect(screen.getByTestId("last-message-partial").textContent).toBe("true")
+
+		act(() => {
+			window.dispatchEvent(
+				new MessageEvent("message", {
+					data: {
+						type: "messageUpdated",
+						clineMessage: {
+							ts: 1,
+							type: "say",
+							say: "text",
+							text: "ab",
+							partial: true,
+						} satisfies ClineMessage,
+					},
+				}),
+			)
+		})
+
+		// not updated immediately
+		expect(screen.getByTestId("last-message-text").textContent).toBe("a")
+
+		act(() => {
+			vi.advanceTimersByTime(199)
+		})
+		expect(screen.getByTestId("last-message-text").textContent).toBe("a")
+
+		act(() => {
+			vi.advanceTimersByTime(1)
+		})
+		expect(screen.getByTestId("last-message-text").textContent).toBe("ab")
+
+		vi.useRealTimers()
+	})
+
+	it("applies messageUpdated immediately when streaming text becomes complete", async () => {
+		vi.useFakeTimers()
+
+		render(
+			<ExtensionStateContextProvider>
+				<StreamingMessageUpdatedTestComponent />
+			</ExtensionStateContextProvider>,
+		)
+
+		act(() => {
+			window.dispatchEvent(
+				new MessageEvent("message", {
+					data: {
+						type: "state",
+						state: {
+							apiConfiguration: {},
+							clineMessages: [
+								{
+									ts: 2,
+									type: "say",
+									say: "text",
+									text: "a",
+									partial: true,
+								} satisfies ClineMessage,
+							],
+						},
+					},
+				}),
+			)
+		})
+
+		act(() => {
+			window.dispatchEvent(
+				new MessageEvent("message", {
+					data: {
+						type: "messageUpdated",
+						clineMessage: {
+							ts: 2,
+							type: "say",
+							say: "text",
+							text: "ab",
+							partial: true,
+						} satisfies ClineMessage,
+					},
+				}),
+			)
+		})
+
+		act(() => {
+			vi.advanceTimersByTime(100)
+		})
+
+		// still buffered
+		expect(screen.getByTestId("last-message-text").textContent).toBe("a")
+
+		act(() => {
+			window.dispatchEvent(
+				new MessageEvent("message", {
+					data: {
+						type: "messageUpdated",
+						clineMessage: {
+							ts: 2,
+							type: "say",
+							say: "text",
+							text: "abc",
+							partial: false,
+						} satisfies ClineMessage,
+					},
+				}),
+			)
+		})
+
+		// complete update should apply immediately (and cancel pending timer)
+		expect(screen.getByTestId("last-message-text").textContent).toBe("abc")
+		expect(screen.getByTestId("last-message-partial").textContent).toBe("false")
+
+		act(() => {
+			vi.advanceTimersByTime(500)
+		})
+		expect(screen.getByTestId("last-message-text").textContent).toBe("abc")
+
+		vi.useRealTimers()
 	})
 })
 

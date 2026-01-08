@@ -30,21 +30,50 @@ vi.mock("../../../../components/ui", () => ({
 	StandardTooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
+let lastVirtuosoProps: any
+
 // Mock react-virtuoso - tracks rendered items for testing
 vi.mock("react-virtuoso", () => ({
-	Virtuoso: ({ data, itemContent }: any) => (
-		<div data-testid="virtuoso-list" data-item-count={data.length}>
-			{data.map((item: any, index: number) => (
-				<div key={index} data-testid={`virtuoso-item-${index}`}>
-					{itemContent(index, item)}
-				</div>
-			))}
-		</div>
-	),
+	Virtuoso: (props: any) => {
+		lastVirtuosoProps = props
+		const { data, itemContent, computeItemKey } = props
+		return (
+			<div data-testid="virtuoso-list" data-item-count={data.length}>
+				{data.map((item: any, index: number) => (
+					<div
+						key={computeItemKey ? computeItemKey(index, item) : index}
+						data-testid={`virtuoso-item-${index}`}
+					>
+						{itemContent(index, item)}
+					</div>
+				))}
+			</div>
+		)
+	},
 }))
 
 describe("MessageList", () => {
 	const sessionId = "test-session"
+
+	it("passes computeItemKey to Virtuoso for stable keys", () => {
+		const store = createStore()
+		store.set(sessionMessagesAtomFamily(sessionId), [
+			{
+				ts: 1,
+				type: "say",
+				say: "text",
+				text: "Hello",
+			} as ClineMessage,
+		])
+
+		render(
+			<Provider store={store}>
+				<MessageList sessionId={sessionId} />
+			</Provider>,
+		)
+
+		expect(typeof lastVirtuosoProps?.computeItemKey).toBe("function")
+	})
 
 	describe("handleCopyToInput", () => {
 		it("appends suggestion to empty input", () => {
@@ -98,6 +127,37 @@ describe("MessageList", () => {
 			fireEvent.click(copyButtons[0])
 
 			expect(store.get(sessionInputAtomFamily(sessionId))).toBe("Existing text \nOption A")
+		})
+	})
+
+	describe("internal message filtering", () => {
+		it("does not include internal say messages in Virtuoso data", () => {
+			const store = createStore()
+			store.set(sessionMessagesAtomFamily(sessionId), [
+				{
+					ts: 1,
+					type: "say",
+					say: "api_req_started",
+					text: "{}",
+				} as ClineMessage,
+				{
+					ts: 2,
+					type: "say",
+					say: "text",
+					text: "Visible",
+				} as ClineMessage,
+			])
+
+			render(
+				<Provider store={store}>
+					<MessageList sessionId={sessionId} />
+				</Provider>,
+			)
+
+			const virtuosoList = screen.getByTestId("virtuoso-list")
+			expect(virtuosoList.getAttribute("data-item-count")).toBe("1")
+			expect(screen.queryByText("messages.api_req_started")).not.toBeInTheDocument()
+			expect(screen.getByText("Visible")).toBeInTheDocument()
 		})
 	})
 

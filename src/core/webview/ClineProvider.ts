@@ -2888,7 +2888,7 @@ ${prompt}
 
 		console.log(`[cancelTask] cancelling task ${task.taskId}.${task.instanceId}`)
 
-		const { historyItem, uiMessagesFilePath } = await this.getTaskWithId(task.taskId)
+		const { historyItem } = await this.getTaskWithId(task.taskId)
 
 		// Preserve parent and root task information for history item.
 		const rootTask = task.rootTask
@@ -2907,24 +2907,75 @@ ${prompt}
 		// Begin abort (non-blocking)
 		task.abortTask()
 
-		// Immediately mark the original instance as abandoned to prevent any residual activity
-		task.abandoned = true
-
+		// kilocode_change start
+		let didTimeoutWaitingForAbort = false
 		await pWaitFor(
-			() =>
-				this.getCurrentTask()! === undefined ||
-				this.getCurrentTask()!.isStreaming === false ||
-				this.getCurrentTask()!.didFinishAbortingStream ||
-				// If only the first chunk is processed, then there's no
-				// need to wait for graceful abort (closes edits, browser,
-				// etc).
-				this.getCurrentTask()!.isWaitingForFirstChunk,
+			() => {
+				const current = this.getCurrentTask()
+				if (!current) {
+					return true
+				}
+				if (current.instanceId !== originalInstanceId) {
+					return true
+				}
+				return current.isStreaming === false || current.didFinishAbortingStream
+			},
 			{
 				timeout: 3_000,
 			},
 		).catch(() => {
-			console.error("Failed to abort task")
+			didTimeoutWaitingForAbort = true
 		})
+
+		const currentAfterWait = this.getCurrentTask()
+		if (currentAfterWait && currentAfterWait.instanceId === originalInstanceId) {
+			// If the abort stream finalization didn't run (e.g., due to an early timeout),
+			// ensure we still clear any trailing partial message and end the api_req_started
+			// state so the webview stops showing the waiting animation.
+			if (didTimeoutWaitingForAbort || currentAfterWait.didFinishAbortingStream !== true) {
+				try {
+					const globalStoragePath = this.contextProxy.globalStorageUri.fsPath
+					const savedMessages = await readTaskMessages({ taskId: task.taskId, globalStoragePath })
+					const messages = savedMessages.slice()
+					const last = messages.at(-1)
+					if (last?.partial === true) {
+						last.partial = false
+					}
+
+					for (let i = messages.length - 1; i >= 0; i--) {
+						const msg = messages[i]
+						if (msg.type === "say" && msg.say === "api_req_started") {
+							let data: any = {}
+							try {
+								data = JSON.parse(msg.text || "{}")
+							} catch {
+								data = {}
+							}
+							if (data.cost === undefined) {
+								data.cost = 0
+							}
+							data.cancelReason = "user_cancelled"
+							msg.text = JSON.stringify(data)
+							break
+						}
+					}
+
+					await saveTaskMessages({ messages, taskId: task.taskId, globalStoragePath })
+					currentAfterWait.clineMessages = messages
+					await this.postStateToWebview()
+				} catch (error) {
+					this.log(
+						`[cancelTask] Failed to finalize cancelled task messages for UI: ${
+							error instanceof Error ? error.message : String(error)
+						}`,
+					)
+				}
+			}
+
+			// Mark the original instance as abandoned to prevent any residual activity.
+			currentAfterWait.abandoned = true
+		}
+		// kilocode_change end
 
 		// Defensive safeguard: if current instance already changed, skip rehydrate
 		const current = this.getCurrentTask()

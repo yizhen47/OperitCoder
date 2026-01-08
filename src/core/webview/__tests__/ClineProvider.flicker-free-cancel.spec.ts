@@ -6,6 +6,25 @@ import { Task } from "../../task/Task"
 import { ContextProxy } from "../../config/ContextProxy"
 import type { ProviderSettings, HistoryItem } from "@roo-code/types"
 
+// task-persistence mocks
+const hoistedTaskMessages = vi.hoisted(() => ({
+	readTaskMessagesMock: vi.fn(),
+}))
+vi.mock("../../task-persistence/taskMessages", () => ({
+	readTaskMessages: hoistedTaskMessages.readTaskMessagesMock,
+}))
+
+const hoistedTaskPersistence = vi.hoisted(() => ({
+	saveTaskMessagesMock: vi.fn().mockResolvedValue(undefined),
+	readApiMessagesMock: vi.fn(),
+	saveApiMessagesMock: vi.fn(),
+}))
+vi.mock("../../task-persistence", () => ({
+	readApiMessages: hoistedTaskPersistence.readApiMessagesMock,
+	saveApiMessages: hoistedTaskPersistence.saveApiMessagesMock,
+	saveTaskMessages: hoistedTaskPersistence.saveTaskMessagesMock,
+}))
+
 // Mock dependencies
 vi.mock("vscode", () => {
 	const mockDisposable = { dispose: vi.fn() }
@@ -185,8 +204,13 @@ describe("ClineProvider flicker-free cancel", () => {
 			taskId: "task-1",
 			instanceId: "instance-1",
 			emit: vi.fn(),
+			cancelCurrentRequest: vi.fn(),
 			abortTask: vi.fn().mockResolvedValue(undefined),
 			abandoned: false,
+			abortReason: undefined,
+			isStreaming: false,
+			didFinishAbortingStream: false,
+			clineMessages: [],
 			dispose: vi.fn(),
 			on: vi.fn(),
 			off: vi.fn(),
@@ -328,5 +352,40 @@ describe("ClineProvider flicker-free cancel", () => {
 		expect((provider as any).clineStack).toHaveLength(2)
 		expect((provider as any).clineStack[0]).toBe(mockParentTask)
 		expect((provider as any).clineStack[1]).toBe(mockTask2)
+	})
+
+	it("should finalize streaming UI state on cancelTask so waiting animation stops", async () => {
+		// Setup: Add a task to the stack first
+		;(provider as any).clineStack = [mockTask1]
+
+		// Simulate persisted messages where UI would still consider this streaming
+		// (last message partial + api_req_started without cost)
+		const persistedMessages: any[] = [
+			{ ts: 1, type: "say", say: "api_req_started", text: JSON.stringify({ apiProtocol: "openai" }) },
+			{ ts: 2, type: "say", say: "text", text: "partial", partial: true },
+		]
+		hoistedTaskMessages.readTaskMessagesMock.mockResolvedValueOnce(persistedMessages)
+
+		await provider.cancelTask()
+
+		// Should read and rewrite messages to end streaming state
+		expect(hoistedTaskMessages.readTaskMessagesMock).toHaveBeenCalledTimes(1)
+		expect(hoistedTaskPersistence.saveTaskMessagesMock).toHaveBeenCalledTimes(1)
+
+		const savedArg = hoistedTaskPersistence.saveTaskMessagesMock.mock.calls[0]?.[0]
+		expect(savedArg.taskId).toBe("task-1")
+		const savedMessages = savedArg.messages
+
+		// Partial should be cleared
+		expect(savedMessages.at(-1)?.partial).toBe(false)
+
+		// api_req_started should have cost + cancelReason so UI doesn't treat it as in-progress
+		const apiReqStarted = savedMessages.find((m: any) => m.type === "say" && m.say === "api_req_started")
+		const parsed = JSON.parse(apiReqStarted.text)
+		expect(parsed.cost).toBe(0)
+		expect(parsed.cancelReason).toBe("user_cancelled")
+
+		// Should update webview state
+		expect(provider.postStateToWebview).toHaveBeenCalled()
 	})
 })

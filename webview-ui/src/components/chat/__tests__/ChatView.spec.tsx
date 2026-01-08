@@ -29,6 +29,8 @@ interface ExtensionState {
 	[key: string]: any
 }
 
+let lastVirtuosoProps: any
+
 // Mock vscode API
 vi.mock("@src/utils/vscode", () => ({
 	vscode: {
@@ -67,14 +69,21 @@ vi.mock("react-virtuoso", () => ({
 	Virtuoso: function MockVirtuoso({
 		data,
 		itemContent,
+		computeItemKey,
+		...rest
 	}: {
 		data: ClineMessage[]
 		itemContent: (index: number, item: ClineMessage) => React.ReactNode
+		computeItemKey?: (index: number, item: ClineMessage) => React.Key
 	}) {
+		lastVirtuosoProps = { data, itemContent, computeItemKey, ...rest }
 		return (
 			<div data-testid="virtuoso-item-list">
 				{data.map((item, index) => (
-					<div key={item.ts} data-testid={`virtuoso-item-${index}`}>
+					<div
+						key={computeItemKey ? computeItemKey(index, item) : item.ts}
+						data-testid={`virtuoso-item-${index}`}
+					>
 						{itemContent(index, item)}
 					</div>
 				))}
@@ -315,6 +324,29 @@ const renderChatView = (props: Partial<ChatViewProps> = {}) => {
 	)
 }
 
+describe("ChatView - Virtuoso key stability", () => {
+	beforeEach(() => vi.clearAllMocks())
+
+	it("passes computeItemKey to Virtuoso", async () => {
+		renderChatView()
+
+		mockPostMessage({
+			clineMessages: [
+				{
+					type: "say",
+					say: "task",
+					ts: Date.now() - 2000,
+					text: "Initial task",
+				},
+			],
+		})
+
+		await waitFor(() => {
+			expect(typeof lastVirtuosoProps?.computeItemKey).toBe("function")
+		})
+	})
+})
+
 describe("ChatView - Sound Playing Tests", () => {
 	beforeEach(() => vi.clearAllMocks())
 
@@ -464,6 +496,84 @@ describe("ChatView - Sound Playing Tests", () => {
 
 		// Should not play sound for completion when resuming from history
 		expect(mockPlayFunction).not.toHaveBeenCalled()
+	})
+
+	it("keeps condensing placeholder ts stable across rerenders while condensing", async () => {
+		const { getByTestId, container } = renderChatView()
+
+		mockPostMessage({
+			clineMessages: [
+				{
+					type: "say",
+					say: "task",
+					ts: Date.now() - 2000,
+					text: "Initial task",
+				},
+				{
+					type: "say",
+					say: "api_req_started",
+					ts: Date.now() - 1000,
+					text: JSON.stringify({ apiProtocol: "anthropic" }),
+				},
+			],
+		})
+
+		await waitFor(() => {
+			expect(getByTestId("chat-view")).toBeInTheDocument()
+		})
+
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, 10))
+		})
+
+		await act(async () => {
+			const event = new MessageEvent("message", {
+				data: {
+					type: "condenseTaskContextStarted",
+					text: "test-task-id",
+				},
+			})
+			window.dispatchEvent(event)
+			await new Promise((resolve) => setTimeout(resolve, 0))
+		})
+
+		const getCondenseTs = () => {
+			const rows = container.querySelectorAll('[data-testid="chat-row"]')
+			const condensingRow = Array.from(rows).find((row) => {
+				const text = row.textContent || ""
+				return text.includes('"say":"condense_context"') && text.includes('"partial":true')
+			})
+			expect(condensingRow).toBeTruthy()
+			return JSON.parse(condensingRow!.textContent || "{}").ts as number
+		}
+
+		const ts1 = await waitFor(() => getCondenseTs())
+
+		mockPostMessage({
+			clineMessages: [
+				{
+					type: "say",
+					say: "task",
+					ts: Date.now() - 2000,
+					text: "Initial task",
+				},
+				{
+					type: "say",
+					say: "api_req_started",
+					ts: Date.now() - 1000,
+					text: JSON.stringify({ apiProtocol: "anthropic" }),
+				},
+				{
+					type: "say",
+					say: "text",
+					ts: Date.now(),
+					text: "Trigger rerender",
+				},
+			],
+		})
+
+		const ts2 = await waitFor(() => getCondenseTs())
+		expect(ts2).toBe(ts1)
 	})
 })
 
@@ -1025,6 +1135,45 @@ describe.skip("ChatView - Message Queueing Tests", () => {
 				type: "queueMessage",
 			}),
 		)
+	})
+
+	it("dedupes rapid repeated sends of the same message", async () => {
+		const { getByTestId } = renderChatView()
+
+		mockPostMessage({
+			clineMessages: [{ type: "say", say: "task", text: "Initial task", ts: Date.now() - 1000 }],
+		})
+
+		await waitFor(() => {
+			expect(getByTestId("chat-textarea")).toBeInTheDocument()
+		})
+
+		vi.mocked(vscode.postMessage).mockClear()
+
+		const chatTextArea = getByTestId("chat-textarea")
+		const input = chatTextArea.querySelector("input")! as HTMLInputElement
+		await act(async () => {
+			fireEvent.change(input, { target: { value: "same message" } })
+		})
+
+		await act(async () => {
+			fireEvent.keyDown(input, { key: "Enter", code: "Enter" })
+			fireEvent.keyDown(input, { key: "Enter", code: "Enter" })
+		})
+
+		await waitFor(() => {
+			expect(vscode.postMessage).toHaveBeenCalledWith({
+				type: "askResponse",
+				askResponse: "messageResponse",
+				text: "same message",
+				images: [],
+			})
+		})
+
+		const askResponseCalls = (vscode.postMessage as any).mock.calls.filter(
+			(call: any) => call[0]?.type === "askResponse" && call[0]?.askResponse === "messageResponse",
+		)
+		expect(askResponseCalls).toHaveLength(1)
 	})
 
 	it("preserves message order when messages sent during queue drain", async () => {

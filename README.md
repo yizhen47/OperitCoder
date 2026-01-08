@@ -1,120 +1,108 @@
 <p align="center">
+  <a href="https://github.com/yizhen47/OperitCoder"><img src="https://img.shields.io/badge/GitHub-Repo-181717?style=flat&logo=github&logoColor=white" alt="GitHub Repo"></a>
+  <a href="https://github.com/yizhen47/OperitCoder/issues"><img src="https://img.shields.io/badge/GitHub-Issues-1F6FEB?style=flat&logo=github&logoColor=white" alt="GitHub Issues"></a>
   <a href="https://marketplace.visualstudio.com/items?itemName=kilocode.Operit-Coder"><img src="https://img.shields.io/badge/VS_Code_Marketplace-007ACC?style=flat&logo=visualstudiocode&logoColor=white" alt="VS Code Marketplace"></a>
-  <a href="https://x.com/kilocode"><img src="https://img.shields.io/badge/kilocode-000000?style=flat&logo=x&logoColor=white" alt="X (Twitter)"></a>
-  <a href="https://blog.kilo.ai"><img src="https://img.shields.io/badge/Blog-555?style=flat&logo=substack&logoColor=white" alt="Substack Blog"></a>
-  <a href="https://kilo.ai/discord"><img src="https://img.shields.io/badge/Join%20Discord-5865F2?style=flat&logo=discord&logoColor=white" alt="Discord"></a>
-  <a href="https://www.reddit.com/r/kilocode/"><img src="https://img.shields.io/badge/Join%20r%2Fkilocode-D84315?style=flat&logo=reddit&logoColor=white" alt="Reddit"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/yizhen47/OperitCoder?style=flat" alt="License"></a>
 </p>
 
 # 🚀 Operit Coder
 
-> Operit Coder 是从 [KiloCode](https://github.com/Kilo-Org/kilocode) fork 而来的 AI 编码助手。我们致力于简化、稳定性和更好的用户体验。
+> 这是我个人维护的 VS Code AI 编码助手分支（基于 [KiloCode](https://github.com/Kilo-Org/kilocode) / Roo Code 体系）。我的目标很简单：把日常用得到的体验打磨好——更稳、更顺手、更少“莫名其妙”。
 
-## 📝 Fork 说明
+## 你可以在这里做什么
 
-本项目从 KiloCode fork，主要改进包括：
+- **自然语言写代码**：描述需求，自动生成/修改项目文件
+- **任务自动化**：自动执行重复性编码流程（含终端、浏览器等）
+- **多模式协作**：规划（Architect）/编码（Coder）/调试（Debugger）+ 自定义模式
+- **MCP 扩展**：通过 MCP 服务器扩展代理能力
+- **自带安全边界**：关键操作需要明确授权（可配置允许/拒绝规则）
 
-- 🗑️ **移除冗余组件**：删除了 `apps` 和 `cloud` 目录，减少不必要的复杂性
-- 📦 **优化构建体积**：通过精简代码和依赖，显著减小了构建产物大小
-- 🎯 **简化架构**：专注于核心功能，提供更清晰、更易维护的代码结构
-- 🔒 **增强稳定性**：优化错误处理和边界情况，提升整体稳定性
-- 🎨 **美化 UI**：改进用户界面，提供更现代、更美观的交互体验
+## 我在这个分支做了哪些“实用向”改动
 
-## 主要特性
+以下是我自己维护过程中已经落地的一些改动点（更多细节见仓库代码与 changeset）：
 
-- ✨ **从自然语言生成代码**：使用自然语言描述需求，AI 自动生成代码
-- ✅ **自我检查**：自动检查生成的代码，确保质量
-- 🧪 **运行终端命令**：直接在终端执行命令
-- 🌐 **自动化浏览器操作**：自动完成浏览器中的任务
-- 🤖 **最新 AI 模型**：支持 500+ 最新的 AI 模型
-- 🔑 **使用自己的 API 密钥**：完全控制您的 API 密钥，数据隐私更有保障
+- **错误页信息更准确**：错误界面优先显示扩展运行时版本号，并把“反馈链接”指向本仓库 Issues
+- **Agent Manager 交互优化**：
+  - 下拉菜单点击外部自动关闭
+  - 悬停提示（tooltip）
+  - 支持“追问问题”的建议按钮，一键回答
+- **CLI 体验增强**：
+  - 增加 `/condense`：手动压缩上下文
+  - ESC/Ctrl+X 取消：更即时的取消反馈 + 更短的 readline escape 超时
+  - `/mode` 命令支持自动补全（包含默认/自定义模式提示）
+- **跨平台细节修复**：例如修复 macOS 下退出提示文案不一致问题
 
-<p align="center">
-  <img src="https://media.githubusercontent.com/media/Kilo-Org/kilocode/main/kilo.gif" width="100%" />
-</p>
+## 安装
 
-- [VS Code 插件市场](https://kilo.ai/vscode-marketplace?utm_source=Readme)（下载）
-- [官方 Kilo.ai 主页](https://kilo.ai)（了解更多）
+### 方式 1：从 VS Code Marketplace 安装
 
-## 核心功能
+Marketplace 列表：
 
-- **代码生成**：Operit Coder 可以使用自然语言生成代码
-- **任务自动化**：可以自动执行重复性编码任务
-- **自动化重构**：可以重构和改进现有代码
-- **MCP 服务器市场**：轻松查找和使用 MCP 服务器来扩展代理能力
-- **多模式**：使用 Architect 进行规划，使用 Coder 进行编码，使用 Debugger 进行调试，还可以创建自定义模式
+- https://marketplace.visualstudio.com/items?itemName=kilocode.Operit-Coder
 
-## 如何开始使用 Operit Coder
+### 方式 2：从源码构建并安装 `.vsix`
 
-1. 从 [VS Code 插件市场](https://marketplace.visualstudio.com/items?itemName=kilocode.Operit-Coder)安装 Operit Coder 扩展
-2. 配置您自己的 API 密钥（支持 OpenAI、Anthropic、Google Gemini 等多种提供商）
-3. 开始使用适应您工作流程的 AI 进行编码。观看我们的快速入门指南，了解 Operit Coder 的实际操作：
+先安装依赖：
 
-[![观看视频](https://img.youtube.com/vi/pqGfYXgrhig/maxresdefault.jpg)](https://youtu.be/pqGfYXgrhig)
+```bash
+pnpm install
+```
 
-## 扩展开发
+构建 `.vsix`：
 
-有关构建和开发扩展的详细信息，请参阅 [DEVELOPMENT.md](/DEVELOPMENT.md)
+```bash
+pnpm build
+```
 
-## 贡献
+构建产物会输出到 `bin/`。
 
-欢迎贡献，我们非常感谢！请阅读我们的[贡献指南](CONTRIBUTING.md)开始。或者加入我们的 [Discord](https://discord.gg/kilocode) 与团队和社区交流。
+在 macOS/Linux：
 
-感谢所有帮助改进 Operit Coder 的贡献者！
+```bash
+code --install-extension "$(ls -1v bin/operit-coder-*.vsix | tail -n1)"
+```
 
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/mcowger">
-        <img src="https://avatars.githubusercontent.com/u/1929548?size=100" width="100" height="100" alt="mcowger" style="border-radius: 50%;" />
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/bhaktatejas922">
-        <img src="https://avatars.githubusercontent.com/u/26863466?size=100" width="100" height="100" alt="bhaktatejas922" style="border-radius: 50%;" />
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/NyxJae">
-        <img src="https://avatars.githubusercontent.com/u/52313587?size=100" width="100" height="100" alt="NyxJae" style="border-radius: 50%;" />
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/Aikiboy123">
-        <img src="https://avatars.githubusercontent.com/u/161741275?size=100" width="100" height="100" alt="Aikiboy123" style="border-radius: 50%;" />
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/cobra91">
-        <img src="https://avatars.githubusercontent.com/u/1060585?size=100" width="100" height="100" alt="cobra91" style="border-radius: 50%;" />
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/ivanarifin">
-        <img src="https://avatars.githubusercontent.com/u/111653938?size=100" width="100" height="100" alt="ivanarifin" style="border-radius: 50%;" />
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/PeterDaveHello">
-        <img src="https://avatars.githubusercontent.com/u/3691490?size=100" width="100" height="100" alt="PeterDaveHello" style="border-radius: 50%;" />
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/possible055">
-        <img src="https://avatars.githubusercontent.com/u/38576169?size=100" width="100" height="100" alt="possible055" style="border-radius: 50%;" />
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/seuros">
-        <img src="https://avatars.githubusercontent.com/u/2394703?size=100" width="100" height="100" alt="seuros" style="border-radius: 50%;" />
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/Kilo-Org/kilocode/graphs/contributors">
-        <b>更多 ...</b>
-      </a>
-    </td>
-  </tr>
-</table>
+在 Windows PowerShell：
+
+```powershell
+$vsix = Get-ChildItem .\bin\operit-coder-*.vsix | Sort-Object Name | Select-Object -Last 1
+code --install-extension $vsix.FullName
+```
+
+## 开发
+
+详细开发说明见：
+
+- [DEVELOPMENT.md](/DEVELOPMENT.md)
+
+常用命令（仓库根目录执行）：
+
+```bash
+pnpm lint
+pnpm check-types
+pnpm test
+```
+
+## 项目结构（简版）
+
+- `src/`：VS Code 扩展主体
+- `webview-ui/`：侧边栏/面板 UI
+- `cli/`：终端版 CLI
+- `packages/`：共享包（含 `cloud` 等 workspace 包）
+- `.changeset/`：版本变更记录
+
+## 反馈与交流
+
+- **Bug / 需求**：https://github.com/yizhen47/OperitCoder/issues
+
+## 致谢
+
+本项目基于上游生态持续演进：
+
+- KiloCode：https://github.com/Kilo-Org/kilocode
+
+感谢所有上游贡献者。
+
+## 许可证
+
+见 [LICENSE](./LICENSE)

@@ -155,7 +155,13 @@ export class RequestyHandler extends BaseProvider implements SingleCompletionHan
 		let stream
 		try {
 			// With streaming params type, SDK returns an async iterable stream
-			stream = await this.client.chat.completions.create(completionParams)
+			// kilocode_change start
+			if (metadata?.abortSignal) {
+				stream = await this.client.chat.completions.create(completionParams, { signal: metadata.abortSignal })
+			} else {
+				stream = await this.client.chat.completions.create(completionParams)
+			}
+			// kilocode_change end
 		} catch (error) {
 			throw handleOpenAIError(error, this.providerName)
 		}

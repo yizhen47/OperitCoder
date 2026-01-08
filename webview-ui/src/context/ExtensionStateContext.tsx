@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react"
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
 
 import {
 	type ProviderSettings,
@@ -8,6 +8,7 @@ import {
 	type ExperimentId,
 	GhostServiceSettings, // kilocode_change
 	openRouterDefaultModelId, // kilocode_change
+	type ClineMessage, // kilocode_change
 	type TodoItem,
 	type TelemetrySetting,
 	type OrganizationAllowList,
@@ -387,6 +388,24 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 	const [includeCurrentTime, setIncludeCurrentTime] = useState(true)
 	const [includeCurrentCost, setIncludeCurrentCost] = useState(true)
 
+	// kilocode_change start
+	const pendingStreamingMessageUpdatesRef = useRef<
+		Map<number, { timeoutId: ReturnType<typeof setTimeout>; message: ClineMessage }>
+	>(new Map())
+	// kilocode_change end
+
+	const updateClineMessageInState = useCallback((clineMessage: ClineMessage) => {
+		setState((prevState) => {
+			const lastIndex = findLastIndex(prevState.clineMessages, (msg) => msg.ts === clineMessage.ts)
+			if (lastIndex !== -1) {
+				const newClineMessages = [...prevState.clineMessages]
+				newClineMessages[lastIndex] = clineMessage
+				return { ...prevState, clineMessages: newClineMessages }
+			}
+			return prevState
+		})
+	}, [])
+
 	const setListApiConfigMeta = useCallback(
 		(value: ProviderSettingsEntry[]) => setState((prevState) => ({ ...prevState, listApiConfigMeta: value })),
 		[],
@@ -471,17 +490,40 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 					break
 				}
 				case "messageUpdated": {
-					const clineMessage = message.clineMessage!
-					setState((prevState) => {
-						// worth noting it will never be possible for a more up-to-date message to be sent here or in normal messages post since the presentAssistantContent function uses lock
-						const lastIndex = findLastIndex(prevState.clineMessages, (msg) => msg.ts === clineMessage.ts)
-						if (lastIndex !== -1) {
-							const newClineMessages = [...prevState.clineMessages]
-							newClineMessages[lastIndex] = clineMessage
-							return { ...prevState, clineMessages: newClineMessages }
+					const clineMessage = message.clineMessage! as ClineMessage
+					const isStreamingTextOrReasoning =
+						clineMessage.type === "say" &&
+						(clineMessage.say === "text" || clineMessage.say === "reasoning")
+
+					if (isStreamingTextOrReasoning && clineMessage.partial === true) {
+						const existing = pendingStreamingMessageUpdatesRef.current.get(clineMessage.ts)
+						if (existing) {
+							existing.message = clineMessage
+							break
 						}
-						return prevState
-					})
+
+						const ts = clineMessage.ts
+						const timeoutId = setTimeout(() => {
+							const latest = pendingStreamingMessageUpdatesRef.current.get(ts)
+							if (!latest) {
+								return
+							}
+							pendingStreamingMessageUpdatesRef.current.delete(ts)
+							updateClineMessageInState(latest.message)
+						}, 200)
+						pendingStreamingMessageUpdatesRef.current.set(ts, { timeoutId, message: clineMessage })
+						break
+					}
+
+					if (isStreamingTextOrReasoning && clineMessage.partial !== true) {
+						const pending = pendingStreamingMessageUpdatesRef.current.get(clineMessage.ts)
+						if (pending) {
+							clearTimeout(pending.timeoutId)
+							pendingStreamingMessageUpdatesRef.current.delete(clineMessage.ts)
+						}
+					}
+
+					updateClineMessageInState(clineMessage)
 					break
 				}
 				case "mcpServers": {
@@ -526,8 +568,17 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 				}
 			}
 		},
-		[setListApiConfigMeta],
+		[setListApiConfigMeta, updateClineMessageInState],
 	)
+
+	useEffect(() => {
+		return () => {
+			for (const pending of pendingStreamingMessageUpdatesRef.current.values()) {
+				clearTimeout(pending.timeoutId)
+			}
+			pendingStreamingMessageUpdatesRef.current.clear()
+		}
+	}, [])
 
 	useEffect(() => {
 		window.addEventListener("message", handleMessage)

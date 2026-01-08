@@ -218,6 +218,46 @@ describe("OpenRouterHandler", () => {
 			)
 		})
 
+		it("passes abortSignal through requestOptions", async () => {
+			const handler = new OpenRouterHandler(mockOptions)
+
+			const mockStream = {
+				async *[Symbol.asyncIterator]() {
+					yield {
+						id: mockOptions.openRouterModelId,
+						choices: [{ delta: { content: "test response" } }],
+					}
+				},
+			}
+
+			const mockCreate = vitest.fn().mockResolvedValue(mockStream)
+			;(OpenAI as any).prototype.chat = {
+				completions: { create: mockCreate },
+			} as any
+
+			const abortController = new AbortController()
+			const systemPrompt = "test system prompt"
+			const messages: Anthropic.Messages.MessageParam[] = [
+				{ role: "user" as const, content: "test message" },
+			]
+
+			const generator = handler.createMessage(systemPrompt, messages, {
+				taskId: "test-task",
+				abortSignal: abortController.signal,
+			} as any)
+
+			for await (const _chunk of generator) {
+				// no-op
+			}
+
+			expect(mockCreate).toHaveBeenCalledWith(
+				expect.any(Object),
+				expect.objectContaining({
+					signal: abortController.signal,
+				}),
+			)
+		})
+
 		it("supports the middle-out transform", async () => {
 			const handler = new OpenRouterHandler({
 				...mockOptions,

@@ -418,8 +418,8 @@ const App = () => {
 const queryClient = new QueryClient()
 
 const AppWithProviders = () => (
-	<ErrorBoundary>
-		<ExtensionStateContextProvider>
+	<ExtensionStateContextProvider>
+		<ErrorBoundary>
 			<TranslationProvider>
 				<QueryClientProvider client={queryClient}>
 					<TooltipProvider delayDuration={STANDARD_TOOLTIP_DELAY}>
@@ -427,8 +427,8 @@ const AppWithProviders = () => (
 					</TooltipProvider>
 				</QueryClientProvider>
 			</TranslationProvider>
-		</ExtensionStateContextProvider>
-	</ErrorBoundary>
+		</ErrorBoundary>
+	</ExtensionStateContextProvider>
 )
 
 export default AppWithProviders
