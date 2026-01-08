@@ -15,9 +15,17 @@ export const Markdown = memo(({ markdown, partial }: { markdown?: string; partia
 	const { copyWithFeedback } = useCopyToClipboard(200)
 
 	useLayoutEffect(() => {
+		let rafId: number | null = null
+		let cancelled = false
+
 		if (!markdown || markdown.length === 0) {
 			prevRenderedTextRef.current = ""
-			return
+			return () => {
+				if (rafId != null) {
+					cancelAnimationFrame(rafId)
+				}
+				cancelled = true
+			}
 		}
 
 		const container = markdownContainerRef.current
@@ -62,12 +70,27 @@ export const Markdown = memo(({ markdown, partial }: { markdown?: string; partia
 			const frag = document.createDocumentFragment()
 			for (let j = 0; j < text.length; j++) {
 				const span = document.createElement("span")
-				span.className = "animate-streaming-reveal"
+				span.className = "streaming-reveal-pending"
 				span.dataset.streamingReveal = "1"
 				span.textContent = text[j]
 				frag.appendChild(span)
 			}
 			return frag
+		}
+
+		const startRevealAnimations = () => {
+			rafId = requestAnimationFrame(() => {
+				if (cancelled) {
+					return
+				}
+				const spans = Array.from(
+					container.querySelectorAll('span[data-streaming-reveal="1"]'),
+				) as HTMLSpanElement[]
+				for (const span of spans) {
+					span.classList.remove("streaming-reveal-pending")
+					span.classList.add("animate-streaming-reveal")
+				}
+			})
 		}
 
 		const applyOrderedDelays = () => {
@@ -171,8 +194,15 @@ export const Markdown = memo(({ markdown, partial }: { markdown?: string; partia
 		}
 
 		applyOrderedDelays()
+		startRevealAnimations()
 
 		prevRenderedTextRef.current = currentText
+		return () => {
+			cancelled = true
+			if (rafId != null) {
+				cancelAnimationFrame(rafId)
+			}
+		}
 	}, [markdown, partial])
 
 	if (!markdown || markdown.length === 0) {

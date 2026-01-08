@@ -2,7 +2,7 @@
 	"name": "operit-coder",
 	"displayName": "%extension.displayName%",
 	"description": "%extension.description%",
-	"publisher": "kilocode",
+	"publisher": "Vlvira",
 	"version": "0.0.1",
 	"icon": "assets/icons/logo-outline-black.png",
 	"galleryBanner": {
@@ -21,9 +21,9 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Kilo-Org/kilocode"
+		"url": "https://github.com/yizhen47/OperitCoder"
 	},
-	"homepage": "https://kilo.ai",
+	"homepage": "https://github.com/yizhen47/OperitCoder",
 	"categories": [
 		"AI",
 		"Chat",

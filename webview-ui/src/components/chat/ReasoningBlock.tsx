@@ -74,9 +74,17 @@ export const ReasoningBlock = ({ content, ts, isPartial, metadata }: ReasoningBl
 	}, [isActive, persistedDurationMs])
 
 	useLayoutEffect(() => {
+		let rafId: number | null = null
+		let cancelled = false
+
 		const container = contentRef.current
 		if (!container) {
-			return
+			return () => {
+				if (rafId != null) {
+					cancelAnimationFrame(rafId)
+				}
+				cancelled = true
+			}
 		}
 
 		const existing = container.querySelectorAll('span[data-streaming-reveal="1"]')
@@ -116,12 +124,27 @@ export const ReasoningBlock = ({ content, ts, isPartial, metadata }: ReasoningBl
 			const frag = document.createDocumentFragment()
 			for (let j = 0; j < text.length; j++) {
 				const span = document.createElement("span")
-				span.className = "animate-streaming-reveal"
+				span.className = "streaming-reveal-pending"
 				span.dataset.streamingReveal = "1"
 				span.textContent = text[j]
 				frag.appendChild(span)
 			}
 			return frag
+		}
+
+		const startRevealAnimations = () => {
+			rafId = requestAnimationFrame(() => {
+				if (cancelled) {
+					return
+				}
+				const spans = Array.from(
+					container.querySelectorAll('span[data-streaming-reveal="1"]'),
+				) as HTMLSpanElement[]
+				for (const span of spans) {
+					span.classList.remove("streaming-reveal-pending")
+					span.classList.add("animate-streaming-reveal")
+				}
+			})
 		}
 
 		const applyOrderedDelays = () => {
@@ -225,8 +248,15 @@ export const ReasoningBlock = ({ content, ts, isPartial, metadata }: ReasoningBl
 		}
 
 		applyOrderedDelays()
+		startRevealAnimations()
 
 		prevRenderedTextRef.current = currentText
+		return () => {
+			cancelled = true
+			if (rafId != null) {
+				cancelAnimationFrame(rafId)
+			}
+		}
 	}, [content, isActive])
 
 	useEffect(() => {

@@ -389,9 +389,12 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 	const [includeCurrentCost, setIncludeCurrentCost] = useState(true)
 
 	// kilocode_change start
-	const pendingStreamingMessageUpdatesRef = useRef<
-		Map<number, { timeoutId: ReturnType<typeof setTimeout>; message: ClineMessage }>
-	>(new Map())
+	type PendingStreamingMessageUpdate = {
+		timeoutId?: ReturnType<typeof setTimeout>
+		message: ClineMessage
+		lastAppliedAtMs: number
+	}
+	const pendingStreamingMessageUpdatesRef = useRef<Map<number, PendingStreamingMessageUpdate>>(new Map())
 	// kilocode_change end
 
 	const updateClineMessageInState = useCallback((clineMessage: ClineMessage) => {
@@ -403,6 +406,22 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 				return { ...prevState, clineMessages: newClineMessages }
 			}
 			return prevState
+		})
+	}, [])
+
+	const updateClineMessageInStateIfStillPartial = useCallback((clineMessage: ClineMessage) => {
+		setState((prevState) => {
+			const lastIndex = findLastIndex(prevState.clineMessages, (msg) => msg.ts === clineMessage.ts)
+			if (lastIndex === -1) {
+				return prevState
+			}
+			const existing = prevState.clineMessages[lastIndex]
+			if (existing?.partial !== true) {
+				return prevState
+			}
+			const newClineMessages = [...prevState.clineMessages]
+			newClineMessages[lastIndex] = clineMessage
+			return { ...prevState, clineMessages: newClineMessages }
 		})
 	}, [])
 
@@ -427,6 +446,32 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 			switch (message.type) {
 				case "state": {
 					const newState = message.state!
+					if (Array.isArray(newState.clineMessages)) {
+						if (newState.clineMessages.length === 0) {
+							for (const pending of pendingStreamingMessageUpdatesRef.current.values()) {
+								if (pending.timeoutId) {
+									clearTimeout(pending.timeoutId)
+								}
+							}
+							pendingStreamingMessageUpdatesRef.current.clear()
+						} else {
+							for (const msg of newState.clineMessages) {
+								if (
+									msg.type === "say" &&
+									(msg.say === "text" || msg.say === "reasoning") &&
+									msg.partial !== true
+								) {
+									const pending = pendingStreamingMessageUpdatesRef.current.get(msg.ts)
+									if (pending) {
+										if (pending.timeoutId) {
+											clearTimeout(pending.timeoutId)
+										}
+										pendingStreamingMessageUpdatesRef.current.delete(msg.ts)
+									}
+								}
+							}
+						}
+					}
 					setState((prevState) => mergeExtensionState(prevState, newState))
 					setShowWelcome(!checkExistKey(newState.apiConfiguration))
 					setDidHydrateState(true)
@@ -496,29 +541,46 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 						(clineMessage.say === "text" || clineMessage.say === "reasoning")
 
 					if (isStreamingTextOrReasoning && clineMessage.partial === true) {
-						const existing = pendingStreamingMessageUpdatesRef.current.get(clineMessage.ts)
-						if (existing) {
-							existing.message = clineMessage
+						const now = Date.now()
+						const ts = clineMessage.ts
+						const existing = pendingStreamingMessageUpdatesRef.current.get(ts)
+						if (!existing) {
+							pendingStreamingMessageUpdatesRef.current.set(ts, { message: clineMessage, lastAppliedAtMs: now })
+							// leading edge apply
+							updateClineMessageInState(clineMessage)
 							break
 						}
 
-						const ts = clineMessage.ts
-						const timeoutId = setTimeout(() => {
-							const latest = pendingStreamingMessageUpdatesRef.current.get(ts)
-							if (!latest) {
-								return
-							}
-							pendingStreamingMessageUpdatesRef.current.delete(ts)
-							updateClineMessageInState(latest.message)
-						}, 200)
-						pendingStreamingMessageUpdatesRef.current.set(ts, { timeoutId, message: clineMessage })
+						existing.message = clineMessage
+						const elapsed = now - existing.lastAppliedAtMs
+						if (elapsed >= 200) {
+							existing.lastAppliedAtMs = now
+							updateClineMessageInState(clineMessage)
+							break
+						}
+
+						if (!existing.timeoutId) {
+							const remainingMs = Math.max(0, 200 - elapsed)
+							const timeoutId = setTimeout(() => {
+								const latest = pendingStreamingMessageUpdatesRef.current.get(ts)
+								if (!latest) {
+									return
+								}
+								latest.timeoutId = undefined
+								latest.lastAppliedAtMs = Date.now()
+								updateClineMessageInStateIfStillPartial(latest.message)
+							}, remainingMs)
+							existing.timeoutId = timeoutId
+						}
 						break
 					}
 
 					if (isStreamingTextOrReasoning && clineMessage.partial !== true) {
 						const pending = pendingStreamingMessageUpdatesRef.current.get(clineMessage.ts)
 						if (pending) {
-							clearTimeout(pending.timeoutId)
+							if (pending.timeoutId != null) {
+								clearTimeout(pending.timeoutId)
+							}
 							pendingStreamingMessageUpdatesRef.current.delete(clineMessage.ts)
 						}
 					}
@@ -568,13 +630,15 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 				}
 			}
 		},
-		[setListApiConfigMeta, updateClineMessageInState],
+		[setListApiConfigMeta, updateClineMessageInState, updateClineMessageInStateIfStillPartial],
 	)
 
 	useEffect(() => {
 		return () => {
 			for (const pending of pendingStreamingMessageUpdatesRef.current.values()) {
-				clearTimeout(pending.timeoutId)
+				if (pending.timeoutId != null) {
+					clearTimeout(pending.timeoutId)
+				}
 			}
 			pendingStreamingMessageUpdatesRef.current.clear()
 		}

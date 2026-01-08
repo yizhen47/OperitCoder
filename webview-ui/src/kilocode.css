@@ -53,9 +53,12 @@
 }
 
 .animate-streaming-reveal {
-	opacity: 0;
-	animation: streaming-reveal 0.2s ease-out forwards;
+	animation: streaming-reveal 0.2s ease-out both;
 	animation-delay: var(--streaming-reveal-delay, 0ms);
+}
+
+.streaming-reveal-pending {
+	opacity: 0;
 }
 
 /* Message highlight animation for timeline clicks */

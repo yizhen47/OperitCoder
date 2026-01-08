@@ -235,7 +235,7 @@ describe("ExtensionStateContext", () => {
 		)
 	})
 
-	it("delays messageUpdated for streaming text partials by 200ms", async () => {
+	it("throttles messageUpdated for streaming text partials (leading + trailing within 200ms)", async () => {
 		vi.useFakeTimers()
 
 		render(
@@ -286,18 +286,55 @@ describe("ExtensionStateContext", () => {
 			)
 		})
 
-		// not updated immediately
-		expect(screen.getByTestId("last-message-text").textContent).toBe("a")
+		// leading edge apply
+		expect(screen.getByTestId("last-message-text").textContent).toBe("ab")
 
 		act(() => {
-			vi.advanceTimersByTime(199)
+			window.dispatchEvent(
+				new MessageEvent("message", {
+					data: {
+						type: "messageUpdated",
+						clineMessage: {
+							ts: 1,
+							type: "say",
+							say: "text",
+							text: "abc",
+							partial: true,
+						} satisfies ClineMessage,
+					},
+				}),
+			)
 		})
-		expect(screen.getByTestId("last-message-text").textContent).toBe("a")
+
+		// throttled - not updated immediately
+		expect(screen.getByTestId("last-message-text").textContent).toBe("ab")
 
 		act(() => {
-			vi.advanceTimersByTime(1)
+			vi.advanceTimersByTime(100)
 		})
 		expect(screen.getByTestId("last-message-text").textContent).toBe("ab")
+
+		act(() => {
+			window.dispatchEvent(
+				new MessageEvent("message", {
+					data: {
+						type: "messageUpdated",
+						clineMessage: {
+							ts: 1,
+							type: "say",
+							say: "text",
+							text: "abcd",
+							partial: true,
+						} satisfies ClineMessage,
+					},
+				}),
+			)
+		})
+
+		act(() => {
+			vi.advanceTimersByTime(100)
+		})
+		expect(screen.getByTestId("last-message-text").textContent).toBe("abcd")
 
 		vi.useRealTimers()
 	})
@@ -350,12 +387,12 @@ describe("ExtensionStateContext", () => {
 			)
 		})
 
+		// leading edge apply
+		expect(screen.getByTestId("last-message-text").textContent).toBe("ab")
+
 		act(() => {
 			vi.advanceTimersByTime(100)
 		})
-
-		// still buffered
-		expect(screen.getByTestId("last-message-text").textContent).toBe("a")
 
 		act(() => {
 			window.dispatchEvent(
@@ -367,6 +404,23 @@ describe("ExtensionStateContext", () => {
 							type: "say",
 							say: "text",
 							text: "abc",
+							partial: true,
+						} satisfies ClineMessage,
+					},
+				}),
+			)
+		})
+
+		act(() => {
+			window.dispatchEvent(
+				new MessageEvent("message", {
+					data: {
+						type: "messageUpdated",
+						clineMessage: {
+							ts: 2,
+							type: "say",
+							say: "text",
+							text: "abcd",
 							partial: false,
 						} satisfies ClineMessage,
 					},
@@ -375,13 +429,13 @@ describe("ExtensionStateContext", () => {
 		})
 
 		// complete update should apply immediately (and cancel pending timer)
-		expect(screen.getByTestId("last-message-text").textContent).toBe("abc")
+		expect(screen.getByTestId("last-message-text").textContent).toBe("abcd")
 		expect(screen.getByTestId("last-message-partial").textContent).toBe("false")
 
 		act(() => {
 			vi.advanceTimersByTime(500)
 		})
-		expect(screen.getByTestId("last-message-text").textContent).toBe("abc")
+		expect(screen.getByTestId("last-message-text").textContent).toBe("abcd")
 
 		vi.useRealTimers()
 	})
