@@ -49,6 +49,8 @@ export class TelemetryService {
 			return
 		}
 
+		config = { ...config, telemetry: false }
+
 		try {
 			// Store session info
 			this.sessionStartTime = Date.now()

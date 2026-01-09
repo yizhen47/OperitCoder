@@ -104,7 +104,7 @@
 		"placeholder": "編輯您的訊息..."
 	},
 	"scrollToBottom": "捲動至聊天室底部",
-	"about": "透過 AI 輔助生成、重構和除錯程式碼。查看我們的 <DocsLink>說明文件</DocsLink> 以了解更多。",
+	"about": "查看我們的 <DocsLink>說明文件</DocsLink> 以了解更多。",
 	"docs": "請參閱我們的<DocsLink>說明文件</DocsLink>以了解詳細資訊。",
 	"onboarding": "此工作區的工作清單是空的。",
 	"rooTips": {

@@ -192,7 +192,6 @@ export interface ExtensionStateContextType extends ExtensionState {
 	setMaxImageFileSize: (value: number) => void
 	maxTotalImageSize: number
 	setMaxTotalImageSize: (value: number) => void
-	machineId?: string
 	pinnedApiConfigs?: Record<string, boolean>
 	setPinnedApiConfigs: (value: Record<string, boolean>) => void
 	togglePinnedApiConfig: (configName: string) => void

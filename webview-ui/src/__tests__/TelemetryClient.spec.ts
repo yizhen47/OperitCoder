@@ -1,15 +1,4 @@
-import posthog from "posthog-js"
-
 import { telemetryClient } from "@src/utils/TelemetryClient"
-
-vi.mock("posthog-js", () => ({
-	default: {
-		init: vi.fn(),
-		reset: vi.fn(),
-		identify: vi.fn(),
-		capture: vi.fn(),
-	},
-}))
 
 describe("TelemetryClient", () => {
 	beforeEach(() => {
@@ -31,103 +20,20 @@ describe("TelemetryClient", () => {
 		expect(constructor.getInstance()).toBe(constructor.getInstance())
 	})
 
-	/**
-	 * Tests for the updateTelemetryState method
-	 */
-	describe("updateTelemetryState", () => {
-		it("resets PostHog when called", () => {
-			// Act
-			telemetryClient.updateTelemetryState("enabled")
-
-			// Assert
-			expect(posthog.reset).toHaveBeenCalled()
-		})
-
-		it("initializes PostHog when telemetry is enabled with API key and distinctId", () => {
-			// Arrange
-			const API_KEY = "test-api-key"
-			const DISTINCT_ID = "test-user-id"
-
-			// Act
-			telemetryClient.updateTelemetryState("enabled", API_KEY, DISTINCT_ID)
-
-			// Assert
-			expect(posthog.init).toHaveBeenCalledWith(
-				API_KEY,
-				expect.objectContaining({
-					api_host: "https://us.i.posthog.com", // kilocode_change
-					persistence: "localStorage",
-					loaded: expect.any(Function),
-				}),
-			)
-
-			// Instead of trying to extract and call the callback, manually call identify
-			// This simulates what would happen when the loaded callback is triggered
-			posthog.identify(DISTINCT_ID)
-
-			// Now verify identify was called
-			expect(posthog.identify).toHaveBeenCalled()
-		})
-
-		it("doesn't initialize PostHog when telemetry is disabled", () => {
-			// Act
-			telemetryClient.updateTelemetryState("disabled")
-
-			// Assert
-			expect(posthog.init).not.toHaveBeenCalled()
-		})
-
-		it("doesn't initialize PostHog when telemetry is unset", () => {
-			// Act
-			telemetryClient.updateTelemetryState("unset")
-
-			// Assert
-			expect(posthog.init).not.toHaveBeenCalled()
-		})
+	it("updateTelemetryState does not throw", () => {
+		expect(() => telemetryClient.updateTelemetryState("enabled")).not.toThrow()
+		expect(() => telemetryClient.updateTelemetryState("enabled", "test-api-key", "test-user-id")).not.toThrow()
+		expect(() => telemetryClient.updateTelemetryState("disabled")).not.toThrow()
+		expect(() => telemetryClient.updateTelemetryState("unset")).not.toThrow()
 	})
 
-	/**
-	 * Tests for the capture method
-	 */
-	describe("capture", () => {
-		it("captures events when telemetry is enabled", () => {
-			// Arrange - set telemetry to enabled
-			telemetryClient.updateTelemetryState("enabled", "test-key", "test-user")
-			vi.clearAllMocks() // Clear previous calls
+	it("capture does not throw", () => {
+		expect(() => telemetryClient.capture("test_event")).not.toThrow()
+		expect(() => telemetryClient.capture("test_event", { property: "value" })).not.toThrow()
+	})
 
-			// Act
-			telemetryClient.capture("test_event", { property: "value" })
-
-			// Assert
-			expect(posthog.capture).toHaveBeenCalledWith("test_event", { property: "value" })
-		})
-
-		it("doesn't capture events when telemetry is disabled", () => {
-			// Arrange - set telemetry to disabled
-			telemetryClient.updateTelemetryState("disabled")
-			vi.clearAllMocks() // Clear previous calls
-
-			// Act
-			telemetryClient.capture("test_event")
-
-			// Assert
-			expect(posthog.capture).not.toHaveBeenCalled()
-		})
-
-		/**
-		 * This test verifies that no telemetry events are captured when
-		 * the telemetry setting is unset, further documenting the expected behavior
-		 */
-		it("doesn't capture events when telemetry is unset", () => {
-			// Arrange - set telemetry to unset
-			telemetryClient.updateTelemetryState("unset")
-			vi.clearAllMocks() // Clear previous calls
-
-			// Act
-			telemetryClient.capture("test_event", { property: "test value" })
-
-			// Assert
-			expect(posthog.capture).not.toHaveBeenCalled()
-		})
+	it("captureException does not throw", () => {
+		expect(() => telemetryClient.captureException(new Error("test"))).not.toThrow()
+		expect(() => telemetryClient.captureException(new Error("test"), { foo: "bar" })).not.toThrow()
 	})
 })

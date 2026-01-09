@@ -57,7 +57,12 @@
 		},
 		"community": "Want tips or to just hang out with other Operit Coder users? Join <redditLink>reddit.com/r/kilocode</redditLink> or <discordLink>kilo.ai/discord</discordLink>",
 		"contactAndCommunity": "Contact & Community",
-		"manageSettings": "Manage Settings"
+		"manageSettings": "Manage Settings",
+		"version": "Version: {{version}}",
+		"support": {
+			"issue": "For issues, please report at https://github.com/yizhen47/OperitCoder/issues",
+			"contact": "Or contact the developer at yihong47@foxmail.com"
+		}
 	},
 	"slashCommands": {
 		"description": "Manage your slash commands to quickly execute custom workflows and actions. <DocsLink>Learn more</DocsLink>"
@@ -381,9 +386,6 @@
 		"getZaiApiKey": "Get Z AI API Key",
 		"zaiEntrypoint": "Z AI Entrypoint",
 		"zaiEntrypointDescription": "Please select the appropriate API entrypoint based on your location. If you are in China, choose open.bigmodel.cn. Otherwise, choose api.z.ai.",
-		"minimaxApiKey": "MiniMax API Key",
-		"getMiniMaxApiKey": "Get MiniMax API Key",
-		"minimaxBaseUrl": "MiniMax Entrypoint",
 		"geminiApiKey": "Gemini API Key",
 		"getGroqApiKey": "Get Groq API Key",
 		"groqApiKey": "Groq API Key",

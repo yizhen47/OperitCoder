@@ -89,7 +89,6 @@ const App = () => {
 		// kilocode_change end
 		renderContext,
 		mdmCompliant,
-		apiConfiguration, // kilocode_change
 	} = useExtensionState()
 
 	// Create a persistent state manager

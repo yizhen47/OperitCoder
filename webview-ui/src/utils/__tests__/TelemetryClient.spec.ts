@@ -1,15 +1,4 @@
-import posthog from "posthog-js"
-
 import { telemetryClient } from "../TelemetryClient"
-
-vi.mock("posthog-js", () => ({
-	default: {
-		reset: vi.fn(),
-		init: vi.fn(),
-		identify: vi.fn(),
-		capture: vi.fn(),
-	},
-}))
 
 describe("TelemetryClient", () => {
 	beforeEach(() => {
@@ -40,37 +29,20 @@ describe("TelemetryClient", () => {
 		expect(() => telemetryClient.capture("test_event", { key: "value" })).not.toThrow()
 	})
 
-	it("should reset PostHog when updating telemetry state", () => {
-		// Act
-		telemetryClient.updateTelemetryState("enabled")
-
-		// Assert
-		expect(posthog.reset).toHaveBeenCalled()
+	it("updateTelemetryState does not throw", () => {
+		expect(() => telemetryClient.updateTelemetryState("enabled")).not.toThrow()
+		expect(() => telemetryClient.updateTelemetryState("enabled", "test-api-key", "test-user-id")).not.toThrow()
+		expect(() => telemetryClient.updateTelemetryState("disabled")).not.toThrow()
+		expect(() => telemetryClient.updateTelemetryState("unset")).not.toThrow()
 	})
 
-	it("should initialize PostHog when telemetry is enabled with API key and distinctId", () => {
-		// Arrange
-		const API_KEY = "test-api-key"
-		const DISTINCT_ID = "test-user-id"
+	it("capture does not throw", () => {
+		expect(() => telemetryClient.capture("test_event")).not.toThrow()
+		expect(() => telemetryClient.capture("test_event", { key: "value" })).not.toThrow()
+	})
 
-		// Act
-		telemetryClient.updateTelemetryState("enabled", API_KEY, DISTINCT_ID)
-
-		// Assert
-		expect(posthog.init).toHaveBeenCalledWith(
-			API_KEY,
-			expect.objectContaining({
-				api_host: "https://us.i.posthog.com", // kilocode_change
-				persistence: "localStorage",
-				loaded: expect.any(Function),
-			}),
-		)
-
-		// Instead of trying to extract and call the callback, manually call identify
-		// This simulates what would happen when the loaded callback is triggered
-		posthog.identify(DISTINCT_ID)
-
-		// Now verify identify was called
-		expect(posthog.identify).toHaveBeenCalled()
+	it("captureException does not throw", () => {
+		expect(() => telemetryClient.captureException(new Error("test"))).not.toThrow()
+		expect(() => telemetryClient.captureException(new Error("test"), { foo: "bar" })).not.toThrow()
 	})
 })

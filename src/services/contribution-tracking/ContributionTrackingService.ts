@@ -223,7 +223,7 @@ export class ContributionTrackingService {
 	async trackContribution(params: TrackContributionParams): Promise<void> {
 		try {
 			// Skip tracking if telemetry is disabled (respects user's privacy preferences)
-			if (TelemetryService.hasInstance() && !TelemetryService.instance.isTelemetryEnabled()) {
+			if (!TelemetryService.hasInstance() || !TelemetryService.instance.isTelemetryEnabled()) {
 				return
 			}
 

@@ -1457,11 +1457,10 @@ ${prompt}
 				// TODO: We should rename `buildApiHandler` for clarity (e.g. `getProviderClient`).
 				const task = this.getCurrentTask()
 
-				if (task) {
+				if (task?.api) {
+					;(task.api as any).dispose?.()
 					task.api = buildApiHandler(providerSettings)
 				}
-
-				await TelemetryService.instance.updateIdentity(providerSettings.kilocodeToken ?? "") // kilocode_change
 
 				this.updateTaskApiHandlerIfNeeded(providerSettings, { forceRebuild: true })
 			} else {
@@ -1522,7 +1521,6 @@ ${prompt}
 		this.updateTaskApiHandlerIfNeeded(providerSettings, { forceRebuild: true })
 
 		await this.postStateToWebview()
-		await TelemetryService.instance.updateIdentity(providerSettings.kilocodeToken ?? "") // kilocode_change
 
 		if (providerSettings.apiProvider) {
 			this.emit(RooCodeEventName.ProviderProfileChanged, { name, provider: providerSettings.apiProvider })
@@ -2123,7 +2121,6 @@ ${prompt}
 		}
 		// kilocode_change end - checkSpeechToTextAvailable
 
-		// kilocode_change: telemetry disabled, do not expose telemetry key or machine ID
 
 		const mergedAllowedCommands = this.mergeAllowedCommands(allowedCommands)
 		const mergedDeniedCommands = this.mergeDeniedCommands(deniedCommands)
@@ -3082,8 +3079,8 @@ ${prompt}
 				wrapperCode: kiloCodeWrapperCode,
 				wrapperVersion: kiloCodeWrapperVersion,
 				wrapperTitle: kiloCodeWrapperTitle,
-				machineId: null, // kilocode_change: do not expose machine identifier
-				vscodeIsTelemetryEnabled: null, // kilocode_change: telemetry disabled
+				machineId: null,
+				vscodeIsTelemetryEnabled: null,
 				// kilocode_change end
 			}
 		}

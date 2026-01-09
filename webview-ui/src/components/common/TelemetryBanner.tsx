@@ -1,19 +1,14 @@
 import { memo, useState } from "react"
 import { Trans } from "react-i18next"
 import { VSCodeLink } from "@vscode/webview-ui-toolkit/react"
-
-import type { TelemetrySetting } from "@roo-code/types"
-
-import { vscode } from "@src/utils/vscode"
 import { useAppTranslation } from "@src/i18n/TranslationContext"
 
 const TelemetryBanner = () => {
 	const { t } = useAppTranslation()
-	const [isDismissed, setIsDismissed] = useState(false)
+	const [isDismissed, setIsDismissed] = useState(true)
 
 	const handleClose = () => {
 		setIsDismissed(true)
-		vscode.postMessage({ type: "telemetrySetting", text: "enabled" satisfies TelemetrySetting })
 	}
 
 	const handleOpenSettings = () => {

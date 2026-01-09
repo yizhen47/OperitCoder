@@ -57,7 +57,12 @@
 		},
 		"community": "想要获取使用技巧或与其他 Operit Coder 用户交流？加入 <redditLink>reddit.com/r/kilocode</redditLink> 或 <discordLink>kilo.ai/discord</discordLink>",
 		"contactAndCommunity": "联系与社区",
-		"manageSettings": "管理设置"
+		"manageSettings": "管理设置",
+		"version": "版本：{{version}}",
+		"support": {
+			"issue": "有问题在https://github.com/yizhen47/OperitCoder/issues反馈",
+			"contact": "或联系开发者邮箱yihong47@foxmail.com"
+		}
 	},
 	"slashCommands": {
 		"description": "管理您的斜杠命令，以快速执行自定义工作流和操作。 <DocsLink>了解更多</DocsLink>"
@@ -573,7 +578,6 @@
 			"none": "无",
 			"minimal": "最小 (最快)",
 			"high": "高",
-			"xhigh": "超高",
 			"medium": "中",
 			"low": "低",
 			"xhigh": "极高"

@@ -16,7 +16,8 @@ export class TelemetryService {
 	constructor(private clients: TelemetryClient[]) {}
 
 	public register(client: TelemetryClient): void {
-		this.clients.push(client)
+		void client
+		return
 	}
 
 	/**
@@ -36,7 +37,7 @@ export class TelemetryService {
 	 * @returns Whether the service is ready to use
 	 */
 	private get isReady(): boolean {
-		return this.clients.length > 0
+		return false
 	}
 
 	/**
@@ -282,7 +283,8 @@ export class TelemetryService {
 			throw new Error("TelemetryService instance already created")
 		}
 
-		this._instance = new TelemetryService(clients)
+		void clients
+		this._instance = new TelemetryService([])
 		return this._instance
 	}
 

@@ -13,7 +13,18 @@ vi.mock("@/i18n/TranslationContext", () => {
 	return {
 		...actual,
 		useAppTranslation: () => ({
-			t: (key: string) => key,
+			t: (key: string, options?: Record<string, any>) => {
+				if (key === "settings:about.support.issue") {
+					return "有问题在https://github.com/yizhen47/OperitCoder/issues反馈"
+				}
+				if (key === "settings:about.support.contact") {
+					return "或联系开发者邮箱yihong47@foxmail.com"
+				}
+				if (key === "settings:about.version") {
+					return `Version: ${options?.version ?? ""}`
+				}
+				return key
+			},
 		}),
 	}
 })
