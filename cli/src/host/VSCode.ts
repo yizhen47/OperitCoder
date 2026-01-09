@@ -3,7 +3,6 @@ import * as path from "path"
 import { logs } from "../services/logs.js"
 import { KiloCodePaths } from "../utils/paths.js"
 import { Package } from "../constants/package.js"
-import { machineIdSync } from "node-machine-id"
 
 // Identity information for VSCode environment
 export interface IdentityInfo {
@@ -2322,7 +2321,7 @@ export function createVSCodeAPIMock(extensionRootPath: string, workspacePath: st
 		appName: `wrapper|cli|cli|${Package.version}`,
 		appRoot: import.meta.dirname,
 		language: "en",
-		machineId: identity?.machineId || machineIdSync(),
+		machineId: identity?.machineId || "cli-machine-id",
 		sessionId: identity?.sessionId || "cli-session-id",
 		remoteName: undefined,
 		shell: process.env.SHELL || "/bin/bash",

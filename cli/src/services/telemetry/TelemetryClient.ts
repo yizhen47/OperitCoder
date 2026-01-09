@@ -3,8 +3,6 @@
  * Standalone PostHog client implementation for CLI telemetry
  */
 
-import { PostHog } from "posthog-node"
-import * as os from "os"
 import { TelemetryEvent, type BaseProperties } from "./events.js"
 import { getIdentityManager, type UserIdentity } from "./identity.js"
 import { logs } from "../logs.js"
@@ -37,7 +35,7 @@ export interface TelemetryConfig {
  * Handles all telemetry operations for the CLI application
  */
 export class TelemetryClient {
-	private client: PostHog | null = null
+	private client: { capture: (payload: unknown) => void; shutdown: () => Promise<void> } | null = null
 	private config: TelemetryConfig
 	private identity: UserIdentity | null = null
 	private eventQueue: QueuedEvent[] = []
@@ -64,31 +62,16 @@ export class TelemetryClient {
 			...config,
 		}
 
-		if (this.config.enabled && this.config.apiKey) {
-			this.initializeClient()
-		}
+		// Intentionally do not initialize any telemetry client.
+		this.client = null
 	}
 
 	/**
 	 * Initialize PostHog client
 	 */
 	private initializeClient(): void {
-		try {
-			this.client = new PostHog(this.config.apiKey, {
-				host: this.config.host,
-				disableGeoip: false,
-			})
-
-			// Start flush timer
-			this.startFlushTimer()
-
-			if (this.config.debug) {
-				logs.debug("Telemetry client initialized", "TelemetryClient")
-			}
-		} catch (error) {
-			logs.error("Failed to initialize telemetry client", "TelemetryClient", { error })
-			this.client = null
-		}
+		void logs
+		return
 	}
 
 	/**
@@ -109,56 +92,24 @@ export class TelemetryClient {
 	 * Update Kilocode user ID
 	 */
 	public async updateKilocodeUserId(kilocodeToken: string): Promise<void> {
-		const identityManager = getIdentityManager()
-		await identityManager.updateKilocodeUserId(kilocodeToken)
-		this.identity = identityManager.getIdentity()
+		void kilocodeToken
+		return
 	}
 
 	/**
 	 * Clear Kilocode user ID
 	 */
 	public clearKilocodeUserId(): void {
-		const identityManager = getIdentityManager()
-		identityManager.clearKilocodeUserId()
-		this.identity = identityManager.getIdentity()
+		return
 	}
 
 	/**
 	 * Capture a telemetry event
 	 */
 	public capture(event: TelemetryEvent, properties: Record<string, unknown> = {}): void {
-		if (!this.config.enabled || !this.client || !this.identity || this.isShuttingDown) {
-			return
-		}
-
-		try {
-			// Build complete properties with base properties
-			const completeProperties = {
-				...this.getBaseProperties(),
-				...properties,
-			}
-
-			// Add to queue
-			this.eventQueue.push({
-				event,
-				properties: completeProperties,
-				timestamp: Date.now(),
-				retryCount: 0,
-			})
-
-			// Flush if queue is full
-			if (this.eventQueue.length >= (this.config.batchSize || 10)) {
-				this.flush()
-			}
-
-			if (this.config.debug) {
-				logs.debug(`Telemetry event queued: ${event}`, "TelemetryClient", {
-					queueSize: this.eventQueue.length,
-				})
-			}
-		} catch (error) {
-			logs.error("Failed to capture telemetry event", "TelemetryClient", { error, event })
-		}
+		void event
+		void properties
+		return
 	}
 
 	/**
@@ -265,40 +216,7 @@ export class TelemetryClient {
 	 * Flush queued events
 	 */
 	public async flush(): Promise<void> {
-		if (!this.client || this.eventQueue.length === 0) {
-			return
-		}
-
-		const eventsToSend = [...this.eventQueue]
-		this.eventQueue = []
-
-		for (const queuedEvent of eventsToSend) {
-			try {
-				const distinctId = this.getDistinctId()
-
-				this.client.capture({
-					distinctId,
-					event: queuedEvent.event,
-					properties: queuedEvent.properties,
-					timestamp: new Date(queuedEvent.timestamp),
-				})
-
-				if (this.config.debug) {
-					logs.debug(`Telemetry event sent: ${queuedEvent.event}`, "TelemetryClient")
-				}
-			} catch (error) {
-				logs.error("Failed to send telemetry event", "TelemetryClient", {
-					error,
-					event: queuedEvent.event,
-				})
-
-				// Retry logic
-				if (queuedEvent.retryCount < (this.config.maxRetries || 3)) {
-					queuedEvent.retryCount++
-					this.eventQueue.push(queuedEvent)
-				}
-			}
-		}
+		return
 	}
 
 	/**
@@ -306,25 +224,13 @@ export class TelemetryClient {
 	 */
 	public async shutdown(): Promise<void> {
 		this.isShuttingDown = true
-
-		// Stop flush timer
+		this.client = null
+		this.eventQueue = []
 		if (this.flushTimer) {
 			clearInterval(this.flushTimer)
 			this.flushTimer = null
 		}
-
-		// Flush remaining events
-		await this.flush()
-
-		// Shutdown PostHog client
-		if (this.client) {
-			await this.client.shutdown()
-			this.client = null
-		}
-
-		if (this.config.debug) {
-			logs.debug("Telemetry client shut down", "TelemetryClient")
-		}
+		return
 	}
 
 	/**
@@ -338,8 +244,8 @@ export class TelemetryClient {
 		const baseProps: BaseProperties = {
 			cliVersion: this.getCLIVersion(),
 			nodeVersion: process.version,
-			platform: os.platform(),
-			architecture: os.arch(),
+			platform: "unknown",
+			architecture: "unknown",
 			sessionId: this.identity.sessionId,
 			sessionDuration: getIdentityManager().getSessionDuration(),
 			mode: "code", // Will be overridden by actual mode
@@ -415,6 +321,6 @@ export class TelemetryClient {
 	 * Check if telemetry is enabled
 	 */
 	public isEnabled(): boolean {
-		return this.config.enabled && this.client !== null
+		return false
 	}
 }

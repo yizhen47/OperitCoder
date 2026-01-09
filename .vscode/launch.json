@@ -13,7 +13,7 @@
 			"args": ["--extensionDevelopmentPath=${workspaceFolder}/src"],
 			"sourceMaps": true,
 			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
-			"preLaunchTask": "build:extension",
+			"preLaunchTask": "dev:all",
 			"env": {
 				"NODE_ENV": "development",
 				"VSCODE_DEBUG_MODE": "true"
@@ -37,7 +37,7 @@
 			],
 			"sourceMaps": true,
 			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
-			"preLaunchTask": "build:extension",
+			"preLaunchTask": "dev:all",
 			"env": {
 				"NODE_ENV": "development",
 				"VSCODE_DEBUG_MODE": "true"
@@ -53,7 +53,7 @@
 			"args": ["--extensionDevelopmentPath=${workspaceFolder}/src", "--disable-extensions"],
 			"sourceMaps": true,
 			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
-			"preLaunchTask": "build:extension",
+			"preLaunchTask": "dev:all",
 			"env": {
 				"NODE_ENV": "development",
 				"VSCODE_DEBUG_MODE": "true",

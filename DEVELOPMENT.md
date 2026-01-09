@@ -149,52 +149,86 @@ The project is organized into several key directories:
 
 ## Development Workflow
 
-### Running the Extension
+### 🔧 本地调试
 
-To run the extension in development mode:
+#### 一键启动调试（推荐）
 
-1. Press `F5` (or select **Run** → **Start Debugging**) in VSCode
-2. This will open a new VSCode window with Operit Coder loaded
+在 VSCode 中按 `F5` 键（或选择 **Run** → **Start Debugging**）
 
-### Hot Reloading
+这会自动：
+1. ✅ 启动 webview-ui 开发服务器（Vite，支持热重载）
+2. ✅ 启动扩展代码监听构建
+3. ✅ 打开新的 VSCode 窗口进行调试
 
-- **Webview UI changes**: Changes to the webview UI will appear immediately without restarting
-- **Core extension changes**: Changes to the core extension code will automatically reload the ext host
+**终端显示**：
+- 会创建两个独立的终端（webview-ui 和 extension）
+- 💡 **提示**：可以点击终端右上角的拆分图标 `⊞`，将两个终端左右拆分显示
 
-In development mode (NODE_ENV="development"), changing the core code will trigger a `workbench.action.reloadWindow` command, so it is no longer necessary to manually start/stop the debugger and tasks.
+**开发模式特性**：
+- ✅ Webview UI 更改会立即热重载
+- ✅ 核心扩展代码更改会自动重新加载窗口
 
-> **Important**: In production builds, when making changes to the core extension, you need to:
->
-> 1. Stop the debugging process
-> 2. Kill any npm tasks running in the background (see screenshot below)
-> 3. Start debugging again
+#### 手动启动（可选）
 
-<img width="600" alt="Stopping background tasks" src="https://github.com/user-attachments/assets/466fb76e-664d-4066-a3f2-0df4d57dd9a4" />
-
-### Building the Extension
-
-To build a production-ready `.vsix` file:
+如果需要单独控制各个服务：
 
 ```bash
+# 启动 webview-ui 开发服务器
+cd webview-ui
+pnpm dev
+
+# 启动扩展代码监听
+cd src
+pnpm watch:bundle
+```
+
+然后在 VSCode 中按 F5 启动调试。
+
+### 📦 打包插件
+
+#### 完整打包流程
+
+在项目根目录或 src 目录执行：
+
+```bash
+# 方式一：在项目根目录
 pnpm build
+
+# 方式二：在 src 目录
+cd src && pnpm vsix
 ```
 
-This will:
+**打包过程**：
+1. ✅ 构建 webview-ui（`cd ../webview-ui && pnpm build`）
+2. ✅ 构建扩展代码（`pnpm bundle --production`）
+3. ✅ 生成 `.vsix` 文件到 `bin/` 目录
 
-1. Build the webview UI
-2. Compile TypeScript
-3. Bundle the extension
-4. Create a `.vsix` file in the `bin/` directory
+**输出文件**：`bin/operit-coder-*.vsix`
 
-### Installing the Built Extension
-
-To install your built extension:
+### 📥 安装打包后的插件
 
 ```bash
+# 自动安装最新版本
 code --install-extension "$(ls -1v bin/operit-coder-*.vsix | tail -n1)"
+
+# 或者在 VSCode 中手动安装
+# Extensions → ... → Install from VSIX → 选择 bin/operit-coder-*.vsix
 ```
 
-Replace `[version]` with the current version number.
+### 🔄 快速安装开发版本
+
+使用 VSCode 任务快速构建并安装：
+
+```bash
+# 在 VSCode 中
+# Terminal → Run Task → install-dev-extension
+```
+
+或命令行：
+
+```bash
+pnpm i && pnpm run build && code --force --install-extension "$(ls -1v bin/operit-coder-*.vsix | tail -n1)"
+```
 
 ## Testing
 

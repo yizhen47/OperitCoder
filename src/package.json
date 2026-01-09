@@ -2,7 +2,7 @@
 	"name": "operit-coder",
 	"displayName": "%extension.displayName%",
 	"description": "%extension.description%",
-	"publisher": "kilocode",
+	"publisher": "Ylvira",
 	"version": "0.0.1",
 	"icon": "assets/icons/logo-outline-black.png",
 	"galleryBanner": {
@@ -650,7 +650,7 @@
 		"test": "vitest run",
 		"format": "prettier --write .",
 		"bundle": "node esbuild.mjs",
-		"vscode:prepublish": "pnpm bundle --production",
+		"vscode:prepublish": "cd ../webview-ui && pnpm build && cd ../src && pnpm bundle --production",
 		"vsix:clean": "rimraf ../bin",
 		"vsix": "mkdirp ../bin && vsce package --no-dependencies --out ../bin",
 		"vsix:unpacked": "mkdirp ../bin-unpacked && unzip -q -o ../bin/operit-coder-*.vsix -d ../bin-unpacked",

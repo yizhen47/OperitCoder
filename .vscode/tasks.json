@@ -22,7 +22,9 @@
 			"group": "build",
 			"isBackground": true,
 			"presentation": {
-				"reveal": "always"
+				"reveal": "always",
+				"panel": "dedicated",
+				"showReuseMessage": false
 			},
 			"problemMatcher": {
 				"owner": "esbuild",
@@ -33,6 +35,29 @@
 					"activeOnStart": true,
 					"beginsPattern": "esbuild-problem-matcher#onStart",
 					"endsPattern": "esbuild-problem-matcher#onEnd"
+				}
+			}
+		},
+		{
+			"label": "watch:webview",
+			"type": "shell",
+			"command": "cd webview-ui && pnpm dev",
+			"group": "build",
+			"isBackground": true,
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"showReuseMessage": false
+			},
+			"problemMatcher": {
+				"owner": "vite",
+				"pattern": {
+					"regexp": "^$"
+				},
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": "VITE.*ready in",
+					"endsPattern": "Local:.*http://localhost"
 				}
 			}
 		},
@@ -71,6 +96,11 @@
 				"showReuseMessage": true,
 				"clear": false
 			},
+			"problemMatcher": []
+		},
+		{
+			"label": "dev:all",
+			"dependsOn": ["watch:webview", "watch:extension"],
 			"problemMatcher": []
 		},
 		{

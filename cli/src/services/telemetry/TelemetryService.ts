@@ -4,11 +4,9 @@
  */
 
 import { TelemetryClient, type TelemetryConfig } from "./TelemetryClient.js"
-import { getIdentityManager } from "./identity.js"
 import { TelemetryEvent } from "./events.js"
 import { logs } from "../logs.js"
 import type { CLIConfig } from "../../config/types.js"
-import { KILOCODE_POSTHOG_API_KEY } from "../../constants/telemetry.js"
 
 /**
  * Telemetry Service
@@ -58,48 +56,9 @@ export class TelemetryService {
 			this.currentCIMode = options.ciMode
 			this.currentWorkspace = options.workspace
 
-			// Check if telemetry is enabled
-			if (!config.telemetry) {
-				logs.info("Telemetry is disabled in config", "TelemetryService")
-				this.isInitialized = true
-				return
-			}
-
-			// Get API key from environment
-			const apiKey = KILOCODE_POSTHOG_API_KEY
-			if (!apiKey) {
-				logs.warn("KILOCODE_POSTHOG_API_KEY not set, telemetry disabled", "TelemetryService")
-				this.isInitialized = true
-				return
-			}
-
-			// Initialize identity
-			const identityManager = getIdentityManager()
-			const identity = await identityManager.initialize()
-
-			// Update Kilocode user ID if token is available
-			const provider = config.providers.find((p) => p.id === config.provider)
-			if (provider && provider.kilocodeToken && typeof provider.kilocodeToken === "string") {
-				await identityManager.updateKilocodeUserId(provider.kilocodeToken)
-			}
-
-			// Create telemetry client
-			const telemetryConfig: TelemetryConfig = {
-				enabled: true,
-				apiKey,
-				host: "https://us.i.posthog.com",
-				debug: process.env.KILO_TELEMETRY_DEBUG === "true",
-			}
-
-			this.client = new TelemetryClient(telemetryConfig)
-			this.client.setIdentity(identity)
-
+			logs.info("Telemetry is disabled in config", "TelemetryService")
 			this.isInitialized = true
-
-			// Track session start
-			this.trackSessionStart(options)
-
-			logs.info("Telemetry service initialized", "TelemetryService")
+			return
 		} catch (error) {
 			logs.error("Failed to initialize telemetry service", "TelemetryService", { error })
 			this.isInitialized = true // Mark as initialized even on error to prevent retries

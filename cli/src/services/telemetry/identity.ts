@@ -3,13 +3,9 @@
  * Handles user identification and session tracking for telemetry
  */
 
-import * as fs from "fs-extra"
-import * as path from "path"
 import * as crypto from "crypto"
-import { KiloCodePaths } from "../../utils/paths.js"
 import { logs } from "../logs.js"
-import { getAppUrl } from "@roo-code/types"
-import { machineIdSync } from "node-machine-id"
+ 
 
 /**
  * User identity structure
@@ -49,7 +45,7 @@ export class IdentityManager {
 	private identityFilePath: string
 
 	private constructor() {
-		this.identityFilePath = path.join(KiloCodePaths.getKiloCodeDir(), "identity.json")
+		this.identityFilePath = ""
 	}
 
 	/**
@@ -68,7 +64,7 @@ export class IdentityManager {
 	public async initialize(): Promise<UserIdentity> {
 		try {
 			// Load or create persistent CLI user ID
-			const cliUserId = await this.loadOrCreateCLIUserId()
+			const cliUserId = this.generateUUID()
 
 			// Get machine ID
 			const machineId = this.getMachineId()
@@ -101,41 +97,8 @@ export class IdentityManager {
 	 * Update Kilocode user ID from authentication token
 	 */
 	public async updateKilocodeUserId(kilocodeToken: string): Promise<void> {
-		if (!this.identity) {
-			logs.warn("Cannot update Kilocode user ID: identity not initialized", "IdentityManager")
-			return
-		}
-
-		try {
-			// Fetch user profile from Kilocode API
-			const response = await fetch(getAppUrl("/api/profile"), {
-				headers: {
-					Authorization: `Bearer ${kilocodeToken}`,
-					"Content-Type": "application/json",
-				},
-			})
-
-			if (!response.ok) {
-				throw new Error(`API request failed: ${response.status}`)
-			}
-
-			const data = await response.json()
-
-			if (data?.user?.email) {
-				this.identity.kilocodeUserId = data.user.email
-				logs.debug("Kilocode user ID updated", "IdentityManager", {
-					userId: data.user.email.substring(0, 3) + "...",
-				})
-			} else {
-				throw new Error("Invalid API response: missing user email")
-			}
-		} catch (error) {
-			logs.warn("Failed to update Kilocode user ID", "IdentityManager", { error })
-			// Clear Kilocode user ID on error
-			if (this.identity.kilocodeUserId) {
-				delete this.identity.kilocodeUserId
-			}
-		}
+		void kilocodeToken
+		return
 	}
 
 	/**
@@ -181,49 +144,14 @@ export class IdentityManager {
 	 * Load or create persistent CLI user ID
 	 */
 	private async loadOrCreateCLIUserId(): Promise<string> {
-		try {
-			// Ensure directory exists
-			await fs.ensureDir(path.dirname(this.identityFilePath))
-
-			// Try to load existing identity
-			if (await fs.pathExists(this.identityFilePath)) {
-				const data = await fs.readJson(this.identityFilePath)
-				if (this.isValidStoredIdentity(data)) {
-					// Update last used timestamp
-					data.lastUsed = Date.now()
-					await fs.writeJson(this.identityFilePath, data, { spaces: 2 })
-					return data.cliUserId
-				}
-			}
-
-			// Create new identity
-			const newIdentity: StoredIdentity = {
-				cliUserId: this.generateUUID(),
-				createdAt: Date.now(),
-				lastUsed: Date.now(),
-			}
-
-			await fs.writeJson(this.identityFilePath, newIdentity, { spaces: 2 })
-			logs.info("Created new CLI user identity", "IdentityManager")
-
-			return newIdentity.cliUserId
-		} catch (error) {
-			logs.error("Failed to load/create CLI user ID", "IdentityManager", { error })
-			// Fallback to generating a temporary ID
-			return this.generateUUID()
-		}
+		return this.generateUUID()
 	}
 
 	/**
 	 * Get machine identifier
 	 */
 	private getMachineId(): string {
-		try {
-			return machineIdSync()
-		} catch (error) {
-			logs.warn("Failed to get machine ID", "IdentityManager", { error })
-			return "unknown"
-		}
+		return "unknown"
 	}
 
 	/**
@@ -258,14 +186,7 @@ export class IdentityManager {
 	 */
 	public async reset(): Promise<void> {
 		this.identity = null
-		try {
-			if (await fs.pathExists(this.identityFilePath)) {
-				await fs.remove(this.identityFilePath)
-				logs.debug("Identity reset", "IdentityManager")
-			}
-		} catch (error) {
-			logs.error("Failed to reset identity", "IdentityManager", { error })
-		}
+		return
 	}
 }
 

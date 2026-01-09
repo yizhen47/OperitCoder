@@ -19,7 +19,7 @@ import {
 } from "./state/atoms/taskHistory.js"
 import { sendWebviewMessageAtom } from "./state/atoms/actions.js"
 import { taskResumedViaContinueOrSessionAtom, currentTaskAtom } from "./state/atoms/extension.js"
-import { getTelemetryService, getIdentityManager } from "./services/telemetry/index.js"
+import { getTelemetryService } from "./services/telemetry/index.js"
 import { notificationsAtom, notificationsErrorAtom, notificationsLoadingAtom } from "./state/atoms/notifications.js"
 import { fetchKilocodeNotifications } from "./utils/notifications.js"
 import { finishParallelMode } from "./parallel/parallel.js"
@@ -95,22 +95,10 @@ export class CLI {
 			})
 			logs.debug("Telemetry service initialized", "CLI")
 
-			// Get identity from Identity Manager
-			const identityManager = getIdentityManager()
-			const identity = identityManager.getIdentity()
-
 			// Create ExtensionService with identity
 			const serviceOptions: Parameters<typeof createExtensionService>[0] = {
 				workspace: this.options.workspace || process.cwd(),
 				mode: this.options.mode || "code",
-			}
-
-			if (identity) {
-				serviceOptions.identity = {
-					machineId: identity.machineId,
-					sessionId: identity.sessionId,
-					cliUserId: identity.cliUserId,
-				}
 			}
 
 			if (this.options.customModes) {
@@ -118,9 +106,7 @@ export class CLI {
 			}
 
 			this.service = createExtensionService(serviceOptions)
-			logs.debug("ExtensionService created with identity", "CLI", {
-				hasIdentity: !!identity,
-			})
+			logs.debug("ExtensionService created", "CLI")
 
 			// Set service in store
 			this.store.set(extensionServiceAtom, this.service)
