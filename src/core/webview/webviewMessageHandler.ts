@@ -563,10 +563,8 @@ export const webviewMessageHandler = async (
 
 			// If user already opted in to telemetry, enable telemetry service
 			provider.getStateToPostToWebview().then(async (/*kilocode_change*/ state) => {
-				const { telemetrySetting } = state
-				// kilocode_change: treat "unset" as not opted-in
-				const isOptedIn = telemetrySetting === "enabled"
-				TelemetryService.instance.updateTelemetryState(isOptedIn)
+				void state
+				return
 			})
 
 			provider.isViewLaunched = true

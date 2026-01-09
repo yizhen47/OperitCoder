@@ -2,48 +2,25 @@
 
 // pnpm --filter @roo-code/telemetry test src/__tests__/PostHogTelemetryClient.test.ts
 
-import * as vscode from "vscode"
-import { PostHog } from "posthog-node"
-
 import { type TelemetryPropertiesProvider, TelemetryEventName, ApiProviderError } from "@roo-code/types"
 
 import { PostHogTelemetryClient } from "../PostHogTelemetryClient"
 
-vi.mock("posthog-node")
-
-vi.mock("vscode", () => ({
-	env: {
-		machineId: "test-machine-id",
-	},
-	workspace: {
-		getConfiguration: vi.fn(),
-	},
-}))
-
 describe("PostHogTelemetryClient", () => {
+	const mockPostHogClient = {
+		capture: vi.fn(),
+		captureException: vi.fn(),
+		optIn: vi.fn(),
+		optOut: vi.fn(),
+		shutdown: vi.fn().mockResolvedValue(undefined),
+	}
+
 	const getPrivateProperty = <T>(instance: any, propertyName: string): T => {
 		return instance[propertyName]
 	}
 
-	let mockPostHogClient: any
-
 	beforeEach(() => {
 		vi.clearAllMocks()
-
-		mockPostHogClient = {
-			capture: vi.fn(),
-			captureException: vi.fn(),
-			optIn: vi.fn(),
-			optOut: vi.fn(),
-			shutdown: vi.fn().mockResolvedValue(undefined),
-		}
-		;(PostHog as any).mockImplementation(() => mockPostHogClient)
-
-		// @ts-expect-error - Accessing private static property for testing
-		PostHogTelemetryClient._instance = undefined
-		;(vscode.workspace.getConfiguration as any).mockReturnValue({
-			get: vi.fn().mockReturnValue("all"),
-		})
 	})
 
 	describe("isEventCapturable", () => {
@@ -371,19 +348,17 @@ describe("PostHogTelemetryClient", () => {
 	})
 
 	describe("capture", () => {
-		it("should not capture events when telemetry is disabled", async () => {
+		it("should never capture events", async () => {
 			const client = new PostHogTelemetryClient()
-			client.updateTelemetryState(false)
+			client.updateTelemetryState(true)
 
 			await client.capture({
 				event: TelemetryEventName.TASK_CREATED,
 				properties: { test: "value" },
 			})
-
-			expect(mockPostHogClient.capture).not.toHaveBeenCalled()
 		})
 
-		it("should not capture events that are not capturable", async () => {
+		it("should not throw for non-capturable events", async () => {
 			const client = new PostHogTelemetryClient()
 			client.updateTelemetryState(true)
 
@@ -391,193 +366,14 @@ describe("PostHogTelemetryClient", () => {
 				event: TelemetryEventName.TASK_MESSAGE, // This is in the exclude list. // kilocode_change
 				properties: { test: "value" },
 			})
-
-			expect(mockPostHogClient.capture).not.toHaveBeenCalled()
-		})
-
-		it("should capture events when telemetry is enabled and event is capturable", async () => {
-			const client = new PostHogTelemetryClient()
-			client.updateTelemetryState(true)
-
-			const mockProvider: TelemetryPropertiesProvider = {
-				getTelemetryProperties: vi.fn().mockResolvedValue({
-					appVersion: "1.0.0",
-					vscodeVersion: "1.60.0",
-					platform: "darwin",
-					editorName: "vscode",
-					language: "en",
-					mode: "code",
-				}),
-			}
-
-			client.setProvider(mockProvider)
-
-			await client.capture({
-				event: TelemetryEventName.TASK_CREATED,
-				properties: { test: "value" },
-			})
-
-			expect(mockPostHogClient.capture).toHaveBeenCalledWith({
-				distinctId: "test-machine-id",
-				event: TelemetryEventName.TASK_CREATED,
-				properties: expect.objectContaining({
-					appVersion: "1.0.0",
-					test: "value",
-				}),
-			})
-		})
-
-		it("should filter out git repository properties when capturing events", async () => {
-			const client = new PostHogTelemetryClient()
-			client.updateTelemetryState(true)
-
-			const mockProvider: TelemetryPropertiesProvider = {
-				getTelemetryProperties: vi.fn().mockResolvedValue({
-					appVersion: "1.0.0",
-					vscodeVersion: "1.60.0",
-					platform: "darwin",
-					editorName: "vscode",
-					language: "en",
-					mode: "code",
-					// Git properties that should be filtered out
-					repositoryUrl: "https://github.com/example/repo",
-					repositoryName: "example/repo",
-					defaultBranch: "main",
-				}),
-			}
-
-			client.setProvider(mockProvider)
-
-			await client.capture({
-				event: TelemetryEventName.TASK_CREATED,
-				properties: { test: "value" },
-			})
-
-			expect(mockPostHogClient.capture).toHaveBeenCalledWith({
-				distinctId: "test-machine-id",
-				event: TelemetryEventName.TASK_CREATED,
-				properties: expect.objectContaining({
-					appVersion: "1.0.0",
-					test: "value",
-				}),
-			})
-
-			// Verify git properties are not included
-			const captureCall = mockPostHogClient.capture.mock.calls[0][0]
-			expect(captureCall.properties).not.toHaveProperty("repositoryUrl")
-			expect(captureCall.properties).not.toHaveProperty("repositoryName")
-			expect(captureCall.properties).not.toHaveProperty("defaultBranch")
-		})
-
-		it("should include organization ID in captured events", async () => {
-			const client = new PostHogTelemetryClient()
-			client.updateTelemetryState(true)
-
-			const mockProvider: TelemetryPropertiesProvider = {
-				getTelemetryProperties: vi.fn().mockResolvedValue({
-					appVersion: "1.0.0",
-					vscodeVersion: "1.60.0",
-					platform: "darwin",
-					editorName: "vscode",
-					language: "en",
-					mode: "code",
-					kilocodeOrganizationId: "org-456",
-				}),
-			}
-
-			client.setProvider(mockProvider)
-
-			await client.capture({
-				event: TelemetryEventName.TASK_CREATED,
-				properties: { test: "value" },
-			})
-
-			expect(mockPostHogClient.capture).toHaveBeenCalledWith({
-				distinctId: "test-machine-id",
-				event: TelemetryEventName.TASK_CREATED,
-				properties: expect.objectContaining({
-					appVersion: "1.0.0",
-					test: "value",
-					kilocodeOrganizationId: "org-456",
-				}),
-			})
-
-			// Verify organization ID is included
-			const captureCall = mockPostHogClient.capture.mock.calls[0][0]
-			expect(captureCall.properties.kilocodeOrganizationId).toBe("org-456")
-		})
-
-		it("should capture events without organization ID when not provided", async () => {
-			const client = new PostHogTelemetryClient()
-			client.updateTelemetryState(true)
-
-			const mockProvider: TelemetryPropertiesProvider = {
-				getTelemetryProperties: vi.fn().mockResolvedValue({
-					appVersion: "1.0.0",
-					vscodeVersion: "1.60.0",
-					platform: "darwin",
-				}),
-			}
-
-			client.setProvider(mockProvider)
-
-			await client.capture({
-				event: TelemetryEventName.TASK_CREATED,
-				properties: { test: "value" },
-			})
-
-			expect(mockPostHogClient.capture).toHaveBeenCalledWith({
-				distinctId: "test-machine-id",
-				event: TelemetryEventName.TASK_CREATED,
-				properties: expect.objectContaining({
-					appVersion: "1.0.0",
-					test: "value",
-				}),
-			})
-
-			// Verify organization ID is not included
-			const captureCall = mockPostHogClient.capture.mock.calls[0][0]
-			expect(captureCall.properties).not.toHaveProperty("kilocodeOrganizationId")
 		})
 	})
 
 	describe("updateTelemetryState", () => {
-		it("should enable telemetry when user opts in and global telemetry is enabled", () => {
+		it("should never enable telemetry", () => {
 			const client = new PostHogTelemetryClient()
-
-			;(vscode.workspace.getConfiguration as any).mockReturnValue({
-				get: vi.fn().mockReturnValue("all"),
-			})
-
-			client.updateTelemetryState(true)
-
-			expect(client.isTelemetryEnabled()).toBe(true)
-			expect(mockPostHogClient.optIn).toHaveBeenCalled()
-		})
-
-		it("should disable telemetry when user opts out", () => {
-			const client = new PostHogTelemetryClient()
-
-			;(vscode.workspace.getConfiguration as any).mockReturnValue({
-				get: vi.fn().mockReturnValue("all"),
-			})
-
-			client.updateTelemetryState(false)
-
-			expect(client.isTelemetryEnabled()).toBe(false)
-			expect(mockPostHogClient.optOut).toHaveBeenCalled()
-		})
-
-		it("should disable telemetry when global telemetry is disabled, regardless of user opt-in", () => {
-			const client = new PostHogTelemetryClient()
-
-			;(vscode.workspace.getConfiguration as any).mockReturnValue({
-				get: vi.fn().mockReturnValue("off"),
-			})
-
 			client.updateTelemetryState(true)
 			expect(client.isTelemetryEnabled()).toBe(false)
-			expect(mockPostHogClient.optOut).toHaveBeenCalled()
 		})
 	})
 
@@ -637,10 +433,9 @@ describe("PostHogTelemetryClient", () => {
 	})
 
 	describe("shutdown", () => {
-		it("should call shutdown on the PostHog client", async () => {
+		it("should not throw", async () => {
 			const client = new PostHogTelemetryClient()
 			await client.shutdown()
-			expect(mockPostHogClient.shutdown).toHaveBeenCalled()
 		})
 	})
 

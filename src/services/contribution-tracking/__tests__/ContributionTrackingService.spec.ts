@@ -206,6 +206,42 @@ describe("ContributionTrackingService", () => {
 			expect(mockFetchWithRetries).not.toHaveBeenCalled()
 		})
 
+		it("should skip tracking even when organization and project data exist (telemetry is always disabled)", async () => {
+			const { fetchWithRetries } = await import("../../../shared/http")
+			const mockFetchWithRetries = vi.mocked(fetchWithRetries)
+
+			const { getProjectId } = await import("../../../utils/kilo-config-file")
+			const mockGetProjectId = vi.mocked(getProjectId)
+			mockGetProjectId.mockResolvedValueOnce("test-project")
+
+			const { getCurrentBranch } = await import("../../code-index/managed/git-utils")
+			const mockGetCurrentBranch = vi.mocked(getCurrentBranch)
+			mockGetCurrentBranch.mockResolvedValueOnce("feature/test")
+
+			const { getGitRepositoryInfo } = await import("../../../utils/git")
+			const mockGetGitRepositoryInfo = vi.mocked(getGitRepositoryInfo)
+			mockGetGitRepositoryInfo.mockResolvedValueOnce({
+				repositoryUrl: "https://github.com/test/repo.git",
+				repositoryName: "test/repo",
+				defaultBranch: "main",
+			})
+
+			const params: TrackContributionParams = {
+				cwd: "/test/repo",
+				filePath: "test.ts",
+				unifiedDiff: "@@ -1,1 +1,2 @@\n const x = 1\n+const y = 2",
+				status: "accepted",
+				taskId: "task-123",
+				organizationId: "org-1",
+				kilocodeToken: "main-token",
+			}
+
+			await service.trackContribution(params)
+
+			// Telemetry is always disabled, so no network calls should happen.
+			expect(mockFetchWithRetries).not.toHaveBeenCalled()
+		})
+
 		it("should skip tracking when no project ID", async () => {
 			const { fetchWithRetries } = await import("../../../shared/http")
 			const mockFetchWithRetries = vi.mocked(fetchWithRetries)
@@ -239,79 +275,6 @@ describe("ContributionTrackingService", () => {
 
 			// Should not make any API calls
 			expect(mockFetchWithRetries).not.toHaveBeenCalled()
-		})
-
-		it("should successfully track accepted contribution", async () => {
-			const { fetchWithRetries } = await import("../../../shared/http")
-			const mockFetchWithRetries = vi.mocked(fetchWithRetries)
-
-			const { getProjectId } = await import("../../../utils/kilo-config-file")
-			const mockGetProjectId = vi.mocked(getProjectId)
-			mockGetProjectId.mockResolvedValueOnce("test-project")
-
-			const { getCurrentBranch } = await import("../../code-index/managed/git-utils")
-			const mockGetCurrentBranch = vi.mocked(getCurrentBranch)
-			mockGetCurrentBranch.mockResolvedValueOnce("feature/test")
-
-			const { getGitRepositoryInfo } = await import("../../../utils/git")
-			const mockGetGitRepositoryInfo = vi.mocked(getGitRepositoryInfo)
-			mockGetGitRepositoryInfo.mockResolvedValueOnce({
-				repositoryUrl: "https://github.com/test/repo.git",
-				repositoryName: "test/repo",
-				defaultBranch: "main",
-			})
-
-			const futureExpiry = new Date(Date.now() + 15 * 60 * 1000).toISOString()
-
-			// Mock token fetch
-			mockFetchWithRetries
-				.mockResolvedValueOnce({
-					ok: true,
-					json: async () => ({
-						token: "short-lived-token",
-						expiresAt: futureExpiry,
-						organizationId: "org-1",
-					}),
-				} as Response)
-				// Mock contribution tracking
-				.mockResolvedValueOnce({
-					ok: true,
-					json: async () => ({ success: true }),
-				} as Response)
-
-			const params: TrackContributionParams = {
-				cwd: "/test/repo",
-				filePath: "test.ts",
-				unifiedDiff: "@@ -1,1 +1,2 @@\n const x = 1\n+const y = 2",
-				status: "accepted",
-				taskId: "task-123",
-				organizationId: "org-1",
-				kilocodeToken: "main-token",
-			}
-
-			await service.trackContribution(params)
-
-			// Should have made 2 API calls: token fetch + contribution tracking
-			expect(mockFetchWithRetries).toHaveBeenCalledTimes(2)
-
-			// Verify contribution tracking call
-			const trackingCall = mockFetchWithRetries.mock.calls[1][0]
-			expect(trackingCall.method).toBe("POST")
-			expect(trackingCall.headers).toMatchObject({
-				Authorization: "Bearer short-lived-token",
-				"Content-Type": "application/json",
-			})
-
-			const payload = JSON.parse(trackingCall.body as string)
-			expect(payload).toMatchObject({
-				project_id: "test-project",
-				branch: "feature/test",
-				file_path: "test.ts",
-				status: "accepted",
-				task_id: "task-123",
-			})
-			expect(payload.lines_added).toHaveLength(1)
-			expect(payload.lines_removed).toHaveLength(0)
 		})
 
 		it("should handle errors gracefully without throwing", async () => {
