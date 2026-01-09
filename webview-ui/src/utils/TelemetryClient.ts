@@ -9,7 +9,8 @@ class TelemetryClient {
 	public updateTelemetryState(telemetrySetting: TelemetrySetting, apiKey?: string, distinctId?: string) {
 		posthog.reset()
 
-		if (telemetrySetting !== "disabled" && apiKey && distinctId) {
+		// kilocode_change: treat "unset" as not opted-in
+		if (telemetrySetting === "enabled" && apiKey && distinctId) {
 			TelemetryClient.telemetryEnabled = true
 
 			posthog.init(apiKey, {

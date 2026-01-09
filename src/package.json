@@ -2,7 +2,7 @@
 	"name": "operit-coder",
 	"displayName": "%extension.displayName%",
 	"description": "%extension.description%",
-	"publisher": "Vlvira",
+	"publisher": "kilocode",
 	"version": "0.0.1",
 	"icon": "assets/icons/logo-outline-black.png",
 	"galleryBanner": {
@@ -24,9 +24,12 @@
 		"url": "https://github.com/yizhen47/OperitCoder"
 	},
 	"homepage": "https://github.com/yizhen47/OperitCoder",
+	"bugs": {
+		"url": "https://github.com/yizhen47/OperitCoder/issues"
+	},
+	"license": "GPL-3.0-only",
+	"qna": false,
 	"categories": [
-		"AI",
-		"Chat",
 		"Programming Languages",
 		"Education",
 		"Snippets",

@@ -564,7 +564,8 @@ export const webviewMessageHandler = async (
 			// If user already opted in to telemetry, enable telemetry service
 			provider.getStateToPostToWebview().then(async (/*kilocode_change*/ state) => {
 				const { telemetrySetting } = state
-				const isOptedIn = telemetrySetting !== "disabled"
+				// kilocode_change: treat "unset" as not opted-in
+				const isOptedIn = telemetrySetting === "enabled"
 				TelemetryService.instance.updateTelemetryState(isOptedIn)
 				await TelemetryService.instance.updateIdentity(state.apiConfiguration.kilocodeToken ?? "") // kilocode_change
 			})
@@ -2835,8 +2836,9 @@ export const webviewMessageHandler = async (
 		case "telemetrySetting": {
 			const telemetrySetting = message.text as TelemetrySetting
 			const previousSetting = getGlobalState("telemetrySetting") || "unset"
-			const isOptedIn = telemetrySetting !== "disabled"
-			const wasPreviouslyOptedIn = previousSetting !== "disabled"
+			// kilocode_change: treat "unset" as not opted-in
+			const isOptedIn = telemetrySetting === "enabled"
+			const wasPreviouslyOptedIn = previousSetting === "enabled"
 
 			// If turning telemetry OFF, fire event BEFORE disabling
 			if (wasPreviouslyOptedIn && !isOptedIn && TelemetryService.hasInstance()) {
@@ -2854,8 +2856,7 @@ export const webviewMessageHandler = async (
 			if (!wasPreviouslyOptedIn && isOptedIn && TelemetryService.hasInstance()) {
 				TelemetryService.instance.captureTelemetrySettingsChanged(previousSetting, telemetrySetting)
 			}
-
-			TelemetryService.instance.updateTelemetryState(isOptedIn)
+			// kilocode_change: avoid duplicate updateTelemetryState call
 			await provider.postStateToWebview()
 			break
 		}

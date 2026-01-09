@@ -1,7 +1,9 @@
 {
 	"name": "operit-coder",
 	"packageManager": "pnpm@10.8.1",
+	
 	"engines": {
+		"vscode": "^1.8.0",
 		"node": "20.19.2"
 	},
 	"scripts": {

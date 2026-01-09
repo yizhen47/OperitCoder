@@ -36,7 +36,6 @@ import { OrganizationSelector } from "../kilocode/common/OrganizationSelector"
 // import { useTaskSearch } from "../history/useTaskSearch" // kilocode_change: unused
 // import { CloudUpsellDialog } from "@src/components/cloud/CloudUpsellDialog" // kilocode_change: unused
 
-import TelemetryBanner from "../common/TelemetryBanner"
 import HistoryPreview from "../history/HistoryPreview"
 import Announcement from "./Announcement"
 import BrowserActionRow from "./BrowserActionRow"
@@ -102,7 +101,6 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		enableCheckpoints, // kilocode_change
 		alwaysAllowUpdateTodoList,
 		customModes,
-		telemetrySetting,
 		hasSystemPromptOverride,
 		historyPreviewCollapsed, // kilocode_change
 		soundEnabled,
@@ -796,12 +794,12 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				case "resume_task":
 					// For completed subtasks (tasks with a parentTaskId and a completion_result),
 					// start a new task instead of resuming since the subtask is done
-					const isCompletedSubtaskForClick =
+					const isCompletedSubtask =
 						currentTaskItem?.parentTaskId &&
 						messagesRef.current.some(
 							(msg) => msg.ask === "completion_result" || msg.say === "completion_result",
 						)
-					if (isCompletedSubtaskForClick) {
+					if (isCompletedSubtask) {
 						startNewTask()
 					} else {
 						// Only send text/images if they exist
@@ -1628,8 +1626,6 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 
 	const areButtonsVisible = primaryButtonText || secondaryButtonText || isStreaming
 
-	const showTelemetryBanner = telemetrySetting === "unset" // kilocode_change
-
 	return (
 		<div
 			data-testid="chat-view"
@@ -1703,12 +1699,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 						<RooHero /> */}
 
 						{/* kilocode_change start: KilocodeNotifications + Layout fixes */}
-						{showTelemetryBanner && <TelemetryBanner />}
-						{!showTelemetryBanner && (
-							<div className={taskHistoryFullLength === 0 ? "mt-10" : undefined}>
-								<KilocodeNotifications />
-							</div>
-						)}
+						<KilocodeNotifications />
 						<div className="flex flex-grow flex-col justify-center gap-4">
 							{/* kilocode_change end */}
 							<p className="text-vscode-editor-foreground leading-normal font-vscode-font-family text-center text-balance max-w-[380px] mx-auto my-0">
