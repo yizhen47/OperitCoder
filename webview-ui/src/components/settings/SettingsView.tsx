@@ -37,7 +37,6 @@ import { ensureBodyPointerEventsRestored } from "@/utils/fixPointerEvents"
 import {
 	type ProviderSettings,
 	type ExperimentId,
-	type TelemetrySetting,
 	type ProfileType, // kilocode_change - autocomplete profile type system
 	DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
 	ImageGenerationProvider,
@@ -204,7 +203,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		ttsEnabled,
 		ttsSpeed,
 		soundVolume,
-		telemetrySetting,
 		terminalOutputLineLimit,
 		terminalOutputCharacterLimit,
 		terminalShellIntegrationTimeout,
@@ -444,17 +442,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		})
 	}, [])
 
-	const setTelemetrySetting = useCallback((setting: TelemetrySetting) => {
-		setCachedState((prevState) => {
-			if (prevState.telemetrySetting === setting) {
-				return prevState
-			}
-
-			setChangeDetected(true)
-			return { ...prevState, telemetrySetting: setting }
-		})
-	}, [])
-
 	const setImageGenerationProvider = useCallback((provider: ImageGenerationProvider) => {
 		setCachedState((prevState) => {
 			if (prevState.imageGenerationProvider !== provider) {
@@ -604,7 +591,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			vscode.postMessage({ type: "yoloGatekeeperApiConfigId", text: yoloGatekeeperApiConfigId || "" }) // kilocode_change: AI gatekeeper for YOLO mode
 			vscode.postMessage({ type: "setReasoningBlockCollapsed", bool: reasoningBlockCollapsed ?? true })
 			vscode.postMessage({ type: "upsertApiConfiguration", text: editingApiConfigName, apiConfiguration }) // kilocode_change: Save to editing profile instead of current active profile
-			vscode.postMessage({ type: "telemetrySetting", text: telemetrySetting })
 			vscode.postMessage({ type: "systemNotificationsEnabled", bool: systemNotificationsEnabled }) // kilocode_change
 			vscode.postMessage({ type: "ghostServiceSettings", values: ghostServiceSettings }) // kilocode_change
 			vscode.postMessage({ type: "morphApiKey", text: morphApiKey }) // kilocode_change
@@ -1217,7 +1203,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 
 					{/* About Section */}
 					{activeTab === "about" && (
-						<About telemetrySetting={telemetrySetting} setTelemetrySetting={setTelemetrySetting} />
+						<About />
 					)}
 				</TabContent>
 			</div>

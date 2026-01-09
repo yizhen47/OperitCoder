@@ -29,7 +29,6 @@ import ErrorBoundary from "./components/ErrorBoundary"
 import { useAddNonInteractiveClickListener } from "./components/ui/hooks/useNonInteractiveClick"
 import { TooltipProvider } from "./components/ui/tooltip"
 import { STANDARD_TOOLTIP_DELAY } from "./components/ui/standard-tooltip"
-import { useKiloIdentity } from "./utils/kilocode/useKiloIdentity"
 import { MemoryWarningBanner } from "./kilocode/MemoryWarningBanner"
 
 type Tab = "settings" | "history" | "mcp" | "modes" | "chat" | "marketplace" | "account" | "cloud" | "auth" // kilocode_change: add "auth"
@@ -82,8 +81,6 @@ const App = () => {
 		showWelcome,
 		shouldShowAnnouncement,
 		telemetrySetting,
-		telemetryKey,
-		machineId,
 		// kilocode_change start: unused
 		// cloudUserInfo,
 		// cloudIsAuthenticated,
@@ -266,11 +263,9 @@ const App = () => {
 		}
 	}, [shouldShowAnnouncement, tab])
 
-	// kilocode_change start
-	const telemetryDistinctId = useKiloIdentity(apiConfiguration?.kilocodeToken ?? "", machineId ?? "")
 	useEffect(() => {
 		if (didHydrateState) {
-			telemetryClient.updateTelemetryState(telemetrySetting, telemetryKey, telemetryDistinctId)
+			telemetryClient.updateTelemetryState(telemetrySetting)
 
 			// kilocode_change start
 			const memoryService = new MemoryService()
@@ -278,8 +273,7 @@ const App = () => {
 			return () => memoryService.stop()
 			// kilocode_change end
 		}
-	}, [telemetrySetting, telemetryKey, telemetryDistinctId, didHydrateState])
-	// kilocode_change end
+	}, [telemetrySetting, didHydrateState])
 
 	// Tell the extension that we are ready to receive messages.
 	useEffect(() => vscode.postMessage({ type: "webviewDidLaunch" }), [])

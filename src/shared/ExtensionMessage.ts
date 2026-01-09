@@ -497,9 +497,7 @@ export type ExtensionState = Pick<
 	toolRequirements?: Record<string, boolean> // Map of tool names to their requirements (e.g. {"apply_diff": true} if diffEnabled)
 
 	cwd?: string // Current working directory
-	telemetrySetting: TelemetrySetting
-	telemetryKey?: string
-	machineId?: string
+	telemetrySetting: TelemetrySetting // kilocode_change
 
 	renderContext: "sidebar" | "editor"
 	settingsImportedAt?: number

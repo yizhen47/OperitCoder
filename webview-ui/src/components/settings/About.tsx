@@ -3,13 +3,7 @@ import {
 	useState, // kilocode_change
 } from "react"
 import { useAppTranslation } from "@/i18n/TranslationContext"
-import { Trans } from "react-i18next"
 import { Info, Download, Upload, TriangleAlert } from "lucide-react"
-import { VSCodeCheckbox, VSCodeLink } from "@vscode/webview-ui-toolkit/react"
-
-import type { TelemetrySetting } from "@roo-code/types"
-
-import { Package } from "@roo/package"
 
 import { vscode } from "@/utils/vscode"
 import { cn } from "@/lib/utils"
@@ -19,69 +13,28 @@ import { SectionHeader } from "./SectionHeader"
 import { Section } from "./Section"
 import { getMemoryPercentage } from "@/kilocode/helpers"
 
-type AboutProps = HTMLAttributes<HTMLDivElement> & {
-	telemetrySetting: TelemetrySetting
-	setTelemetrySetting: (setting: TelemetrySetting) => void
-}
-
-export const About = ({ telemetrySetting, setTelemetrySetting, className, ...props }: AboutProps) => {
+export const About = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
 	const { t } = useAppTranslation()
 
 	const [kiloCodeBloat, setKiloCodeBloat] = useState<number[][]>([])
 
 	return (
 		<div className={cn("flex flex-col gap-2", className)} {...props}>
+			{/* kilocode_change start */}
 			<SectionHeader
-				description={
-					Package.sha
-						? `Version: ${Package.version} (${Package.sha.slice(0, 8)})`
-						: `Version: ${Package.version}`
-				}>
+				description={t("settings:about.version", { version: "0.0.1" })}>
 				<div className="flex items-center gap-2">
 					<Info className="w-4" />
 					<div>{t("settings:sections.about")}</div>
 				</div>
 			</SectionHeader>
+			{/* kilocode_change end */}
 
 			<Section>
-				<div>
-					<VSCodeCheckbox
-						checked={telemetrySetting === "enabled"}
-						onChange={(e: any) => {
-							const checked = e.target.checked === true
-							setTelemetrySetting(checked ? "enabled" : "disabled")
-						}}>
-						{t("settings:footer.telemetry.label")}
-					</VSCodeCheckbox>
-					<p className="text-vscode-descriptionForeground text-sm mt-0">
-						<Trans
-							i18nKey="settings:footer.telemetry.description"
-							components={{
-								privacyLink: <VSCodeLink href="https://kilo.ai/privacy" />,
-							}}
-						/>
-					</p>
-				</div>
-
-				<div>
-					<Trans
-						i18nKey="settings:footer.feedback"
-						components={{
-							githubLink: <VSCodeLink href="https://github.com/Kilo-Org/kilocode" />,
-							redditLink: <VSCodeLink href="https://reddit.com/r/kilocode" />,
-							discordLink: <VSCodeLink href="https://kilo.ai/discord" />,
-						}}
-					/>
-				</div>
-
 				{/* kilocode_change start */}
 				<div>
-					<Trans
-						i18nKey="settings:footer.support"
-						components={{
-							supportLink: <VSCodeLink href="https://kilo.ai/support" />,
-						}}
-					/>
+					<div>{t("settings:about.support.issue")}</div>
+					<div>{t("settings:about.support.contact")}</div>
 				</div>
 				{/* kilocode_change end */}
 

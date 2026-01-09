@@ -2123,8 +2123,7 @@ ${prompt}
 		}
 		// kilocode_change end - checkSpeechToTextAvailable
 
-		const telemetryKey = process.env.KILOCODE_POSTHOG_API_KEY
-		const machineId = vscode.env.machineId
+		// kilocode_change: telemetry disabled, do not expose telemetry key or machine ID
 
 		const mergedAllowedCommands = this.mergeAllowedCommands(allowedCommands)
 		const mergedDeniedCommands = this.mergeDeniedCommands(deniedCommands)
@@ -2226,8 +2225,6 @@ ${prompt}
 			cwd,
 			browserToolEnabled: browserToolEnabled ?? true,
 			telemetrySetting,
-			telemetryKey,
-			machineId,
 			showRooIgnoredFiles: showRooIgnoredFiles ?? false,
 			showAutoApproveMenu: showAutoApproveMenu ?? false, // kilocode_change
 			showTaskTimeline: showTaskTimeline ?? true, // kilocode_change
@@ -3085,8 +3082,8 @@ ${prompt}
 				wrapperCode: kiloCodeWrapperCode,
 				wrapperVersion: kiloCodeWrapperVersion,
 				wrapperTitle: kiloCodeWrapperTitle,
-				machineId: vscode.env.machineId,
-				vscodeIsTelemetryEnabled: vscode.env.isTelemetryEnabled,
+				machineId: null, // kilocode_change: do not expose machine identifier
+				vscodeIsTelemetryEnabled: null, // kilocode_change: telemetry disabled
 				// kilocode_change end
 			}
 		}
