@@ -35,7 +35,7 @@ import { KiloProfileSelector } from "../kilocode/chat/KiloProfileSelector"
 import { MAX_IMAGES_PER_MESSAGE } from "./ChatView"
 import ContextMenu from "./ContextMenu"
 import { ImageWarningBanner } from "./ImageWarningBanner"
-import { VolumeX, Pin, Check, WandSparkles, SendHorizontal, Paperclip, MessageSquareX } from "lucide-react"
+import { VolumeX, Pin, Check, WandSparkles, SendHorizontal, Paperclip, MessageSquareX, X } from "lucide-react"
 import { IndexingStatusBadge } from "./IndexingStatusBadge"
 import KiloRulesToggleModal from "../kilocode/rules/KiloRulesToggleModal"
 import { MicrophoneButton } from "./MicrophoneButton" // kilocode_change: STT microphone button
@@ -65,6 +65,9 @@ interface ChatTextAreaProps {
 	selectedImages: string[]
 	setSelectedImages: React.Dispatch<React.SetStateAction<string[]>>
 	onSend: () => void
+	isTaskRunning?: boolean
+	onCancelTask?: () => void
+	cancelDisabled?: boolean
 	onSelectImages: () => void
 	shouldDisableImages: boolean
 	onHeightChange?: (height: number) => void
@@ -147,6 +150,9 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			isEditMode = false,
 			onCancel,
 			sendMessageOnEnter = true,
+			isTaskRunning = false,
+			onCancelTask,
+			cancelDisabled = false,
 			contextTokens, // kilocode_change: context tokens for display
 		},
 		ref,
@@ -1824,12 +1830,27 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					)}
 					{/* kilocode_change end */}
 
-					{inputValue.trim() !== "" && (
-						<StandardTooltip content={t("chat:sendMessage")}>
+					{(isTaskRunning || !isEditMode || inputValue.trim() !== "" || selectedImages.length > 0) && (
+						<StandardTooltip
+							content={isTaskRunning ? t("chat:cancel.tooltip") : t("chat:sendMessage")}>
 							<button
-								aria-label={t("chat:sendMessage")}
-								disabled={sendingDisabled}
-								onClick={!sendingDisabled ? onSend : undefined}
+								aria-label={isTaskRunning ? t("chat:cancel.tooltip") : t("chat:sendMessage")}
+								disabled={
+									isTaskRunning
+										? cancelDisabled
+										: sendingDisabled || (inputValue.trim() === "" && selectedImages.length === 0)
+								}
+								onClick={() => {
+									if (isTaskRunning) {
+										if (!cancelDisabled) {
+											onCancelTask?.()
+										}
+										return
+									}
+									if (!sendingDisabled && (inputValue.trim() !== "" || selectedImages.length > 0)) {
+										onSend()
+									}
+								}}
 								className={cn(
 									"relative inline-flex items-center justify-center",
 									"bg-transparent border-none p-1.5",
@@ -1839,12 +1860,11 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 									"hover:bg-[rgba(255,255,255,0.03)] hover:border-[rgba(255,255,255,0.15)]",
 									"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 									"active:bg-[rgba(255,255,255,0.1)]",
-									!sendingDisabled && "cursor-pointer",
-									sendingDisabled &&
+									(!sendingDisabled || isTaskRunning) && "cursor-pointer",
+									(sendingDisabled || cancelDisabled) &&
 										"opacity-40 cursor-not-allowed grayscale-[30%] hover:bg-transparent hover:border-[rgba(255,255,255,0.08)] active:bg-transparent",
 								)}>
-								{/* kilocode_change: rtl */}
-								<SendHorizontal className="w-4 h-4 rtl:-scale-x-100" />
+								{isTaskRunning ? <X className="w-4 h-4" /> : <SendHorizontal className="w-4 h-4 rtl:-scale-x-100" />}
 							</button>
 						</StandardTooltip>
 					)}

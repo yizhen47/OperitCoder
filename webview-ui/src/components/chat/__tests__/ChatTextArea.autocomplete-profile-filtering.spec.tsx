@@ -1,6 +1,6 @@
 import { defaultModeSlug } from "@roo/modes"
 
-import { render, screen } from "@src/utils/test-utils"
+import { render, screen, fireEvent } from "@src/utils/test-utils"
 import { useExtensionState } from "@src/context/ExtensionStateContext"
 import { useQuery } from "@tanstack/react-query"
 
@@ -33,6 +33,7 @@ describe("ChatTextArea - autocomplete profile filtering", () => {
 		inputValue: "",
 		setInputValue: vi.fn(),
 		onSend: vi.fn(),
+		onCancelTask: vi.fn(),
 		sendingDisabled: false,
 		selectApiConfigDisabled: false,
 		onSelectImages: vi.fn(),
@@ -161,5 +162,43 @@ describe("ChatTextArea - autocomplete profile filtering", () => {
 		// All profiles are autocomplete, so none should be shown
 		expect(screen.queryByText("Autocomplete Profile 1")).not.toBeInTheDocument()
 		expect(screen.queryByText("Autocomplete Profile 2")).not.toBeInTheDocument()
+	})
+
+	it("should show send button (disabled) even when input is empty in non-edit mode", () => {
+		;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
+			filePaths: [],
+			openedTabs: [],
+			listApiConfigMeta: [],
+			currentApiConfigName: "",
+			taskHistory: [],
+			taskHistoryVersion: 0,
+			clineMessages: [],
+			cwd: "/test/workspace",
+		})
+
+		render(<ChatTextArea {...defaultProps} />)
+
+		const sendButton = screen.getByLabelText("chat:sendMessage")
+		expect(sendButton).toBeDisabled()
+	})
+
+	it("should toggle to cancel and call onCancelTask when task is running", () => {
+		;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
+			filePaths: [],
+			openedTabs: [],
+			listApiConfigMeta: [],
+			currentApiConfigName: "",
+			taskHistory: [],
+			taskHistoryVersion: 0,
+			clineMessages: [],
+			cwd: "/test/workspace",
+		})
+
+		const onCancelTask = vi.fn()
+		render(<ChatTextArea {...defaultProps} isTaskRunning={true} onCancelTask={onCancelTask} />)
+
+		const cancelButton = screen.getByLabelText("chat:cancel.tooltip")
+		fireEvent.click(cancelButton)
+		expect(onCancelTask).toHaveBeenCalledTimes(1)
 	})
 })

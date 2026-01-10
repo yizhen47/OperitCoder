@@ -633,6 +633,11 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		return false
 	}, [modifiedMessages, clineAsk, enableButtons, primaryButtonText])
 
+	const isTaskRunningForInput = useMemo(() => {
+		const isAwaitingResponse = sendingDisabled && clineAsk === undefined && !enableButtons
+		return (isStreaming || isAwaitingResponse) && !didClickCancel
+	}, [sendingDisabled, clineAsk, enableButtons, isStreaming, didClickCancel])
+
 	const markFollowUpAsAnswered = useCallback(() => {
 		const lastFollowUpMessage = messagesRef.current.findLast((msg: ClineMessage) => msg.ask === "followup")
 		if (lastFollowUpMessage) {
@@ -850,7 +855,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 
 			const trimmedInput = text?.trim()
 
-			if (isStreaming) {
+			if (isTaskRunningForInput) {
 				vscode.postMessage({ type: "cancelTask" })
 				setDidClickCancel(true)
 				return
@@ -890,7 +895,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 			setClineAsk(undefined)
 			setEnableButtons(false)
 		},
-		[clineAsk, startNewTask, isStreaming],
+		[clineAsk, startNewTask, isTaskRunningForInput],
 	)
 
 	const handleTaskCloseButtonClick = useCallback(() => startNewTask(), [startNewTask]) // kilocode_change
@@ -1823,16 +1828,6 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							</button>
 						</StandardTooltip>
 					)}
-					{/* kilocode_change: Floating cancel button - overlay style */}
-					{isStreaming && !didClickCancel && (
-						<StandardTooltip content={t("chat:cancel.tooltip")}>
-							<button
-								className="fixed bottom-44 right-6 w-10 h-10 rounded-full bg-vscode-editor-background/80 backdrop-blur-sm border border-vscode-widget-border hover:bg-vscode-editor-background/90 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl z-50 animate-fade-in"
-								onClick={() => handleSecondaryButtonClick(inputValue, selectedImages)}>
-								<span className="codicon codicon-x text-vscode-editor-foreground"></span>
-							</button>
-						</StandardTooltip>
-					)}
 					{areButtonsVisible && !showScrollToBottom && (
 						<div
 							className={`flex h-9 items-center mb-1 px-[15px] ${
@@ -1917,6 +1912,9 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				selectedImages={selectedImages}
 				setSelectedImages={setSelectedImages}
 				onSend={() => handleSendMessage(inputValue, selectedImages)}
+				isTaskRunning={isTaskRunningForInput}
+				onCancelTask={() => handleSecondaryButtonClick(inputValue, selectedImages)}
+				cancelDisabled={didClickCancel}
 				onSelectImages={selectImages}
 				shouldDisableImages={shouldDisableImages}
 				onHeightChange={() => {
