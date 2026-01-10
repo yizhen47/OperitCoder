@@ -292,7 +292,7 @@
 			},
 			{
 				"command": "operit-coder.agentManagerOpen",
-				"title": "Open Agent Manager",
+				"title": "Open Session Manager",
 				"icon": "$(circuit-board)",
 				"category": "%configuration.title%"
 			}
@@ -354,16 +354,6 @@
 					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "operit-coder.mcpButtonClicked",
-					"group": "navigation@2",
-					"when": "view == operit-coder.SidebarProvider"
-				},
-				{
-					"command": "operit-coder.marketplaceButtonClicked",
-					"group": "navigation@3",
-					"when": "view == operit-coder.SidebarProvider"
-				},
-				{
 					"command": "operit-coder.historyButtonClicked",
 					"group": "navigation@4",
 					"when": "view == operit-coder.SidebarProvider"
@@ -388,11 +378,6 @@
 				{
 					"command": "operit-coder.plusButtonClicked",
 					"group": "navigation@1",
-					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
-				},
-				{
-					"command": "operit-coder.mcpButtonClicked",
-					"group": "navigation@2",
 					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{

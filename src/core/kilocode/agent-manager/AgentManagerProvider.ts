@@ -177,7 +177,7 @@ export class AgentManagerProvider implements vscode.Disposable {
 
 		this.panel = vscode.window.createWebviewPanel(
 			AgentManagerProvider.viewType,
-			"Agent Manager",
+			"Session Manager",
 			vscode.ViewColumn.One,
 			{
 				enableScripts: true,

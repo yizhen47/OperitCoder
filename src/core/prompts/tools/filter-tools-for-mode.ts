@@ -328,6 +328,11 @@ export function filterNativeToolsForMode(
 		allowedToolNames.delete("apply_diff")
 	}
 
+	const hasConnectedMcpServer = !!mcpHub?.getServers().some((server) => server.status === "connected")
+	if (!hasConnectedMcpServer) {
+		allowedToolNames.delete("use_mcp_tool")
+	}
+
 	// Conditionally exclude access_mcp_resource if MCP is not enabled or there are no resources
 	if (!mcpHub || !hasAnyMcpResources(mcpHub)) {
 		allowedToolNames.delete("access_mcp_resource")
