@@ -292,7 +292,7 @@
 			},
 			{
 				"command": "operit-coder.agentManagerOpen",
-				"title": "Open Session Manager",
+				"title": "Open Chat in New Tab",
 				"icon": "$(circuit-board)",
 				"category": "%configuration.title%"
 			}

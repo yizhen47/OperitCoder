@@ -94,7 +94,7 @@ const getCommandsMap = ({ context, outputChannel }: RegisterCommandOptions): Rec
 	activationCompleted: () => {},
 	// kilocode_change start
 	agentManagerOpen: () => {
-		agentManagerProvider?.openPanel()
+		return vscode.commands.executeCommand(getCommand("openInNewTab"))
 	},
 	// kilocode_change end
 	cloudButtonClicked: () => {

@@ -388,4 +388,14 @@ describe("ClineProvider flicker-free cancel", () => {
 		// Should update webview state
 		expect(provider.postStateToWebview).toHaveBeenCalled()
 	})
+
+	it("should cancel task even if getTaskWithId throws (early cancel before history files exist)", async () => {
+		;(provider as any).clineStack = [mockTask1]
+
+		// Simulate the failure case: history item exists in global state but apiConversationHistory file does not.
+		provider.getTaskWithId = vi.fn().mockRejectedValue(new Error("Task not found"))
+
+		await expect(provider.cancelTask()).resolves.toBeUndefined()
+		expect(mockTask1.cancelCurrentRequest).toHaveBeenCalledTimes(1)
+	})
 })

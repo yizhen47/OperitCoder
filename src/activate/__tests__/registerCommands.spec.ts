@@ -2,7 +2,7 @@ import type { Mock } from "vitest"
 import * as vscode from "vscode"
 import { ClineProvider } from "../../core/webview/ClineProvider"
 
-import { getVisibleProviderOrLog } from "../registerCommands"
+import { getVisibleProviderOrLog, registerCommands } from "../registerCommands"
 
 vi.mock("execa", () => ({
 	execa: vi.fn(),
@@ -28,6 +28,21 @@ vi.mock("vscode", () => ({
 }))
 
 vi.mock("../../core/webview/ClineProvider")
+
+// Mock AgentManagerProvider to avoid spinning up the full implementation.
+vi.mock("../../core/kilocode/agent-manager/AgentManagerProvider", () => ({
+	AgentManagerProvider: vi.fn().mockImplementation(() => ({
+		dispose: vi.fn(),
+	})),
+}))
+
+vi.mock("../../utils/commands", async () => {
+	const actual = await vi.importActual<any>("../../utils/commands")
+	return {
+		...actual,
+		getCommand: (id: string) => `operit-coder.${id}`,
+	}
+})
 
 describe("getVisibleProviderOrLog", () => {
 	let mockOutputChannel: vscode.OutputChannel
@@ -63,5 +78,34 @@ describe("getVisibleProviderOrLog", () => {
 
 		expect(result).toBeUndefined()
 		expect(mockOutputChannel.appendLine).toHaveBeenCalledWith("Cannot find any visible Operit Coder instances.")
+	})
+})
+
+describe("agentManagerOpen", () => {
+	it("executes openInNewTab command", async () => {
+		const mockExecuteCommand = vi.fn().mockResolvedValue(undefined)
+		const registeredCallbacks = new Map<string, (...args: any[]) => any>()
+		const mockRegisterCommand = vi.fn((commandId: string, cb: any) => {
+			registeredCallbacks.set(commandId, cb)
+			// Return a disposable
+			return { dispose: vi.fn() }
+		})
+
+		;(vscode as any).commands = {
+			executeCommand: mockExecuteCommand,
+			registerCommand: mockRegisterCommand,
+		}
+
+		const mockContext = { subscriptions: [] as any[] } as any
+		const mockOutputChannel = { appendLine: vi.fn() } as any
+		const mockProvider = {} as any
+
+		registerCommands({ context: mockContext, outputChannel: mockOutputChannel, provider: mockProvider })
+
+		const agentManagerOpenCb = registeredCallbacks.get("operit-coder.agentManagerOpen")
+		expect(agentManagerOpenCb).toBeTruthy()
+		await agentManagerOpenCb?.()
+
+		expect(mockExecuteCommand).toHaveBeenCalledWith("operit-coder.openInNewTab")
 	})
 })

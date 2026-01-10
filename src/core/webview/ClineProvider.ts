@@ -2882,8 +2882,6 @@ ${prompt}
 
 		console.log(`[cancelTask] cancelling task ${task.taskId}.${task.instanceId}`)
 
-		const { historyItem } = await this.getTaskWithId(task.taskId)
-
 		// Preserve parent and root task information for history item.
 		const rootTask = task.rootTask
 		const parentTask = task.parentTask
@@ -2896,10 +2894,43 @@ ${prompt}
 
 		// Immediately cancel the underlying HTTP request if one is in progress
 		// This ensures the stream fails quickly rather than waiting for network timeout
-		task.cancelCurrentRequest()
+		try {
+			task.cancelCurrentRequest()
+		} catch (error) {
+			this.log(
+				`[cancelTask] cancelCurrentRequest() failed for ${task.taskId}.${task.instanceId}: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
+			)
+		}
 
 		// Begin abort (non-blocking)
-		task.abortTask()
+		try {
+			task.abortTask()
+		} catch (error) {
+			this.log(
+				`[cancelTask] abortTask() failed for ${task.taskId}.${task.instanceId}: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
+			)
+		}
+
+		// Use task history if available. Avoid getTaskWithId() here because it can throw
+		// when apiConversationHistory.json hasn't been created yet (e.g., cancel very early).
+		const history = this.getTaskHistory()
+		const historyItem: HistoryItem =
+			history.find((item) => item.id === task.taskId) ??
+			({
+				id: task.taskId,
+				number: (task as any).taskNumber ?? 1,
+				ts: Date.now(),
+				task: (task as any).clineMessages?.[0]?.text?.trim() ?? "",
+				tokensIn: 0,
+				tokensOut: 0,
+				totalCost: 0,
+				workspace: (task as any).cwd,
+				status: "active",
+			} as HistoryItem)
 
 		// kilocode_change start
 		let didTimeoutWaitingForAbort = false
