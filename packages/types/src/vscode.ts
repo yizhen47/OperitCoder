@@ -39,14 +39,26 @@ export const commandIds = [
 	"activationCompleted",
 
 	"plusButtonClicked",
+	// kilocode_change start
+	"plusButtonClickedSidebar",
+	"plusButtonClickedTab",
+	// kilocode_change end
 	"promptsButtonClicked",
 	"mcpButtonClicked",
 
 	"historyButtonClicked",
+	// kilocode_change start
+	"historyButtonClickedSidebar",
+	"historyButtonClickedTab",
+	// kilocode_change end
 	"marketplaceButtonClicked",
 	"popoutButtonClicked",
 	"cloudButtonClicked",
 	"settingsButtonClicked",
+	// kilocode_change start
+	"settingsButtonClickedSidebar",
+	"settingsButtonClickedTab",
+	// kilocode_change end
 
 	"openInNewTab",
 	"agentManagerOpen", // kilocode_change

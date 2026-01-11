@@ -602,8 +602,26 @@ export class ClineProvider
 	}
 
 	public static getVisibleInstance(): ClineProvider | undefined {
-		return findLast(Array.from(this.activeInstances), (instance) => instance.view?.visible === true)
+		// kilocode_change start
+		const instances = Array.from(this.activeInstances)
+		const activePanelInstance = findLast(instances, (instance) => {
+			const view = instance.view
+			return !!view && "active" in view && (view as vscode.WebviewPanel).active === true
+		})
+
+		if (activePanelInstance) {
+			return activePanelInstance
+		}
+
+		return findLast(instances, (instance) => instance.view?.visible === true)
+		// kilocode_change end
 	}
+
+	// kilocode_change start
+	public static getInstanceForView(view: vscode.WebviewView | vscode.WebviewPanel): ClineProvider | undefined {
+		return findLast(Array.from(this.activeInstances), (instance) => instance.view === view)
+	}
+	// kilocode_change end
 
 	public static async getInstance(): Promise<ClineProvider | undefined> {
 		let visibleProvider = ClineProvider.getVisibleInstance()
@@ -856,6 +874,7 @@ ${prompt}
 					await this.dispose()
 				} else {
 					this.log("Clearing webview resources for sidebar view")
+					setPanel(undefined, "sidebar") // kilocode_change
 					this.clearWebviewResources()
 					// Reset current workspace manager reference when view is disposed
 					this.codeIndexManager = undefined

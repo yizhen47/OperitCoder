@@ -2,7 +2,7 @@ import type { Mock } from "vitest"
 import * as vscode from "vscode"
 import { ClineProvider } from "../../core/webview/ClineProvider"
 
-import { getVisibleProviderOrLog, registerCommands } from "../registerCommands"
+import { getVisibleProviderOrLog, registerCommands, setPanel } from "../registerCommands"
 
 vi.mock("execa", () => ({
 	execa: vi.fn(),
@@ -48,6 +48,8 @@ describe("getVisibleProviderOrLog", () => {
 	let mockOutputChannel: vscode.OutputChannel
 
 	beforeEach(() => {
+		setPanel(undefined, "tab")
+		setPanel(undefined, "sidebar")
 		mockOutputChannel = {
 			appendLine: vi.fn(),
 			append: vi.fn(),
@@ -78,6 +80,38 @@ describe("getVisibleProviderOrLog", () => {
 
 		expect(result).toBeUndefined()
 		expect(mockOutputChannel.appendLine).toHaveBeenCalledWith("Cannot find any visible Operit Coder instances.")
+	})
+
+	it("prefers sidebar provider when tab panel is not active", () => {
+		const mockActiveProvider = { id: "active" } as unknown as ClineProvider
+		const mockSidebarProvider = { id: "sidebar" } as unknown as ClineProvider
+		;(ClineProvider.getVisibleInstance as Mock).mockReturnValue(mockActiveProvider)
+		;(ClineProvider as any).getInstanceForView = (ClineProvider as any).getInstanceForView ?? vi.fn()
+		;((ClineProvider as any).getInstanceForView as Mock).mockReturnValue(mockSidebarProvider)
+
+		const mockTabPanel = { active: false } as unknown as vscode.WebviewPanel
+		const mockSidebarView = { visible: true } as unknown as vscode.WebviewView
+		setPanel(mockTabPanel, "tab")
+		setPanel(mockSidebarView, "sidebar")
+
+		const result = getVisibleProviderOrLog(mockOutputChannel)
+		expect(result).toBe(mockSidebarProvider)
+	})
+
+	it("prefers active tab provider when tab panel is active", () => {
+		const mockActiveProvider = { id: "active" } as unknown as ClineProvider
+		const mockSidebarProvider = { id: "sidebar" } as unknown as ClineProvider
+		;(ClineProvider.getVisibleInstance as Mock).mockReturnValue(mockActiveProvider)
+		;(ClineProvider as any).getInstanceForView = (ClineProvider as any).getInstanceForView ?? vi.fn()
+		;((ClineProvider as any).getInstanceForView as Mock).mockReturnValue(mockSidebarProvider)
+
+		const mockTabPanel = { active: true } as unknown as vscode.WebviewPanel
+		const mockSidebarView = { visible: true } as unknown as vscode.WebviewView
+		setPanel(mockTabPanel, "tab")
+		setPanel(mockSidebarView, "sidebar")
+
+		const result = getVisibleProviderOrLog(mockOutputChannel)
+		expect(result).toBe(mockActiveProvider)
 	})
 })
 

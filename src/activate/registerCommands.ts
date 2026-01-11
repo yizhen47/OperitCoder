@@ -24,7 +24,12 @@ import { AgentManagerProvider } from "../core/kilocode/agent-manager/AgentManage
  * Helper to get the visible ClineProvider instance or log if not found.
  */
 export function getVisibleProviderOrLog(outputChannel: vscode.OutputChannel): ClineProvider | undefined {
-	const visibleProvider = ClineProvider.getVisibleInstance()
+	// kilocode_change start
+	const activeProvider = ClineProvider.getVisibleInstance()
+	const sidebarProvider = sidebarPanel ? ClineProvider.getInstanceForView(sidebarPanel) : undefined
+	const preferredProvider = tabPanel?.active ? activeProvider : (sidebarProvider ?? activeProvider)
+	const visibleProvider = preferredProvider
+	// kilocode_change end
 	if (!visibleProvider) {
 		outputChannel.appendLine("Cannot find any visible Operit Coder instances.")
 		return undefined
@@ -41,7 +46,15 @@ let tabPanel: vscode.WebviewPanel | undefined = undefined
  * @returns WebviewPanel或WebviewView
  */
 export function getPanel(): vscode.WebviewPanel | vscode.WebviewView | undefined {
+	// kilocode_change start
+	if (tabPanel?.active) {
+		return tabPanel
+	}
+	if (sidebarPanel?.visible) {
+		return sidebarPanel
+	}
 	return tabPanel || sidebarPanel
+	// kilocode_change end
 }
 
 /**
@@ -53,10 +66,8 @@ export function setPanel(
 ): void {
 	if (type === "sidebar") {
 		sidebarPanel = newPanel as vscode.WebviewView
-		tabPanel = undefined
 	} else {
 		tabPanel = newPanel as vscode.WebviewPanel
-		sidebarPanel = undefined
 	}
 }
 
