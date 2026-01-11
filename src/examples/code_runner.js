@@ -1,19 +1,19 @@
 /* METADATA
 {
   name: code_runner
-  description: 提供多语言代码执行能力，支持JavaScript、Python、Ruby、Go、Rust、C和C++脚本的运行。可直接执行代码字符串或运行外部文件，适用于快速测试、自动化脚本和教学演示。
+  description: { zh: "提供多语言代码执行能力，支持JavaScript、Python、Ruby、Go、Rust、C和C++脚本的运行。可直接执行代码字符串或运行外部文件，适用于快速测试、自动化脚本和教学演示。", en: "Multi-language code execution. Supports running JavaScript, Python, Ruby, Go, Rust, C and C++ scripts. You can execute code strings directly or run external files, useful for quick tests, automation, and demos." }
   enabledByDefault: true
   
   // Multiple tools in this package
   tools: [
     {
       name: run_javascript_es5
-      description: 运行自定义 JavaScript (ES5) 脚本。会捕获 console.log 的输出以及最终的返回值。
+      description: { zh: "运行自定义 JavaScript (ES5) 脚本。会捕获 console.log 的输出以及最终的返回值。", en: "Run custom JavaScript (ES5). Captures console.log output and the final return value." }
       // This tool takes parameters
       parameters: [
         {
           name: script
-          description: 要执行的 JavaScript 脚本内容
+          description: { zh: "要执行的 JavaScript 脚本内容", en: "JavaScript script content to execute." }
           type: string
           required: true
         }
@@ -21,11 +21,11 @@
     },
     {
       name: run_javascript_file
-      description: 运行 JavaScript (ES5) 文件。会捕获 console.log 的输出以及最终的返回值。
+      description: { zh: "运行 JavaScript (ES5) 文件。会捕获 console.log 的输出以及最终的返回值。", en: "Run a JavaScript (ES5) file. Captures console.log output and the final return value." }
       parameters: [
         {
           name: file_path
-          description: JavaScript 文件路径
+          description: { zh: "JavaScript 文件路径", en: "Path to the JavaScript file." }
           type: string
           required: true
         }
@@ -33,17 +33,17 @@
     },
     {
       name: install_python_packages
-      description: 在持久虚拟环境(~/.code_runner/py)中安装 Python 包（使用 pip）
+      description: { zh: "在持久虚拟环境(~/.code_runner/py)中安装 Python 包（使用 pip）", en: "Install Python packages in the persistent virtual environment (~/.code_runner/py) using pip." }
       parameters: [
         {
           name: packages
-          description: 要安装的包名（用 | 分隔），如 "numpy|pydantic==2.*"
+          description: { zh: "要安装的包名（用 | 分隔），例如 numpy|pydantic==2.*", en: "Package names to install, separated by | (e.g. numpy|pydantic==2.*)." }
           type: string
           required: true
         },
         {
           name: upgrade
-          description: 是否升级已安装的包，等价于 pip -U
+          description: { zh: "是否升级已安装的包，等价于 pip -U", en: "Whether to upgrade already installed packages (equivalent to pip -U)." }
           type: boolean
           required: false
         }
@@ -51,17 +51,17 @@
     },
     {
       name: run_python
-      description: 运行自定义 Python 脚本。会捕获 print 函数的输出。
+      description: { zh: "运行自定义 Python 脚本。会捕获 print 函数的输出。", en: "Run custom Python scripts. Captures output from print()." }
       parameters: [
         {
           name: script
-          description: 要执行的 Python 脚本内容
+          description: { zh: "要执行的 Python 脚本内容", en: "Python script content to execute." }
           type: string
           required: true
         },
         {
           name: python_flags
-          description: Python 解释器选项，默认为空。可自定义如 "-O"（优化）、"-u"（无缓冲）等
+          description: { zh: "Python 解释器选项，默认为空。可自定义如 -O（优化）、-u（无缓冲）等", en: "Python interpreter flags (default: empty). Examples: -O (optimize), -u (unbuffered)." }
           type: string
           required: false
         }
@@ -69,17 +69,17 @@
     },
     {
       name: run_python_file
-      description: 运行 Python 文件。会捕获 print 函数的输出。
+      description: { zh: "运行 Python 文件。会捕获 print 函数的输出。", en: "Run a Python file. Captures output from print()." }
       parameters: [
         {
           name: file_path
-          description: Python 文件路径
+          description: { zh: "Python 文件路径", en: "Path to the Python file." }
           type: string
           required: true
         },
         {
           name: python_flags
-          description: Python 解释器选项，默认为空。可自定义如 "-O"（优化）、"-u"（无缓冲）等
+          description: { zh: "Python 解释器选项，默认为空。可自定义如 -O（优化）、-u（无缓冲）等", en: "Python interpreter flags (default: empty). Examples: -O (optimize), -u (unbuffered)." }
           type: string
           required: false
         }
@@ -87,17 +87,17 @@
     },
     {
       name: run_ruby
-      description: 运行自定义 Ruby 脚本
+      description: { zh: "运行自定义 Ruby 脚本", en: "Run custom Ruby scripts." }
       parameters: [
         {
           name: script
-          description: 要执行的 Ruby 脚本内容
+          description: { zh: "要执行的 Ruby 脚本内容", en: "Ruby script content to execute." }
           type: string
           required: true
         },
         {
           name: ruby_flags
-          description: Ruby 解释器选项，默认为空。可自定义如 "--jit"（JIT 编译）等
+          description: { zh: "Ruby 解释器选项，默认为空。可自定义如 --jit（JIT 编译）等", en: "Ruby interpreter flags (default: empty). Example: --jit." }
           type: string
           required: false
         }
@@ -105,17 +105,17 @@
     },
     {
       name: run_ruby_file
-      description: 运行 Ruby 文件
+      description: { zh: "运行 Ruby 文件", en: "Run a Ruby file." }
       parameters: [
         {
           name: file_path
-          description: Ruby 文件路径
+          description: { zh: "Ruby 文件路径", en: "Path to the Ruby file." }
           type: string
           required: true
         },
         {
           name: ruby_flags
-          description: Ruby 解释器选项，默认为空。可自定义如 "--jit"（JIT 编译）等
+          description: { zh: "Ruby 解释器选项，默认为空。可自定义如 --jit（JIT 编译）等", en: "Ruby interpreter flags (default: empty). Example: --jit." }
           type: string
           required: false
         }
@@ -123,17 +123,17 @@
     },
     {
       name: run_go
-      description: 运行自定义 Go 代码
+      description: { zh: "运行自定义 Go 代码", en: "Run custom Go code." }
       parameters: [
         {
           name: script
-          description: 要执行的 Go 代码内容
+          description: { zh: "要执行的 Go 代码内容", en: "Go source code to execute." }
           type: string
           required: true
         },
         {
           name: build_flags
-          description: Go 编译选项，默认为空。可自定义如 "-ldflags='-s -w'"（减小二进制体积）等
+          description: { zh: "Go 编译选项，默认为空。可自定义如 -ldflags='-s -w'（减小二进制体积）等", en: "Go build flags (default: empty). Example: -ldflags='-s -w' (reduce binary size)." }
           type: string
           required: false
         }
@@ -141,17 +141,17 @@
     },
     {
       name: run_go_file
-      description: 运行 Go 文件
+      description: { zh: "运行 Go 文件", en: "Run a Go file." }
       parameters: [
         {
           name: file_path
-          description: Go 文件路径
+          description: { zh: "Go 文件路径", en: "Path to the Go file." }
           type: string
           required: true
         },
         {
           name: build_flags
-          description: Go 编译选项，默认为空。可自定义如 "-ldflags='-s -w'"（减小二进制体积）等
+          description: { zh: "Go 编译选项，默认为空。可自定义如 -ldflags='-s -w'（减小二进制体积）等", en: "Go build flags (default: empty). Example: -ldflags='-s -w' (reduce binary size)." }
           type: string
           required: false
         }
@@ -159,17 +159,17 @@
     },
     {
       name: run_rust
-      description: 运行自定义 Rust 代码
+      description: { zh: "运行自定义 Rust 代码", en: "Run custom Rust code." }
       parameters: [
         {
           name: script
-          description: 要执行的 Rust 代码内容
+          description: { zh: "要执行的 Rust 代码内容", en: "Rust source code to execute." }
           type: string
           required: true
         },
         {
           name: cargo_flags
-          description: Cargo 构建选项，默认为 "--release"。可自定义如 ""（调试模式）、"--release --features xxx" 等
+          description: { zh: "Cargo 构建选项，默认为 --release。可自定义如 空字符串（调试模式）、--release --features xxx 等", en: "Cargo build flags (default: --release). Examples: empty string (debug), --release --features xxx." }
           type: string
           required: false
         }
@@ -177,17 +177,17 @@
     },
     {
       name: run_rust_file
-      description: 运行 Rust 文件
+      description: { zh: "运行 Rust 文件", en: "Run a Rust file." }
       parameters: [
         {
           name: file_path
-          description: Rust 文件路径
+          description: { zh: "Rust 文件路径", en: "Path to the Rust file." }
           type: string
           required: true
         },
         {
           name: cargo_flags
-          description: Cargo 构建选项，默认为 "--release"。可自定义如 ""（调试模式）、"--release --features xxx" 等
+          description: { zh: "Cargo 构建选项，默认为 --release。可自定义如 空字符串（调试模式）、--release --features xxx 等", en: "Cargo build flags (default: --release). Examples: empty string (debug), --release --features xxx." }
           type: string
           required: false
         }
@@ -195,17 +195,17 @@
     },
     {
       name: run_c
-      description: 运行自定义 C 代码
+      description: { zh: "运行自定义 C 代码", en: "Run custom C code." }
       parameters: [
         {
           name: script
-          description: 要执行的 C 代码内容
+          description: { zh: "要执行的 C 代码内容", en: "C source code to execute." }
           type: string
           required: true
         },
         {
           name: compile_flags
-          description: 编译选项，默认为 "-O3 -march=native -fopenmp"。可自定义如 "-O2", "-O0 -g" 等
+          description: { zh: "编译选项，默认为 -O3 -march=native -fopenmp。可自定义如 -O2、-O0 -g 等", en: "Compile flags (default: -O3 -march=native -fopenmp). Examples: -O2, -O0 -g." }
           type: string
           required: false
         }
@@ -213,17 +213,17 @@
     },
     {
       name: run_c_file
-      description: 运行 C 文件
+      description: { zh: "运行 C 文件", en: "Run a C file." }
       parameters: [
         {
           name: file_path
-          description: C 文件路径
+          description: { zh: "C 文件路径", en: "Path to the C file." }
           type: string
           required: true
         },
         {
           name: compile_flags
-          description: 编译选项，默认为 "-O3 -march=native -fopenmp"。可自定义如 "-O2", "-O0 -g" 等
+          description: { zh: "编译选项，默认为 -O3 -march=native -fopenmp。可自定义如 -O2、-O0 -g 等", en: "Compile flags (default: -O3 -march=native -fopenmp). Examples: -O2, -O0 -g." }
           type: string
           required: false
         }
@@ -231,17 +231,17 @@
     },
     {
       name: run_cpp
-      description: 运行自定义 C++ 代码
+      description: { zh: "运行自定义 C++ 代码", en: "Run custom C++ code." }
       parameters: [
         {
           name: script
-          description: 要执行的 C++ 代码内容
+          description: { zh: "要执行的 C++ 代码内容", en: "C++ source code to execute." }
           type: string
           required: true
         },
         {
           name: compile_flags
-          description: 编译选项，默认为 "-O3 -march=native -fopenmp"。可自定义如 "-O2", "-O0 -g" 等
+          description: { zh: "编译选项，默认为 -O3 -march=native -fopenmp。可自定义如 -O2、-O0 -g 等", en: "Compile flags (default: -O3 -march=native -fopenmp). Examples: -O2, -O0 -g." }
           type: string
           required: false
         }
@@ -249,17 +249,17 @@
     },
     {
       name: run_cpp_file
-      description: 运行 C++ 文件
+      description: { zh: "运行 C++ 文件", en: "Run a C++ file." }
       parameters: [
         {
           name: file_path
-          description: C++ 文件路径
+          description: { zh: "C++ 文件路径", en: "Path to the C++ file." }
           type: string
           required: true
         },
         {
           name: compile_flags
-          description: 编译选项，默认为 "-O3 -march=native -fopenmp"。可自定义如 "-O2", "-O0 -g" 等
+          description: { zh: "编译选项，默认为 -O3 -march=native -fopenmp。可自定义如 -O2、-O0 -g 等", en: "Compile flags (default: -O3 -march=native -fopenmp). Examples: -O2, -O0 -g." }
           type: string
           required: false
         }

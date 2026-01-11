@@ -1,16 +1,22 @@
 /* METADATA
 {
     "name": "file_converter",
-    "description": "提供全面的文件格式转换功能。支持常见的音频/视频（如 MP4、MOV、MP3、WAV）、图像（如 JPG、PNG、WEBP）以及文档（如 Markdown、HTML、DOCX、PDF）之间的相互转换。",
+    "description": {
+        "zh": "提供全面的文件格式转换功能。支持常见的音频/视频（如 MP4、MOV、MP3、WAV）、图像（如 JPG、PNG、WEBP）以及文档（如 Markdown、HTML、DOCX、PDF）之间的相互转换。",
+        "en": "Comprehensive file format conversion. Supports converting between common audio/video (MP4, MOV, MP3, WAV), images (JPG, PNG, WEBP), and documents (Markdown, HTML, DOCX, PDF)."
+    },
     "enabledByDefault": true,
     "tools": [
         {
             "name": "convert_file",
-            "description": "调用 FFmpeg、ImageMagick 和 Pandoc 等外部命令行工具，转换文件的格式。支持音视频、图像和文档等多种类型。如果检测到工具未安装，会尝试自动安装。",
+            "description": {
+                "zh": "调用 FFmpeg、ImageMagick 和 Pandoc 等外部命令行工具，转换文件的格式。支持音视频、图像和文档等多种类型。如果检测到工具未安装，会尝试自动安装。",
+                "en": "Convert files using external CLI tools such as FFmpeg, ImageMagick, and Pandoc. Supports audio/video, images, and documents. If a required tool is missing, it will attempt to install it automatically."
+            },
             "parameters": [
-                { "name": "input_path", "description": "输入文件的路径。", "type": "string", "required": true },
-                { "name": "output_path", "description": "输出文件的路径。扩展名决定了目标格式。", "type": "string", "required": true },
-                { "name": "options", "description": "用于转换工具的可选命令行选项 (例如, 为 ImageMagick 设置 '-quality 80' )。", "type": "string", "required": false }
+                { "name": "input_path", "description": { "zh": "输入文件的路径。", "en": "Input file path." }, "type": "string", "required": true },
+                { "name": "output_path", "description": { "zh": "输出文件的路径。扩展名决定了目标格式。", "en": "Output file path. The file extension determines the target format." }, "type": "string", "required": true },
+                { "name": "options", "description": { "zh": "用于转换工具的可选命令行选项 (例如, 为 ImageMagick 设置 '-quality 80' )。", "en": "Optional CLI options for the conversion tool (e.g. set '-quality 80' for ImageMagick)." }, "type": "string", "required": false }
             ]
         }
     ]

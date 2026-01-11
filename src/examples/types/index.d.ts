@@ -127,10 +127,36 @@ declare global {
         export type TriggerTaskerEventParams = TaskerType.TriggerTaskerEventParams;
     }
 
+    namespace Workflow {
+        export type CreateParams = WorkflowType.CreateParams;
+        export type GetParams = WorkflowType.GetParams;
+        export type UpdateParams = WorkflowType.UpdateParams;
+        export type DeleteParams = WorkflowType.DeleteParams;
+        export type TriggerParams = WorkflowType.TriggerParams;
+
+        export type Node = WorkflowType.Node;
+        export type Connection = WorkflowType.Connection;
+        export type NodeInput = WorkflowType.NodeInput;
+        export type ConnectionInput = WorkflowType.ConnectionInput;
+        export type ConnectionConditionKeyword = WorkflowType.ConnectionConditionKeyword;
+        export type ConnectionCondition = WorkflowType.ConnectionCondition;
+        export type ParameterValueInput = WorkflowType.ParameterValueInput;
+        export type Info = WorkflowType.Info;
+        export type Detail = WorkflowType.Detail;
+        export type List = WorkflowType.List;
+
+        export type PatchOperation = WorkflowType.PatchOperation;
+        export type NodePatch = WorkflowType.NodePatch;
+        export type ConnectionPatch = WorkflowType.ConnectionPatch;
+        export type PatchParams = WorkflowType.PatchParams;
+    }
+
     // Global interface definitions
     interface ToolParams {
         [key: string]: string | number | boolean | object;
     }
+
+    type LocalizedText = string | { [lang: string]: string };
 
     interface ToolConfig {
         type?: string;
@@ -152,6 +178,8 @@ declare global {
 
     // Get environment variable function
     function getEnv(key: string): string | undefined;
+
+    function getState(): string | undefined;
 
     // Utility objects
     const _: {
@@ -179,7 +207,7 @@ declare global {
         UI: typeof UIType;
         FFmpeg: typeof FFmpegType;
         Tasker: typeof TaskerType;
-        Workflow: typeof WorkflowType;
+        Workflow: WorkflowType.Runtime;
         Chat: typeof ChatType;
         Memory: typeof MemoryType;
         calc: (expression: string) => Promise<CalculationResultData>;

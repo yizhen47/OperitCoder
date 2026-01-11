@@ -3,22 +3,22 @@ METADATA
 {
     // 百度地图智能助手
     name: "Automatic_baiduMap_assistant",
-    description: "高级百度地图智能助手，通过UI自动化技术实现地图交互，支持地点搜索、路线规划、周边查询等功能，为AI提供强大的地理位置服务能力。适用于出行规划、信息查询、智能问答等场景。",
-
+    description: { zh: "高级百度地图智能助手，通过UI自动化技术实现地图交互，支持地点搜索、路线规划、周边查询等功能，为AI提供强大的地理位置服务能力。适用于出行规划、信息查询、智能问答等场景。", en: "Advanced Baidu Maps assistant powered by UI automation. Supports place search, navigation/route planning, and nearby discovery, enabling AI-driven location services. Useful for trip planning, information lookup, and Q&A." },
+ 
     // Tools in this package
     tools: [
         {
             name: "workflow_guide",
-            description: "百度地图助手工具使用流程指南。要完成复杂任务，请按以下顺序组合使用工具：\n1. **搜索地点**: 使用 `search_location` 查找地点、餐馆、公司等，这是多数操作的起点。\n2. **选择地点**: 如果 `search_location` 返回多个结果，使用 `select_location_from_list` 从列表中选择一个。\n3. **开始导航**: 搜索到唯一地点或从列表中选择地点后，使用 `go_to_location` 来规划到该地的路线。\n4. **周边搜索**: 使用 `search_nearby` 查找当前位置或指定地点附近的设施。\n- **随时导航**: `navigate_to_home` 可随时返回地图主页。"
+            description: { zh: "百度地图助手工具使用流程指南。要完成复杂任务，请按以下顺序组合使用工具：\n1. **搜索地点**: 使用 `search_location` 查找地点、餐馆、公司等，这是多数操作的起点。\n2. **选择地点**: 如果 `search_location` 返回多个结果，使用 `select_location_from_list` 从列表中选择一个。\n3. **开始导航**: 搜索到唯一地点或从列表中选择地点后，使用 `go_to_location` 来规划到该地的路线。\n4. **周边搜索**: 使用 `search_nearby` 查找当前位置或指定地点附近的设施。\n- **随时导航**: `navigate_to_home` 可随时返回地图主页。", en: "Workflow guide for the Baidu Maps assistant. For complex tasks, combine tools in this order:\n1. **Search**: use `search_location` to find places/restaurants/companies (starting point for most tasks).\n2. **Select**: if `search_location` returns multiple results, use `select_location_from_list` to pick one from the list.\n3. **Navigate**: after a unique result is found or selected, use `go_to_location` to plan a route.\n4. **Nearby**: use `search_nearby` to find facilities near your current location or a specified place.\n- **Go home anytime**: use `navigate_to_home` to return to the map home screen." }
             parameters: []
         },
         {
             name: "search_location",
-            description: "在百度地图中搜索地点、餐馆、公司等信息。",
+            description: { zh: "在百度地图中搜索地点、餐馆、公司等信息。", en: "Search places, restaurants, companies, and other POIs in Baidu Maps." },
             parameters: [
                 {
                     name: "keyword",
-                    description: "要搜索的地点关键词",
+                    description: { zh: "要搜索的地点关键词", en: "Keyword of the place to search for." },
                     type: "string",
                     required: true
                 }
@@ -26,23 +26,23 @@ METADATA
         },
         {
             name: "get_directions",
-            description: "规划从起点到终点的路线。",
+            description: { zh: "规划从起点到终点的路线。", en: "Plan a route from a start point to a destination." },
             parameters: [
                 {
                     name: "start_point",
-                    description: "路线起点，默认为'我的位置'",
+                    description: { zh: "路线起点，默认为'我的位置'", en: "Route start point (default: 'My location')." },
                     type: "string",
                     required: false
                 },
                 {
                     name: "end_point",
-                    description: "路线终点",
+                    description: { zh: "路线终点", en: "Route destination." },
                     type: "string",
                     required: true
                 },
                 {
                     name: "transport_mode",
-                    description: "交通方式：driving(驾车), transit(公交), walking(步行), cycling(骑行)",
+                    description: { zh: "交通方式：driving(驾车), transit(公交), walking(步行), cycling(骑行)", en: "Transport mode: driving, transit, walking, cycling." },
                     type: "string",
                     required: false
                 }
@@ -50,17 +50,17 @@ METADATA
         },
         {
             name: "select_location_from_list",
-            description: "从 'search_location' 返回的搜索结果列表中选择一个地点。",
+            description: { zh: "从 'search_location' 返回的搜索结果列表中选择一个地点。", en: "Select a place from the result list returned by `search_location`." },
             parameters: [
                 {
                     name: "keyword",
-                    description: "要选择的地点名称关键词",
+                    description: { zh: "要选择的地点名称关键词", en: "Keyword to match the place name to select." },
                     type: "string",
                     required: false
                 },
                 {
                     name: "index",
-                    description: "要选择的地点在列表中的索引位置（从1开始）",
+                    description: { zh: "要选择的地点在列表中的索引位置（从1开始）", en: "Index of the item in the list (1-based)." },
                     type: "number",
                     required: false
                 }
@@ -68,11 +68,11 @@ METADATA
         },
         {
             name: "go_to_location",
-            description: "在地点详情页点击“到这去”，以开启导航或路线规划。可以选择交通方式。",
+            description: { zh: "在地点详情页点击“到这去”，以开启导航或路线规划。可以选择交通方式。", en: "On the place detail page, tap \"Go\" (到这去) to start navigation/route planning. You can optionally select a transport mode." },
             parameters: [
                 {
                     name: "transport_mode",
-                    description: "交通方式：新能源, 驾车, 打车, 公共交通, 代驾, 骑行, 步行, 拼车, 飞机, 火车, 客车, 摩托车",
+                    description: { zh: "交通方式：新能源, 驾车, 打车, 公共交通, 代驾, 骑行, 步行, 拼车, 飞机, 火车, 客车, 摩托车", en: "Transport mode tab label in the app (e.g., 新能源, 驾车, 打车, 公共交通, 代驾, 骑行, 步行, 拼车, 飞机, 火车, 客车, 摩托车)." },
                     type: "string",
                     required: false
                 }
@@ -80,17 +80,17 @@ METADATA
         },
         {
             name: "search_nearby",
-            description: "搜索中心点附近的地点信息。",
+            description: { zh: "搜索中心点附近的地点信息。", en: "Search places around a center point." },
             parameters: [
                 {
                     name: "keyword",
-                    description: "要搜索的周边设施关键词（如：银行, 加油站）",
+                    description: { zh: "要搜索的周边设施关键词（如：银行, 加油站）", en: "Nearby keyword (e.g., bank, gas station)." },
                     type: "string",
                     required: true
                 },
                 {
                     name: "center_point",
-                    description: "搜索的中心点，默认为'我的位置'",
+                    description: { zh: "搜索的中心点，默认为'我的位置'", en: "Center point for the search (default: 'My location')." },
                     type: "string",
                     required: false
                 }
@@ -98,12 +98,12 @@ METADATA
         },
         {
             name: "navigate_to_home",
-            description: "返回百度地图的主界面。",
+            description: { zh: "返回百度地图的主界面。", en: "Return to the Baidu Maps home screen." },
             parameters: []
         },
         {
             name: "activate_voice_assistant",
-            description: "在主界面点击语音搜索按钮，启动“小度”语音助手。",
+            description: { zh: "在主界面点击语音搜索按钮，启动“小度”语音助手。", en: "Tap the voice search button on the home screen to launch the Xiaodu voice assistant." },
             parameters: []
         }
     ]

@@ -101,6 +101,7 @@ export interface ToolResultMap {
     'create_workflow': WorkflowDetailResultData;
     'get_workflow': WorkflowDetailResultData;
     'update_workflow': WorkflowDetailResultData;
+    'patch_workflow': WorkflowDetailResultData;
     'delete_workflow': StringResultData;
     'trigger_workflow': StringResultData;
 

@@ -3,23 +3,23 @@ METADATA
 {
     // QQ Intelligent Assistant Package
     name: Experimental_qq_intelligent
-    description: 高级QQ智能助手，通过UI自动化技术实现QQ应用交互，支持消息自动回复、历史记录读取、联系人搜索与通讯等功能，为AI赋予QQ社交能力。适用于智能客服、自动回复、社交辅助等场景。
+    description: { zh: "高级QQ智能助手，通过UI自动化技术实现QQ应用交互，支持消息自动回复、历史记录读取、联系人搜索与通讯等功能，为AI赋予QQ社交能力。适用于智能客服、自动回复、社交辅助等场景。", en: "Advanced QQ assistant powered by UI automation. Supports sending messages, reading chat history, searching contacts/groups, and basic communication workflows, enabling AI-driven social messaging scenarios." }
 
     // Tools in this package
     tools: [
         {
             name: reply
-            description: 在当前聊天窗口输入消息并发送。一般情况下，用户想要ai帮忙发送消息时，需要ai自己去生成回复的消息，如果不确定发送的内容，请不要调用工具。只要是停留在聊天界面，就可以直接调用这个。
+            description: { zh: "在当前聊天窗口输入消息并发送。一般情况下，用户想要ai帮忙发送消息时，需要ai自己去生成回复的消息，如果不确定发送的内容，请不要调用工具。只要是停留在聊天界面，就可以直接调用这个。", en: "Type and send a message in the current chat window. Usually the AI should generate the message content by itself; if you are unsure what to send, do not call this tool. As long as you are staying on a chat page, you can call it directly." }
             parameters: [
                 {
                     name: message
-                    description: 要发送的消息
+                    description: { zh: "要发送的消息", en: "Message text to send." }
                     type: string
                     required: true
                 },
                 {
                     name: click_send
-                    description: 是否点击发送按钮
+                    description: { zh: "是否点击发送按钮", en: "Whether to tap the Send button." }
                     type: boolean
                     required: false
                 }
@@ -27,17 +27,17 @@ METADATA
         },
         {
             name: find_user
-            description: 在QQ联系人或群成员中查找用户
+            description: { zh: "在QQ联系人或群成员中查找用户", en: "Find a user in QQ contacts or group chats." }
             parameters: [
                 {
                     name: user_name
-                    description: 搜索用户名称
+                    description: { zh: "搜索用户名称", en: "User name keyword to search." }
                     type: string
                     required: true
                 },
                 {
                     name: user_type
-                    description: 搜索类型（contacts/groups）
+                    description: { zh: "搜索类型（contacts/groups）", en: "Search type: contacts or groups." }
                     type: string
                     required: true
                 }
@@ -45,29 +45,29 @@ METADATA
         },
         {
             name: find_and_reply
-            description: 查找用户并发送消息
+            description: { zh: "查找用户并发送消息", en: "Find a user and send a message." }
             parameters: [
                 {
                     name: message
-                    description: 要发送的消息
+                    description: { zh: "要发送的消息", en: "Message text to send." }
                     type: string
                     required: true
                 },
                 {
                     name: user_name
-                    description: 发送目标用户名称
+                    description: { zh: "发送目标用户名称", en: "Target user name keyword." }
                     type: string
                     required: true
                 },
                 {
                     name: user_type
-                    description: 用户类型（contacts/groups）
+                    description: { zh: "用户类型（contacts/groups）", en: "Target type: contacts or groups." }
                     type: string
                     required: true
                 },
                 {
                     name: click_send
-                    description: 是否点击发送按钮
+                    description: { zh: "是否点击发送按钮", en: "Whether to tap the Send button." }
                     type: boolean
                     required: false
                 }
@@ -75,11 +75,11 @@ METADATA
         },
         {
             name: get_history
-            description: 获取当前聊天窗口的历史消息。如果用户要求读取聊天记录，那么可以用这个工具或者find_and_get_history。
+            description: { zh: "获取当前聊天窗口的历史消息。如果用户要求读取聊天记录，那么可以用这个工具或者find_and_get_history。", en: "Get chat history from the current chat window. If the user asks to read chat history, you can use this tool or `find_and_get_history`." }
             parameters: [
                 {
                     name: message_num
-                    description: 获取的消息数量
+                    description: { zh: "获取的消息数量", en: "Number of messages to retrieve." }
                     type: number
                     required: false
                 }
@@ -87,23 +87,23 @@ METADATA
         },
         {
             name: find_and_get_history
-            description: 查找用户并获取聊天历史记录。一般情况下，用户想要让ai帮忙回消息的时候，需要先调用这个，得到历史记录后直接调用reply。
+            description: { zh: "查找用户并获取聊天历史记录。一般情况下，用户想要让ai帮忙回消息的时候，需要先调用这个，得到历史记录后直接调用reply。", en: "Find a user and retrieve chat history. Typically, when the user wants the AI to reply, call this first to get context, then call `reply`." }
             parameters: [
                 {
                     name: user_name
-                    description: 搜索用户名称
+                    description: { zh: "搜索用户名称", en: "User name keyword to search." }
                     type: string
                     required: true
                 },
                 {
                     name: user_type
-                    description: 搜索类型（contacts/groups）
+                    description: { zh: "搜索类型（contacts/groups）", en: "Search type: contacts or groups." }
                     type: string
                     required: true
                 },
                 {
                     name: message_num
-                    description: 获取的消息数量
+                    description: { zh: "获取的消息数量", en: "Number of messages to retrieve." }
                     type: number
                     required: false
                 }

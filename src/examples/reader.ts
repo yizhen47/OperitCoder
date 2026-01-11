@@ -1,35 +1,35 @@
 /* METADATA
 {
   name: code_reader
-  description: 提供代码匹配抓取功能,
+  description: { zh: "提供代码匹配抓取功能", en: "Provide code searching and extraction utilities." },
   enabledByDefault: true
   
   tools: [
     {
       name: search_code_in_folder
-      description: 在文件夹中搜索匹配的代码
+      description: { zh: "在文件夹中搜索匹配的代码", en: "Search for matching code in a folder." }
       parameters: [
         {
           name: folder_path
-          description: 要搜索的文件夹路径
+          description: { zh: "要搜索的文件夹路径", en: "Folder path to search." }
           type: string
           required: true
         },
         {
           name: pattern
-          description: 要搜索的代码模式(字符串或正则表达式)
+          description: { zh: "要搜索的代码模式(字符串或正则表达式)", en: "Pattern to search for (string or regular expression)." }
           type: string
           required: true
         },
         {
           name: file_extensions
-          description: 要搜索的文件扩展名列表(如 ".ts,.js")
+          description: { zh: "要搜索的文件扩展名列表(如 \".ts,.js\")", en: "File extension list to include (e.g. \".ts,.js\")." }
           type: string
           required: false
         },
         {
           name: recursive
-          description: 是否递归搜索子文件夹(true/false)
+          description: { zh: "是否递归搜索子文件夹(true/false)", en: "Whether to search subfolders recursively (true/false)." }
           type: string
           required: false
         }
@@ -37,29 +37,29 @@
     },
     {
       name: extract_functions
-      description: 提取文件夹中的所有函数定义
+      description: { zh: "提取文件夹中的所有函数定义", en: "Extract all function definitions from a folder." }
       parameters: [
         {
           name: folder_path
-          description: 要搜索的文件夹路径
+          description: { zh: "要搜索的文件夹路径", en: "Folder path to search." }
           type: string
           required: true
         },
         {
           name: function_name_pattern
-          description: 函数名匹配模式(可选)
+          description: { zh: "函数名匹配模式(可选)", en: "Function name matching pattern (optional)." }
           type: string
           required: false
         },
         {
           name: file_extensions
-          description: 要搜索的文件扩展名列表(如 ".ts,.js")
+          description: { zh: "要搜索的文件扩展名列表(如 \".ts,.js\")", en: "File extension list to include (e.g. \".ts,.js\")." }
           type: string
           required: false
         },
         {
           name: recursive
-          description: 是否递归搜索子文件夹(true/false)
+          description: { zh: "是否递归搜索子文件夹(true/false)", en: "Whether to search subfolders recursively (true/false)." }
           type: string
           required: false
         }
@@ -67,23 +67,23 @@
     },
     {
       name: extract_function_block
-      description: 提取特定函数的代码块
+      description: { zh: "提取特定函数的代码块", en: "Extract the code block for a specific function." }
       parameters: [
         {
           name: file_path
-          description: 要读取的文件路径
+          description: { zh: "要读取的文件路径", en: "File path to read." }
           type: string
           required: true
         },
         {
           name: function_name
-          description: 要提取的函数名称
+          description: { zh: "要提取的函数名称", en: "Function name to extract." }
           type: string
           required: true
         },
         {
           name: include_line_numbers
-          description: 是否在结果中包含行号(true/false)
+          description: { zh: "是否在结果中包含行号(true/false)", en: "Whether to include line numbers in the result (true/false)." }
           type: string
           required: false
         }
@@ -91,23 +91,23 @@
     },
     {
       name: find_code_blocks
-      description: 查找文件中的代码块
+      description: { zh: "查找文件中的代码块", en: "Find code blocks in a file." }
       parameters: [
         {
           name: file_path
-          description: 要读取的文件路径
+          description: { zh: "要读取的文件路径", en: "File path to read." }
           type: string
           required: true
         },
         {
           name: block_pattern
-          description: 代码块匹配模式(如类定义、接口等)
+          description: { zh: "代码块匹配模式(如类定义、接口等)", en: "Code block matching pattern (e.g., class definition, interface, etc.)." }
           type: string
           required: true
         },
         {
           name: include_line_numbers
-          description: 是否在结果中包含行号(true/false)
+          description: { zh: "是否在结果中包含行号(true/false)", en: "Whether to include line numbers in the result (true/false)." }
           type: string
           required: false
         }
@@ -115,23 +115,23 @@
     },
     {
       name: read_regex_matches
-      description: 读取文件中匹配正则表达式的内容
+      description: { zh: "读取文件中匹配正则表达式的内容", en: "Read content in a file that matches a regular expression." }
       parameters: [
         {
           name: file_path
-          description: 要读取的文件路径
+          description: { zh: "要读取的文件路径", en: "File path to read." }
           type: string
           required: true
         },
         {
           name: regex
-          description: 正则表达式字符串
+          description: { zh: "正则表达式字符串", en: "Regular expression string." }
           type: string
           required: true
         },
         {
           name: include_line_numbers
-          description: 是否在结果中包含行号(true/false)
+          description: { zh: "是否在结果中包含行号(true/false)", en: "Whether to include line numbers in the result (true/false)." }
           type: string
           required: false
         }

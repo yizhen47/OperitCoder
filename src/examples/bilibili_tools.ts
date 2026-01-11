@@ -1,45 +1,45 @@
 /* METADATA
 {
     "name": "bilibili_tools",
-    "description": "提供B站视频信息分析功能，包括获取字幕、弹幕、评论和搜索视频。",
+    "description": { "zh": "提供B站视频信息分析功能，包括获取字幕、弹幕、评论和搜索视频。", "en": "Analyze Bilibili video information, including subtitles, danmaku, comments, and video search." },
     "enabledByDefault": true,
     "tools": [
         {
             "name": "get_subtitles",
-            "description": "从Bilibili视频中获取字幕。",
+            "description": { "zh": "从Bilibili视频中获取字幕。", "en": "Get subtitles from a Bilibili video." },
             "parameters": [
-                { "name": "url", "description": "Bilibili视频URL，例如：https://www.bilibili.com/video/BV1x341177NN", "type": "string", "required": true }
+                { "name": "url", "description": { "zh": "Bilibili视频URL，例如：https://www.bilibili.com/video/BV1x341177NN", "en": "Bilibili video URL, e.g. https://www.bilibili.com/video/BV1x341177NN" }, "type": "string", "required": true }
             ]
         },
         {
             "name": "get_danmaku",
-            "description": "从Bilibili视频中获取弹幕。",
+            "description": { "zh": "从Bilibili视频中获取弹幕。", "en": "Get danmaku (bullet comments) from a Bilibili video." },
             "parameters": [
-                { "name": "url", "description": "Bilibili视频URL，例如：https://www.bilibili.com/video/BV1x341177NN", "type": "string", "required": true },
-                { "name": "count", "description": "要获取的弹幕数量，默认500，最多1000", "type": "number", "required": false }
+                { "name": "url", "description": { "zh": "Bilibili视频URL，例如：https://www.bilibili.com/video/BV1x341177NN", "en": "Bilibili video URL, e.g. https://www.bilibili.com/video/BV1x341177NN" }, "type": "string", "required": true },
+                { "name": "count", "description": { "zh": "要获取的弹幕数量，默认500，最多1000", "en": "Number of danmaku items to fetch (default: 500, max: 1000)." }, "type": "number", "required": false }
             ]
         },
         {
             "name": "get_comments",
-            "description": "从Bilibili视频中获取热门评论。",
+            "description": { "zh": "从Bilibili视频中获取热门评论。", "en": "Get hot comments from a Bilibili video." },
             "parameters": [
-                { "name": "url", "description": "Bilibili视频URL，例如：https://www.bilibili.com/video/BV1x341177NN", "type": "string", "required": true }
+                { "name": "url", "description": { "zh": "Bilibili视频URL，例如：https://www.bilibili.com/video/BV1x341177NN", "en": "Bilibili video URL, e.g. https://www.bilibili.com/video/BV1x341177NN" }, "type": "string", "required": true }
             ]
         },
         {
             "name": "search_videos",
-            "description": "在Bilibili上搜索视频。",
+            "description": { "zh": "在Bilibili上搜索视频。", "en": "Search videos on Bilibili." },
             "parameters": [
-                { "name": "keyword", "description": "要搜索的关键词", "type": "string", "required": true },
-                { "name": "page", "description": "页码，默认为1", "type": "number", "required": false },
-                { "name": "count", "description": "返回结果的数量，默认10，最多20", "type": "number", "required": false }
+                { "name": "keyword", "description": { "zh": "要搜索的关键词", "en": "Keyword to search for." }, "type": "string", "required": true },
+                { "name": "page", "description": { "zh": "页码，默认为1", "en": "Page number (default: 1)." }, "type": "number", "required": false },
+                { "name": "count", "description": { "zh": "返回结果的数量，默认10，最多20", "en": "Number of results to return (default: 10, max: 20)." }, "type": "number", "required": false }
             ]
         },
         {
             "name": "get_user_info",
-            "description": "获取B站用户的基本信息。",
+            "description": { "zh": "获取B站用户的基本信息。", "en": "Get basic information for a Bilibili user." },
             "parameters": [
-                { "name": "mid", "description": "用户的数字ID (UID)", "type": "number", "required": true }
+                { "name": "mid", "description": { "zh": "用户的数字ID (UID)", "en": "User numeric ID (UID)." }, "type": "number", "required": true }
             ]
         }
     ]

@@ -2,16 +2,16 @@
 METADATA
 {
     "name": "daily_life",
-    "description": "日常生活工具集合，提供丰富的日常功能接口，包括日期时间查询、设备状态监测、天气搜索、提醒闹钟设置、短信电话通讯、微信/QQ消息发送、微信朋友圈发表、手电筒控制、音量调节、Wi-Fi开关、截屏拍照及深色模式切换等。通过系统Intent和UI模拟实现各类日常任务，支持用户便捷地完成日常交互需求。",
+    "description": { "zh": "日常生活工具集合，提供丰富的日常功能接口，包括日期时间查询、设备状态监测、天气搜索、提醒闹钟设置、短信电话通讯、微信/QQ消息发送、微信朋友圈发表、手电筒控制、音量调节、Wi-Fi开关、截屏拍照及深色模式切换等。通过系统Intent和UI模拟实现各类日常任务，支持用户便捷地完成日常交互需求。", "en": "Daily life utilities that provide common device actions: date/time, device status, weather, reminders/alarms, SMS/calls, WeChat/QQ messaging, WeChat Moments posting, flashlight, volume, Wi-Fi, screenshots/photos, and dark mode toggling. Implemented via system Intents and UI automation." },
     "enabledByDefault": true,
     "tools": [
         {
             "name": "get_current_date",
-            "description": "获取当前日期和时间，支持多种格式展示",
+            "description": { "zh": "获取当前日期和时间，支持多种格式展示", "en": "Get the current date and time in various formats." },
             "parameters": [
                 {
                     "name": "format",
-                    "description": "日期格式（'short'简短格式, 'medium'中等格式, 'long'完整格式，或自定义格式）",
+                    "description": { "zh": "日期格式（'short'简短格式, 'medium'中等格式, 'long'完整格式，或自定义格式）", "en": "Date format: 'short', 'medium', 'long', or a custom format." },
                     "type": "string",
                     "required": false
                 }
@@ -19,28 +19,28 @@ METADATA
         },
         {
             "name": "device_status",
-            "description": "获取设备状态信息，包括电池和内存使用情况",
+            "description": { "zh": "获取设备状态信息，包括电池和内存使用情况", "en": "Get device status information, including battery and memory usage." },
             "parameters": []
         },
         {
             "name": "set_reminder",
-            "description": "创建提醒或待办事项。",
+            "description": { "zh": "创建提醒或待办事项。", "en": "Create a reminder or to-do item." },
             "parameters": [
                 {
                     "name": "title",
-                    "description": "提醒或待办事项的标题",
+                    "description": { "zh": "提醒或待办事项的标题", "en": "Title of the reminder or to-do item." },
                     "type": "string",
                     "required": true
                 },
                 {
                     "name": "description",
-                    "description": "提醒的附加详细信息",
+                    "description": { "zh": "提醒的附加详细信息", "en": "Additional details for the reminder (optional)." },
                     "type": "string",
                     "required": false
                 },
                 {
                     "name": "due_date",
-                    "description": "提醒的到期日期（ISO字符串格式）",
+                    "description": { "zh": "提醒的到期日期（ISO字符串格式）", "en": "Due date of the reminder (ISO string)." },
                     "type": "string",
                     "required": false
                 }
@@ -48,29 +48,29 @@ METADATA
         },
         {
             "name": "set_alarm",
-            "description": "在设备上设置闹钟。",
+            "description": { "zh": "在设备上设置闹钟。", "en": "Set an alarm on the device." },
             "parameters": [
                 {
                     "name": "hour",
-                    "description": "闹钟小时（0-23）",
+                    "description": { "zh": "闹钟小时（0-23）", "en": "Alarm hour (0-23)." },
                     "type": "number",
                     "required": true
                 },
                 {
                     "name": "minute",
-                    "description": "闹钟分钟（0-59）",
+                    "description": { "zh": "闹钟分钟（0-59）", "en": "Alarm minute (0-59)." },
                     "type": "number",
                     "required": true
                 },
                 {
                     "name": "message",
-                    "description": "闹钟标签",
+                    "description": { "zh": "闹钟标签", "en": "Alarm label." },
                     "type": "string",
                     "required": true
                 },
                 {
                     "name": "days",
-                    "description": "重复闹钟的天数（数字数组，1=周日，7=周六）",
+                    "description": { "zh": "重复闹钟的天数（数字数组，1=周日，7=周六）", "en": "Repeat days for the alarm (number array, 1=Sunday, 7=Saturday)." },
                     "type": "array",
                     "required": false
                 }
@@ -78,17 +78,17 @@ METADATA
         },
         {
             "name": "send_message",
-            "description": "发送短信",
+            "description": { "zh": "发送短信", "en": "Send an SMS message." },
             "parameters": [
                 {
                     "name": "phone_number",
-                    "description": "接收者电话号码",
+                    "description": { "zh": "接收者电话号码", "en": "Recipient phone number." },
                     "type": "string",
                     "required": true
                 },
                 {
                     "name": "message",
-                    "description": "短信内容",
+                    "description": { "zh": "短信内容", "en": "SMS message content." },
                     "type": "string",
                     "required": true
                 }
@@ -96,11 +96,11 @@ METADATA
         },
         {
             "name": "wechat_send_message",
-            "description": "通过微信发送文本消息，调起微信分享界面，由用户选择联系人并确认发送。",
+            "description": { "zh": "通过微信发送文本消息，调起微信分享界面，由用户选择联系人并确认发送。", "en": "Send a text message via WeChat by opening the share UI; the user selects the contact and confirms sending." },
             "parameters": [
                 {
                     "name": "message",
-                    "description": "要发送的文本内容",
+                    "description": { "zh": "要发送的文本内容", "en": "Text content to send." },
                     "type": "string",
                     "required": true
                 }
@@ -108,11 +108,11 @@ METADATA
         },
         {
             "name": "qq_send_message",
-            "description": "通过QQ发送文本消息，调起QQ分享界面，由用户选择联系人并确认发送。",
+            "description": { "zh": "通过QQ发送文本消息，调起QQ分享界面，由用户选择联系人并确认发送。", "en": "Send a text message via QQ by opening the share UI; the user selects the contact and confirms sending." },
             "parameters": [
                 {
                     "name": "message",
-                    "description": "要发送的文本内容",
+                    "description": { "zh": "要发送的文本内容", "en": "Text content to send." },
                     "type": "string",
                     "required": true
                 }
@@ -120,11 +120,11 @@ METADATA
         },
         {
             "name": "wechat_post_moments",
-            "description": "通过微信朋友圈发表文本内容，调起朋友圈编辑界面并预填文案，由用户确认后发送。",
+            "description": { "zh": "通过微信朋友圈发表文本内容，调起朋友圈编辑界面并预填文案，由用户确认后发送。", "en": "Post text to WeChat Moments by opening the editor with prefilled content; the user confirms and posts." },
             "parameters": [
                 {
                     "name": "message",
-                    "description": "要发布到朋友圈的文本内容",
+                    "description": { "zh": "要发布到朋友圈的文本内容", "en": "Text content to post to Moments." },
                     "type": "string",
                     "required": true
                 }
@@ -132,17 +132,17 @@ METADATA
         },
         {
             "name": "make_phone_call",
-            "description": "拨打电话",
+            "description": { "zh": "拨打电话", "en": "Make a phone call." },
             "parameters": [
                 {
                     "name": "phone_number",
-                    "description": "要拨打的电话号码",
+                    "description": { "zh": "要拨打的电话号码", "en": "Phone number to dial." },
                     "type": "string",
                     "required": true
                 },
                 {
                     "name": "emergency",
-                    "description": "是否为紧急呼叫",
+                    "description": { "zh": "是否为紧急呼叫", "en": "Whether this is an emergency call." },
                     "type": "boolean",
                     "required": false
                 }
@@ -150,11 +150,11 @@ METADATA
         },
         {
             "name": "search_weather",
-            "description": "搜索当前天气信息",
+            "description": { "zh": "搜索当前天气信息", "en": "Search current weather information." },
             "parameters": [
                 {
                     "name": "location",
-                    "description": "要查询天气的位置（城市名称或'current'表示当前位置）",
+                    "description": { "zh": "要查询天气的位置（城市名称或'current'表示当前位置）", "en": "Location to query (city name or 'current' for current location)." },
                     "type": "string",
                     "required": false
                 }
@@ -162,11 +162,11 @@ METADATA
         },
         {
             "name": "toggle_flashlight",
-            "description": "打开或关闭手电筒",
+            "description": { "zh": "打开或关闭手电筒", "en": "Turn the flashlight on or off." },
             "parameters": [
                 {
                     "name": "state",
-                    "description": "手电筒状态：'on'表示打开，'off'表示关闭",
+                    "description": { "zh": "手电筒状态：'on'表示打开，'off'表示关闭", "en": "Flashlight state: 'on' to turn on, 'off' to turn off." },
                     "type": "string",
                     "required": true
                 }
@@ -174,17 +174,17 @@ METADATA
         },
         {
             "name": "adjust_volume",
-            "description": "调节设备音量，通过模拟按键点击实现",
+            "description": { "zh": "调节设备音量，通过模拟按键点击实现", "en": "Adjust device volume by simulating key presses." },
             "parameters": [
                 {
                     "name": "action",
-                    "description": "音量调节动作：'up'增加音量，'down'减小音量，'mute'静音",
+                    "description": { "zh": "音量调节动作：'up'增加音量，'down'减小音量，'mute'静音", "en": "Volume action: 'up' to increase, 'down' to decrease, 'mute' to mute." },
                     "type": "string",
                     "required": true
                 },
                 {
                     "name": "count",
-                    "description": "按键次数，默认为1次",
+                    "description": { "zh": "按键次数，默认为1次", "en": "Number of key presses (default: 1)." },
                     "type": "number",
                     "required": false
                 }
@@ -192,11 +192,11 @@ METADATA
         },
         {
             "name": "toggle_wifi",
-            "description": "打开或关闭Wi-Fi",
+            "description": { "zh": "打开或关闭Wi-Fi", "en": "Turn Wi-Fi on or off." },
             "parameters": [
                 {
                     "name": "state",
-                    "description": "Wi-Fi状态：'on'表示打开，'off'表示关闭",
+                    "description": { "zh": "Wi-Fi状态：'on'表示打开，'off'表示关闭", "en": "Wi-Fi state: 'on' to enable, 'off' to disable." },
                     "type": "string",
                     "required": true
                 }
@@ -204,11 +204,11 @@ METADATA
         },
         {
             "name": "take_screenshot",
-            "description": "截取当前屏幕",
+            "description": { "zh": "截取当前屏幕", "en": "Take a screenshot of the current screen." },
             "parameters": [
                 {
                     "name": "file_path",
-                    "description": "截图保存路径，例如 /sdcard/Pictures/screenshot.png。如果未提供，将使用默认路径和时间戳文件名。",
+                    "description": { "zh": "截图保存路径，例如 /sdcard/Pictures/screenshot.png。如果未提供，将使用默认路径和时间戳文件名。", "en": "Screenshot save path, e.g. /sdcard/Pictures/screenshot.png. If omitted, a default path with a timestamp filename will be used." },
                     "type": "string",
                     "required": false
                 }
@@ -216,16 +216,16 @@ METADATA
         },
         {
             "name": "take_photo",
-            "description": "打开相机应用拍照",
+            "description": { "zh": "打开相机应用拍照", "en": "Open the camera app to take a photo." },
             "parameters": []
         },
         {
             "name": "toggle_dark_mode",
-            "description": "切换系统深夜模式（暗色主题）",
+            "description": { "zh": "切换系统深夜模式（暗色主题）", "en": "Toggle system dark mode (dark theme)." },
             "parameters": [
                 {
                     "name": "state",
-                    "description": "模式：'on'开启, 'off'关闭, 'auto'自动",
+                    "description": { "zh": "模式：'on'开启, 'off'关闭, 'auto'自动", "en": "Mode: 'on' to enable, 'off' to disable, 'auto' for automatic." },
                     "type": "string",
                     "required": true
                 }

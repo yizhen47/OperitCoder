@@ -1,23 +1,23 @@
 /* METADATA
 {
   name: various_search
-  description: 提供多平台搜索功能，支持从必应、百度、搜狗、夸克等平台获取搜索结果。
+  description: { zh: "提供多平台搜索功能，支持从必应、百度、搜狗、夸克等平台获取搜索结果。", en: "Multi-platform search tools that fetch results from Bing, Baidu, Sogou, Quark, and more." }
   enabledByDefault: true
   
   tools: [
     {
       name: search_bing
-      description: 使用必应搜索引擎进行搜索
+      description: { zh: "使用必应搜索引擎进行搜索", en: "Search using the Bing search engine." }
       parameters: [
         {
           name: query
-          description: 搜索查询关键词
+          description: { zh: "搜索查询关键词", en: "Search query keywords." }
           type: string
           required: true
         },
         {
           name: includeLinks
-          description: 是否在结果中包含可点击的链接列表，默认为false。如果为true，AI可以根据返回的链接序号进行深入访问。
+          description: { zh: "是否在结果中包含可点击的链接列表，默认为false。如果为true，AI可以根据返回的链接序号进行深入访问。", en: "Whether to include a clickable link list in results (default: false). If true, the AI can follow links by index." }
           type: boolean
           required: false
         }
@@ -25,23 +25,23 @@
     },
     {
       name: search_baidu
-      description: 使用百度搜索引擎进行搜索
+      description: { zh: "使用百度搜索引擎进行搜索", en: "Search using the Baidu search engine." }
       parameters: [
         {
           name: query
-          description: 搜索查询关键词
+          description: { zh: "搜索查询关键词", en: "Search query keywords." }
           type: string
           required: true
         },
         {
           name: page
-          description: 搜索结果页码，默认为1
+          description: { zh: "搜索结果页码，默认为1", en: "Result page number (default: 1)." }
           type: string
           required: false
         },
         {
           name: includeLinks
-          description: 是否在结果中包含可点击的链接列表，默认为false。如果为true，AI可以根据返回的链接序号进行深入访问。
+          description: { zh: "是否在结果中包含可点击的链接列表，默认为false。如果为true，AI可以根据返回的链接序号进行深入访问。", en: "Whether to include a clickable link list in results (default: false). If true, the AI can follow links by index." }
           type: boolean
           required: false
         }
@@ -49,23 +49,23 @@
     },
     {
       name: search_sogou
-      description: 使用搜狗搜索引擎进行搜索
+      description: { zh: "使用搜狗搜索引擎进行搜索", en: "Search using the Sogou search engine." }
       parameters: [
         {
           name: query
-          description: 搜索查询关键词
+          description: { zh: "搜索查询关键词", en: "Search query keywords." }
           type: string
           required: true
         },
         {
           name: page
-          description: 搜索结果页码，默认为1
+          description: { zh: "搜索结果页码，默认为1", en: "Result page number (default: 1)." }
           type: string
           required: false
         },
         {
           name: includeLinks
-          description: 是否在结果中包含可点击的链接列表，默认为false。如果为true，AI可以根据返回的链接序号进行深入访问。
+          description: { zh: "是否在结果中包含可点击的链接列表，默认为false。如果为true，AI可以根据返回的链接序号进行深入访问。", en: "Whether to include a clickable link list in results (default: false). If true, the AI can follow links by index." }
           type: boolean
           required: false
         }
@@ -73,23 +73,23 @@
     },
     {
       name: search_quark
-      description: 使用夸克搜索引擎进行搜索
+      description: { zh: "使用夸克搜索引擎进行搜索", en: "Search using the Quark search engine." }
       parameters: [
         {
           name: query
-          description: 搜索查询关键词
+          description: { zh: "搜索查询关键词", en: "Search query keywords." }
           type: string
           required: true
         },
         {
           name: page
-          description: 搜索结果页码，默认为1
+          description: { zh: "搜索结果页码，默认为1", en: "Result page number (default: 1)." }
           type: string
           required: false
         },
         {
           name: includeLinks
-          description: 是否在结果中包含可点击的链接列表，默认为false。如果为true，AI可以根据返回的链接序号进行深入访问。
+          description: { zh: "是否在结果中包含可点击的链接列表，默认为false。如果为true，AI可以根据返回的链接序号进行深入访问。", en: "Whether to include a clickable link list in results (default: false). If true, the AI can follow links by index." }
           type: boolean
           required: false
         }
@@ -97,23 +97,23 @@
     },
     {
       name: combined_search
-      description: 在多个平台同时执行搜索。建议用户要求搜索的时候默认使用这个工具。
+      description: { zh: "在多个平台同时执行搜索。建议用户要求搜索的时候默认使用这个工具。", en: "Run searches across multiple platforms. Use this tool by default when the user asks to search." }
       parameters: [
         {
           name: query
-          description: 搜索查询关键词
+          description: { zh: "搜索查询关键词", en: "Search query keywords." }
           type: string
           required: true
         },
         {
           name: platforms
-          description: 搜索平台列表字符串，可选值包括"bing","baidu","sogou","quark"，多个平台用逗号分隔，比如"bing,baidu,sogou,quark"
+          description: { zh: "搜索平台列表字符串，可选值包括\"bing\",\"baidu\",\"sogou\",\"quark\"，多个平台用逗号分隔，比如\"bing,baidu,sogou,quark\"", en: "Comma-separated platform list. Supported: \"bing\", \"baidu\", \"sogou\", \"quark\". Example: \"bing,baidu,sogou,quark\"." }
           type: string
           required: true
         },
         {
           name: includeLinks
-          description: 是否在结果中包含可点击的链接列表，默认为false。聚合搜索时建议保持为false以节省输出，仅在需要深入访问时对单个搜索引擎使用。
+          description: { zh: "是否在结果中包含可点击的链接列表，默认为false。聚合搜索时建议保持为false以节省输出，仅在需要深入访问时对单个搜索引擎使用。", en: "Whether to include a clickable link list in results (default: false). For combined search, keep it false to reduce output; enable it for a single engine when you need to open links." }
           type: boolean
           required: false
         }

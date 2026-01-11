@@ -3,28 +3,28 @@ METADATA
 {
     // Bilibili 智能助手包
     name: Automatic_bilibili_assistant
-    description: 高级B站智能助手，通过UI自动化技术实现B站应用交互，支持视频搜索播放、评论互动、用户关注等功能，为AI赋予B站社交和内容消费能力。适用于自动追番、视频推荐、社交互动等场景。
+    description: { zh: "高级B站智能助手，通过UI自动化技术实现B站应用交互，支持视频搜索播放、评论互动、用户关注等功能，为AI赋予B站社交和内容消费能力。适用于自动追番、视频推荐、社交互动等场景。", en: "Advanced Bilibili assistant powered by UI automation. Supports video search/playback, commenting, and following uploaders, enabling AI-driven content consumption and social interaction on Bilibili." }
 
     // Tools in this package
     tools: [
         {
             name: workflow_guide
-            description: "B站助手工具使用流程指南。要完成复杂任务，请按以下顺序组合使用工具：\n1. **搜索视频**: 使用 `search_video` 查找视频，这是所有操作的起点。\n2. **播放视频**: 从搜索结果中，使用 `play_video` 播放指定视频。\n3. **视频内互动**: 视频播放后，可执行 `get_video_info`, `like_video`, `collect_video`, `follow_uploader`, `send_comment`, `browse_comments` 等操作。\n4. **返回列表**: 要播放另一个视频，必须先用 `return_to_video_list` 返回搜索列表，再调用 `play_video`。\n- **随时导航**: `navigate_to_home` 等导航工具可在多数情况下使用。"
+            description: { zh: "B站助手工具使用流程指南。要完成复杂任务，请按以下顺序组合使用工具：\n1. **搜索视频**: 使用 `search_video` 查找视频，这是所有操作的起点。\n2. **播放视频**: 从搜索结果中，使用 `play_video` 播放指定视频。\n3. **视频内互动**: 视频播放后，可执行 `get_video_info`, `like_video`, `collect_video`, `follow_uploader`, `send_comment`, `browse_comments` 等操作。\n4. **返回列表**: 要播放另一个视频，必须先用 `return_to_video_list` 返回搜索列表，再调用 `play_video`。\n- **随时导航**: `navigate_to_home` 等导航工具可在多数情况下使用。", en: "Workflow guide for the Bilibili assistant:\n1. **Search videos**: use `search_video` as the entry point for most tasks.\n2. **Play a video**: use `play_video` to open a specific result.\n3. **Interact**: while on the video page you can run `get_video_info`, `like_video`, `collect_video`, `follow_uploader`, `send_comment`, `browse_comments`, etc.\n4. **Back to list**: to play another video, call `return_to_video_list` first, then `play_video`.\n- **Navigation**: tools like `navigate_to_home` can often be used at any time." }
             parameters: []
         },
         {
             name: search_video
-            description: 在B站搜索视频内容
+            description: { zh: "在B站搜索视频内容", en: "Search videos on Bilibili." }
             parameters: [
                 {
                     name: keyword
-                    description: 搜索关键词
+                    description: { zh: "搜索关键词", en: "Search keyword." }
                     type: string
                     required: true
                 },
                 {
                     name: filter_type
-                    description: 搜索结果过滤类型：comprehensive(综合)、new(最新)、hot(最多播放)、danmaku(最多弹幕)
+                    description: { zh: "搜索结果过滤类型：comprehensive(综合)、new(最新)、hot(最多播放)、danmaku(最多弹幕)", en: "Result filter: comprehensive, new, hot (most played), danmaku (most danmaku)." }
                     type: string
                     required: false
                 }
@@ -32,17 +32,17 @@ METADATA
         },
         {
             name: play_video
-            description: 播放指定的视频，可以通过标题或位置选择
+            description: { zh: "播放指定的视频，可以通过标题或位置选择", en: "Play a specific video by title keyword or by index." }
             parameters: [
                 {
                     name: video_title
-                    description: 要播放的视频标题关键词
+                    description: { zh: "要播放的视频标题关键词", en: "Keyword to match the video title." }
                     type: string
                     required: false
                 },
                 {
                     name: video_index
-                    description: 要播放的视频在搜索结果中的索引位置（从1开始）
+                    description: { zh: "要播放的视频在搜索结果中的索引位置（从1开始）", en: "Index of the video in the search results (1-based)." }
                     type: number
                     required: false
                 }
@@ -50,16 +50,16 @@ METADATA
         },
         {
             name: return_to_video_list
-            description: 从视频播放界面返回到视频列表界面
+            description: { zh: "从视频播放界面返回到视频列表界面", en: "Return from the video player page back to the video list." }
             parameters: []
         },
         {
             name: send_comment
-            description: 在当前视频下发送评论
+            description: { zh: "在当前视频下发送评论", en: "Post a comment under the current video." }
             parameters: [
                 {
                     name: comment_text
-                    description: 要发送的评论内容
+                    description: { zh: "要发送的评论内容", en: "Comment text to send." }
                     type: string
                     required: true
                 }
@@ -67,16 +67,16 @@ METADATA
         },
         {
             name: like_video
-            description: 给当前视频点赞
+            description: { zh: "给当前视频点赞", en: "Like the current video." }
             parameters: []
         },
         {
             name: collect_video
-            description: 收藏当前视频
+            description: { zh: "收藏当前视频", en: "Save (favorite) the current video." }
             parameters: [
                 {
                     name: folder_name
-                    description: 收藏夹名称，留空则使用默认收藏夹
+                    description: { zh: "收藏夹名称，留空则使用默认收藏夹", en: "Favorite folder name (leave empty to use the default folder)." }
                     type: string
                     required: false
                 }
@@ -84,21 +84,21 @@ METADATA
         },
         {
             name: follow_uploader
-            description: 关注当前视频的UP主
+            description: { zh: "关注当前视频的UP主", en: "Follow the uploader (UP) of the current video." }
             parameters: []
         },
         {
             name: get_video_info
-            description: 获取当前视频的详细信息，包括标题、UP主、播放量、评论数等
+            description: { zh: "获取当前视频的详细信息，包括标题、UP主、播放量、评论数等", en: "Get detailed info of the current video (title, uploader, views, comments, etc.)." }
             parameters: []
         },
         {
             name: browse_comments
-            description: 浏览当前视频的评论，获取热门评论内容
+            description: { zh: "浏览当前视频的评论，获取热门评论内容", en: "Browse comments of the current video and retrieve popular comments." }
             parameters: [
                 {
                     name: comment_count
-                    description: 获取的评论数量，默认为5条
+                    description: { zh: "获取的评论数量，默认为5条", en: "Number of comments to fetch (default: 5)." }
                     type: number
                     required: false
                 }
@@ -106,31 +106,31 @@ METADATA
         },
         {
             name: navigate_to_home
-            description: 导航到B站首页
+            description: { zh: "导航到B站首页", en: "Navigate to the Bilibili home page." }
             parameters: []
         },
         {
             name: navigate_to_following
-            description: 导航到关注页面，查看关注的UP主动态
+            description: { zh: "导航到关注页面，查看关注的UP主动态", en: "Navigate to the Following page to view updates from followed uploaders." }
             parameters: []
         },
         {
             name: navigate_to_history
-            description: 导航到观看历史页面
+            description: { zh: "导航到观看历史页面", en: "Navigate to the watch history page." }
             parameters: []
         },
         {
             name: toggle_fullscreen
-            description: 切换视频全屏/非全屏状态
+            description: { zh: "切换视频全屏/非全屏状态", en: "Toggle fullscreen / windowed mode." }
             parameters: []
         },
         {
             name: adjust_playback_speed
-            description: 调整视频播放速度
+            description: { zh: "调整视频播放速度", en: "Adjust video playback speed." }
             parameters: [
                 {
                     name: speed
-                    description: 播放速度：0.5x, 0.75x, 1.0x, 1.25x, 1.5x, 2.0x
+                    description: { zh: "播放速度：0.5x, 0.75x, 1.0x, 1.25x, 1.5x, 2.0x", en: "Playback speed: 0.5x, 0.75x, 1.0x, 1.25x, 1.5x, 2.0x." }
                     type: string
                     required: true
                 }

@@ -2,16 +2,16 @@
 METADATA
 {
     "name": "douyin_download",
-    "description": "抖音工具包，提供从分享链接或分享口令中提取并下载无水印视频的功能。",
+    "description": { "zh": "抖音工具包，提供从分享链接或分享口令中提取并下载无水印视频的功能。", "en": "Douyin toolkit for extracting and downloading watermark-free videos from share links or share codes." },
     "enabledByDefault": true,
     "tools": [
         {
             "name": "get_douyin_download_link",
-            "description": "解析抖音分享链接或口令，下载无水印视频到本地",
+            "description": { "zh": "解析抖音分享链接或口令，下载无水印视频到本地", "en": "Parse a Douyin share link/code and download a watermark-free video to local storage." },
             "parameters": [
                 {
                     "name": "input",
-                    "description": "抖音分享链接或包含链接的分享口令文本",
+                    "description": { "zh": "抖音分享链接或包含链接的分享口令文本", "en": "Douyin share link, or share-code text that contains a link." },
                     "type": "string",
                     "required": true
                 }
@@ -19,11 +19,11 @@ METADATA
         },
         {
             "name": "get_douyin_video_info",
-            "description": "解析抖音分享链接或口令，仅获取视频信息和无水印下载链接，不下载视频",
+            "description": { "zh": "解析抖音分享链接或口令，仅获取视频信息和无水印下载链接，不下载视频", "en": "Parse a Douyin share link/code and return video info + watermark-free download URL (without downloading)." },
             "parameters": [
                 {
                     "name": "input",
-                    "description": "抖音分享链接或包含链接的分享口令文本",
+                    "description": { "zh": "抖音分享链接或包含链接的分享口令文本", "en": "Douyin share link, or share-code text that contains a link." },
                     "type": "string",
                     "required": true
                 }

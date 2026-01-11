@@ -1,82 +1,85 @@
 /* METADATA
 {
     "name": "system_tools",
-    "description": "提供系统级操作工具，包括设置管理、应用安装卸载与启动、通知获取、位置服务和设备信息查询。",
+    "description": {
+        "zh": "提供系统级操作工具，包括设置管理、应用安装卸载与启动、通知获取、位置服务和设备信息查询。",
+        "en": "System-level operations: settings management, app install/uninstall & launch, notification retrieval, location services, and device info queries."
+    },
     "enabledByDefault": true,
     "tools": [
         {
             "name": "get_system_setting",
-            "description": "获取系统设置的值。需要用户授权。",
+            "description": { "zh": "获取系统设置的值。需要用户授权。", "en": "Get the value of a system setting. Requires user authorization." },
             "parameters": [
-                { "name": "setting", "description": "设置名称", "type": "string", "required": true },
-                { "name": "namespace", "description": "命名空间：system/secure/global，默认system", "type": "string", "required": false }
+                { "name": "setting", "description": { "zh": "设置名称", "en": "Setting key/name" }, "type": "string", "required": true },
+                { "name": "namespace", "description": { "zh": "命名空间：system/secure/global，默认system", "en": "Namespace: system/secure/global (default: system)" }, "type": "string", "required": false }
             ]
         },
         {
             "name": "modify_system_setting",
-            "description": "修改系统设置的值。需要用户授权。",
+            "description": { "zh": "修改系统设置的值。需要用户授权。", "en": "Modify the value of a system setting. Requires user authorization." },
             "parameters": [
-                { "name": "setting", "description": "设置名称", "type": "string", "required": true },
-                { "name": "value", "description": "设置值", "type": "string", "required": true },
-                { "name": "namespace", "description": "命名空间：system/secure/global，默认system", "type": "string", "required": false }
+                { "name": "setting", "description": { "zh": "设置名称", "en": "Setting key/name" }, "type": "string", "required": true },
+                { "name": "value", "description": { "zh": "设置值", "en": "Setting value" }, "type": "string", "required": true },
+                { "name": "namespace", "description": { "zh": "命名空间：system/secure/global，默认system", "en": "Namespace: system/secure/global (default: system)" }, "type": "string", "required": false }
             ]
         },
         {
             "name": "install_app",
-            "description": "安装应用程序。需要用户授权。",
+            "description": { "zh": "安装应用程序。需要用户授权。", "en": "Install an app. Requires user authorization." },
             "parameters": [
-                { "name": "apk_path", "description": "APK文件路径", "type": "string", "required": true }
+                { "name": "path", "description": { "zh": "APK文件路径", "en": "APK file path" }, "type": "string", "required": true }
             ]
         },
         {
             "name": "uninstall_app",
-            "description": "卸载应用程序。需要用户授权。",
+            "description": { "zh": "卸载应用程序。需要用户授权。", "en": "Uninstall an app. Requires user authorization." },
             "parameters": [
-                { "name": "package_name", "description": "应用包名", "type": "string", "required": true },
-                { "name": "keep_data", "description": "是否保留数据，默认false", "type": "boolean", "required": false }
+                { "name": "package_name", "description": { "zh": "应用包名", "en": "App package name" }, "type": "string", "required": true },
+                { "name": "keep_data", "description": { "zh": "是否保留数据，默认false", "en": "Whether to keep app data (default: false)" }, "type": "boolean", "required": false }
             ]
         },
         {
             "name": "list_installed_apps",
-            "description": "获取已安装应用程序列表。需要用户授权。",
+            "description": { "zh": "获取已安装应用程序列表。需要用户授权。", "en": "List installed apps. Requires user authorization." },
             "parameters": [
-                { "name": "include_system_apps", "description": "是否包含系统应用，默认false", "type": "boolean", "required": false }
+                { "name": "include_system_apps", "description": { "zh": "是否包含系统应用，默认false", "en": "Whether to include system apps (default: false)" }, "type": "boolean", "required": false }
             ]
         },
         {
             "name": "start_app",
-            "description": "启动应用程序。需要用户授权。",
+            "description": { "zh": "启动应用程序。需要用户授权。", "en": "Launch an app. Requires user authorization." },
             "parameters": [
-                { "name": "package_name", "description": "应用包名", "type": "string", "required": true },
-                { "name": "activity", "description": "可选活动名称", "type": "string", "required": false }
+                { "name": "package_name", "description": { "zh": "应用包名", "en": "App package name" }, "type": "string", "required": true },
+                { "name": "activity", "description": { "zh": "可选活动名称", "en": "Optional activity name" }, "type": "string", "required": false }
             ]
         },
         {
             "name": "stop_app",
-            "description": "停止正在运行的应用程序。需要用户授权。",
+            "description": { "zh": "停止正在运行的应用程序。需要用户授权。", "en": "Force stop a running app. Requires user authorization." },
             "parameters": [
-                { "name": "package_name", "description": "应用包名", "type": "string", "required": true }
+                { "name": "package_name", "description": { "zh": "应用包名", "en": "App package name" }, "type": "string", "required": true }
             ]
         },
         {
             "name": "get_notifications",
-            "description": "获取设备通知内容。",
+            "description": { "zh": "获取设备通知内容。", "en": "Retrieve device notifications." },
             "parameters": [
-                { "name": "limit", "description": "最大返回条数，默认10", "type": "number", "required": false },
-                { "name": "include_ongoing", "description": "是否包含常驻通知，默认false", "type": "boolean", "required": false }
+                { "name": "limit", "description": { "zh": "最大返回条数，默认10", "en": "Max number of entries to return (default: 10)" }, "type": "number", "required": false },
+                { "name": "include_ongoing", "description": { "zh": "是否包含常驻通知，默认false", "en": "Whether to include ongoing notifications (default: false)" }, "type": "boolean", "required": false }
             ]
         },
         {
             "name": "get_device_location",
-            "description": "获取设备当前位置信息。",
+            "description": { "zh": "获取设备当前位置信息。", "en": "Get current device location." },
             "parameters": [
-                { "name": "high_accuracy", "description": "是否使用高精度模式，默认false", "type": "boolean", "required": false },
-                { "name": "timeout", "description": "超时时间（秒），默认10", "type": "number", "required": false }
+                { "name": "high_accuracy", "description": { "zh": "是否使用高精度模式，默认false", "en": "Use high accuracy mode (default: false)" }, "type": "boolean", "required": false },
+                { "name": "timeout", "description": { "zh": "超时时间（秒），默认10", "en": "Timeout in seconds (default: 10)" }, "type": "number", "required": false }
             ]
         },
         {
             "name": "get_device_info",
-            "description": "获取详细的设备信息，包括型号、操作系统版本、内存、存储、网络状态等。",
+            "description": { "zh": "获取详细的设备信息，包括型号、操作系统版本、内存、存储、网络状态等。", "en": "Get detailed device information, including model, OS version, memory, storage, network status, etc." },
             "parameters": []
         }
     ]

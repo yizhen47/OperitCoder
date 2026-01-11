@@ -64,6 +64,7 @@ export interface FileEntry {
 }
 
 export interface FileExistsData {
+    env: 'android' | 'linux';
     path: string;
     exists: boolean;
     isDirectory?: boolean;
@@ -74,6 +75,7 @@ export interface FileExistsData {
  * Detailed file information data
  */
 export interface FileInfoData {
+    env: 'android' | 'linux';
     path: string;
     exists: boolean;
     fileType: string;  // "file", "directory", or "other"
@@ -89,6 +91,7 @@ export interface FileInfoData {
  * Directory listing data
  */
 export interface DirectoryListingData {
+    env: 'android' | 'linux';
     path: string;
     entries: FileEntry[];
     toString(): string;
@@ -98,6 +101,7 @@ export interface DirectoryListingData {
  * File content data
  */
 export interface FileContentData {
+    env: 'android' | 'linux';
     path: string;
     content: string;
     size: number;
@@ -108,6 +112,7 @@ export interface FileContentData {
  * Binary file content data (Base64 encoded)
  */
 export interface BinaryFileContentData {
+    env: 'android' | 'linux';
     path: string;
     /** Base64 encoded content of the file */
     contentBase64: string;
@@ -120,6 +125,7 @@ export interface BinaryFileContentData {
  * File part content data
  */
 export interface FilePartContentData {
+    env: 'android' | 'linux';
     path: string;
     content: string;
     partIndex: number;
@@ -134,6 +140,7 @@ export interface FilePartContentData {
  * File operation data
  */
 export interface FileOperationData {
+    env: 'android' | 'linux';
     operation: string;
     path: string;
     successful: boolean;
@@ -154,6 +161,7 @@ export interface FileApplyResultData {
  * Find files result data
  */
 export interface FindFilesResultData {
+    env: 'android' | 'linux';
     path: string;
     pattern: string;
     files: string[];
@@ -181,6 +189,7 @@ export interface GrepFileMatch {
  * Grep search result data
  */
 export interface GrepResultData {
+    env: 'android' | 'linux';
     searchPath: string;
     pattern: string;
     filePattern?: string;
@@ -409,6 +418,10 @@ export interface AutomationExecutionResultData {
     functionName: string;
     /** Parameters provided to the automation */
     providedParameters: Record<string, string>;
+    /** Optional agent id used for this run (can be reused to keep operating on the same virtual screen session) */
+    agentId?: string | null;
+    /** Optional virtual display id associated with the agent session */
+    displayId?: number | null;
     /** Whether the execution succeeded */
     executionSuccess: boolean;
     /** Detailed execution message and action logs */
@@ -720,10 +733,34 @@ export interface NodePosition {
     y: number;
 }
 
+export interface StaticValue {
+    __type?: string;
+    value: string;
+}
+
+export interface NodeReference {
+    __type?: string;
+    nodeId: string;
+}
+
+export type ParameterValue = string | StaticValue | NodeReference;
+
+/**
+ * 触发类型
+ */
+export type TriggerType =
+    | 'manual'
+    | 'schedule'
+    | 'tasker'
+    | 'intent'
+    | 'speech'
+    | (string & { __triggerTypeBrand?: never });
+
 /**
  * 触发节点
  */
 export interface TriggerNode {
+    __type?: string;
     /** 节点 ID */
     id: string;
     /** 节点类型 */
@@ -735,7 +772,7 @@ export interface TriggerNode {
     /** 节点位置 */
     position: NodePosition;
     /** 触发类型 */
-    triggerType: string;
+    triggerType: TriggerType;
     /** 触发配置 */
     triggerConfig: Record<string, string>;
 }
@@ -744,6 +781,7 @@ export interface TriggerNode {
  * 执行节点
  */
 export interface ExecuteNode {
+    __type?: string;
     /** 节点 ID */
     id: string;
     /** 节点类型 */
@@ -757,15 +795,85 @@ export interface ExecuteNode {
     /** 动作类型（工具名称） */
     actionType: string;
     /** 动作配置（工具参数） */
-    actionConfig: Record<string, string>;
+    actionConfig: Record<string, string | ParameterValue>;
     /** JavaScript 代码（可选） */
     jsCode?: string | null;
+}
+
+export type ConditionOperator =
+    | 'EQ'
+    | 'NE'
+    | 'GT'
+    | 'GTE'
+    | 'LT'
+    | 'LTE'
+    | 'CONTAINS'
+    | 'NOT_CONTAINS'
+    | 'IN'
+    | 'NOT_IN';
+
+export interface ConditionNode {
+    __type?: string;
+    id: string;
+    type: 'condition';
+    name: string;
+    description: string;
+    position: NodePosition;
+    left: ParameterValue;
+    operator: ConditionOperator;
+    right: ParameterValue;
+}
+
+export type LogicOperator = 'AND' | 'OR';
+
+export interface LogicNode {
+    __type?: string;
+    id: string;
+    type: 'logic';
+    name: string;
+    description: string;
+    position: NodePosition;
+    operator: LogicOperator;
+}
+
+export type ExtractMode = 'REGEX' | 'JSON';
+
+export interface ExtractNode {
+    __type?: string;
+    id: string;
+    type: 'extract';
+    name: string;
+    description: string;
+    position: NodePosition;
+    source: ParameterValue;
+    mode: ExtractMode;
+    expression: string;
+    group: number;
+    defaultValue: string;
 }
 
 /**
  * 工作流节点（联合类型）
  */
-export type WorkflowNode = TriggerNode | ExecuteNode;
+export type WorkflowNode = TriggerNode | ExecuteNode | ConditionNode | LogicNode | ExtractNode;
+
+/**
+ * 工作流节点连接条件关键字
+ */
+export type WorkflowConnectionConditionKeyword =
+    | 'true'
+    | 'false'
+    | 'on_success'
+    | 'success'
+    | 'ok'
+    | 'on_error'
+    | 'error'
+    | 'failed';
+
+/**
+ * 工作流节点连接条件
+ */
+export type WorkflowConnectionCondition = WorkflowConnectionConditionKeyword | (string & { __regexConditionBrand?: never });
 
 /**
  * 工作流节点连接
@@ -778,7 +886,7 @@ export interface WorkflowNodeConnection {
     /** 目标节点 ID */
     targetNodeId: string;
     /** 连接条件（可选） */
-    condition?: string | null;
+    condition?: WorkflowConnectionCondition | null;
 }
 
 /**

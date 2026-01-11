@@ -2,38 +2,38 @@
 METADATA
 {
     "name": "jmcomic_downloader",
-    "description": "提供JMComic漫画下载功能，支持搜索、获取信息和下载，包括对新漫画的图片反爬解码。",
+    "description": { "zh": "提供JMComic漫画下载功能，支持搜索、获取信息和下载，包括对新漫画的图片反爬解码。", "en": "JMComic downloader: search comics, fetch details, and download albums. Includes anti-crawling image decoding for newer comics." },
     "tools": [
         {
             "name": "main",
-            "description": "运行一个内置的测试函数，以验证JMComic工具的基本功能（搜索和获取信息）是否正常工作。",
+            "description": { "zh": "运行一个内置的测试函数，以验证JMComic工具的基本功能（搜索和获取信息）是否正常工作。", "en": "Run a built-in test to verify basic JMComic functionality (search and info retrieval)." },
             "parameters": []
         },
         {
             "name": "search_comics",
-            "description": "搜索JMComic漫画",
+            "description": { "zh": "搜索JMComic漫画", "en": "Search JMComic comics." },
             "parameters": [
                 {
                     "name": "query",
-                    "description": "搜索关键词",
+                    "description": { "zh": "搜索关键词", "en": "Search keyword." },
                     "type": "string",
                     "required": true
                 },
                 {
                     "name": "page",
-                    "description": "页码 (默认: 1)",
+                    "description": { "zh": "页码 (默认: 1)", "en": "Page number (default: 1)." },
                     "type": "number",
                     "required": false
                 },
                 {
                     "name": "order_by",
-                    "description": "排序方式 (latest, view, picture, like, 默认: view)",
+                    "description": { "zh": "排序方式 (latest, view, picture, like, 默认: view)", "en": "Sort mode: latest/view/picture/like (default: view)." },
                     "type": "string",
                     "required": false
                 },
                 {
                     "name": "time",
-                    "description": "时间范围 (today, week, month, all, 默认: all)",
+                    "description": { "zh": "时间范围 (today, week, month, all, 默认: all)", "en": "Time range: today/week/month/all (default: all)." },
                     "type": "string",
                     "required": false
                 }
@@ -41,11 +41,11 @@ METADATA
         },
         {
             "name": "get_album_info",
-            "description": "获取漫画（本子）的详细信息",
+            "description": { "zh": "获取漫画（本子）的详细信息", "en": "Get detailed information for a comic album." },
             "parameters": [
                 {
                     "name": "album_id",
-                    "description": "漫画ID",
+                    "description": { "zh": "漫画ID", "en": "Album ID." },
                     "type": "string",
                     "required": true
                 }
@@ -53,17 +53,17 @@ METADATA
         },
         {
             "name": "download_album",
-            "description": "下载指定ID的单本漫画，包含图片解码功能。",
+            "description": { "zh": "下载指定ID的单本漫画，包含图片解码功能。", "en": "Download a single comic album by ID, including image decoding." },
             "parameters": [
                 {
                     "name": "album_id",
-                    "description": "要下载的漫画ID",
+                    "description": { "zh": "要下载的漫画ID", "en": "Album ID to download." },
                     "type": "string",
                     "required": true
                 },
                 {
                     "name": "download_dir",
-                    "description": "下载目录 (可选, 默认: /sdcard/Download/OperitScripts)",
+                    "description": { "zh": "下载目录 (可选, 默认: /sdcard/Download/OperitScripts)", "en": "Download directory (optional; default: /sdcard/Download/OperitScripts)." },
                     "type": "string",
                     "required": false
                 }
@@ -71,17 +71,17 @@ METADATA
         },
         {
             "name": "batch_download_albums",
-            "description": "批量下载多本漫画，包含图片解码功能。",
+            "description": { "zh": "批量下载多本漫画，包含图片解码功能。", "en": "Batch download multiple comic albums, including image decoding." },
             "parameters": [
                 {
                     "name": "album_ids",
-                    "description": "要下载的漫画ID列表，用逗号分隔",
+                    "description": { "zh": "要下载的漫画ID列表，用逗号分隔", "en": "Comma-separated list of album IDs to download." },
                     "type": "string",
                     "required": true
                 },
                 {
                     "name": "download_dir",
-                    "description": "下载目录 (可选, 默认: /sdcard/Download/OperitScripts)",
+                    "description": { "zh": "下载目录 (可选, 默认: /sdcard/Download/OperitScripts)", "en": "Download directory (optional; default: /sdcard/Download/OperitScripts)." },
                     "type": "string",
                     "required": false
                 }

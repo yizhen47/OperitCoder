@@ -2,28 +2,28 @@
 METADATA
 {
     "name": "super_admin",
-    "description": "超级管理员工具集，提供终端命令和Shell操作的高级功能。terminal工具运行在Ubuntu环境中（已正确挂载sdcard和storage），shell工具通过Shizuku/Root直接执行Android系统命令。适合需要进行底层系统管理和命令行操作的场景。",
+    "description": { "zh": "超级管理员工具集，提供终端命令和Shell操作的高级功能。terminal工具运行在Ubuntu环境中（已正确挂载sdcard和storage），shell工具通过Shizuku/Root直接执行Android系统命令。适合需要进行底层系统管理和命令行操作的场景。", "en": "Super admin toolkit providing advanced terminal and shell capabilities. The terminal tool runs in an Ubuntu environment (with sdcard/storage mounted). The shell tool executes Android system commands directly via Shizuku/Root. Useful for low-level system administration and CLI operations." },
     "enabledByDefault": true,
     "tools": [
         {
             "name": "terminal",
-            "description": "在Ubuntu环境中执行命令并收集输出结果。运行环境：完整的Ubuntu系统，已正确挂载sdcard和storage目录，可访问Android存储空间。会自动保留目录上下文。注意：不支持交互式命令，执行需要交互的命令（如apt install）时，请使用-y等参数以避免阻塞。",
+            "description": { "zh": "在Ubuntu环境中执行命令并收集输出结果。运行环境：完整的Ubuntu系统，已正确挂载sdcard和storage目录，可访问Android存储空间。会自动保留目录上下文。注意：不支持交互式命令，执行需要交互的命令（如apt install）时，请使用-y等参数以避免阻塞。", "en": "Execute commands in an Ubuntu environment and collect output. Environment: full Ubuntu system with sdcard/storage mounted, allowing access to Android storage. Automatically preserves working-directory context. Note: interactive commands are not supported; when running commands that require prompts (e.g. apt install), use flags like -y to avoid blocking." },
             "parameters": [
                 {
                     "name": "command",
-                    "description": "要执行的命令",
+                    "description": { "zh": "要执行的命令", "en": "Command to execute." },
                     "type": "string",
                     "required": true
                 },
                 {
                     "name": "background",
-                    "description": "是否在后台运行命令,\"true\" 表示后台执行并立即返回,适合启动服务器等长时间运行的任务（AI 不会收到该命令的输出结果），\"false\" 或未提供则前台执行并等待并返回命令结果",
+                    "description": { "zh": "是否在后台运行命令,\"true\" 表示后台执行并立即返回,适合启动服务器等长时间运行的任务（AI 不会收到该命令的输出结果），\"false\" 或未提供则前台执行并等待并返回命令结果", "en": "Run command in background. 'true' runs in background and returns immediately (good for long-running tasks like servers; AI will not receive output). 'false' or omitted runs in foreground and returns the command result." },
                     "type": "string",
                     "required": false
                 },
                 {
                     "name": "timeoutMs",
-                    "description": "可选的超时时间（毫秒）",
+                    "description": { "zh": "可选的超时时间（毫秒）", "en": "Optional timeout in milliseconds." },
                     "type": "string",
                     "required": false
                 }
@@ -31,11 +31,11 @@ METADATA
         },
         {
             "name": "shell",
-            "description": "通过Shizuku/Root权限直接在Android系统中执行Shell命令。运行环境：直接访问Android系统，具有系统级权限，适用于需要操作Android系统底层的场景（如pm、am等系统命令）。",
+            "description": { "zh": "通过Shizuku/Root权限直接在Android系统中执行Shell命令。运行环境：直接访问Android系统，具有系统级权限，适用于需要操作Android系统底层的场景（如pm、am等系统命令）。", "en": "Execute shell commands directly on Android with Shizuku/Root. Environment: direct Android system access with system-level privileges, suitable for low-level commands such as pm/am." },
             "parameters": [
                 {
                     "name": "command",
-                    "description": "要执行的Shell命令",
+                    "description": { "zh": "要执行的Shell命令", "en": "Shell command to execute." },
                     "type": "string",
                     "required": true
                 }

@@ -2,22 +2,22 @@
 METADATA
 {
     "name": "baidu_map",
-    "description": "百度地图工具集合，提供AOI（兴趣区域）数据获取接口。通过调用百度地图API，支持按地理范围查询AOI边界坐标，基于位置的路线规划，助力地理信息系统应用开发和空间数据分析。",
+    "description": { "zh": "百度地图工具集合，提供AOI（兴趣区域）数据获取接口。通过调用百度地图API，支持按地理范围查询AOI边界坐标，基于位置的路线规划，助力地理信息系统应用开发和空间数据分析。", "en": "A Baidu Maps toolkit that provides AOI (Area of Interest) data access. It supports querying AOI boundary coordinates by geographic range and location-based route planning, useful for GIS development and spatial data analysis." },
     "enabledByDefault": true,
     "tools": [
         {
             "name": "search_aoi",
-            "description": "搜索百度地图兴趣区域(AOI)信息",
+            "description": { "zh": "搜索百度地图兴趣区域(AOI)信息", "en": "Search AOI (Area of Interest) information from Baidu Maps." },
             "parameters": [
                 {
                     "name": "keyword",
-                    "description": "搜索关键词，如商场、小区名称等",
+                    "description": { "zh": "搜索关键词，如商场、小区名称等", "en": "Search keyword, e.g. mall name, residential community name, etc." },
                     "type": "string",
                     "required": true
                 },
                 {
                     "name": "city_name",
-                    "description": "城市名称，如'北京'，默认全国范围",
+                    "description": { "zh": "城市名称，如'北京'，默认全国范围", "en": "City name, e.g. '北京'. Defaults to nationwide." },
                     "type": "string",
                     "required": false
                 }
@@ -25,17 +25,17 @@ METADATA
         },
         {
             "name": "planRoute",
-            "description": "智能路线规划，从当前位置到指定目的地，并发返回驾车、步行、公交三种方式的路线规划。",
+            "description": { "zh": "智能路线规划，从当前位置到指定目的地，并发返回驾车、步行、公交三种方式的路线规划。", "en": "Smart route planning from current location to a destination, returning driving/walking/transit plans in parallel." },
             "parameters": [
                 {
                     "name": "destination",
-                    "description": "目的地名称",
+                    "description": { "zh": "目的地名称", "en": "Destination name." },
                     "type": "string",
                     "required": true
                 },
                 {
                     "name": "city_name",
-                    "description": "城市名称，辅助目的地查找",
+                    "description": { "zh": "城市名称，辅助目的地查找", "en": "City name to help resolve the destination (optional)." },
                     "type": "string",
                     "required": false
                 }

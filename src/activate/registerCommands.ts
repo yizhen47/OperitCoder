@@ -37,6 +37,26 @@ export function getVisibleProviderOrLog(outputChannel: vscode.OutputChannel): Cl
 	return visibleProvider
 }
 
+// kilocode_change start
+function getSidebarProviderOrLog(outputChannel: vscode.OutputChannel): ClineProvider | undefined {
+	const sidebarProvider = sidebarPanel ? ClineProvider.getInstanceForView(sidebarPanel) : undefined
+	if (!sidebarProvider) {
+		outputChannel.appendLine("Cannot find any visible Operit Coder sidebar instance.")
+		return undefined
+	}
+	return sidebarProvider
+}
+
+function getTabProviderOrLog(outputChannel: vscode.OutputChannel): ClineProvider | undefined {
+	const tabProvider = tabPanel ? ClineProvider.getInstanceForView(tabPanel) : undefined
+	if (!tabProvider) {
+		outputChannel.appendLine("Cannot find any visible Operit Coder tab instance.")
+		return undefined
+	}
+	return tabProvider
+}
+// kilocode_change end
+
 // Store panel references in both modes
 let sidebarPanel: vscode.WebviewView | undefined = undefined
 let tabPanel: vscode.WebviewPanel | undefined = undefined
@@ -135,6 +155,36 @@ const getCommandsMap = ({ context, outputChannel }: RegisterCommandOptions): Rec
 		// This ensures the focus happens after the view has switched
 		await visibleProvider.postMessageToWebview({ type: "action", action: "focusInput" })
 	},
+	// kilocode_change start
+	plusButtonClickedSidebar: async () => {
+		const sidebarProvider = getSidebarProviderOrLog(outputChannel)
+
+		if (!sidebarProvider) {
+			return
+		}
+
+		TelemetryService.instance.captureTitleButtonClicked("plus")
+
+		await sidebarProvider.removeClineFromStack()
+		await sidebarProvider.refreshWorkspace()
+		await sidebarProvider.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
+		await sidebarProvider.postMessageToWebview({ type: "action", action: "focusInput" })
+	},
+	plusButtonClickedTab: async () => {
+		const tabProvider = getTabProviderOrLog(outputChannel)
+
+		if (!tabProvider) {
+			return
+		}
+
+		TelemetryService.instance.captureTitleButtonClicked("plus")
+
+		await tabProvider.removeClineFromStack()
+		await tabProvider.refreshWorkspace()
+		await tabProvider.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
+		await tabProvider.postMessageToWebview({ type: "action", action: "focusInput" })
+	},
+	// kilocode_change end
 	popoutButtonClicked: () => {
 		TelemetryService.instance.captureTitleButtonClicked("popout")
 
@@ -154,6 +204,32 @@ const getCommandsMap = ({ context, outputChannel }: RegisterCommandOptions): Rec
 		// Also explicitly post the visibility message to trigger scroll reliably
 		visibleProvider.postMessageToWebview({ type: "action", action: "didBecomeVisible" })
 	},
+	// kilocode_change start
+	settingsButtonClickedSidebar: () => {
+		const sidebarProvider = getSidebarProviderOrLog(outputChannel)
+
+		if (!sidebarProvider) {
+			return
+		}
+
+		TelemetryService.instance.captureTitleButtonClicked("settings")
+
+		sidebarProvider.postMessageToWebview({ type: "action", action: "settingsButtonClicked" })
+		sidebarProvider.postMessageToWebview({ type: "action", action: "didBecomeVisible" })
+	},
+	settingsButtonClickedTab: () => {
+		const tabProvider = getTabProviderOrLog(outputChannel)
+
+		if (!tabProvider) {
+			return
+		}
+
+		TelemetryService.instance.captureTitleButtonClicked("settings")
+
+		tabProvider.postMessageToWebview({ type: "action", action: "settingsButtonClicked" })
+		tabProvider.postMessageToWebview({ type: "action", action: "didBecomeVisible" })
+	},
+	// kilocode_change end
 	historyButtonClicked: () => {
 		const visibleProvider = getVisibleProviderOrLog(outputChannel)
 
@@ -165,6 +241,30 @@ const getCommandsMap = ({ context, outputChannel }: RegisterCommandOptions): Rec
 
 		visibleProvider.postMessageToWebview({ type: "action", action: "historyButtonClicked" })
 	},
+	// kilocode_change start
+	historyButtonClickedSidebar: () => {
+		const sidebarProvider = getSidebarProviderOrLog(outputChannel)
+
+		if (!sidebarProvider) {
+			return
+		}
+
+		TelemetryService.instance.captureTitleButtonClicked("history")
+
+		sidebarProvider.postMessageToWebview({ type: "action", action: "historyButtonClicked" })
+	},
+	historyButtonClickedTab: () => {
+		const tabProvider = getTabProviderOrLog(outputChannel)
+
+		if (!tabProvider) {
+			return
+		}
+
+		TelemetryService.instance.captureTitleButtonClicked("history")
+
+		tabProvider.postMessageToWebview({ type: "action", action: "historyButtonClicked" })
+	},
+	// kilocode_change end
 	// kilocode_change begin
 	mcpButtonClicked: () => {
 		const visibleProvider = getVisibleProviderOrLog(outputChannel)

@@ -221,15 +221,15 @@ async function simple_greeter_tool(params: { user_name: string }) {
 /* METADATA
 {
     "name": "greeter_tool_v2",
-    "description": "一个提供多种问候方式的教学工具集。",
+    "description": { "zh": "一个提供多种问候方式的教学工具集。", "en": "A tutorial tool package that demonstrates multiple greeting methods." },
     "tools": [
         {
             "name": "greet",
-            "description": "向指定的人发送一个标准的问候。",
+            "description": { "zh": "向指定的人发送一个标准的问候。", "en": "Send a standard greeting to a specified person." },
             "parameters": [
                 {
                     "name": "user_name",
-                    "description": "要问候的人的名字。",
+                    "description": { "zh": "要问候的人的名字。", "en": "Name of the person to greet." },
                     "type": "string",
                     "required": true
                 }
@@ -237,11 +237,11 @@ async function simple_greeter_tool(params: { user_name: string }) {
         },
         {
             "name": "system_inspector",
-            "description": "获取设备摘要信息，并在用户的HOME目录下查找符合特定模式的文件。",
+            "description": { "zh": "获取设备摘要信息，并在用户的HOME目录下查找符合特定模式的文件。", "en": "Get device summary information and find files matching a pattern under the user's HOME directory." },
             "parameters": [
                 {
                     "name": "search_pattern",
-                    "description": "用于文件搜索的通配符模式，例如：'*.txt' 或 'documents/*.pdf'。",
+                    "description": { "zh": "用于文件搜索的通配符模式，例如：'*.txt' 或 'documents/*.pdf'。", "en": "Glob pattern for file search, e.g. '*.txt' or 'documents/*.pdf'." },
                     "type": "string",
                     "required": true
                 }

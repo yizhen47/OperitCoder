@@ -3,28 +3,28 @@ METADATA
 {
     // 小红书智能助手包
     name: "Automatic_xiaohongshu_assistant",
-    description: "高级小红书智能助手，通过UI自动化技术实现小红书应用交互，支持内容浏览、搜索查看、评论互动、内容发布等功能，为AI赋予小红书社交和内容创作能力。适用于内容营销、社交互动、生活分享等场景。",
+    description: { zh: "高级小红书智能助手，通过UI自动化技术实现小红书应用交互，支持内容浏览、搜索查看、评论互动、内容发布等功能，为AI赋予小红书社交和内容创作能力。适用于内容营销、社交互动、生活分享等场景。", en: "Advanced Xiaohongshu (RED) assistant powered by UI automation. Supports browsing feeds, searching and viewing content, commenting and interactions, and publishing posts, enabling AI-driven social interaction and content creation. Useful for content marketing and social engagement." },
     
     // Tools in this package
     tools: [
         {
             name: "workflow_guide",
-            description: "小红书助手工具使用流程指南。工具主要分为几类：\n1. **内容发现**: 使用 `browse_home_feed` 浏览主页，或用 `search_content` 搜索特定内容。\n2. **查看与互动**: 发现帖子后，用 `view_post` 查看详情。在详情页内可执行 `like_post`, `collect_post`, `comment_post`, `follow_user`, `unfollow_user` 等并列互动操作。\n3. **内容发布**: `publish_post` 是一个独立的发布流程。\n4. **导航**: `navigate_to_home`, `back_to_feed` 等工具用于在各页面间跳转。",
+            description: { zh: "小红书助手工具使用流程指南。工具主要分为几类：\n1. **内容发现**: 使用 `browse_home_feed` 浏览主页，或用 `search_content` 搜索特定内容。\n2. **查看与互动**: 发现帖子后，用 `view_post` 查看详情。在详情页内可执行 `like_post`, `collect_post`, `comment_post`, `follow_user`, `unfollow_user` 等并列互动操作。\n3. **内容发布**: `publish_post` 是一个独立的发布流程。\n4. **导航**: `navigate_to_home`, `back_to_feed` 等工具用于在各页面间跳转。", en: "Workflow guide for the Xiaohongshu assistant:\n1. **Discover**: browse the home feed via `browse_home_feed`, or search via `search_content`.\n2. **View & interact**: after finding a post, open it with `view_post`. On the detail page you can run `like_post`, `collect_post`, `comment_post`, `follow_user`, `unfollow_user`, etc.\n3. **Publish**: `publish_post` is a dedicated publishing flow.\n4. **Navigation**: use tools like `navigate_to_home` and `back_to_feed` to switch between pages." },
             parameters: []
         },
         {
             name: "browse_home_feed",
-            description: "浏览小红书主页信息流，获取推荐内容",
+            description: { zh: "浏览小红书主页信息流，获取推荐内容", en: "Browse the Xiaohongshu home feed and collect recommended content." },
             parameters: [
                 {
                     name: "scroll_count",
-                    description: "滚动次数，控制浏览的内容量，默认为3次",
+                    description: { zh: "滚动次数，控制浏览的内容量，默认为3次", en: "Number of scrolls (controls how much content to browse; default: 3)." },
                     type: "number",
                     required: false
                 },
                 {
                     name: "collect_posts",
-                    description: "是否收集帖子信息，默认为true",
+                    description: { zh: "是否收集帖子信息，默认为true", en: "Whether to collect post info (default: true)." },
                     type: "boolean",
                     required: false
                 }
@@ -32,17 +32,17 @@ METADATA
         },
         {
             name: "search_content",
-            description: "在小红书中搜索内容、用户或话题",
+            description: { zh: "在小红书中搜索内容、用户或话题", en: "Search content, users, or topics in Xiaohongshu." },
             parameters: [
                 {
                     name: "keyword",
-                    description: "搜索关键词",
+                    description: { zh: "搜索关键词", en: "Search keyword." },
                     type: "string",
                     required: true
                 },
                 {
                     name: "search_type",
-                    description: "搜索类型：comprehensive(综合)、note(笔记)、user(用户)、topic(话题)",
+                    description: { zh: "搜索类型：comprehensive(综合)、note(笔记)、user(用户)、topic(话题)", en: "Search type: comprehensive, note, user, topic." },
                     type: "string",
                     required: false
                 }
@@ -50,17 +50,17 @@ METADATA
         },
         {
             name: "view_post",
-            description: "查看指定的帖子详情",
+            description: { zh: "查看指定的帖子详情", en: "View details of a specific post." },
             parameters: [
                 {
                     name: "post_title",
-                    description: "要查看的帖子标题关键词",
+                    description: { zh: "要查看的帖子标题关键词", en: "Keyword to match the post title (optional)." },
                     type: "string",
                     required: false
                 },
                 {
                     name: "post_index",
-                    description: "要查看的帖子在列表中的索引位置（从1开始）",
+                    description: { zh: "要查看的帖子在列表中的索引位置（从1开始）", en: "Index of the post in the list (1-based, optional)." },
                     type: "number",
                     required: false
                 }
@@ -68,16 +68,16 @@ METADATA
         },
         {
             name: "like_post",
-            description: "给当前帖子点赞",
+            description: { zh: "给当前帖子点赞", en: "Like the current post." },
             parameters: []
         },
         {
             name: "collect_post",
-            description: "收藏当前帖子",
+            description: { zh: "收藏当前帖子", en: "Save (collect) the current post." },
             parameters: [
                 {
                     name: "collection_name",
-                    description: "收藏夹名称，留空则使用默认收藏夹",
+                    description: { zh: "收藏夹名称，留空则使用默认收藏夹", en: "Collection name (leave empty to use the default collection)." },
                     type: "string",
                     required: false
                 }
@@ -85,21 +85,21 @@ METADATA
         },
         {
             name: "follow_user",
-            description: "关注当前帖子的作者",
+            description: { zh: "关注当前帖子的作者", en: "Follow the author of the current post." },
             parameters: []
         },
         {
             name: "unfollow_user",
-            description: "取消关注当前帖子的作者",
+            description: { zh: "取消关注当前帖子的作者", en: "Unfollow the author of the current post." },
             parameters: []
         },
         {
             name: "comment_post",
-            description: "在当前帖子下发表评论",
+            description: { zh: "在当前帖子下发表评论", en: "Post a comment under the current post." },
             parameters: [
                 {
                     name: "comment_text",
-                    description: "要发表的评论内容",
+                    description: { zh: "要发表的评论内容", en: "Comment text to post." },
                     type: "string",
                     required: true
                 }
@@ -107,34 +107,34 @@ METADATA
         },
         {
             name: "get_post_info",
-            description: "获取当前帖子的详细信息，包括标题、作者、点赞数、评论数、发布日期和热门评论等",
+            description: { zh: "获取当前帖子的详细信息，包括标题、作者、点赞数、评论数、发布日期和热门评论等", en: "Get detailed info of the current post: title, author, likes, comments, publish date, hot comments, etc." },
             parameters: []
         },
         {
             name: "publish_post",
-            description: "发布新的帖子内容",
+            description: { zh: "发布新的帖子内容", en: "Publish a new post." },
             parameters: [
                 {
                     name: "content_text",
-                    description: "帖子文字内容",
+                    description: { zh: "帖子文字内容", en: "Post text content." },
                     type: "string",
                     required: true
                 },
                 {
                     name: "image_paths",
-                    description: "图片文件路径列表，用逗号分隔",
+                    description: { zh: "图片文件路径列表，用逗号分隔", en: "Comma-separated list of image file paths (optional)." },
                     type: "string",
                     required: false
                 },
                 {
                     name: "tags",
-                    description: "话题标签，用逗号分隔",
+                    description: { zh: "话题标签，用逗号分隔", en: "Comma-separated topic tags (optional)." },
                     type: "string",
                     required: false
                 },
                 {
                     name: "location",
-                    description: "地理位置信息",
+                    description: { zh: "地理位置信息", en: "Location information (optional)." },
                     type: "string",
                     required: false
                 }
@@ -142,27 +142,27 @@ METADATA
         },
         {
             name: "navigate_to_home",
-            description: "导航到小红书首页",
+            description: { zh: "导航到小红书首页", en: "Navigate to the Xiaohongshu home page." },
             parameters: []
         },
         {
             name: "navigate_to_profile",
-            description: "导航到个人主页",
+            description: { zh: "导航到个人主页", en: "Navigate to the profile page." },
             parameters: []
         },
         {
             name: "navigate_to_search",
-            description: "导航到搜索页面",
+            description: { zh: "导航到搜索页面", en: "Navigate to the search page." },
             parameters: []
         },
         {
             name: "navigate_to_publish",
-            description: "导航到发布页面",
+            description: { zh: "导航到发布页面", en: "Navigate to the publish page." },
             parameters: []
         },
         {
             name: "back_to_feed",
-            description: "从帖子详情页返回到信息流列表",
+            description: { zh: "从帖子详情页返回到信息流列表", en: "Return from the post detail page back to the feed list." },
             parameters: []
         }
     ]

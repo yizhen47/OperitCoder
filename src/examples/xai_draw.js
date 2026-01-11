@@ -1,19 +1,25 @@
 /* METADATA
 {
   "name": "xai_draw",
-  "description": "使用 xAI 图像生成 API (grok-2-image-1212) 根据提示词画图，将图片保存到本地 /sdcard/Download/Operit/draws/ 目录，并返回 Markdown 图片提示。",
+  "description": {
+    "zh": "使用 xAI 图像生成 API (grok-2-image-1212) 根据提示词画图，将图片保存到本地 /sdcard/Download/Operit/draws/ 目录，并返回 Markdown 图片提示。",
+    "en": "Generate images with the xAI image generation API (grok-2-image-1212) from a prompt, save to /sdcard/Download/Operit/draws/, and return a Markdown image reference."
+  },
   "env": [
     "XAI_API_KEY"
   ],
   "tools": [
     {
       "name": "draw_image",
-      "description": "根据提示词调用 xAI 图像生成 API 生成图片，保存到本地并返回 Markdown 图片提示。",
+      "description": {
+        "zh": "根据提示词调用 xAI 图像生成 API 生成图片，保存到本地并返回 Markdown 图片提示。",
+        "en": "Generate an image via the xAI image generation API using a prompt, save it locally, and return a Markdown image reference."
+      },
       "parameters": [
-        { "name": "prompt", "description": "绘图提示词（英文或中文皆可）", "type": "string", "required": true },
-        { "name": "model", "description": "xAI 图像模型名称，默认 grok-2-image-1212", "type": "string", "required": false },
-        { "name": "size", "description": "图片尺寸，例如 '1024x1024'，可选", "type": "string", "required": false },
-        { "name": "file_name", "description": "自定义保存到本地的文件名（不含路径和扩展名）", "type": "string", "required": false }
+        { "name": "prompt", "description": { "zh": "绘图提示词（英文或中文皆可）", "en": "Prompt for image generation (Chinese or English)" }, "type": "string", "required": true },
+        { "name": "model", "description": { "zh": "xAI 图像模型名称，默认 grok-2-image-1212", "en": "xAI image model name (default: grok-2-image-1212)" }, "type": "string", "required": false },
+        { "name": "size", "description": { "zh": "图片尺寸，例如 '1024x1024'，可选", "en": "Image size, e.g. '1024x1024' (optional)" }, "type": "string", "required": false },
+        { "name": "file_name", "description": { "zh": "自定义保存到本地的文件名（不含路径和扩展名）", "en": "Custom output file name (without path or extension)" }, "type": "string", "required": false }
       ]
     }
   ]

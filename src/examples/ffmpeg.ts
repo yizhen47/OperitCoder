@@ -1,31 +1,34 @@
 /* METADATA
 {
     "name": "ffmpeg",
-    "description": "提供FFmpeg工具，用于处理多媒体内容。",
+    "description": {
+        "zh": "提供FFmpeg工具，用于处理多媒体内容。",
+        "en": "FFmpeg utilities for processing multimedia content."
+    },
     "enabledByDefault": true,
     "tools": [
         {
             "name": "ffmpeg_execute",
-            "description": "执行自定义FFmpeg命令。",
+            "description": { "zh": "执行自定义FFmpeg命令。", "en": "Execute a custom FFmpeg command." },
             "parameters": [
-                { "name": "command", "description": "要执行的FFmpeg命令", "type": "string", "required": true }
+                { "name": "command", "description": { "zh": "要执行的FFmpeg命令", "en": "The FFmpeg command to execute" }, "type": "string", "required": true }
             ]
         },
         {
             "name": "ffmpeg_info",
-            "description": "获取FFmpeg系统信息，包括版本、构建配置和支持的编解码器。",
+            "description": { "zh": "获取FFmpeg系统信息，包括版本、构建配置和支持的编解码器。", "en": "Get FFmpeg system info, including version, build config, and supported codecs." },
             "parameters": []
         },
         {
             "name": "ffmpeg_convert",
-            "description": "使用简化参数转换视频文件。",
+            "description": { "zh": "使用简化参数转换视频文件。", "en": "Convert a video file using simplified parameters." },
             "parameters": [
-                { "name": "input_path", "description": "源视频文件路径", "type": "string", "required": true },
-                { "name": "output_path", "description": "目标视频文件路径", "type": "string", "required": true },
-                { "name": "video_codec", "description": "可选，要使用的视频编解码器。支持的值: 'libx264', 'libx265', 'libvpx', 'libaom', 'mpeg4', 'mjpeg', 'prores', 'h264', 'hevc', 'vp8', 'vp9', 'av1'。", "type": "string", "required": false },
-                { "name": "audio_codec", "description": "可选，要使用的音频编解码器。支持的值: 'aac', 'mp3', 'opus', 'vorbis', 'flac', 'pcm', 'wav', 'ac3', 'eac3'。", "type": "string", "required": false },
-                { "name": "resolution", "description": "可选，输出分辨率，例如 '1280x720'。", "type": "string", "required": false },
-                { "name": "bitrate", "description": "可选，视频比特率，例如 '1000k'。", "type": "string", "required": false }
+                { "name": "input_path", "description": { "zh": "源视频文件路径", "en": "Input video file path" }, "type": "string", "required": true },
+                { "name": "output_path", "description": { "zh": "目标视频文件路径", "en": "Output video file path" }, "type": "string", "required": true },
+                { "name": "video_codec", "description": { "zh": "可选，要使用的视频编解码器。支持的值: 'libx264', 'libx265', 'libvpx', 'libaom', 'mpeg4', 'mjpeg', 'prores', 'h264', 'hevc', 'vp8', 'vp9', 'av1'。", "en": "Optional. Video codec to use. Supported values: 'libx264', 'libx265', 'libvpx', 'libaom', 'mpeg4', 'mjpeg', 'prores', 'h264', 'hevc', 'vp8', 'vp9', 'av1'." }, "type": "string", "required": false },
+                { "name": "audio_codec", "description": { "zh": "可选，要使用的音频编解码器。支持的值: 'aac', 'mp3', 'opus', 'vorbis', 'flac', 'pcm', 'wav', 'ac3', 'eac3'。", "en": "Optional. Audio codec to use. Supported values: 'aac', 'mp3', 'opus', 'vorbis', 'flac', 'pcm', 'wav', 'ac3', 'eac3'." }, "type": "string", "required": false },
+                { "name": "resolution", "description": { "zh": "可选，输出分辨率，例如 '1280x720'。", "en": "Optional. Output resolution, e.g. '1280x720'." }, "type": "string", "required": false },
+                { "name": "bitrate", "description": { "zh": "可选，视频比特率，例如 '1000k'。", "en": "Optional. Video bitrate, e.g. '1000k'." }, "type": "string", "required": false }
             ]
         }
     ]

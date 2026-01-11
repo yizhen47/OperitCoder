@@ -269,9 +269,6 @@ importers:
       node-ipc:
         specifier: npm:catrielmuller-node-ipc@12.0.1
         version: catrielmuller-node-ipc@12.0.1
-      node-machine-id:
-        specifier: ^1.1.12
-        version: 1.1.12
       ollama:
         specifier: ^0.5.17
         version: 0.5.17
@@ -296,9 +293,6 @@ importers:
       pkce-challenge:
         specifier: ^5.0.0
         version: 5.0.0
-      posthog-node:
-        specifier: ^4.2.1
-        version: 4.18.0
       pretty-bytes:
         specifier: ^7.0.0
         version: 7.0.0
@@ -660,9 +654,6 @@ importers:
       '@roo-code/types':
         specifier: workspace:^
         version: link:../types
-      posthog-node:
-        specifier: ^5.0.0
-        version: 5.1.1
       zod:
         specifier: ^3.25.61
         version: 3.25.61
@@ -821,6 +812,9 @@ importers:
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
+      hjson:
+        specifier: ^3.2.2
+        version: 3.2.2
       i18next:
         specifier: ^25.0.0
         version: 25.2.1(typescript@5.8.3)
@@ -1026,6 +1020,9 @@ importers:
       '@types/glob':
         specifier: ^8.1.0
         version: 8.1.0
+      '@types/hjson':
+        specifier: ^2.4.6
+        version: 2.4.6
       '@types/jsdom':
         specifier: ^21.1.7
         version: 21.1.7
@@ -2673,7 +2670,6 @@ packages:
   '@lancedb/lancedb@0.21.3':
     resolution: {integrity: sha512-hfzp498BfcCJ730fV1YGGoXVxRgE+W1n0D0KwanKlbt8bBPSQ6E6Tf8mPXc8rKdAXIRR3o5mTzMG3z3Fda+m3Q==}
     engines: {node: '>= 18'}
-    cpu: [x64, arm64]
     os: [darwin, linux, win32]
     peerDependencies:
       apache-arrow: '>=15.0.0 <=18.1.0'
@@ -4725,6 +4721,9 @@ packages:
 
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
+
+  '@types/hjson@2.4.6':
+    resolution: {integrity: sha512-tEQ4hlyKfsb9WWeueUY5eRnU2eK+KdE0eofSpQ05v9Aah4VvWwIRIid/ZN1zZZ0TfeVTRDgabKKqKZXEkfD3Sw==}
 
   '@types/istanbul-lib-coverage@2.0.6':
     resolution: {integrity: sha512-2QF/t/auWm0lsy8XtKVPG19v3sSOQlJe/YHZgfjb/KBBHOGSV+J2q/S671rcq9uTBrLAXmZpqJiaQbMT+zNU1w==}
@@ -7478,6 +7477,10 @@ packages:
     resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
     engines: {node: '>=12.0.0'}
 
+  hjson@3.2.2:
+    resolution: {integrity: sha512-MkUeB0cTIlppeSsndgESkfFD21T2nXPRaBStLtf3cAYA2bVEFdXlodZB0TukwZiobPD1Ksax5DK4RTZeaXCI3Q==}
+    hasBin: true
+
   hosted-git-info@4.1.0:
     resolution: {integrity: sha512-kyCuEOWjJqZuDbRHzL8V93NzQhwIB71oFWSyzVo+KPZI+pnQPPxucdkrOZvkLRnrf5URsQM+IJ09Dw29cRALIA==}
     engines: {node: '>=10'}
@@ -9706,14 +9709,6 @@ packages:
         optional: true
       rrweb-snapshot:
         optional: true
-
-  posthog-node@4.18.0:
-    resolution: {integrity: sha512-XROs1h+DNatgKh/AlIlCtDxWzwrKdYDb2mOs58n4yN8BkGN9ewqeQwG5ApS4/IzwCb7HPttUkOVulkYatd2PIw==}
-    engines: {node: '>=15.0.0'}
-
-  posthog-node@5.1.1:
-    resolution: {integrity: sha512-6VISkNdxO24ehXiDA4dugyCSIV7lpGVaEu5kn/dlAj+SJ1lgcDru9PQ8p/+GSXsXVxohd1t7kHL2JKc9NoGb0w==}
-    engines: {node: '>=20'}
 
   preact@10.26.6:
     resolution: {integrity: sha512-5SRRBinwpwkaD+OqlBDeITlRgvd8I8QlxHJw9AxSdMNV6O+LodN9nUyYGpSF7sadHjs6RzeFShMexC6DbtWr9g==}
@@ -16242,6 +16237,8 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
+  '@types/hjson@2.4.6': {}
+
   '@types/istanbul-lib-coverage@2.0.6': {}
 
   '@types/istanbul-lib-report@3.0.3':
@@ -19494,6 +19491,8 @@ snapshots:
 
   highlight.js@11.11.1: {}
 
+  hjson@3.2.2: {}
+
   hosted-git-info@4.1.0:
     dependencies:
       lru-cache: 6.0.0
@@ -22242,14 +22241,6 @@ snapshots:
       fflate: 0.4.8
       preact: 10.26.6
       web-vitals: 4.2.4
-
-  posthog-node@4.18.0:
-    dependencies:
-      axios: 1.12.0
-    transitivePeerDependencies:
-      - debug
-
-  posthog-node@5.1.1: {}
 
   preact@10.26.6: {}
 

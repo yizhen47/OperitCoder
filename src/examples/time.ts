@@ -1,18 +1,27 @@
 /* METADATA
 {
   name: time
-  description: 提供时间相关功能。实际上，激活本包的同时已经能够获取时间了。
+  description: {
+    zh: "提供时间相关功能。实际上，激活本包的同时已经能够获取时间了。"
+    en: "Provides time-related utilities. In practice, current time is already available once this package is enabled."
+  }
   enabledByDefault: true
   
   tools: [
     {
       name: get_time
-      description: 获取当前时间。当使用此包时，AI已经自动获取了当前的时间信息。
+      description: {
+        zh: "获取当前时间。当使用此包时，AI已经自动获取了当前的时间信息。"
+        en: "Get the current time. When using this package, the AI may already have the current time context."
+      }
       parameters: []
     },
     {
       name: format_time
-      description: 格式化时间。提供各种时间格式化选项。
+      description: {
+        zh: "格式化时间。提供各种时间格式化选项。"
+        en: "Format time. Provides various time formatting options."
+      }
       parameters: []
     }
   ]

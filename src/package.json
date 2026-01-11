@@ -137,6 +137,16 @@
 				"icon": "$(add)"
 			},
 			{
+				"command": "operit-coder.plusButtonClickedSidebar",
+				"title": "%command.newTask.title%",
+				"icon": "$(add)"
+			},
+			{
+				"command": "operit-coder.plusButtonClickedTab",
+				"title": "%command.newTask.title%",
+				"icon": "$(add)"
+			},
+			{
 				"command": "operit-coder.mcpButtonClicked",
 				"title": "%command.mcpServers.title%",
 				"icon": "$(server)"
@@ -162,6 +172,16 @@
 				"icon": "$(history)"
 			},
 			{
+				"command": "operit-coder.historyButtonClickedSidebar",
+				"title": "%command.history.title%",
+				"icon": "$(history)"
+			},
+			{
+				"command": "operit-coder.historyButtonClickedTab",
+				"title": "%command.history.title%",
+				"icon": "$(history)"
+			},
+			{
 				"command": "operit-coder.marketplaceButtonClicked",
 				"title": "%command.marketplace.title%",
 				"icon": "$(extensions)"
@@ -173,6 +193,16 @@
 			},
 			{
 				"command": "operit-coder.settingsButtonClicked",
+				"title": "%command.settings.title%",
+				"icon": "$(settings-gear)"
+			},
+			{
+				"command": "operit-coder.settingsButtonClickedSidebar",
+				"title": "%command.settings.title%",
+				"icon": "$(settings-gear)"
+			},
+			{
+				"command": "operit-coder.settingsButtonClickedTab",
 				"title": "%command.settings.title%",
 				"icon": "$(settings-gear)"
 			},
@@ -344,7 +374,7 @@
 			],
 			"view/title": [
 				{
-					"command": "operit-coder.plusButtonClicked",
+					"command": "operit-coder.plusButtonClickedSidebar",
 					"group": "navigation@0",
 					"when": "view == operit-coder.SidebarProvider"
 				},
@@ -354,12 +384,12 @@
 					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "operit-coder.historyButtonClicked",
+					"command": "operit-coder.historyButtonClickedSidebar",
 					"group": "navigation@4",
 					"when": "view == operit-coder.SidebarProvider"
 				},
 				{
-					"command": "operit-coder.settingsButtonClicked",
+					"command": "operit-coder.settingsButtonClickedSidebar",
 					"group": "navigation@5",
 					"when": "view == operit-coder.SidebarProvider"
 				},
@@ -376,12 +406,12 @@
 			],
 			"editor/title": [
 				{
-					"command": "operit-coder.plusButtonClicked",
+					"command": "operit-coder.plusButtonClickedTab",
 					"group": "navigation@1",
 					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{
-					"command": "operit-coder.historyButtonClicked",
+					"command": "operit-coder.historyButtonClickedTab",
 					"group": "navigation@3",
 					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
@@ -391,7 +421,7 @@
 					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
 				{
-					"command": "operit-coder.settingsButtonClicked",
+					"command": "operit-coder.settingsButtonClickedTab",
 					"group": "navigation@5",
 					"when": "activeWebviewPanelId == operit-coder.TabPanelProvider"
 				},
@@ -689,6 +719,7 @@
 		"js-tiktoken": "^1.0.8",
 		"jsdom": "^26.0.0",
 		"json5": "^2.2.3",
+		"hjson": "^3.2.2",
 		"jwt-decode": "^4.0.0",
 		"lodash.debounce": "^4.0.8",
 		"lru-cache": "^11.1.0",
@@ -754,6 +785,7 @@
 		"@types/glob": "^8.1.0",
 		"@types/jsdom": "^21.1.7",
 		"@types/json5": "^2.2.0",
+		"@types/hjson": "^2.4.6",
 		"@types/lodash.debounce": "^4.0.9",
 		"@types/mocha": "^10.0.10",
 		"@types/node": "20.x",
