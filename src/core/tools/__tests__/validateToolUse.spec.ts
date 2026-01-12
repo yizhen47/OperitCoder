@@ -139,6 +139,25 @@ describe("mode-validator", () => {
 			})
 		})
 
+		describe("dynamic example package tools", () => {
+			it("allows dynamic example tools when mcp group is in mode groups", () => {
+				// Code mode has mcp group, so pkg-- tools should be allowed
+				expect(isToolAllowedForMode("pkg--time--get_time", codeMode, [])).toBe(true)
+			})
+
+			it("disallows dynamic example tools when mcp group is not in mode groups", () => {
+				const customModes: ModeConfig[] = [
+					{
+						slug: "no-mcp-mode",
+						name: "No MCP Mode",
+						roleDefinition: "Custom role",
+						groups: ["read", "edit"] as const,
+					},
+				]
+				expect(isToolAllowedForMode("pkg--time--get_time", "no-mcp-mode", customModes)).toBe(false)
+			})
+		})
+
 		describe("tool requirements", () => {
 			it("respects tool requirements when provided", () => {
 				const requirements = { apply_diff: false }

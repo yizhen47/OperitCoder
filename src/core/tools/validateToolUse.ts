@@ -2,6 +2,7 @@ import type { ToolName, ModeConfig } from "@roo-code/types"
 import { toolNames as validToolNames } from "@roo-code/types"
 
 import { Mode, isToolAllowedForMode } from "../../shared/modes"
+import { EXAMPLE_TOOL_PREFIX, EXAMPLE_TOOL_SEPARATOR } from "../../utils/example-tool-name" // kilocode_change
 
 /**
  * Checks if a tool name is a valid, known tool.
@@ -18,6 +19,13 @@ export function isValidToolName(toolName: string): toolName is ToolName {
 	if (toolName.startsWith("mcp_")) {
 		return true
 	}
+
+	// kilocode_change start
+	// Check if it's a dynamic example package tool (pkg--packageName--toolName format)
+	if (toolName.startsWith(`${EXAMPLE_TOOL_PREFIX}${EXAMPLE_TOOL_SEPARATOR}`)) {
+		return true
+	}
+	// kilocode_change end
 
 	return false
 }

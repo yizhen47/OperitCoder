@@ -15,6 +15,7 @@ import { addCustomInstructions } from "../core/prompts/sections/custom-instructi
 
 import { EXPERIMENT_IDS } from "./experiments"
 import { TOOL_GROUPS, ALWAYS_AVAILABLE_TOOLS } from "./tools"
+import { EXAMPLE_TOOL_PREFIX, EXAMPLE_TOOL_SEPARATOR } from "../utils/example-tool-name" // kilocode_change
 
 export type Mode = string
 
@@ -183,6 +184,11 @@ export function isToolAllowedForMode(
 	// Check if this is a dynamic MCP tool (mcp_serverName_toolName)
 	// These should be allowed if the mcp group is allowed for the mode
 	const isDynamicMcpTool = tool.startsWith("mcp_")
+	// kilocode_change start
+	// Check if this is a dynamic example package tool (pkg--packageName--toolName)
+	// These are treated similarly to MCP tools for mode gating.
+	const isDynamicExampleTool = tool.startsWith(`${EXAMPLE_TOOL_PREFIX}${EXAMPLE_TOOL_SEPARATOR}`)
+	// kilocode_change end
 	if (experiments && Object.values(EXPERIMENT_IDS).includes(tool as ExperimentId)) {
 		if (!experiments[tool]) {
 			return false
@@ -216,6 +222,13 @@ export function isToolAllowedForMode(
 			// Dynamic MCP tools are allowed if the mcp group is in the mode's groups
 			return true
 		}
+
+		// kilocode_change start
+		// Check if this is a dynamic example package tool and the mcp group is allowed
+		if (isDynamicExampleTool && groupName === "mcp") {
+			return true
+		}
+		// kilocode_change end
 
 		// Check if the tool is in the group's regular tools
 		const isRegularTool = groupConfig.tools.includes(tool)
