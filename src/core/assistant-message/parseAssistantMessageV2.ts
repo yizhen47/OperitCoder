@@ -1,8 +1,8 @@
 import { type ToolName, toolNames } from "@roo-code/types"
 
-import { TextContent, ToolUse, ToolParamName, toolParamNames } from "../../shared/tools"
+import { TextContent, ToolUse, McpToolUse, ExampleToolUse, ToolParamName, toolParamNames } from "../../shared/tools"
 
-export type AssistantMessageContent = TextContent | ToolUse
+export type AssistantMessageContent = TextContent | ToolUse | McpToolUse | ExampleToolUse
 
 /**
  * Parses an assistant message string potentially containing mixed text and tool

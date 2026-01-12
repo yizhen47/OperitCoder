@@ -7,6 +7,25 @@ describe("NativeToolCallParser", () => {
 	})
 
 	describe("parseToolCall", () => {
+		// kilocode_change start
+		it("should parse dynamic example package tool (pkg--package--tool)", () => {
+			const toolCall = {
+				id: "toolu_pkg_123",
+				name: "pkg--time--get_time" as any,
+				arguments: JSON.stringify({}),
+			}
+
+			const result = NativeToolCallParser.parseToolCall(toolCall)
+			expect(result).not.toBeNull()
+			expect(result?.type).toBe("pkg_tool_use")
+			if (result?.type === "pkg_tool_use") {
+				expect(result.packageName).toBe("time")
+				expect(result.toolName).toBe("get_time")
+				expect(result.arguments).toEqual({})
+			}
+		})
+		// kilocode_change end
+
 		describe("read_file tool", () => {
 			it("should handle line_ranges as tuples (new format)", () => {
 				const toolCall = {

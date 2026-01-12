@@ -18,6 +18,12 @@ import { isEmpty } from "../../utils/object"
 import { McpHub } from "../../services/mcp/McpHub"
 import { CodeIndexManager } from "../../services/code-index/manager"
 import { SkillsManager } from "../../services/skills/SkillsManager"
+ 
+// kilocode_change start
+import * as path from "path"
+import { scanExamplePackages, type ToolPackage } from "../tool-packages"
+import { buildExampleToolName } from "../../utils/example-tool-name"
+// kilocode_change end
 
 import { PromptVariables, loadSystemPromptFile } from "./sections/custom-system-prompt"
 
@@ -95,6 +101,16 @@ async function generatePrompt(
 	// Determine the effective protocol (defaults to 'xml')
 	const effectiveProtocol = getEffectiveProtocol(settings?.toolProtocol)
 
+	// kilocode_change start
+	const examplePackagesSection = await getExamplePackagesSection(
+		context.extensionPath,
+		modeConfig,
+		language,
+		clineProviderState?.enabledExamplePackages,
+		clineProviderState?.disabledExamplePackages,
+	)
+	// kilocode_change end
+
 	const [modesSection, mcpServersSection, skillsSection] = await Promise.all([
 		getModesSection(context),
 		shouldIncludeMcp
@@ -132,7 +148,7 @@ async function generatePrompt(
 
 ${markdownFormattingSection()}
 
-${getSharedToolUseSection(effectiveProtocol)}${toolsCatalog}
+${getSharedToolUseSection(effectiveProtocol)}${toolsCatalog}${examplePackagesSection ? `\n\n${examplePackagesSection}` : ""}
 
 ${getToolUseGuidelinesSection(effectiveProtocol)}
 
@@ -158,6 +174,123 @@ ${await addCustomInstructions(baseInstructions, globalCustomInstructions || "", 
 
 	return basePrompt
 }
+
+// kilocode_change start
+async function getExamplePackagesSection(
+	extensionPath: string,
+	modeConfig: ReturnType<typeof getModeSelection> extends any ? ModeConfig : ModeConfig,
+	language?: string,
+	enabledExamplePackages?: string[],
+	disabledExamplePackages?: string[],
+): Promise<string> {
+	// Example packages are gated by the mcp group (same as pkg-- tool availability)
+	const hasMcpGroup = modeConfig.groups.some((groupEntry) => getGroupName(groupEntry) === "mcp")
+	if (!hasMcpGroup) {
+		return ""
+	}
+
+	const localizeText = (value: unknown): string => {
+		if (!value) {
+			return ""
+		}
+		if (typeof value === "string") {
+			return value
+		}
+		if (typeof value === "object") {
+			const record = value as Record<string, string>
+			const lang = String(language ?? "").toLowerCase()
+			const candidates = [
+				lang,
+				lang.split("-")[0],
+				"en",
+				"en-us",
+				"zh",
+				"zh-cn",
+			]
+			for (const key of candidates) {
+				if (key && typeof record[key] === "string") {
+					return record[key]
+				}
+			}
+			const first = Object.values(record).find((v) => typeof v === "string")
+			return first ?? ""
+		}
+		return ""
+	}
+
+	const primaryExamplesDir = path.join(extensionPath, "dist", "examples")
+	const isDevExtensionLayout = path.basename(extensionPath).toLowerCase() === "src" // kilocode_change
+	const fallbackExamplesDir = isDevExtensionLayout
+		? path.join(extensionPath, "examples")
+		: path.join(extensionPath, "src", "examples")
+
+	let packages: ToolPackage[] = []
+	try {
+		packages = await scanExamplePackages({ examplesDir: primaryExamplesDir })
+		if (packages.length === 0) {
+			packages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })
+		}
+	} catch {
+		return ""
+	}
+
+	const disabled = new Set((disabledExamplePackages ?? []).map((n) => String(n).toLowerCase()))
+	const enabledOverride = new Set((enabledExamplePackages ?? []).map((n) => String(n).toLowerCase()))
+	const enabled = packages.filter((p) => {
+		const name = String(p.name).toLowerCase()
+		if (enabledOverride.has(name)) {
+			return true
+		}
+		if (disabled.has(name)) {
+			return false
+		}
+		return Boolean(p.enabledByDefault)
+	})
+	if (enabled.length === 0) {
+		return ""
+	}
+
+	const lines: string[] = []
+	lines.push(`# Sandbox Package Tools`)
+	lines.push(
+		`These tools are dynamically loaded from built-in sandbox packages. Tool names use the format: pkg--<package>--<tool>.`,
+	)
+
+	for (const pkg of enabled) {
+		lines.push("")
+		lines.push(`## ${pkg.name}`)
+		const pkgDescription = localizeText(pkg.description)
+		if (pkgDescription) {
+			lines.push(pkgDescription)
+		}
+
+		for (const tool of pkg.tools) {
+			const toolFullName = buildExampleToolName(pkg.name, tool.name)
+			lines.push("")
+			lines.push(`### ${toolFullName}`)
+			const toolDescription = localizeText(tool.description)
+			if (toolDescription) {
+				lines.push(toolDescription)
+			}
+
+			if (tool.parameters && tool.parameters.length > 0) {
+				lines.push("")
+				lines.push(`Parameters:`)
+				for (const param of tool.parameters) {
+					const required = param.required ? "required" : "optional"
+					lines.push(
+						`- ${param.name} (${param.type}, ${required})${param.description ? `: ${param.description}` : ""}`,
+					)
+				}
+			}
+		}
+	}
+
+	return lines.join("\n")
+}
+
+export const __test__getExamplePackagesSection = getExamplePackagesSection // kilocode_change
+// kilocode_change end
 
 export const SYSTEM_PROMPT = async (
 	context: vscode.ExtensionContext,

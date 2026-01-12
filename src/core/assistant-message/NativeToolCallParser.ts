@@ -2,6 +2,7 @@ import { type ToolName, toolNames, type FileEntry } from "@roo-code/types"
 import {
 	type ToolUse,
 	type McpToolUse,
+	type ExampleToolUse,
 	type ToolParamName,
 	toolParamNames,
 	type NativeToolArgs,
@@ -14,6 +15,9 @@ import type {
 	ApiStreamToolCallEndChunk,
 } from "../../api/transform/stream"
 import { MCP_TOOL_PREFIX, MCP_TOOL_SEPARATOR, parseMcpToolName } from "../../utils/mcp-name"
+// kilocode_change start
+import { EXAMPLE_TOOL_PREFIX, EXAMPLE_TOOL_SEPARATOR, parseExampleToolName } from "../../utils/example-tool-name"
+// kilocode_change end
 
 /**
  * Helper type to extract properly typed native arguments for a given tool.
@@ -238,9 +242,10 @@ export class NativeToolCallParser {
 		// Accumulate the JSON string
 		toolCall.argumentsAccumulator += chunk
 
-		// For dynamic MCP tools, we don't return partial updates - wait for final
+		// For dynamic MCP/example tools, we don't return partial updates - wait for final
 		const mcpPrefix = MCP_TOOL_PREFIX + MCP_TOOL_SEPARATOR
-		if (toolCall.name.startsWith(mcpPrefix)) {
+		const examplePrefix = EXAMPLE_TOOL_PREFIX + EXAMPLE_TOOL_SEPARATOR
+		if (toolCall.name.startsWith(mcpPrefix) || toolCall.name.startsWith(examplePrefix)) {
 			return null
 		}
 
@@ -273,7 +278,9 @@ export class NativeToolCallParser {
 	 * Finalize a streaming tool call.
 	 * Parses the complete JSON and returns the final ToolUse or McpToolUse.
 	 */
-	public static finalizeStreamingToolCall(id: string): ToolUse | McpToolUse | null {
+	// kilocode_change start
+	public static finalizeStreamingToolCall(id: string): ToolUse | McpToolUse | ExampleToolUse | null {
+		// kilocode_change end
 		const toolCall = this.streamingToolCalls.get(id)
 		if (!toolCall) {
 			console.warn(`[NativeToolCallParser] Attempting to finalize unknown tool call: ${id}`)
@@ -293,6 +300,39 @@ export class NativeToolCallParser {
 
 		return finalToolUse
 	}
+
+	// kilocode_change start
+	/**
+	 * Parse a dynamic example package tool call (pkg--packageName--toolName).
+	 * These tools are invoked directly in native mode and should preserve their
+	 * original name so it appears correctly in API conversation history.
+	 */
+	public static parseDynamicExampleTool(toolCall: { id: string; name: string; arguments: string }): ExampleToolUse | null {
+		try {
+			const parsed = parseExampleToolName(toolCall.name)
+			if (!parsed) {
+				return null
+			}
+
+			const args = JSON.parse(toolCall.arguments || "{}")
+			if (!args || typeof args !== "object") {
+				return null
+			}
+
+			return {
+				type: "pkg_tool_use",
+				id: toolCall.id,
+				name: toolCall.name,
+				packageName: parsed.packageName,
+				toolName: parsed.toolName,
+				arguments: args as Record<string, unknown>,
+				partial: false,
+			}
+		} catch {
+			return null
+		}
+	}
+	// kilocode_change end
 
 	/**
 	 * Convert raw file entries from API (with line_ranges) to FileEntry objects
@@ -555,12 +595,20 @@ export class NativeToolCallParser {
 		id: string
 		name: TName
 		arguments: string
-	}): ToolUse<TName> | McpToolUse | null {
+	}): ToolUse<TName> | McpToolUse | ExampleToolUse | null {
 		// Check if this is a dynamic MCP tool (mcp--serverName--toolName)
 		const mcpPrefix = MCP_TOOL_PREFIX + MCP_TOOL_SEPARATOR
 		if (typeof toolCall.name === "string" && toolCall.name.startsWith(mcpPrefix)) {
 			return this.parseDynamicMcpTool(toolCall)
 		}
+
+		// kilocode_change start
+		// Check if this is a dynamic example package tool (pkg--packageName--toolName)
+		const examplePrefix = EXAMPLE_TOOL_PREFIX + EXAMPLE_TOOL_SEPARATOR
+		if (typeof toolCall.name === "string" && toolCall.name.startsWith(examplePrefix)) {
+			return this.parseDynamicExampleTool(toolCall)
+		}
+		// kilocode_change end
 
 		// Resolve tool alias to canonical name (e.g., "edit_file" -> "apply_diff", "temp_edit_file" -> "search_and_replace")
 		const resolvedName = resolveToolAlias(toolCall.name as string) as TName

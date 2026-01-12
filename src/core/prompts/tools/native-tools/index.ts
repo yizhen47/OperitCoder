@@ -24,6 +24,11 @@ import deleteFile from "./kilocode/delete_file"
 import editFile from "./kilocode/edit_file"
 
 export { getMcpServerTools } from "./mcp_server"
+export {
+	getExamplePackageTools,
+	getExamplePackageToolsWithDisabledList,
+	getExamplePackageToolsWithToggleLists,
+} from "./example_packages" // kilocode_change
 export { convertOpenAIToolToAnthropic, convertOpenAIToolsToAnthropic } from "./converters"
 
 /**

@@ -1,8 +1,8 @@
 import { type ToolName, toolNames } from "@roo-code/types"
 
-import { TextContent, ToolUse, McpToolUse, ToolParamName, toolParamNames } from "../../shared/tools"
+import { TextContent, ToolUse, McpToolUse, ExampleToolUse, ToolParamName, toolParamNames } from "../../shared/tools"
 
-export type AssistantMessageContent = TextContent | ToolUse | McpToolUse
+export type AssistantMessageContent = TextContent | ToolUse | McpToolUse | ExampleToolUse
 
 export function parseAssistantMessage(assistantMessage: string): AssistantMessageContent[] {
 	let contentBlocks: AssistantMessageContent[] = []

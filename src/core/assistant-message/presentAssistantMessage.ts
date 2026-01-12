@@ -6,10 +6,17 @@ import type { ToolName, ClineAsk, ToolProgressStatus } from "@roo-code/types"
 import { TelemetryService } from "@roo-code/telemetry"
 
 import { defaultModeSlug, getModeBySlug } from "../../shared/modes"
-import type { ToolParamName, ToolResponse, ToolUse, McpToolUse } from "../../shared/tools"
+import type { ToolParamName, ToolResponse, ToolUse, McpToolUse, ExampleToolUse } from "../../shared/tools"
 import { Package } from "../../shared/package"
 import { t } from "../../i18n"
 import { AskIgnoredError } from "../task/AskIgnoredError"
+
+// kilocode_change start
+import * as path from "path"
+import { scanExamplePackages } from "../tool-packages"
+import { sanitizeMcpName } from "../../utils/mcp-name"
+import { executeSandboxedTool } from "../tool-packages/runtime/sandbox"
+// kilocode_change end
 
 import { fetchInstructionsTool } from "../tools/FetchInstructionsTool"
 import { listFilesTool } from "../tools/ListFilesTool"
@@ -108,6 +115,278 @@ export async function presentAssistantMessage(cline: Task) {
 	}
 
 	switch (block.type) {
+		case "pkg_tool_use": {
+			// kilocode_change: Handle native example package tool calls (pkg--packageName--toolName)
+			const pkgBlock = block as ExampleToolUse
+
+			// kilocode_change: Respect disabledExamplePackages toggle
+			try {
+				const state = await cline.providerRef.deref()?.getState()
+				const disabled = (state as any)?.disabledExamplePackages as string[] | undefined
+				const enabled = (state as any)?.enabledExamplePackages as string[] | undefined
+
+				const isDisabled = Array.isArray(disabled) && disabled.includes(pkgBlock.packageName)
+				const isEnabledOverride = Array.isArray(enabled) && enabled.includes(pkgBlock.packageName)
+				if (isDisabled && !isEnabledOverride) {
+					const toolCallId = pkgBlock.id
+					if (toolCallId) {
+						cline.userMessageContent.push({
+							type: "tool_result",
+							tool_use_id: toolCallId,
+							content: `Package '${pkgBlock.packageName}' is disabled in settings.`,
+							is_error: true,
+						} as Anthropic.ToolResultBlockParam)
+						cline.didAlreadyUseTool = true
+					}
+					break
+				}
+			} catch {
+				// ignore and continue
+			}
+
+			if (cline.didRejectTool) {
+				// For native protocol, we must send a tool_result for every tool_use to avoid API errors
+				const toolCallId = pkgBlock.id
+				const errorMessage = !pkgBlock.partial
+					? `Skipping package tool ${pkgBlock.name} due to user rejecting a previous tool.`
+					: `Package tool ${pkgBlock.name} was interrupted and not executed due to user rejecting a previous tool.`
+
+				if (toolCallId) {
+					cline.userMessageContent.push({
+						type: "tool_result",
+						tool_use_id: toolCallId,
+						content: errorMessage,
+						is_error: true,
+					} as Anthropic.ToolResultBlockParam)
+				}
+				break
+			}
+
+			if (cline.didAlreadyUseTool) {
+				const toolCallId = pkgBlock.id
+				const errorMessage = `Package tool [${pkgBlock.name}] was not executed because a tool has already been used in this message. Only one tool may be used per message.`
+
+				if (toolCallId) {
+					cline.userMessageContent.push({
+						type: "tool_result",
+						tool_use_id: toolCallId,
+						content: errorMessage,
+						is_error: true,
+					} as Anthropic.ToolResultBlockParam)
+				}
+				break
+			}
+
+			let hasToolResult = false
+			const toolCallId = pkgBlock.id
+			const toolProtocol = TOOL_PROTOCOL.NATIVE
+
+			const pushToolResult = (content: ToolResponse) => {
+				if (hasToolResult) {
+					console.warn(
+						`[presentAssistantMessage] Skipping duplicate tool_result for pkg_tool_use: ${toolCallId}`,
+					)
+					return
+				}
+
+				let resultContent: string
+				let imageBlocks: Anthropic.ImageBlockParam[] = []
+
+				if (typeof content === "string") {
+					resultContent = content || "(tool did not return anything)"
+				} else {
+					const textBlocks = content.filter((item) => item.type === "text")
+					imageBlocks = content.filter((item) => item.type === "image") as Anthropic.ImageBlockParam[]
+					resultContent =
+						textBlocks.map((item) => (item as Anthropic.TextBlockParam).text).join("\n") ||
+						"(tool did not return anything)"
+				}
+
+				if (toolCallId) {
+					cline.userMessageContent.push({
+						type: "tool_result",
+						tool_use_id: toolCallId,
+						content: resultContent,
+					} as Anthropic.ToolResultBlockParam)
+
+					if (imageBlocks.length > 0) {
+						cline.userMessageContent.push(...imageBlocks)
+					}
+				}
+
+				hasToolResult = true
+				cline.didAlreadyUseTool = true
+			}
+
+			const handleError = async (action: string, error: Error) => {
+				if (error instanceof AskIgnoredError) {
+					return
+				}
+				const errorString = `Error ${action}: ${JSON.stringify(serializeError(error))}`
+				await cline.say(
+					"error",
+					`Error ${action}:\n${error.message ?? JSON.stringify(serializeError(error), null, 2)}`,
+				)
+				pushToolResult(formatResponse.toolError(errorString, toolProtocol))
+			}
+
+			const askApproval = async (
+				type: ClineAsk,
+				partialMessage?: string,
+				progressStatus?: ToolProgressStatus,
+				isProtected?: boolean,
+			) => {
+				const { response, text, images } = await cline.ask(
+					type,
+					partialMessage,
+					false,
+					progressStatus,
+					isProtected || false,
+				)
+
+				if (response !== "yesButtonClicked") {
+					if (text) {
+						await cline.say("user_feedback", text, images)
+						pushToolResult(
+							formatResponse.toolResult(
+								formatResponse.toolDeniedWithFeedback(text, toolProtocol),
+								images,
+							),
+						)
+					} else {
+						pushToolResult(formatResponse.toolDenied(toolProtocol))
+					}
+					cline.didRejectTool = true
+					return false
+				}
+
+				if (text) {
+					await cline.say("user_feedback", text, images)
+					pushToolResult(
+						formatResponse.toolResult(formatResponse.toolApprovedWithFeedback(text, toolProtocol), images),
+					)
+				}
+
+				return true
+			}
+
+			const toolCallForSandbox = async (toolName: string, params?: Record<string, unknown>): Promise<unknown> => {
+				// Execute nested native tools through existing tool handlers and return a string result to sandbox.
+				const name = toolName as ToolName
+				const paramObj = (params ?? {}) as Record<string, any>
+				const legacyParams: Partial<Record<ToolParamName, string>> = {}
+				for (const [k, v] of Object.entries(paramObj)) {
+					legacyParams[k as ToolParamName] = typeof v === "string" ? v : JSON.stringify(v)
+				}
+
+				const toolUse: ToolUse = {
+					type: "tool_use",
+					name,
+					params: legacyParams,
+					partial: false,
+					nativeArgs: paramObj as any,
+				}
+
+				return await new Promise<unknown>(async (resolve, reject) => {
+					let resolved = false
+					const resolveOnce = (value: unknown) => {
+						if (resolved) return
+						resolved = true
+						resolve(value)
+					}
+
+					const pushNestedResult = (content: ToolResponse) => {
+						if (typeof content === "string") {
+							resolveOnce(content)
+							return
+						}
+						const textBlocks = content.filter((item) => item.type === "text")
+						resolveOnce(textBlocks.map((item) => (item as Anthropic.TextBlockParam).text).join("\n"))
+					}
+
+					const callbacks = {
+						askApproval: askApproval,
+						handleError: async (action: string, error: Error) => {
+							await handleError(action, error)
+							reject(error)
+						},
+						pushToolResult: pushNestedResult,
+						removeClosingTag: (_tag: any, text?: string) => text || "",
+						toolProtocol,
+					}
+
+					try {
+						switch (name) {
+							case "execute_command":
+								await executeCommandTool.handle(cline, toolUse as any, callbacks as any)
+								break
+							case "read_file":
+								await readFileTool.handle(cline, toolUse as any, callbacks as any)
+								break
+							case "write_to_file":
+								await writeToFileTool.handle(cline, toolUse as any, callbacks as any)
+								break
+							case "apply_patch":
+								await applyPatchTool.handle(cline, toolUse as any, callbacks as any)
+								break
+							case "apply_diff":
+								await applyDiffToolClass.handle(cline, toolUse as any, callbacks as any)
+								break
+							case "search_files":
+								await searchFilesTool.handle(cline, toolUse as any, callbacks as any)
+								break
+							case "list_files":
+								await listFilesTool.handle(cline, toolUse as any, callbacks as any)
+								break
+							default:
+								throw new Error(`Unsupported nested tool call from sandbox: ${toolName}`)
+						}
+					} catch (e) {
+						reject(e)
+					}
+				})
+			}
+
+			try {
+				const provider = cline.providerRef.deref()
+				const extensionPath = provider?.context.extensionPath
+				if (!extensionPath) {
+					throw new Error("Provider not available")
+				}
+
+				const primaryExamplesDir = path.join(extensionPath, "dist", "examples")
+				const fallbackExamplesDir = path.join(extensionPath, "src", "examples")
+				let packages = await scanExamplePackages({ examplesDir: primaryExamplesDir })
+				if (packages.length === 0) {
+					packages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })
+				}
+
+				const pkg = packages.find((p) => sanitizeMcpName(p.name) === pkgBlock.packageName)
+				if (!pkg) {
+					throw new Error(`Example package not found: ${pkgBlock.packageName}`)
+				}
+
+				const tool = pkg.tools.find((t) => sanitizeMcpName(t.name) === pkgBlock.toolName)
+				if (!tool) {
+					throw new Error(`Tool not found in package '${pkg.name}': ${pkgBlock.toolName}`)
+				}
+
+				const result = await executeSandboxedTool({
+					script: tool.script,
+					toolExportName: tool.name,
+					args: (pkgBlock.arguments ?? {}) as Record<string, unknown>,
+					cwd: cline.cwd,
+					toolCall: toolCallForSandbox,
+					filename: pkg.sourcePath ?? `examples/${pkg.name}.js`,
+					logger: console,
+				})
+
+				pushToolResult(typeof result === "string" ? result : JSON.stringify(result))
+			} catch (error) {
+				await handleError("executing package tool", error as Error)
+			}
+			break
+		}
 		case "mcp_tool_use": {
 			// Handle native MCP tool calls (from mcp_serverName_toolName dynamic tools)
 			// These are converted to the same execution path as use_mcp_tool but preserve

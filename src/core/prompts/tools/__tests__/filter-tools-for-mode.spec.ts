@@ -1,7 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest"
 import type OpenAI from "openai"
 import type { ModeConfig, ModelInfo } from "@roo-code/types"
-import { filterNativeToolsForMode, filterMcpToolsForMode, applyModelToolCustomization } from "../filter-tools-for-mode"
+import {
+	filterNativeToolsForMode,
+	filterMcpToolsForMode,
+	applyModelToolCustomization,
+	filterExampleToolsForMode,
+} from "../filter-tools-for-mode" // kilocode_change
 import * as toolsModule from "../../../../shared/tools"
 
 // kilocode_change start
@@ -480,6 +485,53 @@ describe("filterMcpToolsForMode", () => {
 		// Should include MCP tools since default mode has mcp group
 		expect(filtered.length).toBeGreaterThan(0)
 	})
+
+	// kilocode_change start
+	describe("filterExampleToolsForMode", () => {
+		const mockExampleTools: OpenAI.Chat.ChatCompletionTool[] = [
+			{
+				type: "function",
+				function: {
+					name: "pkg--time--get_time",
+					description: "Example tool",
+					parameters: {},
+				},
+			},
+			{
+				type: "function",
+				function: {
+					name: "pkg--duckduckgo--search",
+					description: "Example tool",
+					parameters: {},
+				},
+			},
+		]
+
+		it("should include example tools when mode has mcp group", () => {
+			const modeWithMcp: ModeConfig = {
+				slug: "test-with-mcp",
+				name: "Test With MCP",
+				roleDefinition: "Test",
+				groups: ["read", "mcp"] as const,
+			}
+
+			const filtered = filterExampleToolsForMode(mockExampleTools, "test-with-mcp", [modeWithMcp], {})
+			expect(filtered).toHaveLength(2)
+		})
+
+		it("should exclude example tools when mode does not have mcp group", () => {
+			const modeWithoutMcp: ModeConfig = {
+				slug: "test-no-mcp",
+				name: "Test No MCP",
+				roleDefinition: "Test",
+				groups: ["read", "edit"] as const,
+			}
+
+			const filtered = filterExampleToolsForMode(mockExampleTools, "test-no-mcp", [modeWithoutMcp], {})
+			expect(filtered).toHaveLength(0)
+		})
+	})
+	// kilocode_change end
 
 	describe("applyModelToolCustomization", () => {
 		const codeMode: ModeConfig = {

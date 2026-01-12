@@ -445,6 +445,11 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 			switch (message.type) {
 				case "state": {
 					const newState = message.state!
+					if (import.meta.env.DEV) {
+						console.log(
+							`[sandbox-packages][webview] received examplePackages=${(newState as any).examplePackages?.length ?? 0}`,
+						) // kilocode_change
+					}
 					if (Array.isArray(newState.clineMessages)) {
 						if (newState.clineMessages.length === 0) {
 							for (const pending of pendingStreamingMessageUpdatesRef.current.values()) {

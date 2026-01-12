@@ -491,3 +491,25 @@ export function filterMcpToolsForMode(
 
 	return isMcpAllowed ? mcpTools : []
 }
+
+// kilocode_change start
+/**
+ * Filters example package tools (pkg--package--tool) based on whether the current mode allows
+ * dynamic example tools. Dynamic example tools are gated by the `mcp` group in isToolAllowedForMode.
+ */
+export function filterExampleToolsForMode(
+	exampleTools: OpenAI.Chat.ChatCompletionTool[],
+	mode: string | undefined,
+	customModes: ModeConfig[] | undefined,
+	experiments: Record<string, boolean> | undefined,
+): OpenAI.Chat.ChatCompletionTool[] {
+	const modeSlug = mode ?? defaultModeSlug
+
+	return exampleTools.filter((tool) => {
+		if (!("function" in tool) || !tool.function) {
+			return false
+		}
+		return isToolAllowedForMode(tool.function.name, modeSlug, customModes ?? [], undefined, undefined, experiments ?? {})
+	})
+}
+// kilocode_change end

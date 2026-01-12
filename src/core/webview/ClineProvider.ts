@@ -50,9 +50,13 @@ import { findLast } from "../../shared/array"
 import { supportPrompt } from "../../shared/support-prompt"
 import { GlobalFileNames } from "../../shared/globalFileNames"
 import type { ExtensionMessage, ExtensionState, MarketplaceInstalledMetadata } from "../../shared/ExtensionMessage"
-import { Mode, defaultModeSlug, getModeBySlug } from "../../shared/modes"
+import { Mode, defaultModeSlug, getGroupName, getModeBySlug } from "../../shared/modes"
 import { experimentDefault } from "../../shared/experiments"
 import { formatLanguage } from "../../shared/language"
+// kilocode_change start
+import { scanExamplePackages } from "../tool-packages"
+import { sanitizeMcpName } from "../../utils/mcp-name"
+// kilocode_change end
 import { WebviewMessage } from "../../shared/WebviewMessage"
 import { EMBEDDING_MODEL_PROFILES } from "../../shared/embeddingModels"
 import { ProfileValidator } from "../../shared/ProfileValidator"
@@ -1879,6 +1883,9 @@ ${prompt}
 
 	async postStateToWebview() {
 		const state = await this.getStateToPostToWebview()
+		if (process.env.VSCODE_DEBUG_MODE === "true") {
+			console.log(`[sandbox-packages] postState examplePackages=${state.examplePackages?.length ?? 0}`) // kilocode_change
+		}
 		this.postMessageToWebview({ type: "state", state })
 
 		// Check MDM compliance and send user to account tab if not compliant
@@ -2123,6 +2130,9 @@ ${prompt}
 			yoloMode, // kilocode_change
 			yoloGatekeeperApiConfigId, // kilocode_change: AI gatekeeper for YOLO mode
 			isBrowserSessionActive,
+			enabledExamplePackages, // kilocode_change
+			disabledExamplePackages, // kilocode_change
+			examplePackages, // kilocode_change
 		} = await this.getState()
 
 		// kilocode_change start: Get active model for virtual quota fallback UI display
@@ -2221,6 +2231,9 @@ ${prompt}
 			fuzzyMatchThreshold: fuzzyMatchThreshold ?? 1.0,
 			mcpEnabled: true, // kilocode_change: always true
 			enableMcpServerCreation: enableMcpServerCreation ?? true,
+			enabledExamplePackages: enabledExamplePackages ?? [], // kilocode_change
+			disabledExamplePackages: disabledExamplePackages ?? [], // kilocode_change
+			examplePackages: examplePackages ?? [], // kilocode_change
 			alwaysApproveResubmit: alwaysApproveResubmit ?? false,
 			requestDelaySeconds: requestDelaySeconds ?? 10,
 			currentApiConfigName: currentApiConfigName ?? "default",
@@ -2442,6 +2455,47 @@ ${prompt}
 			mcpEnabled: true, // kilocode_change: always true
 			enableMcpServerCreation: stateValues.enableMcpServerCreation ?? true,
 			mcpServers: this.mcpHub?.getAllServers() ?? [],
+			// kilocode_change start
+			enabledExamplePackages: stateValues.enabledExamplePackages ?? [],
+			disabledExamplePackages: stateValues.disabledExamplePackages ?? [],
+			examplePackages: await (async () => {
+				const isDebugMode = process.env.VSCODE_DEBUG_MODE === "true"
+				try {
+					const primaryExamplesDir = path.join(this.context.extensionPath, "dist", "examples")
+					const isDevExtensionLayout = path.basename(this.context.extensionPath).toLowerCase() === "src"
+					const fallbackExamplesDir = isDevExtensionLayout
+						? path.join(this.context.extensionPath, "examples")
+						: path.join(this.context.extensionPath, "src", "examples")
+					if (isDebugMode) {
+						console.log(
+							`[sandbox-packages] scan primary=${primaryExamplesDir} fallback=${fallbackExamplesDir}`,
+						)
+					}
+					let packages = await scanExamplePackages({ examplesDir: primaryExamplesDir })
+					if (isDebugMode) {
+						console.log(`[sandbox-packages] primary count=${packages.length}`)
+					}
+					if (packages.length === 0) {
+						packages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })
+						if (isDebugMode) {
+							console.log(`[sandbox-packages] fallback count=${packages.length}`)
+						}
+					}
+					return packages.map((p) => ({
+						name: sanitizeMcpName(p.name),
+						enabledByDefault: p.enabledByDefault,
+						toolCount: p.tools.length,
+					}))
+				} catch (error) {
+					if (isDebugMode) {
+						console.log(
+							`[sandbox-packages] scan failed: ${error instanceof Error ? error.message : String(error)}`,
+						)
+					}
+					return []
+				}
+			})(),
+			// kilocode_change end
 			alwaysApproveResubmit: stateValues.alwaysApproveResubmit ?? false,
 			requestDelaySeconds: Math.max(5, stateValues.requestDelaySeconds ?? 10),
 			currentApiConfigName: stateValues.currentApiConfigName ?? "default",

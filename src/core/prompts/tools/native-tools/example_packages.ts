@@ -4,6 +4,7 @@ import type OpenAI from "openai"
 import * as path from "path"
 
 import { buildExampleToolName } from "../../../../utils/example-tool-name"
+import { sanitizeMcpName } from "../../../../utils/mcp-name" // kilocode_change
 import type { LocalizedText, ToolPackage } from "../../../tool-packages"
 import { scanExamplePackages } from "../../../tool-packages"
 
@@ -39,6 +40,7 @@ function buildParameterSchema(type: string): Record<string, any> {
 			return { type: "string" }
 	}
 }
+// kilocode_change end
 
 function convertToolPackageToOpenAITools(toolPackage: ToolPackage): OpenAI.Chat.ChatCompletionTool[] {
 	const tools: OpenAI.Chat.ChatCompletionTool[] = []
@@ -92,25 +94,64 @@ let cachedKey: string | null = null
  * 当前仅加载 enabledByDefault=true 的包，后续会增加“use_package/激活包”机制。
  */
 export async function getExamplePackageTools(extensionPath: string): Promise<OpenAI.Chat.ChatCompletionTool[]> {
-	const examplesDir = path.join(extensionPath, "examples")
-	const cacheKey = examplesDir
+	// kept for backward compatibility
+	return getExamplePackageToolsWithToggleLists(extensionPath)
+}
 
-	if (cachedTools && cachedKey === cacheKey) {
+// kilocode_change start
+export async function getExamplePackageToolsWithDisabledList(
+	extensionPath: string,
+	disabledExamplePackages?: string[],
+): Promise<OpenAI.Chat.ChatCompletionTool[]> {
+	return getExamplePackageToolsWithToggleLists(extensionPath, { disabledExamplePackages })
+}
+
+export async function getExamplePackageToolsWithToggleLists(
+	extensionPath: string,
+	options?: { enabledExamplePackages?: string[]; disabledExamplePackages?: string[] },
+): Promise<OpenAI.Chat.ChatCompletionTool[]> {
+	const primaryExamplesDir = path.join(extensionPath, "dist", "examples")
+	const isDevExtensionLayout = path.basename(extensionPath).toLowerCase() === "src" // kilocode_change
+	const fallbackExamplesDir = isDevExtensionLayout
+		? path.join(extensionPath, "examples")
+		: path.join(extensionPath, "src", "examples")
+	const examplesDir = primaryExamplesDir
+	const enabledKey = (options?.enabledExamplePackages ?? []).slice().sort().join(",")
+	const disabledKey = (options?.disabledExamplePackages ?? []).slice().sort().join(",")
+	const cacheKey = `${primaryExamplesDir}|${fallbackExamplesDir}|${disabledKey}`
+	const fullCacheKey = `${cacheKey}|${enabledKey}`
+
+	if (cachedTools && cachedKey === fullCacheKey) {
 		return cachedTools
 	}
 
 	try {
-		const packages = await scanExamplePackages({ examplesDir })
-		const enabled = packages.filter((p) => p.enabledByDefault)
+		let packages = await scanExamplePackages({ examplesDir })
+		if (packages.length === 0) {
+			packages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })
+		}
+		const disabled = new Set((options?.disabledExamplePackages ?? []).map((n) => sanitizeMcpName(n)))
+		const enabledOverride = new Set((options?.enabledExamplePackages ?? []).map((n) => sanitizeMcpName(n)))
+
+		const enabled = packages.filter((p) => {
+			const name = sanitizeMcpName(p.name)
+			if (enabledOverride.has(name)) {
+				return true
+			}
+			if (disabled.has(name)) {
+				return false
+			}
+			return Boolean(p.enabledByDefault)
+		})
 		const tools = enabled.flatMap(convertToolPackageToOpenAITools)
 
 		cachedTools = tools
-		cachedKey = cacheKey
+		cachedKey = fullCacheKey
 		return tools
 	} catch (error) {
 		console.warn("Failed to load example packages:", error)
 		cachedTools = []
-		cachedKey = cacheKey
+		cachedKey = fullCacheKey
 		return []
 	}
 }

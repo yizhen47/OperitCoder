@@ -10,26 +10,25 @@ import React, {
 	useState,
 } from "react"
 import {
-	CheckCheck,
-	SquareMousePointer,
-	Webhook,
-	GitBranch,
-	Bell,
-	Database,
-	SquareTerminal,
-	FlaskConical,
 	AlertTriangle,
+	Bell,
+	Bot,
+	CheckCheck,
+	Database,
+	FlaskConical,
+	GitBranch,
 	Globe,
 	Info,
-	Bot, // kilocode_change
 	MessageSquare,
 	Monitor,
-	LucideIcon,
-	// SquareSlash, // kilocode_change
-	// Glasses, // kilocode_change
+	Package,
 	Plug,
 	Server,
+	SquareMousePointer,
+	SquareTerminal,
+	type LucideIcon,
 	Users2,
+	Webhook,
 } from "lucide-react"
 
 // kilocode_change
@@ -61,6 +60,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 	StandardTooltip,
+	ToggleSwitch,
 } from "@src/components/ui"
 
 import { Tab, TabContent, TabHeader, TabList, TabTrigger } from "../common/Tab"
@@ -107,6 +107,7 @@ const sectionNames = [
 	"checkpoints",
 	"ghost", // kilocode_change
 	"display", // kilocode_change
+	"examplePackages", // kilocode_change
 	"notifications",
 	"contextManagement",
 	"terminal",
@@ -116,7 +117,6 @@ const sectionNames = [
 	"ui",
 	"experimental",
 	"language",
-	"mcp",
 	"about",
 ] as const
 
@@ -733,6 +733,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			{ id: "checkpoints", icon: GitBranch },
 			{ id: "display", icon: Monitor }, // kilocode_change
 			{ id: "ghost" as const, icon: Bot }, // kilocode_change
+			{ id: "examplePackages", icon: Package }, // kilocode_change
 			{ id: "notifications", icon: Bell },
 			{ id: "contextManagement", icon: Database },
 			{ id: "terminal", icon: SquareTerminal },
@@ -1078,6 +1079,56 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 							ghostServiceSettings={ghostServiceSettings}
 							onGhostServiceSettingsChange={setGhostServiceSettingsField}
 						/>
+					)}
+
+					{activeTab === "examplePackages" && (
+						<div>
+							<SectionHeader>
+								<div className="flex items-center gap-2">
+									<Package className="w-4" />
+									<div>Sandbox Packages</div>
+								</div>
+							</SectionHeader>
+
+							<Section>
+								{(extensionState.examplePackages ?? []).length === 0 ? (
+									<div className="text-vscode-descriptionForeground">No sandbox packages found.</div>
+								) : (
+									<div className="flex flex-col gap-2">
+										{(extensionState.examplePackages ?? []).map((pkg) => {
+											const enabledByDefault = Boolean(pkg.enabledByDefault)
+											const isEnabledOverride = (extensionState.enabledExamplePackages ?? []).includes(pkg.name)
+											const isDisabled = (extensionState.disabledExamplePackages ?? []).includes(pkg.name)
+											const enabled = isEnabledOverride || (enabledByDefault && !isDisabled)
+
+											return (
+												<div
+													key={pkg.name}
+													className="flex items-center justify-between rounded border border-vscode-panel-border px-3 py-2">
+													<div className="flex flex-col">
+														<div className="text-vscode-foreground">{pkg.name}</div>
+														<div className="text-vscode-descriptionForeground text-sm">
+															Tools: {pkg.toolCount}
+														</div>
+													</div>
+
+													<ToggleSwitch
+														checked={enabled}
+														onChange={() => {
+															vscode.postMessage({
+																type: "toggleExamplePackage",
+																packageName: pkg.name,
+																disabled: !enabled,
+															})
+														}}
+													/>
+												</div>
+											)
+										})}
+									</div>
+								)}
+							</Section>
+						</div>
 					)}
 					{/* kilocode_change end display section */}
 

@@ -91,6 +91,26 @@ async function main() {
 					// Copy walkthrough files to dist directory
 					copyPaths([["walkthrough", "walkthrough"]], srcDir, distDir)
 
+					try {
+						const examplesSrc = path.join(srcDir, "examples")
+						const examplesDest = path.join(distDir, "examples")
+						if (fs.existsSync(examplesSrc)) {
+							if (fs.existsSync(examplesDest)) {
+								fs.rmSync(examplesDest, { recursive: true, force: true })
+							}
+							fs.mkdirSync(examplesDest, { recursive: true })
+							for (const entry of fs.readdirSync(examplesSrc, { withFileTypes: true })) {
+								if (!entry.isFile()) continue
+								if (!entry.name.toLowerCase().endsWith(".js")) continue
+								const srcFile = path.join(examplesSrc, entry.name)
+								const destFile = path.join(examplesDest, entry.name)
+								fs.copyFileSync(srcFile, destFile)
+							}
+						}
+					} catch (error) {
+						console.error(`[${name}] Failed to copy examples:`, error.message)
+					}
+
 					// Copy tree-sitter files to dist directory
 					copyPaths([["services/continuedev/tree-sitter", "tree-sitter"]], srcDir, distDir)
 

@@ -114,6 +114,9 @@ export interface WebviewMessage {
 		| "toggleToolAlwaysAllow"
 		| "toggleToolEnabledForPrompt"
 		| "toggleMcpServer"
+		// kilocode_change start
+		| "toggleExamplePackage"
+		// kilocode_change end
 		| "updateMcpTimeout"
 		| "fuzzyMatchThreshold" // kilocode_change
 		| "morphApiKey" // kilocode_change: Morph fast apply - global setting
@@ -288,6 +291,9 @@ export interface WebviewMessage {
 		| "requestChatCompletion" // kilocode_change: Request FIM completion for chat text area
 		| "chatCompletionAccepted" // kilocode_change: User accepted a chat completion suggestion
 	text?: string
+	// kilocode_change start
+	packageName?: string
+	// kilocode_change end
 	suggestionLength?: number // kilocode_change: Length of accepted suggestion for telemetry
 	completionRequestId?: string // kilocode_change
 	shareId?: string // kilocode_change - for sessionFork

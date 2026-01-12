@@ -1,8 +1,12 @@
 import type OpenAI from "openai"
 import type { ProviderSettings, ModeConfig, ModelInfo } from "@roo-code/types"
 import type { ClineProvider } from "../webview/ClineProvider"
-import { getNativeTools, getMcpServerTools } from "../prompts/tools/native-tools"
-import { filterNativeToolsForMode, filterMcpToolsForMode } from "../prompts/tools/filter-tools-for-mode"
+import {
+	getNativeTools,
+	getMcpServerTools,
+	getExamplePackageToolsWithToggleLists,
+} from "../prompts/tools/native-tools" // kilocode_change
+import { filterNativeToolsForMode, filterMcpToolsForMode, filterExampleToolsForMode } from "../prompts/tools/filter-tools-for-mode" // kilocode_change
 import type { ClineProviderState } from "../webview/ClineProvider" // kilocode_change
 
 interface BuildToolsOptions {
@@ -80,5 +84,15 @@ export async function buildNativeToolsArray(options: BuildToolsOptions): Promise
 	const mcpTools = getMcpServerTools(mcpHub)
 	const filteredMcpTools = filterMcpToolsForMode(mcpTools, mode, customModes, experiments)
 
-	return [...filteredNativeTools, ...filteredMcpTools]
+	// kilocode_change start
+	// Filter example package tools (pkg--*) based on mode restrictions.
+	// These are dynamically generated tools and are gated by the mcp group.
+	const toggledExampleTools = await getExamplePackageToolsWithToggleLists(provider.context.extensionPath, {
+		enabledExamplePackages: options.state?.enabledExamplePackages,
+		disabledExamplePackages: options.state?.disabledExamplePackages,
+	})
+	const filteredExampleTools = filterExampleToolsForMode(toggledExampleTools, mode, customModes, experiments)
+	// kilocode_change end
+
+	return [...filteredNativeTools, ...filteredMcpTools, ...filteredExampleTools]
 }

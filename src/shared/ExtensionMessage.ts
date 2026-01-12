@@ -451,6 +451,10 @@ export type ExtensionState = Pick<
 	| "maxDiagnosticMessages"
 	| "imageGenerationProvider"
 	| "openRouterImageGenerationSelectedModel"
+	// kilocode_change start
+	| "enabledExamplePackages"
+	| "disabledExamplePackages"
+	// kilocode_change end
 	| "includeTaskHistoryInEnhance"
 	| "reasoningBlockCollapsed"
 	| "enterBehavior"
@@ -531,6 +535,13 @@ export type ExtensionState = Pick<
 	showTimestamps?: boolean // kilocode_change: Show timestamps in chat messages
 	debug?: boolean
 	speechToTextStatus?: { available: boolean; reason?: "openaiKeyMissing" | "ffmpegNotInstalled" } // kilocode_change: Speech-to-text availability status with failure reason
+	// kilocode_change start
+	/**
+	 * Example packages (sandbox tool packs) available to toggle in settings.
+	 * This is UI-only state; the persisted toggle list is `disabledExamplePackages`.
+	 */
+	examplePackages?: Array<{ name: string; enabledByDefault?: boolean; toolCount: number }>
+	// kilocode_change end
 }
 
 export interface ClineSayTool {

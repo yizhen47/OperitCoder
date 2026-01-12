@@ -210,6 +210,12 @@ export const globalSettingsSchema = z.object({
 	enableMcpServerCreation: z.boolean().optional(),
 	mcpMarketplaceCatalog: z.any().optional(), // kilocode_change: MCP marketplace catalog
 
+	// kilocode_change start
+	// Example package (sandbox) tool packs
+	enabledExamplePackages: z.array(z.string()).optional(),
+	disabledExamplePackages: z.array(z.string()).optional(),
+	// kilocode_change end
+
 	mode: z.string().optional(),
 	modeApiConfigs: z.record(z.string(), z.string()).optional(),
 	customModes: z.array(modeConfigSchema).optional(),

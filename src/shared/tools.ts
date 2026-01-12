@@ -167,6 +167,26 @@ export interface McpToolUse {
 	partial: boolean
 }
 
+// kilocode_change start
+/**
+ * Represents a native example package tool call from the model.
+ * Example package tools are called directly with their prefixed name (e.g., "pkg--time--get_time").
+ */
+export interface ExampleToolUse {
+	type: "pkg_tool_use"
+	id?: string // Tool call ID from the API
+	/** The original tool name from the API (e.g., "pkg--packageName--toolName") */
+	name: string
+	/** Extracted package name from the tool name */
+	packageName: string
+	/** Extracted tool name from the tool name */
+	toolName: string
+	/** Arguments passed to the package tool */
+	arguments: Record<string, unknown>
+	partial: boolean
+}
+// kilocode_change end
+
 export interface ExecuteCommandToolUse extends ToolUse<"execute_command"> {
 	name: "execute_command"
 	// Pick<Record<ToolParamName, string>, "command"> makes "command" required, but Partial<> makes it optional

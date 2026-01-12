@@ -786,6 +786,31 @@ export const webviewMessageHandler = async (
 			}
 			break
 		}
+
+		// kilocode_change start
+		case "toggleExamplePackage": {
+			if (!message.packageName) {
+				break
+			}
+
+			const currentDisabled = (getGlobalState("disabledExamplePackages") ?? []) as string[]
+			const currentEnabled = (getGlobalState("enabledExamplePackages") ?? []) as string[]
+			const name = String(message.packageName)
+			const shouldDisable = Boolean(message.disabled)
+
+			const nextDisabled = shouldDisable
+				? Array.from(new Set([...currentDisabled, name]))
+				: currentDisabled.filter((x) => x !== name)
+			const nextEnabled = shouldDisable
+				? currentEnabled.filter((x) => x !== name)
+				: Array.from(new Set([...currentEnabled, name]))
+
+			await updateGlobalState("disabledExamplePackages", nextDisabled)
+			await updateGlobalState("enabledExamplePackages", nextEnabled)
+			await provider.postStateToWebview()
+			break
+		}
+		// kilocode_change end
 		case "exportTaskWithId":
 			provider.exportTaskWithId(message.text!)
 			break
