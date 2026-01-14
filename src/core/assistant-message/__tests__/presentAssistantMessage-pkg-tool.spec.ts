@@ -96,15 +96,6 @@ describe("presentAssistantMessage - pkg_tool_use", () => {
 
 		await presentAssistantMessage(mockTask)
 
-		expect(mockTask.say).toHaveBeenCalledWith(
-			"text",
-			expect.stringContaining("【Pkg Sandbox】开始调用"),
-		)
-		expect(mockTask.say).toHaveBeenCalledWith(
-			"text",
-			expect.stringContaining("【Pkg Sandbox】调用完成"),
-		)
-
 		const toolResult = mockTask.userMessageContent.find(
 			(item: any) => item.type === "tool_result" && item.tool_use_id === toolCallId,
 		)
@@ -120,5 +111,46 @@ describe("presentAssistantMessage - pkg_tool_use", () => {
 			toolName: "get_time",
 			arguments: JSON.stringify({}),
 		})
+	})
+
+	it("should execute pkg_tool_use in XML protocol without pushing tool_result", async () => {
+		const { scanExamplePackages } = await import("../../tool-packages")
+		const { executeSandboxedTool } = await import("../../tool-packages/runtime/sandbox")
+
+		;(scanExamplePackages as any).mockResolvedValue([
+			{
+				name: "time",
+				enabledByDefault: true,
+				sourcePath: "c:/ext/src/examples/time.js",
+				tools: [
+					{
+						name: "get_time",
+						script: "exports.get_time = async () => ({ ok: true })",
+						parameters: [],
+					},
+				],
+			},
+		])
+
+		;(executeSandboxedTool as any).mockResolvedValue({ ok: true })
+
+		mockTask.cwd = "/test"
+		mockTask.assistantMessageContent = [
+			{
+				type: "pkg_tool_use",
+				id: undefined,
+				name: "pkg--time--get_time",
+				packageName: "time",
+				toolName: "get_time",
+				arguments: {},
+				partial: false,
+			},
+		]
+
+		await presentAssistantMessage(mockTask)
+
+		// XML protocol should write results as text blocks (legacy behavior)
+		expect(mockTask.userMessageContent.some((item: any) => item.type === "tool_result")).toBe(false)
+		expect(mockTask.userMessageContent.some((item: any) => item.type === "text")).toBe(true)
 	})
 })

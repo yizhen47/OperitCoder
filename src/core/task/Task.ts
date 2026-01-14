@@ -3333,7 +3333,8 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 				// Check if we have any content to process (text or tool uses)
 				const hasTextContent = assistantMessage.length > 0
 				const hasToolUses = this.assistantMessageContent.some(
-					(block) => block.type === "tool_use" || block.type === "mcp_tool_use",
+					(block) =>
+						block.type === "tool_use" || block.type === "mcp_tool_use" || block.type === "pkg_tool_use",
 				)
 
 				if (hasTextContent || hasToolUses) {
@@ -3362,9 +3363,10 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 					}
 
 					// Add tool_use blocks with their IDs for native protocol
-					// This handles both regular ToolUse and McpToolUse types
+					// This handles regular ToolUse, McpToolUse, and ExampleToolUse (pkg_tool_use)
 					const toolUseBlocks = this.assistantMessageContent.filter(
-						(block) => block.type === "tool_use" || block.type === "mcp_tool_use",
+						(block) =>
+							block.type === "tool_use" || block.type === "mcp_tool_use" || block.type === "pkg_tool_use",
 					)
 					for (const block of toolUseBlocks) {
 						if (block.type === "mcp_tool_use") {
@@ -3377,6 +3379,18 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 									id: mcpBlock.id,
 									name: mcpBlock.name, // Original dynamic name
 									input: mcpBlock.arguments, // Direct tool arguments
+								})
+							}
+						} else if (block.type === "pkg_tool_use") {
+							// Example package tool call (pkg--packageName--toolName)
+							// Must be converted to a standard tool_use block so subsequent tool_result blocks can match it.
+							const pkgBlock = block as import("../../shared/tools").ExampleToolUse
+							if (pkgBlock.id) {
+								assistantContent.push({
+									type: "tool_use" as const,
+									id: pkgBlock.id,
+									name: pkgBlock.name,
+									input: pkgBlock.arguments,
 								})
 							}
 						} else {
@@ -3434,7 +3448,8 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 					// If the model did not tool use, then we need to tell it to
 					// either use a tool or attempt_completion.
 					const didToolUse = this.assistantMessageContent.some(
-						(block) => block.type === "tool_use" || block.type === "mcp_tool_use",
+						(block) =>
+							block.type === "tool_use" || block.type === "mcp_tool_use" || block.type === "pkg_tool_use",
 					)
 
 					if (!didToolUse) {

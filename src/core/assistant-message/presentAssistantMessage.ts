@@ -118,6 +118,8 @@ export async function presentAssistantMessage(cline: Task) {
 		case "pkg_tool_use": {
 			// kilocode_change: Handle native example package tool calls (pkg--packageName--toolName)
 			const pkgBlock = block as ExampleToolUse
+			const toolCallId = pkgBlock.id
+			const toolProtocol = toolCallId ? TOOL_PROTOCOL.NATIVE : TOOL_PROTOCOL.XML
 
 			// kilocode_change: Respect disabledExamplePackages toggle
 			try {
@@ -128,16 +130,20 @@ export async function presentAssistantMessage(cline: Task) {
 				const isDisabled = Array.isArray(disabled) && disabled.includes(pkgBlock.packageName)
 				const isEnabledOverride = Array.isArray(enabled) && enabled.includes(pkgBlock.packageName)
 				if (isDisabled && !isEnabledOverride) {
-					const toolCallId = pkgBlock.id
-					if (toolCallId) {
+					if (toolProtocol === TOOL_PROTOCOL.NATIVE && toolCallId) {
 						cline.userMessageContent.push({
 							type: "tool_result",
 							tool_use_id: toolCallId,
 							content: `Package '${pkgBlock.packageName}' is disabled in settings.`,
 							is_error: true,
 						} as Anthropic.ToolResultBlockParam)
-						cline.didAlreadyUseTool = true
+					} else {
+						cline.userMessageContent.push({
+							type: "text",
+							text: `Package '${pkgBlock.packageName}' is disabled in settings.`,
+						})
 					}
+					cline.didAlreadyUseTool = true
 					break
 				}
 			} catch {
@@ -146,75 +152,82 @@ export async function presentAssistantMessage(cline: Task) {
 
 			if (cline.didRejectTool) {
 				// For native protocol, we must send a tool_result for every tool_use to avoid API errors
-				const toolCallId = pkgBlock.id
 				const errorMessage = !pkgBlock.partial
 					? `Skipping package tool ${pkgBlock.name} due to user rejecting a previous tool.`
 					: `Package tool ${pkgBlock.name} was interrupted and not executed due to user rejecting a previous tool.`
-
-				if (toolCallId) {
+				if (toolProtocol === TOOL_PROTOCOL.NATIVE && toolCallId) {
 					cline.userMessageContent.push({
 						type: "tool_result",
 						tool_use_id: toolCallId,
 						content: errorMessage,
 						is_error: true,
 					} as Anthropic.ToolResultBlockParam)
+				} else {
+					cline.userMessageContent.push({ type: "text", text: errorMessage })
 				}
 				break
 			}
 
 			if (cline.didAlreadyUseTool) {
-				const toolCallId = pkgBlock.id
 				const errorMessage = `Package tool [${pkgBlock.name}] was not executed because a tool has already been used in this message. Only one tool may be used per message.`
-
-				if (toolCallId) {
+				if (toolProtocol === TOOL_PROTOCOL.NATIVE && toolCallId) {
 					cline.userMessageContent.push({
 						type: "tool_result",
 						tool_use_id: toolCallId,
 						content: errorMessage,
 						is_error: true,
 					} as Anthropic.ToolResultBlockParam)
+				} else {
+					cline.userMessageContent.push({ type: "text", text: errorMessage })
 				}
 				break
 			}
 
 			let hasToolResult = false
-			const toolCallId = pkgBlock.id
-			const toolProtocol = TOOL_PROTOCOL.NATIVE
+			const toolDescription = () =>
+				`[sandbox_package_tool for '${pkgBlock.packageName}.${pkgBlock.toolName}']`
 
 			const pushToolResult = (content: ToolResponse) => {
-				if (hasToolResult) {
-					console.warn(
-						`[presentAssistantMessage] Skipping duplicate tool_result for pkg_tool_use: ${toolCallId}`,
-					)
-					return
-				}
-
-				let resultContent: string
-				let imageBlocks: Anthropic.ImageBlockParam[] = []
-
-				if (typeof content === "string") {
-					resultContent = content || "(tool did not return anything)"
+				if (toolProtocol === TOOL_PROTOCOL.NATIVE) {
+					if (hasToolResult) {
+						console.warn(
+							`[presentAssistantMessage] Skipping duplicate tool_result for pkg_tool_use: ${toolCallId}`,
+						)
+						return
+					}
+					let resultContent: string
+					let imageBlocks: Anthropic.ImageBlockParam[] = []
+					if (typeof content === "string") {
+						resultContent = content || "(tool did not return anything)"
+					} else {
+						const textBlocks = content.filter((item) => item.type === "text")
+						imageBlocks = content.filter((item) => item.type === "image") as Anthropic.ImageBlockParam[]
+						resultContent =
+							textBlocks.map((item) => (item as Anthropic.TextBlockParam).text).join("\n") ||
+							"(tool did not return anything)"
+					}
+					if (toolCallId) {
+						cline.userMessageContent.push({
+							type: "tool_result",
+							tool_use_id: toolCallId,
+							content: resultContent,
+						} as Anthropic.ToolResultBlockParam)
+						if (imageBlocks.length > 0) {
+							cline.userMessageContent.push(...imageBlocks)
+						}
+					}
+					hasToolResult = true
 				} else {
-					const textBlocks = content.filter((item) => item.type === "text")
-					imageBlocks = content.filter((item) => item.type === "image") as Anthropic.ImageBlockParam[]
-					resultContent =
-						textBlocks.map((item) => (item as Anthropic.TextBlockParam).text).join("\n") ||
-						"(tool did not return anything)"
-				}
-
-				if (toolCallId) {
-					cline.userMessageContent.push({
-						type: "tool_result",
-						tool_use_id: toolCallId,
-						content: resultContent,
-					} as Anthropic.ToolResultBlockParam)
-
-					if (imageBlocks.length > 0) {
-						cline.userMessageContent.push(...imageBlocks)
+					cline.userMessageContent.push({ type: "text", text: `${toolDescription()} Result:` })
+					if (typeof content === "string") {
+						cline.userMessageContent.push({
+							type: "text",
+							text: content || "(tool did not return anything)",
+						})
+					} else {
+						cline.userMessageContent.push(...content)
 					}
 				}
-
-				hasToolResult = true
 				cline.didAlreadyUseTool = true
 			}
 
@@ -294,10 +307,11 @@ export async function presentAssistantMessage(cline: Task) {
 			} catch {
 				pkgArgsForLog = String(pkgBlock.arguments ?? "{}")
 			}
-			await cline.say(
-				"text",
-				`【Pkg Sandbox】开始调用\n- package: ${pkgBlock.packageName}\n- tool: ${pkgBlock.toolName}\n- args:\n${pkgArgsForLog}`,
-			)
+			console.log("[Pkg Sandbox] start", {
+				packageName: pkgBlock.packageName,
+				toolName: pkgBlock.toolName,
+				args: pkgArgsForLog,
+			})
 
 			const toolCallForSandbox = async (toolName: string, params?: Record<string, unknown>): Promise<unknown> => {
 				// Execute nested native tools through existing tool handlers and return a string result to sandbox.
@@ -420,10 +434,11 @@ export async function presentAssistantMessage(cline: Task) {
 						resultForLog = String(result)
 					}
 				}
-				await cline.say(
-					"text",
-					`【Pkg Sandbox】调用完成\n- package: ${pkgBlock.packageName}\n- tool: ${pkgBlock.toolName}\n- result:\n${resultForLog}`,
-				)
+				console.log("[Pkg Sandbox] done", {
+					packageName: pkgBlock.packageName,
+					toolName: pkgBlock.toolName,
+					result: resultForLog,
+				})
 				pushToolResult(resultForLog)
 			} catch (error) {
 				await handleError(
