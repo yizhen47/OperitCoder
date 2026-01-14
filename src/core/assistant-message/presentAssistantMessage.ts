@@ -270,6 +270,35 @@ export async function presentAssistantMessage(cline: Task) {
 				return true
 			}
 
+			// Only execute when the tool call is complete.
+			if (pkgBlock.partial) {
+				break
+			}
+
+			// Ask for approval so the package tool call is visible in the UI (similar to other tools).
+			const approvalMessage = JSON.stringify({
+				tool: "sandboxPackageTool",
+				packageName: pkgBlock.packageName,
+				toolName: pkgBlock.toolName,
+				arguments: JSON.stringify(pkgBlock.arguments ?? {}),
+			})
+			const didApprove = await askApproval("tool", approvalMessage)
+			if (!didApprove) {
+				// askApproval already pushed a tool_result (native) and set didRejectTool.
+				break
+			}
+
+			let pkgArgsForLog = "{}"
+			try {
+				pkgArgsForLog = JSON.stringify(pkgBlock.arguments ?? {}, null, 2)
+			} catch {
+				pkgArgsForLog = String(pkgBlock.arguments ?? "{}")
+			}
+			await cline.say(
+				"text",
+				`【Pkg Sandbox】开始调用\n- package: ${pkgBlock.packageName}\n- tool: ${pkgBlock.toolName}\n- args:\n${pkgArgsForLog}`,
+			)
+
 			const toolCallForSandbox = async (toolName: string, params?: Record<string, unknown>): Promise<unknown> => {
 				// Execute nested native tools through existing tool handlers and return a string result to sandbox.
 				const name = toolName as ToolName
@@ -381,9 +410,26 @@ export async function presentAssistantMessage(cline: Task) {
 					logger: console,
 				})
 
-				pushToolResult(typeof result === "string" ? result : JSON.stringify(result))
+				let resultForLog: string
+				if (typeof result === "string") {
+					resultForLog = result
+				} else {
+					try {
+						resultForLog = JSON.stringify(result)
+					} catch {
+						resultForLog = String(result)
+					}
+				}
+				await cline.say(
+					"text",
+					`【Pkg Sandbox】调用完成\n- package: ${pkgBlock.packageName}\n- tool: ${pkgBlock.toolName}\n- result:\n${resultForLog}`,
+				)
+				pushToolResult(resultForLog)
 			} catch (error) {
-				await handleError("executing package tool", error as Error)
+				await handleError(
+					`executing package tool ${pkgBlock.packageName}.${pkgBlock.toolName}`,
+					error as Error,
+				)
 			}
 			break
 		}

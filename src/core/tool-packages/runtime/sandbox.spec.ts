@@ -155,7 +155,7 @@ exports.main = async function () {
 		const script = `
 exports.main = async function () {
   await Tools.Files.mkdir('dir', true);
-  await Tools.Files.write('dir/b.txt', 'a\nb\nc');
+  await Tools.Files.write('dir/b.txt', 'a\\nb\\nc');
   const part = await Tools.Files.readPart('dir/b.txt', 2, 2);
   return {
     startLine: part.startLine,

@@ -26,6 +26,7 @@ export const toolNames = [
 	"list_files",
 	"browser_action",
 	"use_mcp_tool",
+	"sandbox_package_tool",
 	"access_mcp_resource",
 	"ask_followup_question",
 	"attempt_completion",

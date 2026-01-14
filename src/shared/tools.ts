@@ -308,6 +308,7 @@ export const TOOL_DISPLAY_NAMES: Record<ToolName, string> = {
 	list_files: "list files",
 	browser_action: "use a browser",
 	use_mcp_tool: "use mcp tools",
+	sandbox_package_tool: "use sandbox packages",
 	access_mcp_resource: "access mcp resources",
 	ask_followup_question: "ask questions",
 	attempt_completion: "complete tasks",
@@ -343,7 +344,7 @@ export const TOOL_GROUPS: Record<ToolGroup, ToolGroupConfig> = {
 		tools: ["execute_command"],
 	},
 	mcp: {
-		tools: ["use_mcp_tool", "access_mcp_resource"],
+		tools: ["use_mcp_tool", "access_mcp_resource", "sandbox_package_tool"],
 	},
 	modes: {
 		tools: ["switch_mode", "new_task"],

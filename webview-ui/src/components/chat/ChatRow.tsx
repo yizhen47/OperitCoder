@@ -879,6 +879,31 @@ export const ChatRowContent = ({
 						)}
 					</>
 				)
+			case "sandboxPackageTool":
+				return (
+					<>
+						{message.type === "ask" && (
+							<div className="pl-0">
+								<ToolUseBlock>
+									<ToolUseBlockHeader className="group">
+										<PocketKnife className="w-4 shrink-0" aria-label="Tool icon" style={{ marginRight: "8px" }} />
+										<span style={{ fontWeight: "bold", flexGrow: 1 }}>Sandbox package tool</span>
+										<span className="whitespace-nowrap overflow-hidden text-ellipsis text-left mr-2 rtl">
+											{tool.packageName && tool.toolName
+												? `${tool.packageName} / ${tool.toolName}`
+												: "(unknown)"}
+										</span>
+									</ToolUseBlockHeader>
+									{tool.arguments && (
+										<div className="p-2 text-xs text-vscode-descriptionForeground whitespace-pre-wrap break-words">
+											{tool.arguments}
+										</div>
+									)}
+								</ToolUseBlock>
+							</div>
+						)}
+					</>
+				)
 			default:
 				return null
 		}

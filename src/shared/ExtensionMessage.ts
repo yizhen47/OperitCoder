@@ -562,6 +562,7 @@ export interface ClineSayTool {
 		| "imageGenerated"
 		| "runSlashCommand"
 		| "updateTodoList"
+		| "sandboxPackageTool" // kilocode_change: Sandbox example package tool execution
 		| "deleteFile" // kilocode_change: Handles both files and directories
 	path?: string
 	diff?: string
@@ -619,6 +620,11 @@ export interface ClineSayTool {
 	args?: string
 	source?: string
 	description?: string
+	// kilocode_change start: properties for sandboxPackageTool approval UI
+	packageName?: string
+	toolName?: string
+	arguments?: string
+	// kilocode_change end
 }
 
 // Must keep in sync with system prompt.

@@ -89,7 +89,6 @@ export function validateToolFunctionExists(jsContent: string, toolName: string):
 		}
 	}
 
-	console.warn(`Could not find function '${toolName}' in JavaScript/TypeScript file`)
 	return false
 }
 

@@ -81,6 +81,7 @@ describe("presentAssistantMessage - pkg_tool_use", () => {
 		;(executeSandboxedTool as any).mockResolvedValue({ ok: true })
 
 		const toolCallId = "tool_call_pkg_123"
+		mockTask.cwd = "/test"
 		mockTask.assistantMessageContent = [
 			{
 				type: "pkg_tool_use",
@@ -95,10 +96,29 @@ describe("presentAssistantMessage - pkg_tool_use", () => {
 
 		await presentAssistantMessage(mockTask)
 
+		expect(mockTask.say).toHaveBeenCalledWith(
+			"text",
+			expect.stringContaining("【Pkg Sandbox】开始调用"),
+		)
+		expect(mockTask.say).toHaveBeenCalledWith(
+			"text",
+			expect.stringContaining("【Pkg Sandbox】调用完成"),
+		)
+
 		const toolResult = mockTask.userMessageContent.find(
 			(item: any) => item.type === "tool_result" && item.tool_use_id === toolCallId,
 		)
 		expect(toolResult).toBeDefined()
-		expect(toolResult.content).toContain("ok")
+		expect(toolResult.content).toContain('"ok":true')
+		expect(mockTask.ask).toHaveBeenCalledTimes(1)
+		expect(mockTask.ask).toHaveBeenCalledWith("tool", expect.any(String), false, undefined, false)
+		const approvalMessage = mockTask.ask.mock.calls[0]?.[1]
+		const parsed = JSON.parse(approvalMessage || "{}")
+		expect(parsed).toMatchObject({
+			tool: "sandboxPackageTool",
+			packageName: "time",
+			toolName: "get_time",
+			arguments: JSON.stringify({}),
+		})
 	})
 })

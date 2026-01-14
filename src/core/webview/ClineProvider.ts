@@ -166,6 +166,7 @@ export class ClineProvider
 	private currentWorkspacePath: string | undefined
 	private autoPurgeScheduler?: any // kilocode_change - (Any) Prevent circular import
 	private deviceAuthHandler?: DeviceAuthHandler // kilocode_change - Device auth handler
+	private examplePackagesCache?: Array<{ name: string; enabledByDefault: boolean; toolCount: number }> // kilocode_change - Cache for example packages
 
 	private recentTasksCache?: string[]
 	private pendingOperations: Map<string, PendingEditOperation> = new Map()
@@ -1883,9 +1884,6 @@ ${prompt}
 
 	async postStateToWebview() {
 		const state = await this.getStateToPostToWebview()
-		if (process.env.VSCODE_DEBUG_MODE === "true") {
-			console.log(`[sandbox-packages] postState examplePackages=${state.examplePackages?.length ?? 0}`) // kilocode_change
-		}
 		this.postMessageToWebview({ type: "state", state })
 
 		// Check MDM compliance and send user to account tab if not compliant
@@ -2459,39 +2457,26 @@ ${prompt}
 			enabledExamplePackages: stateValues.enabledExamplePackages ?? [],
 			disabledExamplePackages: stateValues.disabledExamplePackages ?? [],
 			examplePackages: await (async () => {
-				const isDebugMode = process.env.VSCODE_DEBUG_MODE === "true"
+				if (this.examplePackagesCache) {
+					return this.examplePackagesCache
+				}
 				try {
 					const primaryExamplesDir = path.join(this.context.extensionPath, "dist", "examples")
 					const isDevExtensionLayout = path.basename(this.context.extensionPath).toLowerCase() === "src"
 					const fallbackExamplesDir = isDevExtensionLayout
 						? path.join(this.context.extensionPath, "examples")
 						: path.join(this.context.extensionPath, "src", "examples")
-					if (isDebugMode) {
-						console.log(
-							`[sandbox-packages] scan primary=${primaryExamplesDir} fallback=${fallbackExamplesDir}`,
-						)
-					}
 					let packages = await scanExamplePackages({ examplesDir: primaryExamplesDir })
-					if (isDebugMode) {
-						console.log(`[sandbox-packages] primary count=${packages.length}`)
-					}
 					if (packages.length === 0) {
 						packages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })
-						if (isDebugMode) {
-							console.log(`[sandbox-packages] fallback count=${packages.length}`)
-						}
 					}
-					return packages.map((p) => ({
+					this.examplePackagesCache = packages.map((p) => ({
 						name: sanitizeMcpName(p.name),
-						enabledByDefault: p.enabledByDefault,
+						enabledByDefault: p.enabledByDefault ?? false,
 						toolCount: p.tools.length,
 					}))
+					return this.examplePackagesCache
 				} catch (error) {
-					if (isDebugMode) {
-						console.log(
-							`[sandbox-packages] scan failed: ${error instanceof Error ? error.message : String(error)}`,
-						)
-					}
 					return []
 				}
 			})(),
