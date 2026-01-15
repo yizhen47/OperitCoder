@@ -9,6 +9,7 @@ interface ToolResultDisplayProps {
 	resultText: string
 	isError?: boolean
 	isRunning?: boolean
+	defaultExpanded?: boolean
 	enableCopy?: boolean
 	className?: string
 }
@@ -24,12 +25,13 @@ export const ToolResultDisplay = ({
 	resultText,
 	isError,
 	isRunning,
+	defaultExpanded = false,
 	enableCopy = true,
 	className,
 }: ToolResultDisplayProps) => {
 	const normalized = resultText.startsWith("⏎") ? resultText.slice(1) : resultText
 	const boolResult = parseBooleanResult(normalized)
-	const [isExpanded, setIsExpanded] = useState(false)
+	const [isExpanded, setIsExpanded] = useState(defaultExpanded)
 	const isBoolTrue = boolResult === true
 	const isBoolFalse = boolResult === false
 

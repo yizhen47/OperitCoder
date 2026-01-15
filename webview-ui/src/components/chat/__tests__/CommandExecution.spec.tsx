@@ -60,7 +60,10 @@ describe("CommandExecution", () => {
 			</ExtensionStateWrapper>,
 		)
 
-		expect(screen.getByTestId("code-block")).toHaveTextContent("npm install")
+		const toggle = screen.getByTestId("tool-call-toggle")
+		expect(toggle).toHaveTextContent("execute_command")
+		expect(toggle).toHaveTextContent("npm install")
+		expect(screen.getByTestId("tool-result-collapsed")).toHaveTextContent("执行成功")
 	})
 
 	it("should render command with output", () => {
@@ -69,9 +72,10 @@ describe("CommandExecution", () => {
 				<CommandExecution executionId="test-1" text="npm install\nOutput:\nInstalling packages..." />
 			</ExtensionStateWrapper>,
 		)
-
-		const codeBlocks = screen.getAllByTestId("code-block")
-		expect(codeBlocks[0]).toHaveTextContent("npm install")
+		const toggle = screen.getByTestId("tool-call-toggle")
+		expect(toggle).toHaveTextContent("execute_command")
+		expect(toggle).toHaveTextContent("npm install")
+		expect(screen.getByTestId("tool-result-collapsed")).toHaveTextContent("Installing packages...")
 	})
 
 	it("should render with custom icon and title", () => {
@@ -227,10 +231,11 @@ Suggested patterns: npm, npm install, npm run`
 			</ExtensionStateWrapper>,
 		)
 
-		// First check that the command was parsed correctly
-		const codeBlocks = screen.getAllByTestId("code-block")
-		expect(codeBlocks[0]).toHaveTextContent("npm install")
-		expect(codeBlocks[1]).toHaveTextContent("Suggested patterns: npm, npm install, npm run")
+		const toggle = screen.getByTestId("tool-call-toggle")
+		expect(toggle).toHaveTextContent("npm install")
+		expect(screen.getByTestId("tool-result-collapsed")).toHaveTextContent(
+			"Suggested patterns: npm, npm install, npm run",
+		)
 
 		const selector = screen.getByTestId("command-pattern-selector")
 		expect(selector).toBeInTheDocument()
@@ -291,9 +296,7 @@ Output here`
 		)
 
 		// Output should be visible when shell integration is disabled
-		const codeBlocks = screen.getAllByTestId("code-block")
-		expect(codeBlocks).toHaveLength(2) // Command and output blocks
-		expect(codeBlocks[1]).toHaveTextContent("Output here")
+		expect(screen.getByTestId("tool-result-expanded")).toHaveTextContent("Output here")
 	})
 
 	it("should handle undefined allowedCommands and deniedCommands", () => {
@@ -491,7 +494,7 @@ Running tests...
 			)
 
 			// Should render without errors
-			expect(screen.getByTestId("code-block")).toBeInTheDocument()
+			expect(screen.getByTestId("tool-call-toggle")).toBeInTheDocument()
 
 			// Should not show pattern selector for empty commands
 			expect(screen.queryByTestId("command-pattern-selector")).not.toBeInTheDocument()
@@ -509,11 +512,10 @@ Without any command prefix`
 			)
 
 			// Should treat the entire text as command when no prefix is found
-			const codeBlock = screen.getByTestId("code-block")
-			// The mock CodeBlock component renders text content without preserving newlines
-			expect(codeBlock.textContent).toContain("Some output without a command")
-			expect(codeBlock.textContent).toContain("Multiple lines of output")
-			expect(codeBlock.textContent).toContain("Without any command prefix")
+			const toggle = screen.getByTestId("tool-call-toggle")
+			expect(toggle.textContent).toContain("Some output without a command")
+			expect(toggle.textContent).toContain("Multiple lines of output")
+			expect(toggle.textContent).toContain("Without any command prefix")
 		})
 
 		it("should handle simple commands", () => {
@@ -525,8 +527,8 @@ Without any command prefix`
 				</ExtensionStateWrapper>,
 			)
 
-			// Should render the command
-			expect(screen.getByTestId("code-block")).toHaveTextContent("docker build .")
+			const toggle = screen.getByTestId("tool-call-toggle")
+			expect(toggle).toHaveTextContent("docker build .")
 
 			// Should show pattern selector with the full command
 			const selector = screen.getByTestId("command-pattern-selector")
@@ -534,17 +536,16 @@ Without any command prefix`
 			expect(selector).toHaveTextContent("docker build .")
 
 			// Verify no output is shown (since there's no Output: separator)
-			const codeBlocks = screen.getAllByTestId("code-block")
-			expect(codeBlocks).toHaveLength(1) // Only the command block, no output block
+			expect(screen.getByTestId("tool-result-collapsed")).toHaveTextContent("执行成功")
 		})
 
 		it("should handle commands with numeric output", () => {
 			const commandWithNumericOutput = `wc -l *.go *.java
 Output:
-			   10 file1.go
-			   20 file2.go
-			   15 Main.java
-			   45 total`
+		   10 file1.go
+		   20 file2.go
+		   15 Main.java
+		   45 total`
 
 			render(
 				<ExtensionStateWrapper>
@@ -552,9 +553,8 @@ Output:
 				</ExtensionStateWrapper>,
 			)
 
-			// Should render the command and output
-			const codeBlocks = screen.getAllByTestId("code-block")
-			expect(codeBlocks[0]).toHaveTextContent("wc -l *.go *.java")
+			const toggle = screen.getByTestId("tool-call-toggle")
+			expect(toggle).toHaveTextContent("wc -l *.go *.java")
 
 			// Should show pattern selector
 			const selector = screen.getByTestId("command-pattern-selector")
@@ -563,15 +563,13 @@ Output:
 			// Should show a command pattern
 			expect(selector.textContent).toMatch(/wc/)
 
-			// The output should still be displayed in the code block
-			expect(codeBlocks.length).toBeGreaterThan(1)
-			expect(codeBlocks[1].textContent).toContain("45 total")
+			expect(screen.getByTestId("tool-result-collapsed").textContent).toContain("45 total")
 		})
 
 		it("should handle commands with zero output", () => {
 			const commandWithZeroTotal = `wc -l *.go *.java
 Output:
-		     0 total`
+	     0 total`
 
 			render(
 				<ExtensionStateWrapper>
@@ -586,10 +584,7 @@ Output:
 			// Should show a command pattern
 			expect(selector.textContent).toMatch(/wc/)
 
-			// The output should still be displayed in the code block
-			const codeBlocks = screen.getAllByTestId("code-block")
-			expect(codeBlocks.length).toBeGreaterThan(1)
-			expect(codeBlocks[1]).toHaveTextContent("0 total")
+			expect(screen.getByTestId("tool-result-collapsed")).toHaveTextContent("0 total")
 		})
 	})
 })
