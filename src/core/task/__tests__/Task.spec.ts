@@ -322,6 +322,55 @@ describe("Cline", () => {
 			expect(cline.diffEnabled).toBe(false)
 		})
 
+		it("does not post ask to webview when tool ask is auto-approved", async () => {
+			const cline = new Task({
+				provider: mockProvider,
+				apiConfiguration: mockApiConfig,
+				task: "test task",
+				startTask: false,
+				context: mockExtensionContext,
+			})
+
+			mockProvider.getState = vi.fn().mockResolvedValue({
+				autoApprovalEnabled: true,
+				alwaysAllowReadOnly: true,
+				alwaysAllowReadOnlyOutsideWorkspace: true,
+			})
+
+			const toolAskText = JSON.stringify({ tool: "readFile", path: "/mock/workspace/path/file.ts" })
+			const result = await cline.ask("tool" as any, toolAskText)
+
+			expect(result.response).toBe("yesButtonClicked")
+			expect(mockProvider.postStateToWebview).not.toHaveBeenCalled()
+		})
+
+		it("does not post ask to webview when sandboxPackageTool is auto-approved", async () => {
+			const cline = new Task({
+				provider: mockProvider,
+				apiConfiguration: mockApiConfig,
+				task: "test task",
+				startTask: false,
+				context: mockExtensionContext,
+			})
+
+			mockProvider.getState = vi.fn().mockResolvedValue({
+				autoApprovalEnabled: true,
+				alwaysAllowPkgTools: true,
+			})
+
+			const toolAskText = JSON.stringify({
+				tool: "sandboxPackageTool",
+				packageName: "example",
+				toolName: "exampleTool",
+				content: "ok",
+				isError: false,
+			})
+			const result = await cline.ask("tool" as any, toolAskText)
+
+			expect(result.response).toBe("yesButtonClicked")
+			expect(mockProvider.postStateToWebview).not.toHaveBeenCalled()
+		})
+
 		it("should use default fuzzy match threshold when not provided", async () => {
 			const cline = new Task({
 				provider: mockProvider,

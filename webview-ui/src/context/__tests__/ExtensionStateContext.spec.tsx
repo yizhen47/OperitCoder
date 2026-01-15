@@ -235,7 +235,7 @@ describe("ExtensionStateContext", () => {
 		)
 	})
 
-	it("throttles messageUpdated for streaming text partials (leading + trailing within 200ms)", async () => {
+	it("throttles messageUpdated for streaming text partials (leading + trailing within 100ms)", async () => {
 		vi.useFakeTimers()
 
 		render(
@@ -310,7 +310,7 @@ describe("ExtensionStateContext", () => {
 		expect(screen.getByTestId("last-message-text").textContent).toBe("ab")
 
 		act(() => {
-			vi.advanceTimersByTime(100)
+			vi.advanceTimersByTime(50)
 		})
 		expect(screen.getByTestId("last-message-text").textContent).toBe("ab")
 
@@ -332,7 +332,7 @@ describe("ExtensionStateContext", () => {
 		})
 
 		act(() => {
-			vi.advanceTimersByTime(100)
+			vi.advanceTimersByTime(50)
 		})
 		expect(screen.getByTestId("last-message-text").textContent).toBe("abcd")
 

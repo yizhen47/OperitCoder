@@ -261,6 +261,10 @@
 			"addButton": "Add",
 			"autoDenied": "Commands with the prefix `{{prefix}}` have been forbidden by the user. Do not bypass this restriction by running another command."
 		},
+		"pkgTools": {
+			"label": "Pkg Tool",
+			"description": "Automatically run sandbox package tools without requiring approval"
+		},
 		"showMenu": {
 			"label": "Show auto-approve menu in chat view",
 			"description": "When enabled, the auto-approve menu will be displayed at the bottom of the chat view, allowing quick access to auto-approve settings"

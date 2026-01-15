@@ -26,6 +26,7 @@ describe("AutoApproveToggle", () => {
 		alwaysAllowModeSwitch: true,
 		alwaysAllowSubtasks: false,
 		alwaysAllowExecute: true,
+		alwaysAllowPkgTools: false, // kilocode_change
 		alwaysAllowFollowupQuestions: false,
 		alwaysAllowUpdateTodoList: true,
 		onToggle: mockOnToggle,

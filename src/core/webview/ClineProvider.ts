@@ -2031,6 +2031,7 @@ ${prompt}
 			alwaysAllowMcp,
 			alwaysAllowModeSwitch,
 			alwaysAllowSubtasks,
+			alwaysAllowPkgTools, // kilocode_change
 			alwaysAllowUpdateTodoList,
 			allowedMaxRequests,
 			allowedMaxCost,
@@ -2178,6 +2179,7 @@ ${prompt}
 			alwaysAllowMcp: alwaysAllowMcp ?? true,
 			alwaysAllowModeSwitch: alwaysAllowModeSwitch ?? true,
 			alwaysAllowSubtasks: alwaysAllowSubtasks ?? true,
+			alwaysAllowPkgTools: alwaysAllowPkgTools ?? true, // kilocode_change
 			alwaysAllowUpdateTodoList: alwaysAllowUpdateTodoList ?? true,
 			isBrowserSessionActive,
 			yoloMode: yoloMode ?? false, // kilocode_change
@@ -2409,6 +2411,7 @@ ${prompt}
 			alwaysAllowModeSwitch: stateValues.alwaysAllowModeSwitch ?? true,
 			alwaysAllowSubtasks: stateValues.alwaysAllowSubtasks ?? true,
 			alwaysAllowFollowupQuestions: stateValues.alwaysAllowFollowupQuestions ?? false,
+			alwaysAllowPkgTools: stateValues.alwaysAllowPkgTools ?? true, // kilocode_change
 			alwaysAllowUpdateTodoList: stateValues.alwaysAllowUpdateTodoList ?? true, // kilocode_change
 			isBrowserSessionActive,
 			yoloMode: stateValues.yoloMode ?? false, // kilocode_change

@@ -245,6 +245,113 @@ vi.mock("../ChatTextArea", () => {
 	}
 })
 
+describe("ChatView - Streaming Indicator Stability Tests", () => {
+	beforeEach(() => vi.clearAllMocks())
+
+	it("queues messages when API request is in progress even if the last message is not api_req_started", async () => {
+		const { getByTestId } = renderChatView()
+
+		mockPostMessage({
+			clineMessages: [
+				{
+					type: "say",
+					say: "task",
+					ts: Date.now() - 2000,
+					text: "Initial task",
+				},
+				{
+					type: "say",
+					say: "api_req_started",
+					ts: Date.now() - 1000,
+					text: JSON.stringify({ apiProtocol: "anthropic" }), // No cost = still streaming
+				},
+				{
+					type: "say",
+					say: "text",
+					ts: Date.now(),
+					text: "some intermediate non-partial message",
+					partial: false,
+				},
+			],
+		})
+
+		await waitFor(() => {
+			expect(getByTestId("chat-textarea")).toBeInTheDocument()
+		})
+
+		vi.mocked(vscode.postMessage).mockClear()
+
+		const chatTextArea = getByTestId("chat-textarea")
+		const input = chatTextArea.querySelector("input")! as HTMLInputElement
+
+		await act(async () => {
+			fireEvent.change(input, { target: { value: "follow-up while api_req_started still pending" } })
+			fireEvent.keyDown(input, { key: "Enter", code: "Enter" })
+		})
+
+		await waitFor(() => {
+			expect(vscode.postMessage).toHaveBeenCalledWith({
+				type: "queueMessage",
+				text: "follow-up while api_req_started still pending",
+				images: [],
+			})
+		})
+	})
+})
+
+describe("ChatView - Cancel Task UI", () => {
+	beforeEach(() => vi.clearAllMocks())
+
+	it("keeps task running state after cancel click and disables repeated cancel until reset", async () => {
+		const { getByLabelText } = renderChatView()
+
+		// Hydrate state with an active task that is awaiting response (shows cancel)
+		mockPostMessage({
+			clineMessages: [
+				{
+					type: "say",
+					say: "task",
+					ts: Date.now() - 2000,
+					text: "Initial task",
+				},
+			],
+		})
+
+		// Force the UI into the "task running" state by sendingDisabled=true and no ask/buttons
+		mockPostMessage({
+			sendingDisabled: true,
+			clineMessages: [
+				{
+					type: "say",
+					say: "task",
+					ts: Date.now() - 2000,
+					text: "Initial task",
+				},
+			],
+		})
+
+		// Cancel button shares the same aria-label as send, depending on state
+		const cancelButton = await waitFor(() => getByLabelText("chat:cancel.tooltip"))
+		fireEvent.click(cancelButton)
+
+		expect(vscode.postMessage).toHaveBeenCalledWith({ type: "cancelTask" })
+
+		// After clicking cancel, it should still be in cancel mode but disabled
+		await waitFor(() => {
+			expect(getByLabelText("chat:cancel.tooltip")).toBeDisabled()
+		})
+
+		// When messages are cleared (new task / reset), cancel should become available again
+		mockPostMessage({
+			clineMessages: [],
+		})
+
+		await waitFor(() => {
+			expect(getByLabelText("chat:sendMessage")).not.toBeDisabled()
+		})
+	})
+})
+
 // Mock VSCode components
 vi.mock("@vscode/webview-ui-toolkit/react", () => ({
 	VSCodeButton: function MockVSCodeButton({

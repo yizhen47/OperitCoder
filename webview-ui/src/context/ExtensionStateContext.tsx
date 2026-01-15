@@ -112,6 +112,8 @@ export interface ExtensionStateContextType extends ExtensionState {
 	setAlwaysAllowWriteOutsideWorkspace: (value: boolean) => void
 	setAlwaysAllowDelete: (value: boolean) => void // kilocode_change
 	setAlwaysAllowExecute: (value: boolean) => void
+	alwaysAllowPkgTools?: boolean // kilocode_change
+	setAlwaysAllowPkgTools: (value: boolean) => void // kilocode_change
 	setAlwaysAllowBrowser: (value: boolean) => void
 	setAlwaysAllowMcp: (value: boolean) => void
 	setAlwaysAllowModeSwitch: (value: boolean) => void
@@ -557,14 +559,15 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 
 						existing.message = clineMessage
 						const elapsed = now - existing.lastAppliedAtMs
-						if (elapsed >= 200) {
+						// kilocode_change start: smoother streaming (100ms throttle)
+						if (elapsed >= 100) {
 							existing.lastAppliedAtMs = now
 							updateClineMessageInState(clineMessage)
 							break
 						}
 
 						if (!existing.timeoutId) {
-							const remainingMs = Math.max(0, 200 - elapsed)
+							const remainingMs = Math.max(0, 100 - elapsed)
 							const timeoutId = setTimeout(() => {
 								const latest = pendingStreamingMessageUpdatesRef.current.get(ts)
 								if (!latest) {
@@ -576,6 +579,7 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 							}, remainingMs)
 							existing.timeoutId = timeoutId
 						}
+						// kilocode_change end
 						break
 					}
 
@@ -718,6 +722,8 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 			setState((prevState) => ({ ...prevState, alwaysAllowWriteOutsideWorkspace: value })),
 		setAlwaysAllowDelete: (value) => setState((prevState) => ({ ...prevState, alwaysAllowDelete: value })), // kilocode_change
 		setAlwaysAllowExecute: (value) => setState((prevState) => ({ ...prevState, alwaysAllowExecute: value })),
+		alwaysAllowPkgTools: state.alwaysAllowPkgTools, // kilocode_change
+		setAlwaysAllowPkgTools: (value) => setState((prevState) => ({ ...prevState, alwaysAllowPkgTools: value })), // kilocode_change
 		setAlwaysAllowBrowser: (value) => setState((prevState) => ({ ...prevState, alwaysAllowBrowser: value })),
 		setAlwaysAllowMcp: (value) => setState((prevState) => ({ ...prevState, alwaysAllowMcp: value })),
 		setAlwaysAllowModeSwitch: (value) => setState((prevState) => ({ ...prevState, alwaysAllowModeSwitch: value })),

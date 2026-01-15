@@ -85,6 +85,7 @@ export const globalSettingsSchema = z.object({
 	alwaysAllowModeSwitch: z.boolean().optional(),
 	alwaysAllowSubtasks: z.boolean().optional(),
 	alwaysAllowExecute: z.boolean().optional(),
+	alwaysAllowPkgTools: z.boolean().optional(), // kilocode_change
 	alwaysAllowFollowupQuestions: z.boolean().optional(),
 	followupAutoApproveTimeoutMs: z.number().optional(),
 	alwaysAllowUpdateTodoList: z.boolean().optional(),
@@ -367,6 +368,7 @@ export const EVALS_SETTINGS: RooCodeSettings = {
 	alwaysAllowModeSwitch: true,
 	alwaysAllowSubtasks: true,
 	alwaysAllowExecute: true,
+	alwaysAllowPkgTools: true, // kilocode_change
 	alwaysAllowFollowupQuestions: true,
 	alwaysAllowUpdateTodoList: true,
 	followupAutoApproveTimeoutMs: 0,

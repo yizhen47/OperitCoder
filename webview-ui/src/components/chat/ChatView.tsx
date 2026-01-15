@@ -523,6 +523,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 			setSendingDisabled(false)
 			setClineAsk(undefined)
 			setEnableButtons(false)
+			setDidClickCancel(false) // kilocode_change
 			setPrimaryButtonText(undefined)
 			setSecondaryButtonText(undefined)
 		}
@@ -534,6 +535,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		everVisibleMessagesTsRef.current.clear() // Clear for new task
 		setCurrentFollowUpTs(null) // Clear follow-up answered state for new task
 		setIsCondensing(false) // Reset condensing state when switching tasks
+		setDidClickCancel(false) // kilocode_change
 		// Note: sendingDisabled is not reset here as it's managed by message effects
 
 		// Clear any pending auto-approval timeout from previous task
@@ -602,6 +604,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		if (isLastMessagePartial) {
 			return true
 		} else {
+			// kilocode_change start: stabilize streaming indicator (avoid flicker)
 			const lastApiReqStarted = findLast(
 				modifiedMessages,
 				(message: ClineMessage) => message.say === "api_req_started",
@@ -614,29 +617,71 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				lastApiReqStarted.say === "api_req_started"
 			) {
 				let cost: unknown
+				let cancelReason: unknown
 				try {
-					cost = JSON.parse(lastApiReqStarted.text).cost
+					const parsed = JSON.parse(lastApiReqStarted.text)
+					cost = parsed.cost
+					cancelReason = parsed.cancelReason
 				} catch {
 					cost = undefined
+					cancelReason = undefined
 				}
 
-				if (cost === undefined) {
-					const last = modifiedMessages.at(-1)
-					if (last?.say === "api_req_started" || last?.say === "api_req_retry_delayed") {
-						return true
-					}
+				if (cancelReason !== null && cancelReason !== undefined) {
 					return false
 				}
+
+				if (cost === undefined || cost === null) {
+					return true
+				}
 			}
+			// kilocode_change end
 		}
 
 		return false
 	}, [modifiedMessages, clineAsk, enableButtons, primaryButtonText])
 
+	// kilocode_change start: keep cancel UI visible after user clicks cancel
+	// Clicking cancel should disable repeated cancels, but it should not flip the UI
+	// into "send" mode while the task is still cancelling.
 	const isTaskRunningForInput = useMemo(() => {
 		const isAwaitingResponse = sendingDisabled && clineAsk === undefined && !enableButtons
-		return (isStreaming || isAwaitingResponse) && !didClickCancel
-	}, [sendingDisabled, clineAsk, enableButtons, isStreaming, didClickCancel])
+		return isStreaming || isAwaitingResponse
+	}, [sendingDisabled, clineAsk, enableButtons, isStreaming])
+	// kilocode_change end
+
+	// kilocode_change start: prevent loading footer flicker
+	const virtuosoFooter = useCallback(() => {
+		const shouldAnimate = isStreaming && !wasStreaming
+		return (
+			<div
+				className={`flex items-center justify-start pl-4 py-4 ${shouldAnimate ? "animate-fade-in" : ""}`}
+			>
+				{isStreaming && (
+					<div className="flex items-center gap-2 text-sm text-vscode-descriptionForeground">
+						<div className="flex items-center gap-1">
+							<span
+								className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"
+								style={{ animationDuration: "1.4s", animationDelay: "0ms" }}
+							/>
+							<span
+								className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"
+								style={{ animationDuration: "1.4s", animationDelay: "200ms" }}
+							/>
+							<span
+								className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"
+								style={{ animationDuration: "1.4s", animationDelay: "400ms" }}
+							/>
+						</div>
+						<span>{t("chat:loading")}</span>
+					</div>
+				)}
+			</div>
+		)
+	}, [isStreaming, wasStreaming, t])
+
+	const virtuosoComponents = useMemo(() => ({ Footer: virtuosoFooter }), [virtuosoFooter])
+	// kilocode_change end
 
 	const markFollowUpAsAnswered = useCallback(() => {
 		const lastFollowUpMessage = messagesRef.current.findLast((msg: ClineMessage) => msg.ask === "followup")
@@ -653,6 +698,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		}
 		// Reset user response flag for new message
 		userRespondedRef.current = false
+		setDidClickCancel(false) // kilocode_change
 
 		// Only reset message-specific state, preserving mode.
 		setInputValue("")
@@ -1779,31 +1825,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 								}}
 								atBottomThreshold={10}
 								initialTopMostItemIndex={groupedMessages.length - 1}
-								components={{
-									Footer: () => (
-										<div className="flex items-center justify-start pl-4 py-4 animate-fade-in">
-											{isStreaming && (
-												<div className="flex items-center gap-2 text-sm text-vscode-descriptionForeground">
-													<div className="flex items-center gap-1">
-														<span
-															className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"
-															style={{ animationDuration: '1.4s', animationDelay: '0ms' }}
-														/>
-														<span
-															className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"
-															style={{ animationDuration: '1.4s', animationDelay: '200ms' }}
-														/>
-														<span
-															className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"
-															style={{ animationDuration: '1.4s', animationDelay: '400ms' }}
-														/>
-													</div>
-													<span>{t("chat:loading")}</span>
-												</div>
-											)}
-										</div>
-									),
-								}}
+								components={virtuosoComponents}
 							/>
 						</div>
 					</div>

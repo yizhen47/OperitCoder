@@ -15,6 +15,7 @@ type AutoApproveToggles = Pick<
 	| "alwaysAllowModeSwitch"
 	| "alwaysAllowSubtasks"
 	| "alwaysAllowExecute"
+	| "alwaysAllowPkgTools" // kilocode_change
 	| "alwaysAllowFollowupQuestions"
 	| "alwaysAllowUpdateTodoList"
 >
@@ -95,6 +96,15 @@ export const autoApproveSettingsConfig: Record<AutoApproveSetting, AutoApproveCo
 		icon: "terminal",
 		testId: "always-allow-execute-toggle",
 	},
+	// kilocode_change start
+	alwaysAllowPkgTools: {
+		key: "alwaysAllowPkgTools",
+		labelKey: "settings:autoApprove.pkgTools.label",
+		descriptionKey: "settings:autoApprove.pkgTools.description",
+		icon: "package",
+		testId: "always-allow-pkg-tools-toggle",
+	},
+	// kilocode_change end
 	alwaysAllowFollowupQuestions: {
 		key: "alwaysAllowFollowupQuestions",
 		labelKey: "settings:autoApprove.followupQuestions.label",

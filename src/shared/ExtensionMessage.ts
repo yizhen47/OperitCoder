@@ -383,6 +383,7 @@ export type ExtensionState = Pick<
 	| "alwaysAllowSubtasks"
 	| "alwaysAllowFollowupQuestions"
 	| "alwaysAllowExecute"
+	| "alwaysAllowPkgTools" // kilocode_change
 	| "alwaysAllowUpdateTodoList"
 	| "followupAutoApproveTimeoutMs"
 	| "allowedCommands"

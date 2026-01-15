@@ -1110,6 +1110,33 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 			throw new Error(`[KiloCode#ask] task ${this.taskId}.${this.instanceId} aborted`)
 		}
 
+		// kilocode_change start: avoid UI flicker for auto-approved asks
+		// If this ask will be auto-approved/denied, handle it before posting the ask
+		// message to the webview so approve/reject buttons never render briefly.
+		const provider = this.providerRef.deref()
+		const state = provider ? await provider.getState() : undefined
+		const approval = await checkAutoApproval({ state, ask: type, text, isProtected })
+		const isApprovalAsk =
+			type === "tool" || type === "command" || type === "browser_action_launch" || type === "use_mcp_server"
+		if ((approval.decision === "approve" || approval.decision === "deny") && isApprovalAsk && !partial) {
+			if (approval.decision === "approve") {
+				this.approveAsk()
+			} else {
+				this.denyAsk()
+			}
+
+			const result = {
+				response: this.askResponse!,
+				text: this.askResponseText,
+				images: this.askResponseImages,
+			}
+			this.askResponse = undefined
+			this.askResponseText = undefined
+			this.askResponseImages = undefined
+			return result
+		}
+		// kilocode_change end
+
 		let askTs: number
 
 		if (partial !== undefined) {
@@ -1226,11 +1253,6 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		}
 		// kilocode_change end
 		let timeouts: NodeJS.Timeout[] = []
-
-		// Automatically approve if the ask according to the user's settings.
-		const provider = this.providerRef.deref()
-		const state = provider ? await provider.getState() : undefined
-		const approval = await checkAutoApproval({ state, ask: type, text, isProtected })
 
 		if (approval.decision === "approve") {
 			this.approveAsk()

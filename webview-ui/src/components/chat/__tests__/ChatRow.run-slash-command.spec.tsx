@@ -169,7 +169,10 @@ describe("ChatRow - runSlashCommand tool", () => {
 			partial: false,
 		}
 
-		const { getByTestId } = renderChatRowWithProviders(message)
+		const { getByTestId, getByText } = renderChatRowWithProviders(message)
+
+		expect(getByText("sandboxPackageTool")).toBeInTheDocument()
+		expect(getByText("time / get_time")).toBeInTheDocument()
 
 		const collapsed = getByTestId("tool-result-collapsed")
 		expect(collapsed).toBeInTheDocument()
@@ -243,9 +246,35 @@ describe("ChatRow - runSlashCommand tool", () => {
 			partial: true,
 		}
 
-		const { getByTestId } = renderChatRowWithProviders(message)
+		const { getByTestId, getByText } = renderChatRowWithProviders(message)
+
+		expect(getByText("sandboxPackageTool")).toBeInTheDocument()
+		expect(getByText("time / get_time")).toBeInTheDocument()
 		const collapsed = getByTestId("tool-result-collapsed")
 		expect(collapsed).toBeInTheDocument()
 		expect(collapsed).toHaveTextContent("执行中")
+	})
+
+	it("should display sandboxPackageTool invocation-only say message without rendering result", () => {
+		const message: any = {
+			type: "say",
+			say: "tool",
+			ts: Date.now(),
+			text: JSON.stringify({
+				tool: "sandboxPackageTool",
+				packageName: "time",
+				toolName: "get_time",
+				content: "",
+				isError: false,
+			}),
+			partial: true,
+		}
+
+		const { getByText, queryByTestId } = renderChatRowWithProviders(message)
+
+		expect(getByText("sandboxPackageTool")).toBeInTheDocument()
+		expect(getByText("time / get_time")).toBeInTheDocument()
+		// No result should be rendered for invocation-only messages.
+		expect(queryByTestId("tool-result-collapsed")).toBeNull()
 	})
 })

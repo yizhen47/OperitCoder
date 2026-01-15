@@ -253,6 +253,10 @@
 			"addButton": "添加",
 			"autoDenied": "前缀为 `{{prefix}}` 的命令已被用户禁止。不要通过运行其他命令来绕过此限制。"
 		},
+		"pkgTools": {
+			"label": "沙盒包",
+			"description": "自动运行 pkg tool（沙盒包工具），无需批准"
+		},
 		"showMenu": {
 			"label": "在聊天视图中显示自动批准菜单",
 			"description": "启用后，自动批准菜单将显示在聊天视图底部，方便快速访问自动批准设置"

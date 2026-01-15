@@ -29,6 +29,7 @@ const AutoApproveMenu = ({ style }: AutoApproveMenuProps) => {
 		setAlwaysAllowWrite,
 		setAlwaysAllowDelete, // kilocode_change
 		setAlwaysAllowExecute,
+		setAlwaysAllowPkgTools, // kilocode_change
 		setAlwaysAllowBrowser,
 		setAlwaysAllowMcp,
 		setAlwaysAllowModeSwitch,
@@ -75,6 +76,11 @@ const AutoApproveMenu = ({ style }: AutoApproveMenuProps) => {
 				case "alwaysAllowExecute":
 					setAlwaysAllowExecute(value)
 					break
+				// kilocode_change start
+				case "alwaysAllowPkgTools":
+					setAlwaysAllowPkgTools(value)
+					break
+				// kilocode_change end
 				case "alwaysAllowBrowser":
 					setAlwaysAllowBrowser(value)
 					break
@@ -125,6 +131,7 @@ const AutoApproveMenu = ({ style }: AutoApproveMenuProps) => {
 			setAlwaysAllowWrite,
 			setAlwaysAllowDelete, // kilocode_change
 			setAlwaysAllowExecute,
+			setAlwaysAllowPkgTools, // kilocode_change
 			setAlwaysAllowBrowser,
 			setAlwaysAllowMcp,
 			setAlwaysAllowModeSwitch,

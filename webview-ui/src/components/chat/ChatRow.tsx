@@ -1419,13 +1419,40 @@ export const ChatRowContent = ({
 
 					switch (sayTool.tool) {
 						case "sandboxPackageTool" as any: {
+							// kilocode_change start: show pkg tool invocation header for say(tool)
+							const hasContentField = typeof (sayTool as any).content === "string"
 							const content = ((sayTool as any).content as string | undefined) ?? ""
 							const isError = (sayTool as any).isError === true
+							const packageName = (sayTool as any).packageName as string | undefined
+							const toolName = (sayTool as any).toolName as string | undefined
+							const args = (sayTool as any).arguments as string | undefined
+							const summary = packageName && toolName ? `${packageName} / ${toolName}` : ""
+							const shouldShowResult = message.partial === true || hasContentField
 							return (
 								<div className="pl-0">
-									<ToolResultDisplay resultText={content} isError={isError} isRunning={message.partial === true} />
+									<CompactToolDisplay
+										toolName={String(sayTool.tool)}
+										params={summary}
+										expandedContent={
+											args ? (
+												<div className="text-xs text-vscode-descriptionForeground whitespace-pre-wrap break-words">
+													{args}
+												</div>
+											) : undefined
+										}
+									/>
+									{shouldShowResult && (
+										<div className="pl-0">
+											<ToolResultDisplay
+												resultText={content}
+												isError={isError}
+												isRunning={message.partial === true}
+											/>
+										</div>
+									)}
 								</div>
 							)
+							// kilocode_change end
 						}
 						case "runSlashCommand": {
 							return null

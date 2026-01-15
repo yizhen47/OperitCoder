@@ -11,6 +11,7 @@ export function useAutoApprovalToggles() {
 		alwaysAllowWrite,
 		alwaysAllowDelete, // kilocode_change
 		alwaysAllowExecute,
+		alwaysAllowPkgTools, // kilocode_change
 		alwaysAllowBrowser,
 		alwaysAllowMcp,
 		alwaysAllowModeSwitch,
@@ -26,6 +27,7 @@ export function useAutoApprovalToggles() {
 			alwaysAllowWrite,
 			alwaysAllowDelete, // kilocode_change
 			alwaysAllowExecute,
+			alwaysAllowPkgTools, // kilocode_change
 			alwaysAllowBrowser,
 			alwaysAllowMcp,
 			alwaysAllowModeSwitch,
@@ -39,6 +41,7 @@ export function useAutoApprovalToggles() {
 			alwaysAllowWrite,
 			alwaysAllowDelete, // kilocode_change
 			alwaysAllowExecute,
+			alwaysAllowPkgTools, // kilocode_change
 			alwaysAllowBrowser,
 			alwaysAllowMcp,
 			alwaysAllowModeSwitch,

@@ -30,6 +30,7 @@ type AutoApproveSettingsProps = HTMLAttributes<HTMLDivElement> & {
 	alwaysAllowModeSwitch?: boolean
 	alwaysAllowSubtasks?: boolean
 	alwaysAllowExecute?: boolean
+	alwaysAllowPkgTools?: boolean // kilocode_change
 	alwaysAllowFollowupQuestions?: boolean
 	alwaysAllowUpdateTodoList?: boolean
 	followupAutoApproveTimeoutMs?: number
@@ -54,6 +55,7 @@ type AutoApproveSettingsProps = HTMLAttributes<HTMLDivElement> & {
 		| "alwaysAllowModeSwitch"
 		| "alwaysAllowSubtasks"
 		| "alwaysAllowExecute"
+		| "alwaysAllowPkgTools" // kilocode_change
 		| "alwaysAllowFollowupQuestions"
 		| "followupAutoApproveTimeoutMs"
 		| "allowedCommands"
@@ -80,6 +82,7 @@ export const AutoApproveSettings = ({
 	alwaysAllowModeSwitch,
 	alwaysAllowSubtasks,
 	alwaysAllowExecute,
+	alwaysAllowPkgTools, // kilocode_change
 	alwaysAllowFollowupQuestions,
 	followupAutoApproveTimeoutMs = 60000,
 	alwaysAllowUpdateTodoList,
@@ -206,6 +209,7 @@ export const AutoApproveSettings = ({
 						alwaysAllowModeSwitch={alwaysAllowModeSwitch}
 						alwaysAllowSubtasks={alwaysAllowSubtasks}
 						alwaysAllowExecute={alwaysAllowExecute}
+						alwaysAllowPkgTools={alwaysAllowPkgTools}
 						alwaysAllowFollowupQuestions={alwaysAllowFollowupQuestions}
 						alwaysAllowUpdateTodoList={alwaysAllowUpdateTodoList}
 						onToggle={(key, value) => setCachedStateField(key, value)}

@@ -18,6 +18,7 @@ export type AutoApprovalState =
 	| "alwaysAllowModeSwitch"
 	| "alwaysAllowSubtasks"
 	| "alwaysAllowExecute"
+	| "alwaysAllowPkgTools" // kilocode_change
 	| "alwaysAllowFollowupQuestions"
 	| "alwaysAllowUpdateTodoList"
 
@@ -48,7 +49,7 @@ export async function checkAutoApproval({
 	text,
 	isProtected,
 }: {
-	state?: Pick<ExtensionState, AutoApprovalState | AutoApprovalStateOptions>
+	state?: Pick<ExtensionState, Extract<AutoApprovalState | AutoApprovalStateOptions, keyof ExtensionState>>
 	ask: ClineAsk
 	text?: string
 	isProtected?: boolean
@@ -147,6 +148,12 @@ export async function checkAutoApproval({
 		if (tool.tool === "updateTodoList") {
 			return state.alwaysAllowUpdateTodoList === true ? { decision: "approve" } : { decision: "ask" }
 		}
+
+		// kilocode_change start
+		if (tool.tool === "sandboxPackageTool") {
+			return state.alwaysAllowPkgTools === true ? { decision: "approve" } : { decision: "ask" }
+		}
+		// kilocode_change end
 
 		if (tool?.tool === "fetchInstructions") {
 			if (tool.content === "create_mode") {
