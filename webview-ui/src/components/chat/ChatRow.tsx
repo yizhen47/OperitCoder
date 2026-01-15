@@ -37,6 +37,8 @@ import { Markdown } from "./Markdown"
 import { CommandExecution } from "./CommandExecution"
 import { CommandExecutionError } from "./CommandExecutionError"
 import ReportBugPreview from "./ReportBugPreview"
+import { ToolResultDisplay } from "./ToolResultDisplay"
+import { CompactToolDisplay } from "./CompactToolDisplay"
 
 import { AutoApprovedRequestLimitWarning } from "./AutoApprovedRequestLimitWarning"
 import { InProgressRow, CondensationResultRow, CondensationErrorRow, TruncationResultRow } from "./context-management"
@@ -112,6 +114,37 @@ function getPreviousTodos(messages: ClineMessage[], currentMessageTs: number): a
 	return []
 }
 
+function formatCompactToolParams(tool: any): string {
+	if (!tool || typeof tool !== "object") return ""
+	const omitKeys = new Set([
+		"tool",
+		"content",
+		"diff",
+		"batchDiffs",
+		"batchFiles",
+		"diffStats",
+		"fastApplyResult",
+		"todos",
+		"images",
+	])
+
+	const parts: string[] = []
+	for (const [key, value] of Object.entries(tool)) {
+		if (omitKeys.has(key)) continue
+		if (value === undefined || value === null) continue
+		if (typeof value === "string" && value.trim() === "") continue
+		if (Array.isArray(value) && value.length === 0) continue
+
+		try {
+			parts.push(`${key}: ${typeof value === "string" ? value : JSON.stringify(value)}`)
+		} catch {
+			parts.push(`${key}: ${String(value)}`)
+		}
+	}
+
+	return parts.join(" | ")
+}
+
 interface ChatRowProps {
 	message: ClineMessage
 	lastModifiedMessage?: ClineMessage
@@ -139,6 +172,27 @@ const ChatRow = memo(
 		const { highlighted } = props // kilocode_change: Add highlighted prop
 		const { showTaskTimeline } = useExtensionState() // kilocode_change: Used by KiloChatRowGutterBar
 		const { isLast, onHeightChange, message } = props
+		const isNonDiffToolRow = useMemo(() => {
+			if (message.type === "say" && message.say === ("tool" as any)) {
+				return true
+			}
+			if (message.type === "ask" && message.ask === "tool") {
+				try {
+					const parsed = JSON.parse(message.text || "{}") as any
+					const diffTools = new Set([
+						"editedExistingFile",
+						"appliedDiff",
+						"insertContent",
+						"searchAndReplace",
+						"newFileCreated",
+					])
+					return !diffTools.has(parsed?.tool)
+				} catch {
+					return true
+				}
+			}
+			return false
+		}, [message])
 		// Store the previous height to compare with the current height
 		// This allows us to detect changes without causing re-renders
 		const prevHeightRef = useRef(0)
@@ -147,7 +201,9 @@ const ChatRow = memo(
 			<div
 				// kilocode_change: add highlighted className
 				className={cn(
-					`px-[15px] py-[4px] pr-[6px] relative ${highlighted ? "animate-message-highlight" : ""}`,
+					"px-[15px] pr-[6px] relative",
+					isNonDiffToolRow ? "py-[1px]" : "py-[4px]",
+					highlighted ? "animate-message-highlight" : "",
 				)}>
 				{showTaskTimeline && <KiloChatRowGutterBar message={message} />}
 				<ChatRowContent {...props} />
@@ -435,6 +491,92 @@ export const ChatRowContent = ({
 		if (!tool) return undefined
 		return (tool.content ?? tool.diff) as string | undefined
 	}, [tool])
+
+	// Non-diff tools should use compact display. Diff tools remain unchanged.
+	if (tool && message.type === "ask" && message.ask === "tool") {
+		const diffTools = new Set([
+			"editedExistingFile",
+			"appliedDiff",
+			"insertContent",
+			"searchAndReplace",
+			"newFileCreated",
+		])
+
+		if (!diffTools.has(tool.tool as any)) {
+			const params =
+				(tool.tool === "runSlashCommand" && tool.command
+					? `/${tool.command}${tool.args ? ` ${tool.args}` : ""}`
+					: formatCompactToolParams(tool))
+
+			if (tool.tool === "readFile" && tool.batchFiles && Array.isArray(tool.batchFiles)) {
+				const files = tool.batchFiles as Array<{ path: string; lineSnippet?: string; content?: string }>
+				const summaryText = files?.[0]?.path ? `${files[0].path}${files.length > 1 ? ` (+${files.length - 1})` : ""}` : `${files.length} files`
+
+				return (
+					<div className="pl-0">
+						<CompactToolDisplay
+							toolName={String(tool.tool)}
+							params={summaryText}
+							expandedContent={
+								<div className="flex flex-col gap-0">
+									{files.map((file, idx) => (
+										<div key={`${file.path}-${idx}-${message.ts}`} className="py-[1px]">
+											<PathTooltip
+												content={formatPathTooltip(
+													file.path,
+													file.lineSnippet ? ` ${file.lineSnippet}` : undefined,
+												)}>
+												<span
+													className="block text-xs text-vscode-descriptionForeground whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer hover:underline hover:text-vscode-foreground"
+													onClick={() => vscode.postMessage({ type: "openFile", text: file.content })}>
+													{formatPathTooltip(
+														file.path,
+														file.lineSnippet ? ` ${file.lineSnippet}` : undefined,
+													)}
+												</span>
+											</PathTooltip>
+										</div>
+									))}
+								</div>
+							}
+						/>
+					</div>
+				)
+			}
+
+			if (tool.tool === "readFile" && tool.content) {
+				return (
+					<div className="pl-0">
+						<CompactToolDisplay
+							toolName={String(tool.tool)}
+							params={formatPathTooltip(tool.path, tool.reason)}
+							disableExpand={true}
+							onRowClick={() => vscode.postMessage({ type: "openFile", text: tool.content })}
+						/>
+					</div>
+				)
+			}
+
+			if (tool.tool === ("updateTodoList" as any)) {
+				const todos = (tool as any).todos || []
+				const previousTodos = getPreviousTodos(clineMessages, message.ts)
+				return (
+					<>
+						<div className="pl-0">
+							<CompactToolDisplay toolName={String(tool.tool)} params={params} />
+						</div>
+						<TodoChangeDisplay previousTodos={previousTodos} newTodos={todos} />
+					</>
+				)
+			}
+
+			return (
+				<div className="pl-0">
+					<CompactToolDisplay toolName={String(tool.tool)} params={params} />
+				</div>
+			)
+		}
+	}
 
 	const followUpData = useMemo(() => {
 		if (message.type === "ask" && message.ask === "followup" && !message.partial) {
@@ -1270,87 +1412,37 @@ export const ChatRowContent = ({
 					return <CodebaseSearchResultsDisplay results={results} />
 				case "user_edit_todos":
 					return <UpdateTodoListToolBlock userEdited onChange={() => {}} />
-				case "tool" as any:
+				case "tool" as any: {
 					// Handle say tool messages
 					const sayTool = safeJsonParse<ClineSayTool>(message.text)
 					if (!sayTool) return null
 
 					switch (sayTool.tool) {
-						case "runSlashCommand": {
-							const slashCommandInfo = sayTool
+						case "sandboxPackageTool" as any: {
+							const content = ((sayTool as any).content as string | undefined) ?? ""
+							const isError = (sayTool as any).isError === true
 							return (
-								<>
-									<div className="pl-0">
-										<ToolUseBlock>
-											<ToolUseBlockHeader
-												style={{
-													display: "flex",
-													flexDirection: "column",
-													alignItems: "flex-start",
-													gap: "4px",
-													padding: "10px 12px",
-												}}>
-												<div
-													style={{
-														display: "flex",
-														alignItems: "center",
-														gap: "8px",
-														width: "100%",
-													}}>
-													<span
-														style={{
-															fontWeight: "500",
-															fontSize: "var(--vscode-font-size)",
-														}}>
-														/{slashCommandInfo.command}
-													</span>
-													{slashCommandInfo.args && (
-														<span
-															style={{
-																color: "var(--vscode-descriptionForeground)",
-																fontSize: "var(--vscode-font-size)",
-															}}>
-															{slashCommandInfo.args}
-														</span>
-													)}
-												</div>
-												{slashCommandInfo.description && (
-													<div
-														style={{
-															color: "var(--vscode-descriptionForeground)",
-															fontSize: "calc(var(--vscode-font-size) - 1px)",
-														}}>
-														{slashCommandInfo.description}
-													</div>
-												)}
-												{slashCommandInfo.source && (
-													<div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-														<VSCodeBadge
-															style={{ fontSize: "calc(var(--vscode-font-size) - 2px)" }}>
-															{slashCommandInfo.source}
-														</VSCodeBadge>
-													</div>
-												)}
-											</ToolUseBlockHeader>
-										</ToolUseBlock>
-									</div>
-								</>
+								<div className="pl-0">
+									<ToolResultDisplay resultText={content} isError={isError} isRunning={message.partial === true} />
+								</div>
 							)
 						}
-						default:
+						case "runSlashCommand": {
 							return null
+						}
+						default: {
+							const resultText = (sayTool as any).content
+							if (typeof resultText !== "string" || resultText.trim() === "") {
+								return null
+							}
+							return (
+								<div className="pl-0">
+									<ToolResultDisplay resultText={resultText} isRunning={message.partial === true} />
+								</div>
+							)
+						}
 					}
-				case "image":
-					// Parse the JSON to get imageUri and imagePath
-					const imageInfo = safeJsonParse<{ imageUri: string; imagePath: string }>(message.text || "{}")
-					if (!imageInfo) {
-						return null
-					}
-					return (
-						<div style={{ marginTop: "10px" }}>
-							<ImageBlock imageUri={imageInfo.imageUri} imagePath={imageInfo.imagePath} />
-						</div>
-					)
+				}
 				// kilocode_change start: upstream pr https://github.com/RooCodeInc/Roo-Code/pull/5452
 				case "browser_action":
 					return null

@@ -5,6 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ExtensionStateContextProvider } from "@src/context/ExtensionStateContext"
 import { ChatRowContent } from "../ChatRow"
 
+const mockVscodePostMessage = vi.fn()
+
+vi.mock("@src/utils/vscode", () => ({
+	vscode: {
+		postMessage: (...args: any[]) => mockVscodePostMessage(...args),
+	},
+}))
+
 // Mock i18n
 vi.mock("react-i18next", () => ({
 	useTranslation: () => ({
@@ -60,6 +68,27 @@ const mockOnFollowUpUnmount = vi.fn()
 describe("ChatRow - runSlashCommand tool", () => {
 	beforeEach(() => {
 		vi.clearAllMocks()
+	})
+
+	it("should open file when clicking readFile single-file tool row", () => {
+		const message: any = {
+			type: "ask",
+			ask: "tool",
+			ts: Date.now(),
+			text: JSON.stringify({
+				tool: "readFile",
+				path: "src/index.ts",
+				content: "src/index.ts",
+			}),
+			partial: false,
+		}
+
+		const { getByTestId } = renderChatRowWithProviders(message)
+		getByTestId("tool-call-toggle").click()
+		expect(mockVscodePostMessage).toHaveBeenCalledWith({
+			type: "openFile",
+			text: "src/index.ts",
+		})
 	})
 
 	it("should display runSlashCommand ask message with command only", () => {
@@ -123,5 +152,100 @@ describe("ChatRow - runSlashCommand tool", () => {
 		expect(getByText("Roo ran slash command:")).toBeInTheDocument()
 		expect(getByText("/deploy")).toBeInTheDocument()
 		expect(getByText("global")).toBeInTheDocument()
+	})
+
+	it("should display sandboxPackageTool say result and mark true in green", () => {
+		const message: any = {
+			type: "say",
+			say: "tool",
+			ts: Date.now(),
+			text: JSON.stringify({
+				tool: "sandboxPackageTool",
+				packageName: "time",
+				toolName: "get_time",
+				content: "true",
+				isError: false,
+			}),
+			partial: false,
+		}
+
+		const { getByTestId } = renderChatRowWithProviders(message)
+
+		const collapsed = getByTestId("tool-result-collapsed")
+		expect(collapsed).toBeInTheDocument()
+		expect(collapsed).toHaveTextContent("true")
+		// true should be green
+		expect(collapsed).toHaveClass("text-vscode-charts-green")
+	})
+
+	it("should expand tool result when clicked and limit height", () => {
+		const message: any = {
+			type: "say",
+			say: "tool",
+			ts: Date.now(),
+			text: JSON.stringify({
+				tool: "sandboxPackageTool",
+				packageName: "time",
+				toolName: "get_time",
+				content: "true",
+				isError: false,
+			}),
+			partial: false,
+		}
+
+		const { getByTestId, queryByTestId } = renderChatRowWithProviders(message)
+		// initially collapsed
+		expect(getByTestId("tool-result-collapsed")).toBeInTheDocument()
+		expect(queryByTestId("tool-result-expanded")).toBeNull()
+		getByTestId("tool-result-toggle").click()
+		const expanded = getByTestId("tool-result-expanded")
+		expect(expanded).toBeInTheDocument()
+		// max height + scroll
+		expect(expanded).toHaveClass("max-h-40")
+		expect(expanded).toHaveClass("overflow-y-auto")
+	})
+
+	it("should display sandboxPackageTool say result in grey when error", () => {
+		const message: any = {
+			type: "say",
+			say: "tool",
+			ts: Date.now(),
+			text: JSON.stringify({
+				tool: "sandboxPackageTool",
+				packageName: "time",
+				toolName: "get_time",
+				content: "{\"status\":\"error\",\"message\":\"bad\"}",
+				isError: true,
+			}),
+			partial: false,
+		}
+
+		const { getByText } = renderChatRowWithProviders(message)
+
+		const contentEl = getByText("{\"status\":\"error\",\"message\":\"bad\"}")
+		expect(contentEl).toBeInTheDocument()
+		// Uses unified grey styling now; no per-status color.
+		expect(contentEl).toHaveClass("text-xs")
+	})
+
+	it("should show running placeholder for sandboxPackageTool when partial", () => {
+		const message: any = {
+			type: "say",
+			say: "tool",
+			ts: Date.now(),
+			text: JSON.stringify({
+				tool: "sandboxPackageTool",
+				packageName: "time",
+				toolName: "get_time",
+				content: "",
+				isError: false,
+			}),
+			partial: true,
+		}
+
+		const { getByTestId } = renderChatRowWithProviders(message)
+		const collapsed = getByTestId("tool-result-collapsed")
+		expect(collapsed).toBeInTheDocument()
+		expect(collapsed).toHaveTextContent("执行中")
 	})
 })

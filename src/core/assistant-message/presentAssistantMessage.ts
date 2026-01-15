@@ -58,6 +58,96 @@ import { reportBugTool } from "../tools/kilocode/reportBugTool"
 import { condenseTool } from "../tools/kilocode/condenseTool"
 import { captureAskApproval } from "./kilocode/captureAskApprovalEvent"
 
+// kilocode_change start
+type NormalizedToolResponse = {
+  text: string
+  imageBlocks: Anthropic.ImageBlockParam[]
+}
+
+const normalizeToolResponse = (
+  content: ToolResponse,
+  formatText: (text: string) => string = (text) => text || "(tool did not return anything)",
+): NormalizedToolResponse => {
+  if (typeof content === "string") {
+    return { text: formatText(content), imageBlocks: [] }
+  }
+
+  const textBlocks = content.filter((item) => item.type === "text")
+  const imageBlocks = content.filter((item) => item.type === "image") as Anthropic.ImageBlockParam[]
+  const text = formatText(textBlocks.map((item) => (item as Anthropic.TextBlockParam).text).join("\n"))
+  return { text, imageBlocks }
+}
+
+const pushNativeToolSkipResult = (cline: Task, toolCallId: string | undefined, errorMessage: string) => {
+  if (!toolCallId) {
+    return
+  }
+  cline.userMessageContent.push({
+    type: "tool_result",
+    tool_use_id: toolCallId,
+    content: errorMessage,
+    is_error: true,
+  } as Anthropic.ToolResultBlockParam)
+}
+
+const createNativeToolResultPusher = (options: {
+  cline: Task
+  toolCallId: string | undefined
+  warnLabel: string
+  formatText?: (text: string) => string
+  computeIsError?: (text: string) => boolean
+  includeIsErrorField?: boolean
+  markToolUsed?: boolean
+  onDidPush?: (text: string, isError: boolean) => void
+}) => {
+  let hasToolResult = false
+  const {
+    cline,
+    toolCallId,
+    warnLabel,
+    formatText,
+    computeIsError,
+    includeIsErrorField = false,
+    markToolUsed = false,
+    onDidPush,
+  } = options
+
+  const pushToolResult = (content: ToolResponse) => {
+    if (!toolCallId) {
+      return
+    }
+    if (hasToolResult) {
+      console.warn(`[presentAssistantMessage] Skipping duplicate tool_result for ${warnLabel}: ${toolCallId}`)
+      return
+    }
+
+    const normalized = normalizeToolResponse(content, formatText)
+    const isError = computeIsError ? computeIsError(normalized.text) : false
+    const toolResultBlock: any = {
+      type: "tool_result",
+      tool_use_id: toolCallId,
+      content: normalized.text,
+    }
+    if (includeIsErrorField) {
+      toolResultBlock.is_error = isError
+    }
+
+    cline.userMessageContent.push(toolResultBlock as Anthropic.ToolResultBlockParam)
+    if (normalized.imageBlocks.length > 0) {
+      cline.userMessageContent.push(...normalized.imageBlocks)
+    }
+
+    onDidPush?.(normalized.text, isError)
+    hasToolResult = true
+    if (markToolUsed) {
+      cline.didAlreadyUseTool = true
+    }
+  }
+
+  return { pushToolResult }
+}
+// kilocode_change end
+
 /**
  * Processes and presents assistant message content to the user interface.
  *
@@ -130,19 +220,35 @@ export async function presentAssistantMessage(cline: Task) {
 				const isDisabled = Array.isArray(disabled) && disabled.includes(pkgBlock.packageName)
 				const isEnabledOverride = Array.isArray(enabled) && enabled.includes(pkgBlock.packageName)
 				if (isDisabled && !isEnabledOverride) {
+					const message = `Package '${pkgBlock.packageName}' is disabled in settings.`
 					if (toolProtocol === TOOL_PROTOCOL.NATIVE && toolCallId) {
 						cline.userMessageContent.push({
 							type: "tool_result",
 							tool_use_id: toolCallId,
-							content: `Package '${pkgBlock.packageName}' is disabled in settings.`,
+							content: message,
 							is_error: true,
 						} as Anthropic.ToolResultBlockParam)
 					} else {
 						cline.userMessageContent.push({
 							type: "text",
-							text: `Package '${pkgBlock.packageName}' is disabled in settings.`,
+							text: message,
 						})
 					}
+					await cline.say(
+						"tool" as any,
+						JSON.stringify({
+							tool: "sandboxPackageTool",
+							packageName: pkgBlock.packageName,
+							toolName: pkgBlock.toolName,
+							content: message,
+							isError: true,
+						}),
+						undefined,
+						false,
+						undefined,
+						undefined,
+						{ isNonInteractive: true },
+					)
 					cline.didAlreadyUseTool = true
 					break
 				}
@@ -155,31 +261,63 @@ export async function presentAssistantMessage(cline: Task) {
 				const errorMessage = !pkgBlock.partial
 					? `Skipping package tool ${pkgBlock.name} due to user rejecting a previous tool.`
 					: `Package tool ${pkgBlock.name} was interrupted and not executed due to user rejecting a previous tool.`
+				const formatted = errorMessage
 				if (toolProtocol === TOOL_PROTOCOL.NATIVE && toolCallId) {
 					cline.userMessageContent.push({
 						type: "tool_result",
 						tool_use_id: toolCallId,
-						content: errorMessage,
+						content: formatted,
 						is_error: true,
 					} as Anthropic.ToolResultBlockParam)
 				} else {
-					cline.userMessageContent.push({ type: "text", text: errorMessage })
+					cline.userMessageContent.push({ type: "text", text: formatted })
 				}
+				await cline.say(
+					"tool" as any,
+					JSON.stringify({
+						tool: "sandboxPackageTool",
+						packageName: pkgBlock.packageName,
+						toolName: pkgBlock.toolName,
+						content: formatted,
+						isError: true,
+					}),
+					undefined,
+					false,
+					undefined,
+					undefined,
+					{ isNonInteractive: true },
+				)
 				break
 			}
 
 			if (cline.didAlreadyUseTool) {
 				const errorMessage = `Package tool [${pkgBlock.name}] was not executed because a tool has already been used in this message. Only one tool may be used per message.`
+				const formatted = errorMessage
 				if (toolProtocol === TOOL_PROTOCOL.NATIVE && toolCallId) {
 					cline.userMessageContent.push({
 						type: "tool_result",
 						tool_use_id: toolCallId,
-						content: errorMessage,
+						content: formatted,
 						is_error: true,
 					} as Anthropic.ToolResultBlockParam)
 				} else {
-					cline.userMessageContent.push({ type: "text", text: errorMessage })
+					cline.userMessageContent.push({ type: "text", text: formatted })
 				}
+				await cline.say(
+					"tool" as any,
+					JSON.stringify({
+						tool: "sandboxPackageTool",
+						packageName: pkgBlock.packageName,
+						toolName: pkgBlock.toolName,
+						content: formatted,
+						isError: true,
+					}),
+					undefined,
+					false,
+					undefined,
+					undefined,
+					{ isNonInteractive: true },
+				)
 				break
 			}
 
@@ -187,45 +325,76 @@ export async function presentAssistantMessage(cline: Task) {
 			const toolDescription = () =>
 				`[sandbox_package_tool for '${pkgBlock.packageName}.${pkgBlock.toolName}']`
 
+			const formatPkgToolResultContent = (result: string) => {
+				return result || "(tool did not return anything)"
+			}
+
+			const isPkgToolErrorResult = (formattedResult: string) => {
+				try {
+					const parsed = JSON.parse(formattedResult)
+					const status = (parsed as any)?.status
+					return status === "error" || status === "denied"
+				} catch {
+					return false
+				}
+			}
+
+			const sayPkgToolResult = async (formattedResult: string, isError: boolean) => {
+				await cline.say(
+					"tool" as any,
+					JSON.stringify({
+						tool: "sandboxPackageTool",
+						packageName: pkgBlock.packageName,
+						toolName: pkgBlock.toolName,
+						content: formattedResult,
+						isError,
+					}),
+					undefined,
+					false,
+					undefined,
+					undefined,
+					{ isNonInteractive: true },
+				)
+			}
+
+			const { pushToolResult: pushNativePkgToolResult } = createNativeToolResultPusher({
+				cline,
+				toolCallId,
+				warnLabel: "pkg_tool_use",
+				formatText: formatPkgToolResultContent,
+				computeIsError: isPkgToolErrorResult,
+				includeIsErrorField: true,
+				markToolUsed: true,
+				onDidPush: (text, isError) => {
+					void sayPkgToolResult(text, isError)
+				},
+			})
+
 			const pushToolResult = (content: ToolResponse) => {
 				if (toolProtocol === TOOL_PROTOCOL.NATIVE) {
-					if (hasToolResult) {
-						console.warn(
-							`[presentAssistantMessage] Skipping duplicate tool_result for pkg_tool_use: ${toolCallId}`,
-						)
-						return
-					}
-					let resultContent: string
-					let imageBlocks: Anthropic.ImageBlockParam[] = []
-					if (typeof content === "string") {
-						resultContent = content || "(tool did not return anything)"
-					} else {
-						const textBlocks = content.filter((item) => item.type === "text")
-						imageBlocks = content.filter((item) => item.type === "image") as Anthropic.ImageBlockParam[]
-						resultContent =
-							textBlocks.map((item) => (item as Anthropic.TextBlockParam).text).join("\n") ||
-							"(tool did not return anything)"
-					}
-					if (toolCallId) {
-						cline.userMessageContent.push({
-							type: "tool_result",
-							tool_use_id: toolCallId,
-							content: resultContent,
-						} as Anthropic.ToolResultBlockParam)
-						if (imageBlocks.length > 0) {
-							cline.userMessageContent.push(...imageBlocks)
-						}
-					}
+					pushNativePkgToolResult(content)
 					hasToolResult = true
 				} else {
 					cline.userMessageContent.push({ type: "text", text: `${toolDescription()} Result:` })
 					if (typeof content === "string") {
+						const formatted = formatPkgToolResultContent(content)
 						cline.userMessageContent.push({
 							type: "text",
-							text: content || "(tool did not return anything)",
+							text: formatted,
 						})
+						void sayPkgToolResult(formatted, isPkgToolErrorResult(formatted))
 					} else {
-						cline.userMessageContent.push(...content)
+						const textBlocks = content.filter((item) => item.type === "text")
+						const imageBlocks = content.filter((item) => item.type === "image") as Anthropic.ImageBlockParam[]
+						const formatted = formatPkgToolResultContent(
+							textBlocks.map((item) => (item as Anthropic.TextBlockParam).text).join("\n"),
+						)
+						cline.userMessageContent.push({
+							type: "text",
+							text: formatted,
+						})
+						cline.userMessageContent.push(...imageBlocks)
+						void sayPkgToolResult(formatted, isPkgToolErrorResult(formatted))
 					}
 				}
 				cline.didAlreadyUseTool = true
@@ -300,6 +469,23 @@ export async function presentAssistantMessage(cline: Task) {
 				// askApproval already pushed a tool_result (native) and set didRejectTool.
 				break
 			}
+
+			// Show a running tool result block in the UI while the sandboxed tool is executing.
+			await cline.say(
+				"tool" as any,
+				JSON.stringify({
+					tool: "sandboxPackageTool",
+					packageName: pkgBlock.packageName,
+					toolName: pkgBlock.toolName,
+					content: "",
+					isError: false,
+				}),
+				undefined,
+				true,
+				undefined,
+				undefined,
+				{ isNonInteractive: true },
+			)
 
 			let pkgArgsForLog = "{}"
 			try {
@@ -455,79 +641,29 @@ export async function presentAssistantMessage(cline: Task) {
 			const mcpBlock = block as McpToolUse
 
 			if (cline.didRejectTool) {
-				// For native protocol, we must send a tool_result for every tool_use to avoid API errors
 				const toolCallId = mcpBlock.id
 				const errorMessage = !mcpBlock.partial
 					? `Skipping MCP tool ${mcpBlock.name} due to user rejecting a previous tool.`
 					: `MCP tool ${mcpBlock.name} was interrupted and not executed due to user rejecting a previous tool.`
-
-				if (toolCallId) {
-					cline.userMessageContent.push({
-						type: "tool_result",
-						tool_use_id: toolCallId,
-						content: errorMessage,
-						is_error: true,
-					} as Anthropic.ToolResultBlockParam)
-				}
+				pushNativeToolSkipResult(cline, toolCallId, errorMessage)
 				break
 			}
 
 			if (cline.didAlreadyUseTool) {
 				const toolCallId = mcpBlock.id
 				const errorMessage = `MCP tool [${mcpBlock.name}] was not executed because a tool has already been used in this message. Only one tool may be used per message.`
-
-				if (toolCallId) {
-					cline.userMessageContent.push({
-						type: "tool_result",
-						tool_use_id: toolCallId,
-						content: errorMessage,
-						is_error: true,
-					} as Anthropic.ToolResultBlockParam)
-				}
+				pushNativeToolSkipResult(cline, toolCallId, errorMessage)
 				break
 			}
 
-			// Track if we've already pushed a tool result
-			let hasToolResult = false
 			const toolCallId = mcpBlock.id
 			const toolProtocol = TOOL_PROTOCOL.NATIVE // MCP tools in native mode always use native protocol
-
-			const pushToolResult = (content: ToolResponse) => {
-				if (hasToolResult) {
-					console.warn(
-						`[presentAssistantMessage] Skipping duplicate tool_result for mcp_tool_use: ${toolCallId}`,
-					)
-					return
-				}
-
-				let resultContent: string
-				let imageBlocks: Anthropic.ImageBlockParam[] = []
-
-				if (typeof content === "string") {
-					resultContent = content || "(tool did not return anything)"
-				} else {
-					const textBlocks = content.filter((item) => item.type === "text")
-					imageBlocks = content.filter((item) => item.type === "image") as Anthropic.ImageBlockParam[]
-					resultContent =
-						textBlocks.map((item) => (item as Anthropic.TextBlockParam).text).join("\n") ||
-						"(tool did not return anything)"
-				}
-
-				if (toolCallId) {
-					cline.userMessageContent.push({
-						type: "tool_result",
-						tool_use_id: toolCallId,
-						content: resultContent,
-					} as Anthropic.ToolResultBlockParam)
-
-					if (imageBlocks.length > 0) {
-						cline.userMessageContent.push(...imageBlocks)
-					}
-				}
-
-				hasToolResult = true
-				cline.didAlreadyUseTool = true
-			}
+			const { pushToolResult } = createNativeToolResultPusher({
+				cline,
+				toolCallId,
+				warnLabel: "mcp_tool_use",
+				markToolUsed: true,
+			})
 
 			const toolDescription = () => `[mcp_tool: ${mcpBlock.serverName}/${mcpBlock.toolName}]`
 
@@ -881,46 +1017,15 @@ export async function presentAssistantMessage(cline: Task) {
 			// Previously resolved from experiments.isEnabled(..., EXPERIMENT_IDS.MULTIPLE_NATIVE_TOOL_CALLS)
 			const isMultipleNativeToolCallsEnabled = false
 
+			const { pushToolResult: pushNativeToolResult } = createNativeToolResultPusher({
+				cline,
+				toolCallId,
+				warnLabel: "tool_use_id",
+			})
+
 			const pushToolResult = (content: ToolResponse) => {
 				if (toolProtocol === TOOL_PROTOCOL.NATIVE) {
-					// For native protocol, only allow ONE tool_result per tool call
-					if (hasToolResult) {
-						console.warn(
-							`[presentAssistantMessage] Skipping duplicate tool_result for tool_use_id: ${toolCallId}`,
-						)
-						return
-					}
-
-					// For native protocol, tool_result content must be a string
-					// Images are added as separate blocks in the user message
-					let resultContent: string
-					let imageBlocks: Anthropic.ImageBlockParam[] = []
-
-					if (typeof content === "string") {
-						resultContent = content || "(tool did not return anything)"
-					} else {
-						// Separate text and image blocks
-						const textBlocks = content.filter((item) => item.type === "text")
-						imageBlocks = content.filter((item) => item.type === "image") as Anthropic.ImageBlockParam[]
-
-						// Convert text blocks to string for tool_result
-						resultContent =
-							textBlocks.map((item) => (item as Anthropic.TextBlockParam).text).join("\n") ||
-							"(tool did not return anything)"
-					}
-
-					// Add tool_result with text content only
-					cline.userMessageContent.push({
-						type: "tool_result",
-						tool_use_id: toolCallId,
-						content: resultContent,
-					} as Anthropic.ToolResultBlockParam)
-
-					// Add image blocks separately after tool_result
-					if (imageBlocks.length > 0) {
-						cline.userMessageContent.push(...imageBlocks)
-					}
-
+					pushNativeToolResult(content)
 					hasToolResult = true
 				} else {
 					// For XML protocol, add as text blocks (legacy behavior)

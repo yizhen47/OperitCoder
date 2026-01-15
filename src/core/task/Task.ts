@@ -1602,6 +1602,9 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 
 		if (partial !== undefined) {
 			const lastMessage = this.clineMessages.at(-1)
+			const previousPartialMessage = [...this.clineMessages]
+				.reverse()
+				.find((msg) => msg.type === "say" && msg.say === type && msg.partial) as ClineMessage | undefined
 
 			const isUpdatingPreviousPartial =
 				lastMessage && lastMessage.partial && lastMessage.type === "say" && lastMessage.say === type
@@ -1643,23 +1646,28 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 				// New now have a complete version of a previously partial message.
 				// This is the complete version of a previously partial
 				// message, so replace the partial with the complete version.
-				if (isUpdatingPreviousPartial) {
+				const messageToUpdate =
+					(isUpdatingPreviousPartial ? lastMessage : previousPartialMessage) as any as
+						| (typeof lastMessage)
+						| undefined
+
+				if (messageToUpdate && (messageToUpdate as any).type === "say" && (messageToUpdate as any).say === type) {
 					if (!options.isNonInteractive) {
-						this.lastMessageTs = lastMessage.ts
+						this.lastMessageTs = (messageToUpdate as any).ts
 					}
 
-					lastMessage.text = text
-					lastMessage.images = images
-					lastMessage.partial = false
-					lastMessage.progressStatus = progressStatus
+					;(messageToUpdate as any).text = text
+					;(messageToUpdate as any).images = images
+					;(messageToUpdate as any).partial = false
+					;(messageToUpdate as any).progressStatus = progressStatus
 					// kilocode_change start
 					if (options.metadata) {
-						lastMessage.metadata = Object.assign(lastMessage.metadata ?? {}, options.metadata)
+						;(messageToUpdate as any).metadata = Object.assign((messageToUpdate as any).metadata ?? {}, options.metadata)
 					}
 					if (type === "reasoning") {
-						const startedAt = (lastMessage.metadata as any)?.reasoningStartedAtMs
+						const startedAt = ((messageToUpdate as any).metadata as any)?.reasoningStartedAtMs
 						if (typeof startedAt === "number") {
-							lastMessage.metadata = Object.assign(lastMessage.metadata ?? {}, {
+							;(messageToUpdate as any).metadata = Object.assign((messageToUpdate as any).metadata ?? {}, {
 								reasoningDurationMs: Math.max(0, Date.now() - startedAt),
 							})
 						}
@@ -1671,7 +1679,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 					await this.saveClineMessages()
 
 					// More performant than an entire `postStateToWebview`.
-					this.updateClineMessage(lastMessage)
+					this.updateClineMessage(messageToUpdate as any)
 				} else {
 					// This is a new and complete message, so add it like normal.
 					const sayTs = await this.nextClineMessageTimestamp_kilocode()

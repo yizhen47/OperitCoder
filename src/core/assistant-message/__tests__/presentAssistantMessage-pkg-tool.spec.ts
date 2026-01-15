@@ -101,6 +101,26 @@ describe("presentAssistantMessage - pkg_tool_use", () => {
 		)
 		expect(toolResult).toBeDefined()
 		expect(toolResult.content).toContain('"ok":true')
+		// First emit a partial tool result so the UI can show a loading state.
+		expect(mockTask.say).toHaveBeenCalledWith(
+			"tool",
+			expect.stringContaining('"tool":"sandboxPackageTool"'),
+			undefined,
+			true,
+			undefined,
+			undefined,
+			expect.any(Object),
+		)
+		// Then emit the final tool result.
+		expect(mockTask.say).toHaveBeenCalledWith(
+			"tool",
+			expect.stringContaining('"tool":"sandboxPackageTool"'),
+			undefined,
+			false,
+			undefined,
+			undefined,
+			expect.any(Object),
+		)
 		expect(mockTask.ask).toHaveBeenCalledTimes(1)
 		expect(mockTask.ask).toHaveBeenCalledWith("tool", expect.any(String), false, undefined, false)
 		const approvalMessage = mockTask.ask.mock.calls[0]?.[1]

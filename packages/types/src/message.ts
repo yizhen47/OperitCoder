@@ -173,6 +173,7 @@ export const clineSays = [
 	"api_req_retried",
 	"api_req_retry_delayed",
 	"api_req_deleted",
+	"tool", // kilocode_change
 	"text",
 	"image",
 	"reasoning",
