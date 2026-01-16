@@ -1117,11 +1117,14 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 
 													<ToggleSwitch
 														checked={enabled}
+														size="medium"
+														aria-label={`Toggle sandbox package ${pkg.name}`}
+														data-testid={`sandbox-package-toggle-${pkg.name}`}
 														onChange={() => {
 															vscode.postMessage({
 																type: "toggleExamplePackage",
 																packageName: pkg.name,
-																disabled: !enabled,
+																disabled: enabled,
 															})
 														}}
 													/>

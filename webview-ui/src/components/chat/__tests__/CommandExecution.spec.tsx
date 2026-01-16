@@ -19,10 +19,6 @@ vi.mock("../../../utils/vscode", () => ({
 	},
 }))
 
-vi.mock("../../kilocode/common/CodeBlock", () => ({
-	default: ({ source }: { source: string }) => <div data-testid="code-block">{source}</div>,
-}))
-
 vi.mock("../CommandPatternSelector", () => ({
 	CommandPatternSelector: ({ patterns, onAllowPatternChange, onDenyPatternChange }: any) => (
 		<div data-testid="command-pattern-selector">
@@ -216,8 +212,9 @@ Installing...`
 			</ExtensionStateWrapper>,
 		)
 
-		const codeBlocks = screen.getAllByTestId("code-block")
-		expect(codeBlocks[0]).toHaveTextContent("npm install")
+		const toggle = screen.getByTestId("tool-call-toggle")
+		expect(toggle).toHaveTextContent("npm install")
+		expect(screen.getByTestId("tool-result-collapsed")).toHaveTextContent("Installing...")
 	})
 
 	it("should parse command with output", () => {
@@ -478,7 +475,8 @@ Running tests...
 			)
 
 			// Should still render the command
-			expect(screen.getByTestId("code-block")).toHaveTextContent("echo 'test with unclosed quote")
+			const toggle = screen.getByTestId("tool-call-toggle")
+			expect(toggle).toHaveTextContent("echo 'test with unclosed quote")
 
 			// Should show pattern selector with a command pattern
 			const selector = screen.getByTestId("command-pattern-selector")

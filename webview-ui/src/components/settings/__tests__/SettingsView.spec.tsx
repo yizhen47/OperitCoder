@@ -301,6 +301,27 @@ describe("SettingsView - Sound Settings", () => {
 		vi.clearAllMocks()
 	})
 
+	it("toggles sandbox package and sends message to VSCode", () => {
+		const { activateTab } = renderSettingsView({
+			examplePackages: [{ name: "alpha", enabledByDefault: true, toolCount: 1 }],
+			enabledExamplePackages: [],
+			disabledExamplePackages: [],
+		})
+
+		activateTab("examplePackages")
+
+		const toggle = screen.getByTestId("sandbox-package-toggle-alpha")
+		fireEvent.click(toggle)
+
+		expect(vscode.postMessage).toHaveBeenCalledWith(
+			expect.objectContaining({
+				type: "toggleExamplePackage",
+				packageName: "alpha",
+				disabled: true,
+			}),
+		)
+	})
+
 	it("initializes with tts disabled by default", () => {
 		// Render once and get the activateTab helper
 		const { activateTab } = renderSettingsView()

@@ -17,7 +17,8 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
 	"aria-label": ariaLabel,
 	"data-testid": dataTestId,
 }) => {
-	const dimensions = size === "small" ? { width: 16, height: 8, dotSize: 4 } : { width: 20, height: 10, dotSize: 6 }
+	const dimensions =
+		size === "small" ? { width: 28, height: 16, dotSize: 12 } : { width: 36, height: 20, dotSize: 16 }
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === "Enter" || e.key === " ") {

@@ -3902,7 +3902,15 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 	}
 
 	public async *attemptApiRequest(retryAttempt: number = 0): ApiStream {
+		if (this.abort) {
+			throw new Error(`[Task#attemptApiRequest] task ${this.taskId}.${this.instanceId} aborted`)
+		}
+
 		const state = await this.providerRef.deref()?.getState()
+
+		if (this.abort) {
+			throw new Error(`[Task#attemptApiRequest] task ${this.taskId}.${this.instanceId} aborted`)
+		}
 
 		const {
 			apiConfiguration,
@@ -3954,6 +3962,9 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		if (rateLimitDelay > 0 && retryAttempt === 0) {
 			// Show countdown timer
 			for (let i = rateLimitDelay; i > 0; i--) {
+				if (this.abort) {
+					throw new Error(`[Task#attemptApiRequest] task ${this.taskId}.${this.instanceId} aborted`)
+				}
 				const delayMessage = `Rate limiting for ${i} seconds...`
 				await this.say("api_req_retry_delayed", delayMessage, undefined, true)
 				await delay(1000)
@@ -3965,6 +3976,10 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		Task.lastGlobalApiRequestTime = performance.now()
 
 		const systemPrompt = await this.getSystemPrompt()
+
+		if (this.abort) {
+			throw new Error(`[Task#attemptApiRequest] task ${this.taskId}.${this.instanceId} aborted`)
+		}
 		const { contextTokens } = this.getTokenUsage()
 
 		if (contextTokens) {

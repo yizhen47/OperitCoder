@@ -23,6 +23,7 @@ import { SkillsManager } from "../../services/skills/SkillsManager"
 import * as path from "path"
 import { scanExamplePackages, type ToolPackage } from "../tool-packages"
 import { buildExampleToolName } from "../../utils/example-tool-name"
+import { sanitizeMcpName } from "../../utils/mcp-name"
 // kilocode_change end
 
 import { PromptVariables, loadSystemPromptFile } from "./sections/custom-system-prompt"
@@ -234,10 +235,12 @@ async function getExamplePackagesSection(
 		return ""
 	}
 
-	const disabled = new Set((disabledExamplePackages ?? []).map((n) => String(n).toLowerCase()))
-	const enabledOverride = new Set((enabledExamplePackages ?? []).map((n) => String(n).toLowerCase()))
+	const disabled = new Set((disabledExamplePackages ?? []).map((n) => sanitizeMcpName(String(n)).toLowerCase()))
+	const enabledOverride = new Set(
+		(enabledExamplePackages ?? []).map((n) => sanitizeMcpName(String(n)).toLowerCase()),
+	)
 	const enabled = packages.filter((p) => {
-		const name = String(p.name).toLowerCase()
+		const name = sanitizeMcpName(String(p.name)).toLowerCase()
 		if (enabledOverride.has(name)) {
 			return true
 		}

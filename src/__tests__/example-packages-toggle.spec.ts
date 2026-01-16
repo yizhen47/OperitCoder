@@ -59,6 +59,7 @@ describe("sandbox package toggles", () => {
 			pkg("alpha", true, ["t1"]),
 			pkg("beta", false, ["t2"]),
 			pkg("gamma", true, ["t3"]),
+			pkg("my pkg", true, ["t4"]),
 		])
 
 		const modeConfig = {
@@ -70,7 +71,7 @@ describe("sandbox package toggles", () => {
 			modeConfig,
 			"en",
 			["beta"],
-			["gamma"],
+			["gamma", "my_pkg"],
 		)
 
 		expect(section).toContain("## alpha")
@@ -79,5 +80,7 @@ describe("sandbox package toggles", () => {
 		expect(section).toContain("### pkg--beta--t2")
 		expect(section).not.toContain("## gamma")
 		expect(section).not.toContain("### pkg--gamma--t3")
+		expect(section).not.toContain("## my pkg")
+		expect(section).not.toContain("### pkg--my_pkg--t4")
 	})
 })

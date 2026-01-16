@@ -1067,6 +1067,23 @@ describe("Cline", () => {
 				Task.resetGlobalApiRequestTime()
 			})
 
+			it("should not start request when task is aborted", async () => {
+				const task = new Task({
+					provider: mockProvider,
+					apiConfiguration: mockApiConfig,
+					task: "test task",
+					startTask: false,
+					context: mockExtensionContext,
+				})
+
+				const createMessageSpy = vi.spyOn(task.api, "createMessage")
+				task.abort = true
+
+				const iterator = task.attemptApiRequest(0)
+				await expect(iterator.next()).rejects.toThrow("aborted")
+				expect(createMessageSpy).not.toHaveBeenCalled()
+			})
+
 			it("should enforce rate limiting across parent and subtask", async () => {
 				// Add a spy to track getState calls
 				const getStateSpy = vi.spyOn(mockProvider, "getState")
