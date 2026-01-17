@@ -108,7 +108,7 @@ export async function getExamplePackageToolsWithDisabledList(
 
 export async function getExamplePackageToolsWithToggleLists(
 	extensionPath: string,
-	options?: { enabledExamplePackages?: string[]; disabledExamplePackages?: string[] },
+	options?: { enabledExamplePackages?: string[]; disabledExamplePackages?: string[]; activatedExamplePackages?: string[] },
 ): Promise<OpenAI.Chat.ChatCompletionTool[]> {
 	const primaryExamplesDir = path.join(extensionPath, "dist", "examples")
 	const isDevExtensionLayout = path.basename(extensionPath).toLowerCase() === "src" // kilocode_change
@@ -118,8 +118,9 @@ export async function getExamplePackageToolsWithToggleLists(
 	const examplesDir = primaryExamplesDir
 	const enabledKey = (options?.enabledExamplePackages ?? []).slice().sort().join(",")
 	const disabledKey = (options?.disabledExamplePackages ?? []).slice().sort().join(",")
+	const activatedKey = (options?.activatedExamplePackages ?? []).slice().sort().join(",")
 	const cacheKey = `${primaryExamplesDir}|${fallbackExamplesDir}|${disabledKey}`
-	const fullCacheKey = `${cacheKey}|${enabledKey}`
+	const fullCacheKey = `${cacheKey}|${enabledKey}|${activatedKey}`
 
 	if (cachedTools && cachedKey === fullCacheKey) {
 		return cachedTools
@@ -132,6 +133,7 @@ export async function getExamplePackageToolsWithToggleLists(
 		}
 		const disabled = new Set((options?.disabledExamplePackages ?? []).map((n) => sanitizeMcpName(n)))
 		const enabledOverride = new Set((options?.enabledExamplePackages ?? []).map((n) => sanitizeMcpName(n)))
+		const activated = new Set((options?.activatedExamplePackages ?? []).map((n) => sanitizeMcpName(n)))
 
 		const enabled = packages.filter((p) => {
 			const name = sanitizeMcpName(p.name)
@@ -143,7 +145,11 @@ export async function getExamplePackageToolsWithToggleLists(
 			}
 			return Boolean(p.enabledByDefault)
 		})
-		const tools = enabled.flatMap(convertToolPackageToOpenAITools)
+
+		// Require explicit activation before exposing any pkg-- tools to the model.
+		// If no activated packages, return empty tool list.
+		const activatedEnabled = enabled.filter((p) => activated.has(sanitizeMcpName(p.name)))
+		const tools = activatedEnabled.flatMap(convertToolPackageToOpenAITools)
 
 		cachedTools = tools
 		cachedKey = fullCacheKey

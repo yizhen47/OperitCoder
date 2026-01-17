@@ -256,7 +256,10 @@ async function getExamplePackagesSection(
 	const lines: string[] = []
 	lines.push(`# Sandbox Package Tools`)
 	lines.push(
-		`These tools are dynamically loaded from built-in sandbox packages. Tool names use the format: pkg--<package>--<tool>.`,
+		`Sandbox packages are discoverable by name and description. Their specific tools (pkg--<package>--<tool>) are NOT exposed until you activate a package.`,
+	)
+	lines.push(
+		`To activate a package, call activate_sandbox_package with package_name='<package>'. After activation, the tool result will include the package's tool names and parameters, and subsequent requests will allow calling those pkg-- tools.`,
 	)
 
 	for (const pkg of enabled) {
@@ -265,27 +268,6 @@ async function getExamplePackagesSection(
 		const pkgDescription = localizeText(pkg.description)
 		if (pkgDescription) {
 			lines.push(pkgDescription)
-		}
-
-		for (const tool of pkg.tools) {
-			const toolFullName = buildExampleToolName(pkg.name, tool.name)
-			lines.push("")
-			lines.push(`### ${toolFullName}`)
-			const toolDescription = localizeText(tool.description)
-			if (toolDescription) {
-				lines.push(toolDescription)
-			}
-
-			if (tool.parameters && tool.parameters.length > 0) {
-				lines.push("")
-				lines.push(`Parameters:`)
-				for (const param of tool.parameters) {
-					const required = param.required ? "required" : "optional"
-					lines.push(
-						`- ${param.name} (${param.type}, ${required})${param.description ? `: ${param.description}` : ""}`,
-					)
-				}
-			}
 		}
 	}
 

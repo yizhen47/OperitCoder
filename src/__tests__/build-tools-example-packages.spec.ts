@@ -33,19 +33,26 @@ vi.mock("../core/prompts/tools/native-tools", () => {
 		getMcpServerTools: () => [],
 		getExamplePackageToolsWithToggleLists: async (
 			_extensionPath: string,
-			options?: { enabledExamplePackages?: string[]; disabledExamplePackages?: string[] },
+			options?: {
+				enabledExamplePackages?: string[]
+				disabledExamplePackages?: string[]
+				activatedExamplePackages?: string[]
+			},
 		): Promise<MockedTool[]> => {
 			const disabled = new Set((options?.disabledExamplePackages ?? []).map((x) => String(x).toLowerCase()))
 			const enabledOverride = new Set((options?.enabledExamplePackages ?? []).map((x) => String(x).toLowerCase()))
+			const activated = new Set((options?.activatedExamplePackages ?? []).map((x) => String(x).toLowerCase()))
 
 			const alphaEnabled = enabledOverride.has("alpha") || !disabled.has("alpha")
 			const betaEnabled = enabledOverride.has("beta") || !disabled.has("beta")
+			const alphaActivated = activated.has("alpha")
+			const betaActivated = activated.has("beta")
 
 			const result: MockedTool[] = []
-			if (alphaEnabled) {
+			if (alphaEnabled && alphaActivated) {
 				result.push(mkTool("pkg--alpha--t1"))
 			}
-			if (betaEnabled) {
+			if (betaEnabled && betaActivated) {
 				result.push(mkTool("pkg--beta--t2"))
 			}
 
@@ -74,6 +81,7 @@ describe("buildNativeToolsArray example package toggles", () => {
 				enabledExamplePackages: [],
 				disabledExamplePackages: ["alpha"],
 			} as any,
+			activatedExamplePackages: ["beta"],
 			modelInfo: undefined,
 			diffEnabled: true,
 		})

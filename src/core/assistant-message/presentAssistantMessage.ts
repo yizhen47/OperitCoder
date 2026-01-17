@@ -42,6 +42,10 @@ import { updateTodoListTool } from "../tools/UpdateTodoListTool"
 import { runSlashCommandTool } from "../tools/RunSlashCommandTool"
 import { generateImageTool } from "../tools/GenerateImageTool"
 
+// kilocode_change start
+import { activateSandboxPackageTool } from "../tools/ActivateSandboxPackageTool"
+// kilocode_change end
+
 import { formatResponse } from "../prompts/responses"
 import { validateToolUse } from "../tools/validateToolUse"
 import { Task } from "../task/Task"
@@ -383,6 +387,31 @@ async function handleMcpToolUse(cline: Task, mcpBlock: McpToolUse): Promise<void
 async function handlePkgToolUse(cline: Task, pkgBlock: ExampleToolUse): Promise<void> {
 	const toolCallId = pkgBlock.id
 	const toolProtocol = toolCallId ? TOOL_PROTOCOL.NATIVE : TOOL_PROTOCOL.XML
+
+	// kilocode_change start
+	// Require explicit activation before executing any package tools.
+	if (!cline.isExamplePackageActivated(pkgBlock.packageName)) {
+		const message = `Package '${pkgBlock.packageName}' is not activated. Activate it first using activate_sandbox_package with package_name='${pkgBlock.packageName}'.`
+		pushToolSkipResult(cline, toolProtocol, toolCallId, message)
+		await cline.say(
+			"tool" as any,
+			JSON.stringify({
+				tool: "sandboxPackageTool",
+				packageName: pkgBlock.packageName,
+				toolName: pkgBlock.toolName,
+				content: message,
+				isError: true,
+			}),
+			undefined,
+			false,
+			undefined,
+			undefined,
+			{ isNonInteractive: true },
+		)
+		cline.didAlreadyUseTool = true
+		return
+	}
+	// kilocode_change end
 
 	// kilocode_change: Respect disabledExamplePackages toggle
 	try {
@@ -1235,6 +1264,11 @@ async function handleToolUse(cline: Task, toolBlock: ToolUse): Promise<void> {
 		case "run_slash_command":
 			await runSlashCommandTool.handle(cline, toolBlock as ToolUse<"run_slash_command">, commonCallbacks)
 			break
+		// kilocode_change start
+		case "activate_sandbox_package":
+			await activateSandboxPackageTool.handle(cline, toolBlock as ToolUse<"activate_sandbox_package">, commonCallbacks)
+			break
+		// kilocode_change end
 		case "generate_image":
 			await checkpointSaveAndMark(cline)
 			await generateImageTool.handle(cline, toolBlock as ToolUse<"generate_image">, commonCallbacks)

@@ -27,6 +27,10 @@ import { getGenerateImageDescription } from "./generate-image"
 import { getDeleteFileDescription } from "./delete-file" // kilocode_change
 import { CodeIndexManager } from "../../../services/code-index/manager"
 
+// kilocode_change start
+import { getActivateSandboxPackageDescription } from "./activate-sandbox-package"
+// kilocode_change end
+
 // kilocode_change start: Morph fast apply
 import { isFastApplyAvailable } from "../../tools/kilocode/editFileTool"
 import { getEditFileDescription } from "./edit-file"
@@ -64,6 +68,9 @@ const toolDescriptionMap: Record<string, (args: ToolArgs) => string | undefined>
 	update_todo_list: (args) => getUpdateTodoListDescription(args),
 	run_slash_command: () => getRunSlashCommandDescription(),
 	generate_image: (args) => getGenerateImageDescription(args),
+	// kilocode_change start
+	activate_sandbox_package: (args) => getActivateSandboxPackageDescription(args),
+	// kilocode_change end
 }
 
 export function getToolDescriptionsForMode(

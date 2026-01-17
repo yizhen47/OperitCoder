@@ -344,6 +344,34 @@ describe("Cline", () => {
 			expect(mockProvider.postStateToWebview).not.toHaveBeenCalled()
 		})
 
+		it("does not post ask to webview when sandboxPackageTool activation is auto-approved", async () => {
+			const cline = new Task({
+				provider: mockProvider,
+				apiConfiguration: mockApiConfig,
+				task: "test task",
+				startTask: false,
+				context: mockExtensionContext,
+			})
+
+			mockProvider.getState = vi.fn().mockResolvedValue({
+				autoApprovalEnabled: true,
+				alwaysAllowPkgTools: true,
+			})
+
+			const toolAskText = JSON.stringify({
+				tool: "sandboxPackageTool",
+				packageName: "example",
+				toolName: "__activate__",
+				arguments: JSON.stringify({ package_name: "example" }),
+				content: "ok",
+				isError: false,
+			})
+			const result = await cline.ask("tool" as any, toolAskText)
+
+			expect(result.response).toBe("yesButtonClicked")
+			expect(mockProvider.postStateToWebview).not.toHaveBeenCalled()
+		})
+
 		it("does not post ask to webview when sandboxPackageTool is auto-approved", async () => {
 			const cline = new Task({
 				provider: mockProvider,

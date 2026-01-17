@@ -40,17 +40,30 @@ describe("sandbox package toggles", () => {
 			pkg("gamma", true, ["t3"]),
 		])
 
+		// Without activation, no pkg-- tools should be exposed.
 		const tools = await getExamplePackageToolsWithToggleLists("/ext", {
 			enabledExamplePackages: ["beta"],
 			disabledExamplePackages: ["gamma"],
+			activatedExamplePackages: [],
 		})
 
 		const names = tools
 			.filter((t): t is Extract<(typeof tools)[number], { type: "function" }> => t.type === "function")
 			.map((t) => t.function.name)
-		expect(names).toContain("pkg--alpha--t1")
-		expect(names).toContain("pkg--beta--t2")
-		expect(names).not.toContain("pkg--gamma--t3")
+		expect(names).toEqual([])
+
+		// With activation, only activated packages should be exposed.
+		const activatedTools = await getExamplePackageToolsWithToggleLists("/ext", {
+			enabledExamplePackages: ["beta"],
+			disabledExamplePackages: ["gamma"],
+			activatedExamplePackages: ["alpha", "beta"],
+		})
+		const activatedNames = activatedTools
+			.filter((t): t is Extract<(typeof activatedTools)[number], { type: "function" }> => t.type === "function")
+			.map((t) => t.function.name)
+		expect(activatedNames).toContain("pkg--alpha--t1")
+		expect(activatedNames).toContain("pkg--beta--t2")
+		expect(activatedNames).not.toContain("pkg--gamma--t3")
 	})
 
 	it("system example packages section filters packages with same override logic", async () => {
@@ -74,13 +87,13 @@ describe("sandbox package toggles", () => {
 			["gamma", "my_pkg"],
 		)
 
+		expect(section).toContain("activate_sandbox_package")
 		expect(section).toContain("## alpha")
-		expect(section).toContain("### pkg--alpha--t1")
 		expect(section).toContain("## beta")
-		expect(section).toContain("### pkg--beta--t2")
 		expect(section).not.toContain("## gamma")
-		expect(section).not.toContain("### pkg--gamma--t3")
 		expect(section).not.toContain("## my pkg")
-		expect(section).not.toContain("### pkg--my_pkg--t4")
+		// Tool names should NOT be exposed in system prompt until activation.
+		expect(section).not.toContain("pkg--alpha--t1")
+		expect(section).not.toContain("pkg--beta--t2")
 	})
 })

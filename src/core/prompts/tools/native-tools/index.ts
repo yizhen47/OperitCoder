@@ -20,6 +20,10 @@ import switchMode from "./switch_mode"
 import updateTodoList from "./update_todo_list"
 import writeToFile from "./write_to_file"
 
+// kilocode_change start
+import activateSandboxPackage from "./activate_sandbox_package"
+// kilocode_change end
+
 import deleteFile from "./kilocode/delete_file"
 import editFile from "./kilocode/edit_file"
 
@@ -46,6 +50,9 @@ export function getNativeTools(partialReadsEnabled: boolean = true): OpenAI.Chat
 		// condenseTool,
 		// newRuleTool,
 		// reportBugTool,
+		// kilocode_change end
+		// kilocode_change start
+		activateSandboxPackage,
 		// kilocode_change end
 		accessMcpResource,
 		apply_diff,

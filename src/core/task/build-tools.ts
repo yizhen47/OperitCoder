@@ -20,6 +20,7 @@ interface BuildToolsOptions {
 	browserToolEnabled: boolean
 	// kilocode_change start
 	state?: ClineProviderState
+	activatedExamplePackages?: string[]
 	// kilocode_change end
 	modelInfo?: ModelInfo
 	diffEnabled: boolean
@@ -90,6 +91,7 @@ export async function buildNativeToolsArray(options: BuildToolsOptions): Promise
 	const toggledExampleTools = await getExamplePackageToolsWithToggleLists(provider.context.extensionPath, {
 		enabledExamplePackages: options.state?.enabledExamplePackages,
 		disabledExamplePackages: options.state?.disabledExamplePackages,
+		activatedExamplePackages: options.activatedExamplePackages,
 	})
 	const filteredExampleTools = filterExampleToolsForMode(toggledExampleTools, mode, customModes, experiments)
 	// kilocode_change end

@@ -49,6 +49,7 @@ export const toolParamNames = [
 	"server_name",
 	"tool_name",
 	"arguments",
+	"package_name", // kilocode_change
 	"uri",
 	"question",
 	"result",
@@ -121,6 +122,7 @@ export type NativeToolArgs = {
 	update_todo_list: { todos: string }
 	use_mcp_tool: { server_name: string; tool_name: string; arguments?: Record<string, unknown> }
 	write_to_file: { path: string; content: string }
+	activate_sandbox_package: { package_name: string } // kilocode_change
 	// Add more tools as they are migrated to native protocol
 }
 
@@ -309,6 +311,7 @@ export const TOOL_DISPLAY_NAMES: Record<ToolName, string> = {
 	browser_action: "use a browser",
 	use_mcp_tool: "use mcp tools",
 	sandbox_package_tool: "use sandbox packages",
+	activate_sandbox_package: "activate sandbox packages", // kilocode_change
 	access_mcp_resource: "access mcp resources",
 	ask_followup_question: "ask questions",
 	attempt_completion: "complete tasks",
@@ -344,7 +347,7 @@ export const TOOL_GROUPS: Record<ToolGroup, ToolGroupConfig> = {
 		tools: ["execute_command"],
 	},
 	mcp: {
-		tools: ["use_mcp_tool", "access_mcp_resource", "sandbox_package_tool"],
+		tools: ["use_mcp_tool", "access_mcp_resource", "sandbox_package_tool", "activate_sandbox_package"], // kilocode_change
 	},
 	modes: {
 		tools: ["switch_mode", "new_task"],

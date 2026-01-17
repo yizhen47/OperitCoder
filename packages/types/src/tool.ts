@@ -27,6 +27,7 @@ export const toolNames = [
 	"browser_action",
 	"use_mcp_tool",
 	"sandbox_package_tool",
+	"activate_sandbox_package", // kilocode_change
 	"access_mcp_resource",
 	"ask_followup_question",
 	"attempt_completion",

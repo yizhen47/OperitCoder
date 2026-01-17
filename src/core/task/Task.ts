@@ -72,6 +72,10 @@ import { DiffStrategy, type ToolUse, type ToolParamName, toolParamNames } from "
 import { EXPERIMENT_IDS, experiments } from "../../shared/experiments"
 import { getModelMaxOutputTokens } from "../../shared/api"
 
+// kilocode_change start
+import { sanitizeMcpName } from "../../utils/mcp-name"
+// kilocode_change end
+
 // services
 import { UrlContentFetcher } from "../../services/browser/UrlContentFetcher"
 import { BrowserSession } from "../../services/browser/BrowserSession"
@@ -298,11 +302,34 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 	public lastMessageTs?: number
 	private autoApprovalTimeoutRef?: NodeJS.Timeout
 
+	// kilocode_change start
+	public activateExamplePackage(packageName: string): void {
+		const normalized = sanitizeMcpName(String(packageName ?? "")).toLowerCase()
+		if (!normalized) {
+			return
+		}
+		this.activatedExamplePackages.add(normalized)
+	}
+
+	public isExamplePackageActivated(packageName: string): boolean {
+		const normalized = sanitizeMcpName(String(packageName ?? "")).toLowerCase()
+		return this.activatedExamplePackages.has(normalized)
+	}
+
+	public getActivatedExamplePackages(): string[] {
+		return Array.from(this.activatedExamplePackages)
+	}
+	// kilocode_change end
+
 	// Tool Use
 	consecutiveMistakeCount: number = 0
 	consecutiveMistakeLimit: number
 	consecutiveMistakeCountForApplyDiff: Map<string, number> = new Map()
 	toolUsage: ToolUsage = {}
+
+	// kilocode_change start
+	private activatedExamplePackages: Set<string> = new Set()
+	// kilocode_change end
 
 	// Checkpoints
 	enableCheckpoints: boolean
@@ -4160,6 +4187,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 				browserToolEnabled: state?.browserToolEnabled ?? true,
 				// kilocode_change start
 				state,
+				activatedExamplePackages: this.getActivatedExamplePackages(),
 				// kilocode_change end
 				modelInfo,
 				diffEnabled: this.diffEnabled,
