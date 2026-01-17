@@ -64,7 +64,7 @@ export const ToolResultDisplay = ({
 	return (
 		<div className={cn(className)}>
 			<div
-				className="w-full flex items-center gap-2 pl-6 pr-4 py-[2px] rounded-sm cursor-pointer select-none"
+				className="w-full flex items-center gap-2 pl-6 pr-4 py-[1px] rounded-sm cursor-pointer select-none"
 				onClick={handleToggle}
 				data-testid="tool-result-toggle">
 				<CornerDownRight className={cn("w-4 h-4", statusColorClass)} />
@@ -97,9 +97,9 @@ export const ToolResultDisplay = ({
 				<div
 					data-testid="tool-result-expanded"
 					className={cn(
-						"mt-0.5 ml-6 mr-4 rounded-md border border-vscode-panel-border/50 bg-vscode-editor-background/30",
+						"mt-0 ml-6 mr-4 rounded-md border border-vscode-panel-border/50 bg-vscode-editor-background/30",
 						"max-h-72 overflow-y-auto",
-						"px-2 py-1.5",
+						"px-2 py-1",
 					)}>
 					<div className={cn("text-xs whitespace-pre-wrap break-words", statusColorClass)}>{normalized}</div>
 				</div>

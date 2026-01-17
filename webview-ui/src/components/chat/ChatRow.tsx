@@ -202,7 +202,7 @@ const ChatRow = memo(
 				// kilocode_change: add highlighted className
 				className={cn(
 					"px-[15px] pr-[6px] relative",
-					isNonDiffToolRow ? "py-[1px]" : "py-[4px]",
+					isNonDiffToolRow ? "py-[1px]" : "py-[2px]",
 					highlighted ? "animate-message-highlight" : "",
 				)}>
 				{showTaskTimeline && <KiloChatRowGutterBar message={message} />}
