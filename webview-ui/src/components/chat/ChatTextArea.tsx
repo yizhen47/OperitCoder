@@ -207,7 +207,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		const [fileSearchResults, setFileSearchResults] = useState<SearchResult[]>([])
 
 		// kilocode_change begin: remove button from chat when it gets to small
-		const [containerWidth, setContainerWidth] = useState<number>(300) // Default to a value larger than our threshold
+		const [containerWidth, setContainerWidth] = useState<number>(400) // Default to a value larger than our threshold
 
 		const containerRef = useRef<HTMLDivElement>(null)
 
@@ -231,6 +231,8 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			}
 		}, [])
 		// kilocode_change end: Container width tracking for responsive UI
+
+		const isCompactBottomControls = containerWidth < 320
 
 		const [searchLoading, setSearchLoading] = useState(false)
 		const [searchRequestId, setSearchRequestId] = useState<string>("")
@@ -1671,7 +1673,11 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				</div>
 
 				{/* kilocode_change: position tweaked, rtl support */}
-				<div className="absolute bottom-2 end-2 z-30 flex items-center gap-1">
+				<div
+					className={cn(
+						"absolute bottom-2 end-2 z-30 flex gap-1",
+						isCompactBottomControls ? "flex-col items-end" : "items-center",
+					)}>
 					{/* kilocode_change start: Volume visualizer - leftmost in icon group when recording */}
 					{isRecording && <VolumeVisualizer volume={volumeLevel} isActive={isRecording} />}
 					{/* kilocode_change end: Volume visualizer */}
