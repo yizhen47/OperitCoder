@@ -1676,7 +1676,9 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				<div
 					className={cn(
 						"absolute bottom-2 end-2 z-30 flex gap-1",
-						isCompactBottomControls ? "flex-col items-end" : "items-center",
+						isCompactBottomControls
+							? "flex-col items-end gap-0.5 [&_button]:min-h-[24px] [&_button]:min-w-[24px] [&_button]:p-1 [&_svg]:h-3.5 [&_svg]:w-3.5"
+							: "items-center",
 					)}>
 					{/* kilocode_change start: Volume visualizer - leftmost in icon group when recording */}
 					{isRecording && <VolumeVisualizer volume={volumeLevel} isActive={isRecording} />}
