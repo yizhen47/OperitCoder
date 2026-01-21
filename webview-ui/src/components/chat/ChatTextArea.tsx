@@ -232,8 +232,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		}, [])
 		// kilocode_change end: Container width tracking for responsive UI
 
-		const compactBottomControlsThreshold = 235
-		const isCompactBottomControls = containerWidth < compactBottomControlsThreshold
+		const isCompactBottomControls = containerWidth < 250
 
 		const [searchLoading, setSearchLoading] = useState(false)
 		const [searchRequestId, setSearchRequestId] = useState<string>("")
@@ -1611,6 +1610,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						"transition-background-color duration-150 ease-in-out",
 						"will-change-background-color",
 						"min-h-[90px]",
+						isCompactBottomControls && "min-h-[190px]",
 						"box-border",
 						"rounded",
 						"resize-none",
@@ -1690,7 +1690,9 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					{/* kilocode_change end */}
 
 					{/* kilocode_change start */}
-					{!isEditMode && <IndexingStatusBadge />}
+					{!isEditMode && (
+						<IndexingStatusBadge className={cn({ hidden: !isCompactBottomControls && containerWidth < 235 })} />
+					)}
 
 					<Popover open={showContextPanel} onOpenChange={setShowContextPanel}>
 							<StandardTooltip content={t("chat:task.contextWindow")}>
@@ -1795,7 +1797,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 								showContextMenu &&
 									"opacity-40 cursor-not-allowed grayscale-[30%] hover:bg-transparent hover:border-[rgba(255,255,255,0.08)] active:bg-transparent",
 							)}>
-							<Paperclip className={cn("w-4", "h-4")} />
+							<Paperclip className={cn("w-4", "h-4", { hidden: !isCompactBottomControls && containerWidth < 235 })} />
 						</button>
 					</StandardTooltip>
 					{isEditMode && (
