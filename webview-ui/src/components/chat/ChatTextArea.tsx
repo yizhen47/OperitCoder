@@ -232,7 +232,8 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		}, [])
 		// kilocode_change end: Container width tracking for responsive UI
 
-		const isCompactBottomControls = containerWidth < 320
+		const compactBottomControlsThreshold = 235
+		const isCompactBottomControls = containerWidth < compactBottomControlsThreshold
 
 		const [searchLoading, setSearchLoading] = useState(false)
 		const [searchRequestId, setSearchRequestId] = useState<string>("")
@@ -1528,7 +1529,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							: "border border-transparent",
 						isEditMode ? "pt-1.5 pb-10 px-2" : "py-1.5 px-2",
 						"px-[8px]",
-						"pr-9",
+						isCompactBottomControls ? "pr-16" : "pr-9",
 						"z-10",
 						"forced-color-adjust-none",
 						"pb-16", // kilocode_change
@@ -1615,7 +1616,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						"resize-none",
 						"overflow-x-hidden",
 						"overflow-y-auto",
-						"pr-9",
+						isCompactBottomControls ? "pr-16" : "pr-9",
 						"flex-none flex-grow",
 						"z-[2]",
 						"scrollbar-none",
@@ -1675,10 +1676,10 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				{/* kilocode_change: position tweaked, rtl support */}
 				<div
 					className={cn(
-						"absolute bottom-2 end-2 z-30 flex gap-1",
+						"absolute end-2 z-30 flex",
 						isCompactBottomControls
-							? "flex-col items-end gap-0.5 [&_button]:min-h-[24px] [&_button]:min-w-[24px] [&_button]:p-1 [&_svg]:h-3.5 [&_svg]:w-3.5"
-							: "items-center",
+							? "top-11 bottom-auto flex-col items-end gap-px [&_button]:min-h-[22px] [&_button]:min-w-[22px] [&_button]:p-0.75 [&_svg]:h-3 [&_svg]:w-3"
+							: "bottom-2 items-center gap-1",
 					)}>
 					{/* kilocode_change start: Volume visualizer - leftmost in icon group when recording */}
 					{isRecording && <VolumeVisualizer volume={volumeLevel} isActive={isRecording} />}
@@ -1689,7 +1690,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					{/* kilocode_change end */}
 
 					{/* kilocode_change start */}
-					{!isEditMode && <IndexingStatusBadge className={cn({ hidden: containerWidth < 235 })} />}
+					{!isEditMode && <IndexingStatusBadge />}
 
 					<Popover open={showContextPanel} onOpenChange={setShowContextPanel}>
 							<StandardTooltip content={t("chat:task.contextWindow")}>
@@ -1794,7 +1795,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 								showContextMenu &&
 									"opacity-40 cursor-not-allowed grayscale-[30%] hover:bg-transparent hover:border-[rgba(255,255,255,0.08)] active:bg-transparent",
 							)}>
-							<Paperclip className={cn("w-4", "h-4", { hidden: containerWidth < 235 })} />
+							<Paperclip className={cn("w-4", "h-4")} />
 						</button>
 					</StandardTooltip>
 					{isEditMode && (
