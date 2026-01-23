@@ -1999,7 +1999,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						<div
 							// kilocode_change start
 							style={{
-								marginTop: "-38px",
+								marginTop: isCompactBottomControls ? "-70px" : "-38px",
 								zIndex: 10,
 								paddingLeft: "8px",
 								paddingRight: "8px",
@@ -2007,19 +2007,28 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							}}
 							ref={containerRef}
 							// kilocode_change end
-							className={cn("flex", "flex-nowrap", "items-center", "gap-1", "mt-auto")}>
-							<div className="shrink-0">
+							className={cn(
+								"flex",
+								isCompactBottomControls ? "flex-col items-stretch gap-1" : "flex-nowrap items-center gap-1",
+								"mt-auto",
+							)}>
+							<div className={cn("shrink-0", isCompactBottomControls && "w-full")}>
 								{/* kilocode_change start: KiloModeSelector instead of ModeSelector */}
 								<KiloModeSelector
 									value={mode}
 									onChange={setMode}
 									modeShortcutText={modeShortcutText}
 									customModes={customModes}
+									triggerClassName={
+										isCompactBottomControls
+											? "px-1 py-0.5 text-[11px] [&_svg]:size-3"
+											: undefined
+									}
 								/>
 								{/* kilocode_change end */}
 							</div>
 
-							<div className="shrink-0">
+							<div className={cn("shrink-0", isCompactBottomControls && "w-full")}>
 								<KiloProfileSelector
 									currentConfigId={currentConfigId}
 									currentApiConfigName={currentApiConfigName}
@@ -2028,6 +2037,11 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 									pinnedApiConfigs={pinnedApiConfigs}
 									togglePinnedApiConfig={togglePinnedApiConfig}
 									selectApiConfigDisabled={selectApiConfigDisabled}
+									triggerClassName={
+										isCompactBottomControls
+											? "px-1 py-0.5 text-[11px] [&_svg]:size-3"
+											: undefined
+									}
 								/>
 							</div>
 

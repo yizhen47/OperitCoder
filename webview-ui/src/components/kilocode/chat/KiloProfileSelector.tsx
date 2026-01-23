@@ -19,6 +19,7 @@ interface KiloProfileSelectorProps {
 	togglePinnedApiConfig: (configId: string) => void
 	selectApiConfigDisabled?: boolean
 	initiallyOpen?: boolean
+	triggerClassName?: string
 }
 
 export const KiloProfileSelector = ({
@@ -30,6 +31,7 @@ export const KiloProfileSelector = ({
 	togglePinnedApiConfig,
 	selectApiConfigDisabled = false,
 	initiallyOpen = false,
+	triggerClassName,
 }: KiloProfileSelectorProps) => {
 	const { t } = useAppTranslation()
 
@@ -104,6 +106,7 @@ export const KiloProfileSelector = ({
 				triggerClassName={cn(
 					"w-full text-ellipsis overflow-hidden",
 					"bg-[var(--background)] border-[var(--vscode-input-border)] hover:bg-[var(--color-vscode-list-hoverBackground)]",
+					triggerClassName,
 				)}
 				// kilocode_change end
 				itemClassName="group"
