@@ -650,6 +650,55 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 	}, [sendingDisabled, clineAsk, enableButtons, isStreaming])
 	// kilocode_change end
 
+	useEffect(() => {
+		if (!sendingDisabled) {
+			return
+		}
+		if (isStreaming) {
+			return
+		}
+		if (clineAsk !== undefined) {
+			return
+		}
+		if (enableButtons) {
+			return
+		}
+
+		const lastApiReqStarted = findLast(
+			modifiedMessages,
+			(message: ClineMessage) => message.say === "api_req_started",
+		)
+		if (!lastApiReqStarted?.text) {
+			return
+		}
+
+		let cost: unknown
+		let cancelReason: unknown
+		try {
+			const parsed = JSON.parse(lastApiReqStarted.text)
+			cost = parsed.cost
+			cancelReason = parsed.cancelReason
+		} catch {
+			cost = undefined
+			cancelReason = undefined
+		}
+
+		if (cost !== undefined && cost !== null) {
+			setSendingDisabled(false)
+			return
+		}
+		if (cancelReason !== undefined && cancelReason !== null) {
+			setSendingDisabled(false)
+			return
+		}
+	}, [sendingDisabled, isStreaming, clineAsk, enableButtons, modifiedMessages])
+
+	useEffect(() => {
+		if (didClickCancel && !isTaskRunningForInput) {
+			setDidClickCancel(false)
+		}
+	}, [didClickCancel, isTaskRunningForInput])
+
 	// kilocode_change start: prevent loading footer flicker
 	const virtuosoFooter = useCallback(() => {
 		const shouldAnimate = isStreaming && !wasStreaming

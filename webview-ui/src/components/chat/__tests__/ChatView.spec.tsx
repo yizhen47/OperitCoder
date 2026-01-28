@@ -190,6 +190,9 @@ vi.mock("react-i18next", () => ({
 
 interface ChatTextAreaProps {
 	onSend: () => void
+	isTaskRunning?: boolean
+	onCancelTask?: () => void
+	cancelDisabled?: boolean
 	inputValue?: string
 	setInputValue?: (value: string) => void
 	sendingDisabled?: boolean
@@ -221,13 +224,11 @@ vi.mock("../ChatTextArea", () => {
 					type="text"
 					value={props.inputValue || ""}
 					onChange={(e) => {
-						// Use parent's setInputValue if available
 						if (props.setInputValue) {
 							props.setInputValue(e.target.value)
 						}
 					}}
 					onKeyDown={(e) => {
-						// Only call onSend when Enter is pressed (simulating real behavior)
 						if (e.key === "Enter" && !e.shiftKey) {
 							e.preventDefault()
 							props.onSend()
@@ -235,6 +236,19 @@ vi.mock("../ChatTextArea", () => {
 					}}
 					data-sending-disabled={props.sendingDisabled}
 				/>
+				<button
+					aria-label={props.isTaskRunning ? "chat:cancel.tooltip" : "chat:sendMessage"}
+					disabled={props.isTaskRunning ? props.cancelDisabled : props.sendingDisabled}
+					onClick={() => {
+						if (props.isTaskRunning) {
+							props.onCancelTask?.()
+							return
+						}
+						props.onSend()
+					}}
+				>
+					{props.isTaskRunning ? "cancel" : "send"}
+				</button>
 			</div>
 		)
 	})
@@ -305,30 +319,18 @@ describe("ChatView - Cancel Task UI", () => {
 	it("keeps task running state after cancel click and disables repeated cancel until reset", async () => {
 		const { getByLabelText } = renderChatView()
 
-		// Hydrate state with an active task that is awaiting response (shows cancel)
-		mockPostMessage({
-			clineMessages: [
-				{
-					type: "say",
-					say: "task",
-					ts: Date.now() - 2000,
-					text: "Initial task",
-				},
-			],
+		vi.mocked(vscode.postMessage).mockClear()
+
+		// Trigger ChatView local sendingDisabled=true by sending a message
+		const input = getByLabelText("chat:sendMessage").parentElement?.querySelector("input") as HTMLInputElement
+		fireEvent.change(input, { target: { value: "hello" } })
+		fireEvent.keyDown(input, { key: "Enter", code: "Enter" })
+
+		await waitFor(() => {
+			expect(vscode.postMessage).toHaveBeenCalled()
 		})
 
-		// Force the UI into the "task running" state by sendingDisabled=true and no ask/buttons
-		mockPostMessage({
-			sendingDisabled: true,
-			clineMessages: [
-				{
-					type: "say",
-					say: "task",
-					ts: Date.now() - 2000,
-					text: "Initial task",
-				},
-			],
-		})
+		vi.mocked(vscode.postMessage).mockClear()
 
 		// Cancel button shares the same aria-label as send, depending on state
 		const cancelButton = await waitFor(() => getByLabelText("chat:cancel.tooltip"))
@@ -348,6 +350,58 @@ describe("ChatView - Cancel Task UI", () => {
 
 		await waitFor(() => {
 			expect(getByLabelText("chat:sendMessage")).not.toBeDisabled()
+		})
+	})
+
+	it("resets cancel back to send when cancellation completes", async () => {
+		const { getByLabelText } = renderChatView()
+
+		vi.mocked(vscode.postMessage).mockClear()
+
+		// Trigger ChatView local sendingDisabled=true by sending a message
+		const input = getByLabelText("chat:sendMessage").parentElement?.querySelector("input") as HTMLInputElement
+		fireEvent.change(input, { target: { value: "hello" } })
+		fireEvent.keyDown(input, { key: "Enter", code: "Enter" })
+
+		await waitFor(() => {
+			expect(vscode.postMessage).toHaveBeenCalled()
+		})
+
+		vi.mocked(vscode.postMessage).mockClear()
+
+		const cancelButton = await waitFor(() => getByLabelText("chat:cancel.tooltip"))
+		fireEvent.click(cancelButton)
+
+		expect(vscode.postMessage).toHaveBeenCalledWith({ type: "cancelTask" })
+
+		// Simulate backend finalizing cancellation by providing api_req_started with cancelReason
+		mockPostMessage({
+			clineMessages: [
+				{
+					type: "say",
+					say: "task",
+					ts: Date.now() - 2000,
+					text: "Initial task",
+				},
+				{
+					type: "say",
+					say: "api_req_started",
+					ts: Date.now() - 1000,
+					text: JSON.stringify({ apiProtocol: "anthropic", cost: 0, cancelReason: "user_cancelled" }),
+				},
+				{
+					type: "say",
+					say: "text",
+					ts: Date.now(),
+					text: "Cancelled",
+					partial: false,
+				},
+			],
+		})
+
+		// Should return to send mode (cancel tooltip should be gone)
+		await waitFor(() => {
+			expect(getByLabelText("chat:sendMessage")).toBeInTheDocument()
 		})
 	})
 })
