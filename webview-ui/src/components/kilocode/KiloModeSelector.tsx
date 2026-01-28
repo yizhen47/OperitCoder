@@ -114,14 +114,21 @@ export const KiloModeSelector = ({
 		<SelectDropdown
 			value={allModes.find((m) => m.slug === value)?.slug ?? defaultModeSlug}
 			title={title || t("chat:selectMode")}
+			triggerPrefix={
+				<span className="pointer-events-none opacity-80 flex-shrink-0 text-[11px] leading-none font-mono">
+					{"</>"}
+				</span>
+			}
+			showSelectedCodicon={false}
 			disabled={disabled}
 			initiallyOpen={initiallyOpen}
 			options={options}
 			onChange={handleChange}
 			shortcutText={modeShortcutText}
 			triggerClassName={cn(
-				"w-full bg-[var(--background)] border-[var(--vscode-input-border)] hover:bg-[var(--color-vscode-list-hoverBackground)]",
 				triggerClassName,
+				// icon-only trigger: hide label + any codicon and remove the border/box
+				"w-auto bg-transparent border-0 hover:bg-[var(--color-vscode-list-hoverBackground)] [&_.truncate]:hidden [&_.codicon]:hidden",
 			)}
 		/>
 	)

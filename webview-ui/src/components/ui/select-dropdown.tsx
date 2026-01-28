@@ -35,6 +35,8 @@ export interface SelectDropdownProps {
 	initiallyOpen?: boolean // kilocode_change
 	title?: string
 	triggerClassName?: string
+	triggerPrefix?: React.ReactNode
+	showSelectedCodicon?: boolean // kilocode_change
 	contentClassName?: string
 	itemClassName?: string
 	sideOffset?: number
@@ -57,6 +59,8 @@ export const SelectDropdown = React.memo(
 				initiallyOpen = false, // kilocode_change
 				title = "",
 				triggerClassName = "",
+				triggerPrefix,
+				showSelectedCodicon = true, // kilocode_change
 				contentClassName = "",
 				itemClassName = "",
 				sideOffset = 4,
@@ -211,12 +215,13 @@ export const SelectDropdown = React.memo(
 							: "opacity-90 hover:opacity-100 hover:bg-[rgba(255,255,255,0.03)] hover:border-[rgba(255,255,255,0.15)] cursor-pointer",
 						triggerClassName,
 					)}>
-					{/* kilocode_change start */}
-					{TriggerIcon && <TriggerIcon className="pointer-events-none opacity-80 flex-shrink-0 size-3" />}
-					{/* kilocode_change end */}
+					{triggerPrefix ??
+						(TriggerIcon ? (
+							<TriggerIcon className="pointer-events-none opacity-80 flex-shrink-0 size-3" />
+						) : null)}
 
 					{/* kilocode_change start */}
-					{selectedOption?.codicon && (
+					{showSelectedCodicon && selectedOption?.codicon && (
 						<span
 							slot="start"
 							style={{ fontSize: "12px" }}

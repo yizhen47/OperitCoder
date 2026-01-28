@@ -100,9 +100,9 @@ export const KiloProfileSelector = ({
 	}, [providerModels, modelSearchValue, currentModelId])
 
 	const triggerText = useMemo(() => {
-		const modelPart = currentModelId ? ` · ${currentModelId}` : ""
-		return `${displayName}${modelPart}`
-	}, [displayName, currentModelId])
+		const modelLabel = currentModelId ? (providerModels?.[currentModelId]?.displayName ?? currentModelId) : ""
+		return modelLabel || displayName
+	}, [displayName, currentModelId, providerModels])
 
 	useEffect(() => {
 		if (!open) {
@@ -120,8 +120,8 @@ export const KiloProfileSelector = ({
 					<PopoverTrigger
 						disabled={selectApiConfigDisabled}
 						className={cn(
-							"w-full min-w-0 max-w-full inline-flex items-center gap-1.5 relative whitespace-nowrap px-1.5 py-1 text-xs",
-							"bg-[var(--background)] border border-[var(--vscode-input-border)] rounded-md text-vscode-foreground",
+							"w-full min-w-0 max-w-full inline-flex items-center gap-1.5 relative whitespace-nowrap px-1 py-0.5 text-xs",
+							"bg-transparent border-0 rounded-md text-vscode-foreground",
 							"transition-all duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder focus-visible:ring-inset",
 							selectApiConfigDisabled
 								? "opacity-50 cursor-not-allowed"

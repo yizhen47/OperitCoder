@@ -129,6 +129,38 @@ describe("SelectDropdown", () => {
 		expect(trigger.classList.toString()).toContain("custom-trigger-class")
 	})
 
+	it("renders triggerPrefix when provided", () => {
+		render(
+			<SelectDropdown
+				value="option1"
+				options={options}
+				onChange={onChangeMock}
+				triggerPrefix={<span data-testid="custom-prefix">{"</>"}</span>}
+			/>
+		)
+
+		expect(screen.getByTestId("custom-prefix")).toBeInTheDocument()
+	})
+
+	it("hides selected codicon in trigger when showSelectedCodicon is false", () => {
+		const optionsWithCodicon = [
+			{ value: "option1", label: "Option 1", codicon: "codicon-code" },
+			{ value: "option2", label: "Option 2" },
+		]
+
+		const { container } = render(
+			<SelectDropdown
+				value="option1"
+				options={optionsWithCodicon}
+				onChange={onChangeMock}
+				showSelectedCodicon={false}
+			/>
+		)
+
+		// codicon span should not render in trigger when disabled
+		expect(container.querySelector(".codicon-code")).toBeNull()
+	})
+
 	it("ensures open state is controlled via props", () => {
 		// Test that the component accepts and uses the open state controlled prop
 		render(<SelectDropdown value="option1" options={options} onChange={onChangeMock} />)

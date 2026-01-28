@@ -1651,7 +1651,8 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				)}
 
 				{/* kilocode_change: position tweaked */}
-				<div className="absolute top-2 right-2 z-30">
+				<div className="absolute top-2 right-2 z-30 flex items-center gap-1">
+					{!isEditMode && <KiloRulesToggleModal />}
 					<StandardTooltip content={t("chat:enhancePrompt")}>
 						<button
 							aria-label={t("chat:enhancePrompt")}
@@ -1686,7 +1687,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					{/* kilocode_change end: Volume visualizer */}
 
 					{/* kilocode_change start: Rules button moved here */}
-					{!isEditMode && <KiloRulesToggleModal />}
+					{false}
 					{/* kilocode_change end */}
 
 					{/* kilocode_change start */}
@@ -2012,6 +2013,42 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 								isCompactBottomControls ? "flex-col items-stretch gap-1" : "flex-nowrap items-center gap-1",
 								"mt-auto",
 							)}>
+							<div className={cn("shrink-0", isCompactBottomControls && "w-full")}>
+								<StandardTooltip content="Add Context (@)">
+									<button
+										aria-label="Add Context (@)"
+										disabled={showContextMenu}
+										onClick={() => {
+											if (showContextMenu || !textAreaRef.current) return
+
+											textAreaRef.current.focus()
+
+											setInputValue(`${inputValue} @`)
+											setShowContextMenu(true)
+											// Empty search query explicitly to show all options
+											// and set to "File" option by default
+											setSearchQuery("")
+											setSelectedMenuIndex(4)
+										}}
+										className={cn(
+											"relative inline-flex items-center justify-center",
+											"bg-transparent border-none p-1.5",
+											"rounded-md min-w-[28px] min-h-[28px]",
+											"opacity-60 hover:opacity-100 text-vscode-descriptionForeground hover:text-vscode-foreground",
+											"transition-all duration-150",
+											"hover:bg-[rgba(255,255,255,0.03)] hover:border-[rgba(255,255,255,0.15)]",
+											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
+											"active:bg-[rgba(255,255,255,0.1)]",
+											!showContextMenu && "cursor-pointer",
+											showContextMenu &&
+												"opacity-40 cursor-not-allowed grayscale-[30%] hover:bg-transparent hover:border-[rgba(255,255,255,0.08)] active:bg-transparent",
+										)}>
+										<Paperclip
+											className={cn("w-4", "h-4", { hidden: !isCompactBottomControls && containerWidth < 235 })}
+										/>
+									</button>
+								</StandardTooltip>
+							</div>
 							<div className={cn("shrink-0", isCompactBottomControls && "w-full")}>
 								{/* kilocode_change start: KiloModeSelector instead of ModeSelector */}
 								<KiloModeSelector
