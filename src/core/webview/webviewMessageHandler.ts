@@ -28,6 +28,9 @@ import {
 	// kilocode_change start
 	ghostServiceSettingsSchema,
 	fastApplyModelSchema,
+	isTypicalProvider,
+	modelIdKeys,
+	modelIdKeysByProvider,
 	// kilocode_change end
 	DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
 	RooCodeSettings,
@@ -45,7 +48,7 @@ import { BrowserSessionPanelManager } from "./BrowserSessionPanelManager"
 import { handleCheckpointRestoreOperation } from "./checkpointRestoreHandler"
 import { changeLanguage, t } from "../../i18n"
 import { Package } from "../../shared/package"
-import { type RouterName, type ModelRecord, toRouterName } from "../../shared/api"
+import { type RouterName, type ModelRecord, isRouterName, toRouterName } from "../../shared/api"
 import { MessageEnhancer } from "./messageEnhancer"
 
 import {
@@ -1031,6 +1034,217 @@ export const webviewMessageHandler = async (
 				values: providerFilter ? { provider: requestedProvider } : undefined,
 			})
 			break
+		case "requestApiConfigModels": {
+			const configId =
+				(typeof message.text === "string" && message.text.length > 0
+					? message.text
+					: (message.values?.configId as string | undefined)) || ""
+
+			if (!configId) {
+				break
+			}
+
+			try {
+				const { name: _, ...profileConfig } = await provider.providerSettingsManager.getProfile({ id: configId })
+				const apiProvider = profileConfig.apiProvider
+				provider.log(
+					`[requestApiConfigModels] configId=${configId} provider=${String(apiProvider)}`,
+				) // kilocode_change
+
+				if (!apiProvider || !isRouterName(apiProvider)) {
+					provider.postMessageToWebview({
+						type: "apiConfigModels",
+						success: false,
+						error: "This provider does not support dynamic model fetching.",
+						values: { configId },
+					})
+					break
+				}
+
+				const buildOptions = (): GetModelsOptions => {
+					switch (apiProvider) {
+						case "openrouter":
+							return {
+								provider: "openrouter",
+								apiKey: profileConfig.openRouterApiKey,
+								baseUrl: profileConfig.openRouterBaseUrl,
+							}
+						case "kilocode":
+							return {
+								provider: "kilocode",
+								kilocodeToken: profileConfig.kilocodeToken,
+								kilocodeOrganizationId: profileConfig.kilocodeOrganizationId,
+							}
+						case "requesty":
+							return {
+								provider: "requesty",
+								apiKey: profileConfig.requestyApiKey,
+								baseUrl: profileConfig.requestyBaseUrl,
+							}
+						case "unbound":
+							return { provider: "unbound", apiKey: profileConfig.unboundApiKey }
+						case "glama":
+							return { provider: "glama" }
+						case "litellm": {
+							const apiKey = profileConfig.litellmApiKey
+							const baseUrl = profileConfig.litellmBaseUrl
+							if (!apiKey || !baseUrl) {
+								throw new Error("LiteLLM requires both apiKey and baseUrl")
+							}
+							return { provider: "litellm", apiKey, baseUrl }
+						}
+						case "ollama":
+							return {
+								provider: "ollama",
+								apiKey: profileConfig.ollamaApiKey,
+								baseUrl: profileConfig.ollamaBaseUrl,
+								numCtx: profileConfig.ollamaNumCtx,
+							}
+						case "lmstudio":
+							return { provider: "lmstudio", baseUrl: profileConfig.lmStudioBaseUrl }
+						case "gemini":
+							return {
+								provider: "gemini",
+								apiKey: profileConfig.geminiApiKey,
+								baseUrl: profileConfig.googleGeminiBaseUrl,
+							}
+						case "deepinfra":
+							return {
+								provider: "deepinfra",
+								apiKey: profileConfig.deepInfraApiKey,
+								baseUrl: profileConfig.deepInfraBaseUrl,
+							}
+						case "io-intelligence": {
+							const apiKey = profileConfig.ioIntelligenceApiKey
+							if (!apiKey) {
+								throw new Error("IO Intelligence requires apiKey")
+							}
+							return { provider: "io-intelligence", apiKey }
+						}
+						case "vercel-ai-gateway":
+							return { provider: "vercel-ai-gateway" }
+						case "huggingface":
+							return { provider: "huggingface" }
+						case "roo":
+							return { provider: "roo" }
+						case "chutes":
+							return { provider: "chutes", apiKey: profileConfig.chutesApiKey }
+						case "nano-gpt":
+							return {
+								provider: "nano-gpt",
+								apiKey: profileConfig.nanoGptApiKey,
+								nanoGptModelList: profileConfig.nanoGptModelList,
+							}
+						case "ovhcloud":
+							return {
+								provider: "ovhcloud",
+								apiKey: profileConfig.ovhCloudAiEndpointsApiKey,
+								baseUrl: profileConfig.ovhCloudAiEndpointsBaseUrl,
+							}
+						case "inception":
+							return {
+								provider: "inception",
+								apiKey: profileConfig.inceptionLabsApiKey,
+								baseUrl: profileConfig.inceptionLabsBaseUrl,
+							}
+						case "synthetic":
+							return { provider: "synthetic", apiKey: profileConfig.syntheticApiKey }
+						case "sap-ai-core": {
+							const serviceKey = profileConfig.sapAiCoreServiceKey
+							if (!serviceKey) {
+								throw new Error("SAP AI Core requires service key")
+							}
+							return {
+								provider: "sap-ai-core",
+								sapAiCoreServiceKey: serviceKey,
+								sapAiCoreResourceGroup: profileConfig.sapAiCoreResourceGroup,
+								sapAiCoreUseOrchestration: profileConfig.sapAiCoreUseOrchestration,
+							}
+						}
+					}
+				}
+
+				const apiConfigModels = await getModels(buildOptions())
+				provider.log(
+					`[requestApiConfigModels] configId=${configId} provider=${String(apiProvider)} models=${Object.keys(apiConfigModels).length}`,
+				) // kilocode_change
+				provider.postMessageToWebview({
+					type: "apiConfigModels",
+					success: true,
+					apiConfigModels,
+					values: { configId, provider: apiProvider },
+				})
+			} catch (error) {
+				const errorMessage = error instanceof Error ? error.message : String(error)
+				provider.postMessageToWebview({
+					type: "apiConfigModels",
+					success: false,
+					error: errorMessage,
+					apiConfigModels: {},
+					values: { configId },
+				})
+			}
+
+			break
+		}
+		case "setApiConfigModelById": {
+			const configId =
+				(typeof message.text === "string" && message.text.length > 0
+					? message.text
+					: (message.values?.configId as string | undefined)) || ""
+			const modelId = (message.values?.modelId as string | undefined) || ""
+
+			if (!configId || !modelId) {
+				break
+			}
+
+			try {
+				const { name, ...profileConfig } = await provider.providerSettingsManager.getProfile({ id: configId })
+				const apiProvider = profileConfig.apiProvider
+
+				let modelIdKey: string | undefined
+				if (apiProvider && isTypicalProvider(apiProvider)) {
+					modelIdKey = modelIdKeysByProvider[apiProvider]
+				} else if (apiProvider === "openai") {
+					modelIdKey = "openAiModelId"
+				}
+
+				if (!modelIdKey) {
+					provider.postMessageToWebview({
+						type: "apiConfigModels",
+						success: false,
+						error: "Unable to set model for this provider.",
+						values: { configId },
+					})
+					break
+				}
+
+				const nextProfileConfig: Record<string, any> = { ...profileConfig, [modelIdKey]: modelId }
+				for (const key of modelIdKeys) {
+					if (key !== modelIdKey) {
+						delete nextProfileConfig[key]
+					}
+				}
+
+				await provider.providerSettingsManager.saveConfig(name, nextProfileConfig)
+
+				const listApiConfig = await provider.providerSettingsManager.listConfig()
+				await updateGlobalState("listApiConfigMeta", listApiConfig)
+				provider.postMessageToWebview({ type: "listApiConfig", listApiConfig })
+
+				const { currentApiConfigName } = await provider.getState()
+				if (currentApiConfigName === name) {
+					await provider.activateProviderProfile({ name })
+				}
+			} catch (error) {
+				provider.log(
+					`Error set api config model id: ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`,
+				)
+				vscode.window.showErrorMessage(t("common:errors.save_api_config"))
+			}
+
+			break
+		}
 		case "requestOllamaModels": {
 			// Specific handler for Ollama models only.
 			const { apiConfiguration: ollamaApiConfig } = await provider.getState()

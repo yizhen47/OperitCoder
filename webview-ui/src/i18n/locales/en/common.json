@@ -29,7 +29,11 @@
 	},
 	"ui": {
 		"search_placeholder": "Search...",
-		"no_results": "No results found"
+		"no_results": "No results found",
+		"loading": "Loading...",
+		"select": "Select",
+		"back": "Back",
+		"error": "Error"
 	},
 	"mermaid": {
 		"loading": "Generating mermaid diagram...",

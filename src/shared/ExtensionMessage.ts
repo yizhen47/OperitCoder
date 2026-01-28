@@ -96,6 +96,7 @@ export interface ExtensionMessage {
 		| "commitSearchResults"
 		| "listApiConfig"
 		| "routerModels"
+		| "apiConfigModels"
 		| "openAiModels"
 		| "ollamaModels"
 		| "lmStudioModels"
@@ -237,6 +238,7 @@ export interface ExtensionMessage {
 	}>
 	clineMessage?: ClineMessage
 	routerModels?: RouterModels
+	apiConfigModels?: ModelRecord
 	openAiModels?: string[]
 	ollamaModels?: ModelRecord
 	lmStudioModels?: ModelRecord

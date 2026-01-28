@@ -2031,7 +2031,9 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							<div className={cn("shrink-0", isCompactBottomControls && "w-full")}>
 								<KiloProfileSelector
 									currentConfigId={currentConfigId}
+									currentModelId={modelId}
 									currentApiConfigName={currentApiConfigName}
+									apiConfiguration={apiConfiguration}
 									displayName={displayName}
 									listApiConfigMeta={listApiConfigMeta}
 									pinnedApiConfigs={pinnedApiConfigs}

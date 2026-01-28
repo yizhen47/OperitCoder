@@ -29,7 +29,11 @@
 	},
 	"ui": {
 		"search_placeholder": "搜索...",
-		"no_results": "未找到结果"
+		"no_results": "未找到结果",
+		"loading": "加载中...",
+		"select": "选择",
+		"back": "返回",
+		"error": "错误"
 	},
 	"mermaid": {
 		"loading": "生成 Mermaid 图表中...",
