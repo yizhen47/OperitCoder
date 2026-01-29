@@ -1527,7 +1527,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							: "border border-transparent",
 						isEditMode ? "pt-1.5 pb-10 px-2" : "py-1.5 px-2",
 						"px-[8px]",
-						isCompactBottomControls ? "pr-16" : "pr-9",
+						"pr-9",
 						"z-10",
 						"forced-color-adjust-none",
 						"pb-16", // kilocode_change
@@ -1545,6 +1545,40 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						}
 						textAreaRef.current = el
 					}}
+					className={cn(
+						"w-full",
+						"text-vscode-input-foreground",
+						"font-vscode-font-family",
+						"text-vscode-editor-font-size",
+						"leading-vscode-editor-line-height",
+						"cursor-text",
+						isEditMode ? "pt-1.5 pb-10 px-2" : "py-1.5 px-2",
+						// kilocode_change start - removing duplicated border
+						isRecording && "focus:outline-0",
+						// isFocused
+						// 	? "border border-vscode-focusBorder outline outline-vscode-focusBorder"
+						// 	: isDraggingOver
+						// 		? "border-2 border-dashed border-vscode-focusBorder"
+						// 		: "border border-transparent",
+						// kilocode_change end - removing duplicated border
+						isDraggingOver
+							? "bg-[color-mix(in_srgb,var(--vscode-input-background)_95%,var(--vscode-focusBorder))]"
+							: "bg-vscode-input-background",
+						"transition-background-color duration-150 ease-in-out",
+						"will-change-background-color",
+						"min-h-[90px]",
+						"box-border",
+						"rounded",
+						"resize-none",
+						"overflow-x-hidden",
+						"overflow-y-auto",
+						"pr-9",
+						"flex-none flex-grow",
+						"z-[2]",
+						"scrollbar-none",
+						"scrollbar-hide",
+						"pb-16", // kilocode_change: Increased padding to prevent overlap with control bar
+					)}
 					value={displayValue}
 					onChange={(e) => {
 						// During recording, ignore changes to prevent cursor jumping
@@ -1587,41 +1621,6 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							: "1px solid transparent",
 					}}
 					// kilocode_change end - isRecording active
-					className={cn(
-						"w-full",
-						"text-vscode-input-foreground",
-						"font-vscode-font-family",
-						"text-vscode-editor-font-size",
-						"leading-vscode-editor-line-height",
-						"cursor-text",
-						isEditMode ? "pt-1.5 pb-10 px-2" : "py-1.5 px-2",
-						// kilocode_change start - removing duplicated border
-						isRecording && "focus:outline-0",
-						// isFocused
-						// 	? "border border-vscode-focusBorder outline outline-vscode-focusBorder"
-						// 	: isDraggingOver
-						// 		? "border-2 border-dashed border-vscode-focusBorder"
-						// 		: "border border-transparent",
-						// kilocode_change end - removing duplicated border
-						isDraggingOver
-							? "bg-[color-mix(in_srgb,var(--vscode-input-background)_95%,var(--vscode-focusBorder))]"
-							: "bg-vscode-input-background",
-						"transition-background-color duration-150 ease-in-out",
-						"will-change-background-color",
-						"min-h-[90px]",
-						isCompactBottomControls && "min-h-[190px]",
-						"box-border",
-						"rounded",
-						"resize-none",
-						"overflow-x-hidden",
-						"overflow-y-auto",
-						isCompactBottomControls ? "pr-16" : "pr-9",
-						"flex-none flex-grow",
-						"z-[2]",
-						"scrollbar-none",
-						"scrollbar-hide",
-						"pb-16", // kilocode_change: Increased padding to prevent overlap with control bar
-					)}
 					onScroll={() => updateHighlights()}
 				/>
 				{/* kilocode_change {Transparent overlay at bottom of textArea to avoid text overlap } */}
@@ -1677,7 +1676,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					className={cn(
 						"absolute end-2 z-30 flex",
 						isCompactBottomControls
-							? "top-11 bottom-auto flex-col items-end gap-px [&_button]:min-h-[22px] [&_button]:min-w-[22px] [&_button]:p-0.75 [&_svg]:h-3 [&_svg]:w-3"
+							? "bottom-2 items-center gap-1 [&_button]:min-h-[22px] [&_button]:min-w-[22px] [&_button]:p-0.75 [&_svg]:h-3 [&_svg]:w-3 flex-col"
 							: "bottom-2 items-center gap-1",
 					)}>
 					{/* kilocode_change start: Volume visualizer - leftmost in icon group when recording */}
@@ -1967,7 +1966,10 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						<div
 							// kilocode_change start
 							style={{
-								marginTop: isCompactBottomControls ? "-70px" : "-38px",
+								marginTop:
+									isCompactBottomControls && containerWidth < 360
+										? "-52px"
+										: "-38px",
 								zIndex: 10,
 								paddingLeft: "8px",
 								paddingRight: "8px",
@@ -1977,10 +1979,10 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							// kilocode_change end
 							className={cn(
 								"flex",
-								isCompactBottomControls ? "flex-col items-stretch gap-1" : "flex-nowrap items-center gap-1",
+								isCompactBottomControls ? "flex-wrap items-center gap-1" : "flex-nowrap items-center gap-1",
 								"mt-auto",
 							)}>
-							<div className={cn("shrink-0", isCompactBottomControls && "w-full")}>
+							<div className={cn("shrink-0")}>
 								<StandardTooltip content="Add Context (@)">
 									<button
 										aria-label="Add Context (@)"
@@ -2016,7 +2018,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 									</button>
 								</StandardTooltip>
 							</div>
-							<div className={cn("shrink-0", isCompactBottomControls && "w-full")}>
+							<div className={cn("shrink-0")}>
 								{/* kilocode_change start: KiloModeSelector instead of ModeSelector */}
 								<KiloModeSelector
 									value={mode}
@@ -2032,7 +2034,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 								{/* kilocode_change end */}
 							</div>
 
-							<div className={cn("shrink-0", isCompactBottomControls && "w-full")}>
+							<div className={cn("shrink-0")}>
 								<KiloProfileSelector
 									currentConfigId={currentConfigId}
 									currentModelId={modelId}
