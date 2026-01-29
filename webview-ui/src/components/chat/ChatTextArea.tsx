@@ -231,7 +231,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		}, [])
 		// kilocode_change end: Container width tracking for responsive UI
 
-		const isCompactBottomControls = containerWidth < 175
+		const isCompactBottomControls = containerWidth < 200
 
 		const [searchLoading, setSearchLoading] = useState(false)
 		const [searchRequestId, setSearchRequestId] = useState<string>("")
@@ -1648,7 +1648,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				)}
 
 				{/* kilocode_change: position tweaked */}
-				<div className="absolute top-2 right-2 z-30">
+				<div className="absolute top-2 right-3 z-30">
 					<StandardTooltip content={t("chat:enhancePrompt")}>
 						<button
 							aria-label={t("chat:enhancePrompt")}
@@ -1690,7 +1690,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 
 					{/* kilocode_change start */}
 					{!isEditMode && (
-						<IndexingStatusBadge className={cn({ hidden: !isCompactBottomControls && containerWidth < 175 })} />
+						<IndexingStatusBadge className={cn({ hidden: !isCompactBottomControls && containerWidth < 200 })} />
 					)}
 
 					<Popover open={showContextPanel} onOpenChange={setShowContextPanel}>
@@ -2015,7 +2015,11 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 												"opacity-40 cursor-not-allowed grayscale-[30%] hover:bg-transparent hover:border-[rgba(255,255,255,0.08)] active:bg-transparent",
 										)}>
 										<Paperclip
-											className={cn("w-4", "h-4", { hidden: !isCompactBottomControls && containerWidth < 175 })}
+											className={cn(
+												"w-4",
+												"h-4",
+												{ hidden: !isCompactBottomControls && containerWidth < 200 },
+											)}
 										/>
 									</button>
 								</StandardTooltip>
