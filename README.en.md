@@ -72,6 +72,36 @@ If you like VS Code, or you used closed-source AI code editors before and now ha
 - **Smoother UI**: better animations and interaction consistency
 - **Will follow Operit project memory sync in the future**: https://github.com/AAswordman/Operit
 
+## Changelog
+
+### 0.0.3
+
+- **Removed Kilo Gateway / login entry points**: settings no longer show related providers/token validation; chat errors/prompts no longer show login buttons.
+- **Removed Roo Code / Roo Cloud entry points and promotion**: no Roo Cloud login, balance, or cloud share entry points in the start page/settings/cloud UI.
+- **Cleaned up image generation configuration**: removed Kilo Gateway-related image generation options/state fields; kept OpenRouter image generation configuration.
+- **Simplified the start page**: “Configuration Type/Profile Type” is no longer shown.
+- **Fixed start page navigation**: clicking “Get Started” now saves and automatically activates (loads) the profile, avoiding returning back to the start screen after saving.
+- **Kept MCP marketplace**: MCP marketplace functionality and entry points remain unchanged.
+- **Chat dialog layout fixes**: top buttons no longer overlap in narrow widths, and the dialog bottom boundary no longer shifts downward with width changes.
+- **Fixed duplicate message sending/receiving**: fixed a message loop between the webview and extension so a single user message won’t trigger duplicate requests.
+
+### 0.0.2
+
+- **Operit toolkit**: synced Operit’s toolkit (still being adapted; some tools may be temporarily unavailable).
+- **Settings**: added a **Sandbox package** option in settings.
+- **Task cancel interaction**: removed the floating “cancel task” button to make cancellation logic stricter.
+- **Send button state**: improved state management for the send message button.
+- **Chat dialog layout**: adjusted layout so it automatically switches to a vertical arrangement when width shrinks.
+- **Sandbox i18n**: added multi-language support for the Sandbox package.
+- **Config display/switching**: improved how “Interaction Mode” and “API Profile” are shown and can be changed directly in the dialog; supports loading all models from the profile (loading GLM models the second time may be slightly slow).
+- **Login dependency fix**: fixed the behavior where logging into Kilo was required to use the extension.
+- **Tool activation logic**: rewrote tool activation logic and improved AI context management under the Sandbox package.
+- **Auto approve**: added auto-approve support for the Sandbox package and tool activation.
+
+### 0.0.1
+
+- Initial release
+
 ## Installation
 
 ### Option 1: Install from VS Code Marketplace
