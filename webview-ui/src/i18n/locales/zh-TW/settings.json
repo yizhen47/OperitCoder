@@ -28,6 +28,7 @@
 		"browser": "電腦存取",
 		"checkpoints": "檢查點",
 		"display": "顯示",
+		"examplePackages": "沙盒套件",
 		"notifications": "通知",
 		"contextManagement": "上下文",
 		"terminal": "終端機",
@@ -39,6 +40,18 @@
 		"about": "關於 Operit Coder",
 		"autoPurge": "自動清理",
 		"ghost": "Ghost"
+	},
+	"examplePackages": {
+		"empty": "未找到沙盒套件。",
+		"toolsCount": "工具：{{count}}",
+		"noToolsMetadata": "沒有可用的工具中繼資料。",
+		"parametersLabel": "參數：",
+		"cardAriaLabel": "查看沙盒套件 {{packageName}} 詳情",
+		"toggleAriaLabel": "切換沙盒套件 {{packageName}}",
+		"parameter": {
+			"required": "必填",
+			"optional": "選填"
+		}
 	},
 	"about": {
 		"bugReport": {

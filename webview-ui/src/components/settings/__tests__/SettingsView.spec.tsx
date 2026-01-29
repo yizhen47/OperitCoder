@@ -322,6 +322,47 @@ describe("SettingsView - Sound Settings", () => {
 		)
 	})
 
+	it("renders sandbox package description and expands to show tools", async () => {
+		const { activateTab } = renderSettingsView({
+			language: "en",
+			examplePackages: [
+				{
+					name: "alpha",
+					displayName: "Alpha Package",
+					enabledByDefault: true,
+					toolCount: 1,
+					description: { en: "Alpha package description" },
+					tools: [
+						{
+							name: "do_thing",
+							description: { en: "Does a thing" },
+							parameters: [{ name: "q", type: "string", required: true, description: { en: "Query" } }],
+						},
+					],
+				},
+			],
+			enabledExamplePackages: [],
+			disabledExamplePackages: [],
+		})
+
+		activateTab("examplePackages")
+
+		expect(await screen.findByText("Alpha package description")).toBeInTheDocument()
+
+		// Tools panel should not be present before expand.
+		expect(screen.queryByTestId("sandbox-package-tools-alpha")).not.toBeInTheDocument()
+
+		fireEvent.click(await screen.findByTestId("sandbox-package-card-alpha"))
+
+		expect(await screen.findByTestId("sandbox-package-tools-alpha")).toBeInTheDocument()
+		expect(screen.getByText("do_thing")).toBeInTheDocument()
+		expect(screen.getByText("Does a thing")).toBeInTheDocument()
+		expect(screen.getByText("Query")).toBeInTheDocument()
+		expect(screen.getByText("q")).toBeInTheDocument()
+		expect(screen.getByText(/string/)).toBeInTheDocument()
+		expect(screen.getByText(/required/)).toBeInTheDocument()
+	})
+
 	it("initializes with tts disabled by default", () => {
 		// Render once and get the activateTab helper
 		const { activateTab } = renderSettingsView()

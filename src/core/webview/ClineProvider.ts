@@ -166,7 +166,23 @@ export class ClineProvider
 	private currentWorkspacePath: string | undefined
 	private autoPurgeScheduler?: any // kilocode_change - (Any) Prevent circular import
 	private deviceAuthHandler?: DeviceAuthHandler // kilocode_change - Device auth handler
-	private examplePackagesCache?: Array<{ name: string; enabledByDefault: boolean; toolCount: number }> // kilocode_change - Cache for example packages
+	private examplePackagesCache?: Array<{
+		name: string
+		displayName?: string
+		enabledByDefault: boolean
+		toolCount: number
+		description?: string | Record<string, string>
+		tools?: Array<{
+			name: string
+			description?: string | Record<string, string>
+			parameters?: Array<{
+				name: string
+				type: string
+				required?: boolean
+				description?: string | Record<string, string>
+			}>
+		}>
+	}> // kilocode_change - Cache for example packages
 
 	private recentTasksCache?: string[]
 	private pendingOperations: Map<string, PendingEditOperation> = new Map()
@@ -2475,8 +2491,20 @@ ${prompt}
 					}
 					this.examplePackagesCache = packages.map((p) => ({
 						name: sanitizeMcpName(p.name),
+						displayName: p.name,
 						enabledByDefault: p.enabledByDefault ?? false,
 						toolCount: p.tools.length,
+						description: p.description,
+						tools: p.tools.map((t) => ({
+							name: t.name,
+							description: t.description,
+							parameters: (t.parameters ?? []).map((param) => ({
+								name: param.name,
+								type: param.type,
+								required: param.required,
+								description: param.description,
+							})),
+						})),
 					}))
 					return this.examplePackagesCache
 				} catch (error) {

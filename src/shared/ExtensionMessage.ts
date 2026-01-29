@@ -546,7 +546,36 @@ export type ExtensionState = Pick<
 	 * Example packages (sandbox tool packs) available to toggle in settings.
 	 * This is UI-only state; the persisted toggle list is `disabledExamplePackages`.
 	 */
-	examplePackages?: Array<{ name: string; enabledByDefault?: boolean; toolCount: number }>
+	// kilocode_change: Localized text payloads used by sandbox packages metadata.
+	examplePackages?: Array<{
+		/**
+		 * Package identifier used for toggles. This is sanitized to be safe for tool/function naming.
+		 */
+		name: string
+		/**
+		 * Human friendly/original package name from METADATA.
+		 */
+		displayName?: string
+		enabledByDefault?: boolean
+		toolCount: number
+		/**
+		 * Optional description of the package, supports localization.
+		 */
+		description?: string | Record<string, string>
+		/**
+		 * Optional list of tools for UI display.
+		 */
+		tools?: Array<{
+			name: string
+			description?: string | Record<string, string>
+			parameters?: Array<{
+				name: string
+				type: string
+				required?: boolean
+				description?: string | Record<string, string>
+			}>
+		}>
+	}>
 	// kilocode_change end
 }
 

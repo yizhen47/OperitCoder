@@ -28,6 +28,7 @@
 		"browser": "计算机交互",
 		"checkpoints": "存档点",
 		"display": "显示",
+		"examplePackages": "沙盒包",
 		"notifications": "通知",
 		"contextManagement": "上下文",
 		"terminal": "终端",
@@ -38,6 +39,18 @@
 		"language": "语言",
 		"about": "关于 Operit Coder",
 		"autoPurge": "自动清理"
+	},
+	"examplePackages": {
+		"empty": "未找到沙盒包。",
+		"toolsCount": "工具：{{count}}",
+		"noToolsMetadata": "没有可用的工具元数据。",
+		"parametersLabel": "参数：",
+		"cardAriaLabel": "查看沙盒包 {{packageName}} 详情",
+		"toggleAriaLabel": "切换沙盒包 {{packageName}}",
+		"parameter": {
+			"required": "必填",
+			"optional": "可选"
+		}
 	},
 	"about": {
 		"bugReport": {

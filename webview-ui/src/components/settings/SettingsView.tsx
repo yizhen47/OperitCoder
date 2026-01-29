@@ -61,6 +61,9 @@ import {
 	TooltipTrigger,
 	StandardTooltip,
 	ToggleSwitch,
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
 } from "@src/components/ui"
 
 import { Tab, TabContent, TabHeader, TabList, TabTrigger } from "../common/Tab"
@@ -132,7 +135,7 @@ type SettingsViewProps = {
 const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref) => {
 	const { onDone, targetSection, editingProfile } = props
 	// kilocode_change end - editingProfile
-	const { t } = useAppTranslation()
+	const { t, i18n } = useAppTranslation()
 
 	const extensionState = useExtensionState()
 	const { currentApiConfigName, listApiConfigMeta, uriScheme, settingsImportedAt } = extensionState
@@ -263,6 +266,41 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 	} = cachedState
 
 	const apiConfiguration = useMemo(() => cachedState.apiConfiguration ?? {}, [cachedState.apiConfiguration])
+	const languageKey = language || "en"
+	const getLocalizedText = (value?: string | Record<string, string>) => {
+		if (!value) {
+			return undefined
+		}
+		if (typeof value === "string") {
+			return value
+		}
+		const normalized = languageKey.toLowerCase()
+		const base = normalized.split("-")[0]
+		const langKeyCandidates = Array.from(
+			new Set([
+				languageKey,
+				normalized,
+				base,
+				base.toUpperCase(),
+				"zh-CN",
+				"zh",
+				"en",
+			]),
+		)
+
+		for (const key of langKeyCandidates) {
+			if (value[key]) {
+				return value[key]
+			}
+		}
+		return Object.values(value)[0] as string | undefined
+	}
+
+	useEffect(() => {
+		if (language) {
+			i18n.changeLanguage(language)
+		}
+	}, [i18n, language])
 
 	useEffect(() => {
 		// Update only when currentApiConfigName is changed.
@@ -351,7 +389,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 				}))
 			} else {
 				// When editing the active profile, sync everything including apiConfiguration
-				setCachedState(extensionState)
+				setCachedState((prevState) => ({ ...prevState, ...extensionState }))
 			}
 		}
 	}, [extensionState, isChangeDetected, editingApiConfigName, currentApiConfigName])
@@ -1089,13 +1127,13 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 							<SectionHeader>
 								<div className="flex items-center gap-2">
 									<Package className="w-4" />
-									<div>Sandbox Packages</div>
+									<div>{t("settings:sections.examplePackages")}</div>
 								</div>
 							</SectionHeader>
 
 							<Section>
 								{(extensionState.examplePackages ?? []).length === 0 ? (
-									<div className="text-vscode-descriptionForeground">No sandbox packages found.</div>
+									<div className="text-vscode-descriptionForeground">{t("settings:examplePackages.empty")}</div>
 								) : (
 									<div className="flex flex-col gap-2">
 										{(extensionState.examplePackages ?? []).map((pkg) => {
@@ -1103,32 +1141,98 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 											const isEnabledOverride = (extensionState.enabledExamplePackages ?? []).includes(pkg.name)
 											const isDisabled = (extensionState.disabledExamplePackages ?? []).includes(pkg.name)
 											const enabled = isEnabledOverride || (enabledByDefault && !isDisabled)
+											const displayName = pkg.displayName || pkg.name
+											const desc = getLocalizedText(pkg.description)
 
 											return (
-												<div
-													key={pkg.name}
-													className="flex items-center justify-between rounded border border-vscode-panel-border px-3 py-2">
-													<div className="flex flex-col">
-														<div className="text-vscode-foreground">{pkg.name}</div>
-														<div className="text-vscode-descriptionForeground text-sm">
-															Tools: {pkg.toolCount}
-														</div>
-													</div>
+												<Collapsible key={pkg.name}>
+													<div className="rounded border border-vscode-panel-border bg-vscode-editor-background">
+														<div className="flex items-start justify-between gap-3 px-3 py-2">
+															<div className="min-w-0 flex-1">
+																<CollapsibleTrigger asChild>
+																	<button
+																		type="button"
+																		aria-label={t("settings:examplePackages.cardAriaLabel", { packageName: pkg.name })}
+																		data-testid={`sandbox-package-card-${pkg.name}`}
+																		className="w-full text-left">
+																		<div className="text-vscode-foreground truncate">{displayName}</div>
+																		<div className="text-vscode-descriptionForeground text-sm">
+																			{desc ? (
+																				<span>{desc}</span>
+																			) : (
+																				<span>{t("settings:examplePackages.toolsCount", { count: pkg.toolCount })}</span>
+																			)}
+																		</div>
+																	</button>
+																</CollapsibleTrigger>
+															</div>
 
-													<ToggleSwitch
-														checked={enabled}
-														size="medium"
-														aria-label={`Toggle sandbox package ${pkg.name}`}
-														data-testid={`sandbox-package-toggle-${pkg.name}`}
-														onChange={() => {
-															vscode.postMessage({
-																type: "toggleExamplePackage",
-																packageName: pkg.name,
-																disabled: enabled,
-															})
-														}}
-													/>
-												</div>
+															<ToggleSwitch
+																checked={enabled}
+																size="medium"
+																aria-label={t("settings:examplePackages.toggleAriaLabel", { packageName: pkg.name })}
+																data-testid={`sandbox-package-toggle-${pkg.name}`}
+																onChange={() => {
+																	vscode.postMessage({
+																		type: "toggleExamplePackage",
+																		packageName: pkg.name,
+																		disabled: enabled,
+																	})
+																}}
+															/>
+														</div>
+
+														<CollapsibleContent>
+															<div className="border-t border-vscode-panel-border px-3 py-2">
+																{(pkg.tools ?? []).length === 0 ? (
+																	<div className="text-vscode-descriptionForeground text-sm">{t("settings:examplePackages.noToolsMetadata")}</div>
+																) : (
+																	<div
+																		className="flex flex-col gap-2"
+																		data-testid={`sandbox-package-tools-${pkg.name}`}>
+																		{(pkg.tools ?? []).map((tool) => {
+																			const toolDesc = getLocalizedText(tool.description)
+																			const toolTitle = toolDesc ?? tool.name
+																			return (
+																				<div
+																					key={tool.name}
+																					className="rounded border border-vscode-panel-border px-2 py-2">
+																					<div className="text-vscode-foreground text-sm">{toolTitle}</div>
+																					{toolDesc ? (
+																						<div className="text-vscode-descriptionForeground font-mono text-xs">{tool.name}</div>
+																					) : null}
+																					{(tool.parameters ?? []).length > 0 ? (
+																						<div className="mt-2 flex flex-col gap-1">
+																							<div className="text-vscode-descriptionForeground text-xs">{t("settings:examplePackages.parametersLabel")}</div>
+																							<div className="flex flex-col gap-1">
+																								{(tool.parameters ?? []).map((p) => {
+																									const pDesc = getLocalizedText(p.description)
+																									const pTitle = pDesc ?? p.name
+																									return (
+																										<div key={p.name} className="flex flex-col gap-0.5">
+																											<div className="text-vscode-foreground text-sm">{pTitle}</div>
+																											<div className="text-vscode-descriptionForeground font-mono text-xs">
+																												{pDesc ? (
+																														<>( {p.name}, {p.type}, {p.required === false ? t("settings:examplePackages.parameter.optional") : t("settings:examplePackages.parameter.required")} )</>
+																													) : (
+																														<>( {p.type}, {p.required === false ? t("settings:examplePackages.parameter.optional") : t("settings:examplePackages.parameter.required")} )</>
+																													)}
+																											</div>
+																										</div>
+																									)
+																								})}
+																							</div>
+																						</div>
+																					) : null}
+																				</div>
+																			)
+																		})}
+																	</div>
+																)}
+															</div>
+														</CollapsibleContent>
+													</div>
+												</Collapsible>
 											)
 										})}
 									</div>

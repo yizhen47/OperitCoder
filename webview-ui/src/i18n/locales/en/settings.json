@@ -28,6 +28,7 @@
 		"browser": "Browser",
 		"checkpoints": "Checkpoints",
 		"display": "Display",
+		"examplePackages": "Sandbox Packages",
 		"notifications": "Notifications",
 		"contextManagement": "Context",
 		"terminal": "Terminal",
@@ -38,6 +39,18 @@
 		"language": "Language",
 		"about": "About Operit Coder",
 		"autoPurge": "Auto-Cleanup"
+	},
+	"examplePackages": {
+		"empty": "No sandbox packages found.",
+		"toolsCount": "Tools: {{count}}",
+		"noToolsMetadata": "No tools metadata.",
+		"parametersLabel": "Parameters:",
+		"cardAriaLabel": "View sandbox package {{packageName}} details",
+		"toggleAriaLabel": "Toggle sandbox package {{packageName}}",
+		"parameter": {
+			"required": "required",
+			"optional": "optional"
+		}
 	},
 	"about": {
 		"bugReport": {
