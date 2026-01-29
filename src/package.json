@@ -137,6 +137,11 @@
 				"icon": "$(add)"
 			},
 			{
+				"command": "operit-coder.rulesButtonClickedSidebar",
+				"title": "%command.rules.title%",
+				"icon": "$(law)"
+			},
+			{
 				"command": "operit-coder.plusButtonClickedSidebar",
 				"title": "%command.newTask.title%",
 				"icon": "$(add)"
@@ -376,6 +381,11 @@
 				{
 					"command": "operit-coder.plusButtonClickedSidebar",
 					"group": "navigation@0",
+					"when": "view == operit-coder.SidebarProvider"
+				},
+				{
+					"command": "operit-coder.rulesButtonClickedSidebar",
+					"group": "navigation@0.5",
 					"when": "view == operit-coder.SidebarProvider"
 				},
 				{

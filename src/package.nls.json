@@ -6,6 +6,7 @@
 	"views.activitybar.title": "Operit Coder",
 	"views.sidebar.name": "Operit Coder",
 	"command.newTask.title": "New Task",
+	"command.rules.title": "Rules & Workflows",
 	"command.prompts.title": "Modes",
 	"command.mcpServers.title": "MCP Servers",
 	"command.history.title": "Task History",

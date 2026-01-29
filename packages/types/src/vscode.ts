@@ -42,6 +42,7 @@ export const commandIds = [
 	// kilocode_change start
 	"plusButtonClickedSidebar",
 	"plusButtonClickedTab",
+	"rulesButtonClickedSidebar", // kilocode_change
 	// kilocode_change end
 	"promptsButtonClicked",
 	"mcpButtonClicked",

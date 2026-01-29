@@ -30,7 +30,11 @@ const DescriptionWithLink: React.FC<DescriptionWithLinkProps> = ({ children, hre
 	</p>
 )
 
-const KiloRulesToggleModal: React.FC = () => {
+interface KiloRulesToggleModalProps {
+	hideTrigger?: boolean
+}
+
+const KiloRulesToggleModal: React.FC<KiloRulesToggleModalProps> = ({ hideTrigger = false }) => {
 	const { t } = useTranslation()
 
 	const [isVisible, setIsVisible] = useState(false)
@@ -59,6 +63,11 @@ const KiloRulesToggleModal: React.FC = () => {
 				setGlobalRules(sortedRules(message.globalRules))
 				setLocalWorkflows(sortedRules(message.localWorkflows))
 				setGlobalWorkflows(sortedRules(message.globalWorkflows))
+				return
+			}
+
+			if (message.type === "action" && message.action === "rulesButtonClicked") {
+				setIsVisible((prev) => !prev)
 			}
 		}
 
@@ -89,19 +98,29 @@ const KiloRulesToggleModal: React.FC = () => {
 	})
 
 	useEffect(() => {
-		if (isVisible && buttonRef.current) {
-			const buttonRect = buttonRef.current.getBoundingClientRect()
-			const buttonCenter = buttonRect.left + buttonRect.width / 2
-			const rightPosition = document.documentElement.clientWidth - buttonCenter - 5
-
-			setArrowPosition(rightPosition)
-			setMenuPosition(buttonRect.top + 1)
+		if (!isVisible) {
+			return
 		}
-	}, [isVisible, viewportWidth, viewportHeight])
+
+		if (hideTrigger || !buttonRef.current) {
+			setArrowPosition(20)
+			setMenuPosition(40)
+			return
+		}
+
+		const buttonRect = buttonRef.current.getBoundingClientRect()
+		const buttonCenter = buttonRect.left + buttonRect.width / 2
+		const rightPosition = document.documentElement.clientWidth - buttonCenter - 5
+
+		setArrowPosition(rightPosition)
+		setMenuPosition(buttonRect.top + 1)
+	}, [isVisible, viewportWidth, viewportHeight, hideTrigger])
 
 	return (
 		<div ref={modalRef}>
-			<div ref={buttonRef} className="inline-flex min-w-0 max-w-full">
+			<div
+				ref={buttonRef}
+				className={`inline-flex min-w-0 max-w-full${hideTrigger ? " opacity-0 pointer-events-none select-none" : ""}`}>
 				<TooltipProvider>
 					<Tooltip open={isVisible ? false : undefined}>
 						<TooltipTrigger asChild>

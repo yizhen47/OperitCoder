@@ -170,6 +170,18 @@ const getCommandsMap = ({ context, outputChannel }: RegisterCommandOptions): Rec
 		await sidebarProvider.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
 		await sidebarProvider.postMessageToWebview({ type: "action", action: "focusInput" })
 	},
+	// kilocode_change start
+	rulesButtonClickedSidebar: () => {
+		const sidebarProvider = getSidebarProviderOrLog(outputChannel)
+
+		if (!sidebarProvider) {
+			return
+		}
+
+		TelemetryService.instance.captureTitleButtonClicked("rules")
+		sidebarProvider.postMessageToWebview({ type: "action", action: "rulesButtonClicked" })
+	},
+	// kilocode_change end
 	plusButtonClickedTab: async () => {
 		const tabProvider = getTabProviderOrLog(outputChannel)
 

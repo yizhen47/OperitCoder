@@ -241,6 +241,32 @@ describe("title bar command routing", () => {
 		expect(mockTabProvider.postMessageToWebview).not.toHaveBeenCalledWith({ type: "action", action: "settingsButtonClicked" })
 	})
 
+	it("rulesButtonClickedSidebar targets the sidebar provider", async () => {
+		const mockSidebarProvider = {
+			postMessageToWebview: vi.fn(),
+		} as any
+		const mockTabProvider = {
+			postMessageToWebview: vi.fn(),
+		} as any
+
+		;(ClineProvider.getVisibleInstance as Mock).mockReturnValue(mockTabProvider)
+		;(ClineProvider as any).getInstanceForView = (ClineProvider as any).getInstanceForView ?? vi.fn()
+		;((ClineProvider as any).getInstanceForView as Mock).mockImplementation((view: any) => {
+			return view?.active === true ? mockTabProvider : mockSidebarProvider
+		})
+
+		setPanel({ active: true } as any, "tab")
+		setPanel({ visible: true } as any, "sidebar")
+
+		registerCommands({ context: mockContext, outputChannel: mockOutputChannel, provider: {} as any })
+		const cb = registeredCallbacks.get("operit-coder.rulesButtonClickedSidebar")
+		expect(cb).toBeTruthy()
+		cb?.()
+
+		expect(mockSidebarProvider.postMessageToWebview).toHaveBeenCalledWith({ type: "action", action: "rulesButtonClicked" })
+		expect(mockTabProvider.postMessageToWebview).not.toHaveBeenCalledWith({ type: "action", action: "rulesButtonClicked" })
+	})
+
 	it("historyButtonClickedTab targets the tab provider", async () => {
 		const mockSidebarProvider = {
 			postMessageToWebview: vi.fn(),

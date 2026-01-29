@@ -2,6 +2,7 @@
 	"extension.displayName": "Operit Coder AI Agent / Operit Coder AI 代理",
 	"extension.description": "Open Source AI coding assistant for planning, building, and fixing code.\n用于规划、构建和修复代码的开源 AI 编码助手。",
 	"command.newTask.title": "新建任务",
+	"command.rules.title": "规则和工作流",
 	"command.explainCode.title": "解释代码",
 	"command.fixCode.title": "修复代码",
 	"command.improveCode.title": "改进代码",

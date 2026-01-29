@@ -218,6 +218,9 @@ export interface ExtensionMessage {
 		| "chatButtonClicked"
 		| "settingsButtonClicked"
 		| "historyButtonClicked"
+		// kilocode_change start
+		| "rulesButtonClicked"
+		// kilocode_change end
 		| "promptsButtonClicked" // kilocode_change
 		| "marketplaceButtonClicked"
 		| "mcpButtonClicked" // kilocode_change
