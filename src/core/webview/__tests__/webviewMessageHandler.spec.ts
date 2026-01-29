@@ -16,6 +16,7 @@ const mockGetModels = getModels as Mock<typeof getModels>
 const mockClineProvider = {
 	getState: vi.fn(),
 	postMessageToWebview: vi.fn(),
+	createTask: vi.fn(),
 	customModesManager: {
 		getCustomModes: vi.fn(),
 		deleteCustomMode: vi.fn(),
@@ -96,6 +97,26 @@ import type { ModeConfig } from "@roo-code/types"
 vi.mock("../../../utils/fs")
 vi.mock("../../../utils/path")
 vi.mock("../../../utils/globalContext")
+
+describe("webviewMessageHandler - askResponse messageResponse", () => {
+	beforeEach(() => {
+		vi.clearAllMocks()
+		mockClineProvider.getCurrentTask = vi.fn().mockReturnValue(undefined)
+		mockClineProvider.createTask = vi.fn().mockResolvedValue(undefined)
+	})
+
+	it("creates a new task when no active task exists", async () => {
+		await webviewMessageHandler(mockClineProvider, {
+			type: "askResponse",
+			askResponse: "messageResponse",
+			text: "hello",
+			images: ["img"],
+		})
+
+		expect(mockClineProvider.createTask).toHaveBeenCalledWith("hello", ["img"])
+		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({ type: "invoke", invoke: "newChat" })
+	})
+})
 
 describe("webviewMessageHandler - requestLmStudioModels", () => {
 	beforeEach(() => {

@@ -800,9 +800,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				// Mark that user has responded - this prevents any pending auto-approvals.
 				userRespondedRef.current = true
 
-				if (messagesRef.current.length === 0) {
-					vscode.postMessage({ type: "newTask", text, images })
-				} else if (clineAskRef.current) {
+				if (clineAskRef.current) {
 					if (clineAskRef.current === "followup") {
 						markFollowUpAsAnswered()
 					}

@@ -599,6 +599,19 @@ export const webviewMessageHandler = async (
 			break
 
 		case "askResponse":
+			if (message.askResponse === "messageResponse" && !provider.getCurrentTask()) {
+				try {
+					await provider.createTask(message.text, message.images)
+					await provider.postMessageToWebview({ type: "invoke", invoke: "newChat" })
+				} catch (error) {
+					await provider.postMessageToWebview({ type: "invoke", invoke: "newChat" })
+					vscode.window.showErrorMessage(
+						`Failed to create task: ${error instanceof Error ? error.message : String(error)}`,
+					)
+				}
+				break
+			}
+
 			provider.getCurrentTask()?.handleWebviewAskResponse(message.askResponse!, message.text, message.images)
 			break
 

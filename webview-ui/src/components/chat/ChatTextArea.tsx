@@ -22,20 +22,19 @@ import {
 import { convertToMentionPath } from "@/utils/path-mentions"
 import { escapeHtml } from "@/utils/highlight" // kilocode_change - FIM autocomplete
 import { useChatGhostText } from "./hooks/useChatGhostText" // kilocode_change: FIM autocomplete
-import { DropdownOptionType, Button, StandardTooltip, Popover, PopoverTrigger, PopoverContent } from "@/components/ui"
+import { Button, StandardTooltip, Popover, PopoverTrigger, PopoverContent } from "@/components/ui"
 import { CircularProgress } from "./CircularProgress"
 import { getModelMaxOutputTokens } from "@roo/api"
 import { formatLargeNumber } from "@src/utils/format"
 import { useSelectedModel } from "@/components/ui/hooks/useSelectedModel"
 
 import Thumbnails from "../common/Thumbnails"
-import { ModeSelector } from "./ModeSelector"
-import KiloModeSelector from "../kilocode/KiloModeSelector"
+import { KiloModeSelector } from "../kilocode/KiloModeSelector"
 import { KiloProfileSelector } from "../kilocode/chat/KiloProfileSelector"
 import { MAX_IMAGES_PER_MESSAGE } from "./ChatView"
 import ContextMenu from "./ContextMenu"
 import { ImageWarningBanner } from "./ImageWarningBanner"
-import { VolumeX, Pin, Check, WandSparkles, SendHorizontal, Paperclip, MessageSquareX, X } from "lucide-react"
+import { VolumeX, WandSparkles, SendHorizontal, Paperclip, MessageSquareX, X } from "lucide-react"
 import { IndexingStatusBadge } from "./IndexingStatusBadge"
 import { MicrophoneButton } from "./MicrophoneButton" // kilocode_change: STT microphone button
 import { VolumeVisualizer } from "./VolumeVisualizer" // kilocode_change: STT volume level visual
@@ -163,7 +162,6 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			currentApiConfigName,
 			listApiConfigMeta: listApiConfigMeta_unfilteredByKiloCodeProfileType,
 			customModes,
-			customModePrompts,
 			cwd,
 			pinnedApiConfigs,
 			togglePinnedApiConfig,
@@ -202,7 +200,6 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		}, [listApiConfigMeta, currentApiConfigName])
 
 		const [gitCommits, setGitCommits] = useState<any[]>([])
-		const [showDropdown, setShowDropdown] = useState(false)
 		const [fileSearchResults, setFileSearchResults] = useState<SearchResult[]>([])
 
 		// kilocode_change begin: remove button from chat when it gets to small
@@ -235,18 +232,6 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 
 		const [searchLoading, setSearchLoading] = useState(false)
 		const [searchRequestId, setSearchRequestId] = useState<string>("")
-
-		// Close dropdown when clicking outside.
-		useEffect(() => {
-			const handleClickOutside = () => {
-				if (showDropdown) {
-					setShowDropdown(false)
-				}
-			}
-
-			document.addEventListener("mousedown", handleClickOutside)
-			return () => document.removeEventListener("mousedown", handleClickOutside)
-		}, [showDropdown])
 
 		// Handle enhanced prompt response and search results.
 		useEffect(() => {
@@ -1354,147 +1339,17 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 
 		const placeholderBottomText = ` (${t("chat:addContext")}${shouldDisableImages ? `, ${t("chat:dragFiles")}` : `, ${t("chat:dragFilesImages")}`})`
 
-		// Common mode selector handler
-		const handleModeChange = useCallback(
-			(value: Mode) => {
-				setMode(value)
-				vscode.postMessage({ type: "mode", text: value })
-			},
-			[setMode],
-		)
-
 		// Helper function to render mode
 		// kilocode_change: unused
-		const _renderModeSelector = () => (
-			<ModeSelector
-				value={mode}
-				title={t("chat:selectMode")}
-				onChange={handleModeChange}
-				triggerClassName="w-full"
-				modeShortcutText={modeShortcutText}
-				customModes={customModes}
-				customModePrompts={customModePrompts}
-			/>
-		)
 
 		// Helper function to get API config dropdown options
 		// kilocode_change: unused
-		const _getApiConfigOptions = useMemo(() => {
-			const pinnedConfigs = (listApiConfigMeta || [])
-				.filter((config) => pinnedApiConfigs && pinnedApiConfigs[config.id])
-				.map((config) => ({
-					value: config.id,
-					label: config.name,
-					name: config.name,
-					type: DropdownOptionType.ITEM,
-					pinned: true,
-				}))
-				.sort((a, b) => a.label.localeCompare(b.label))
-
-			const unpinnedConfigs = (listApiConfigMeta || [])
-				.filter((config) => !pinnedApiConfigs || !pinnedApiConfigs[config.id])
-				.map((config) => ({
-					value: config.id,
-					label: config.name,
-					name: config.name,
-					type: DropdownOptionType.ITEM,
-					pinned: false,
-				}))
-				.sort((a, b) => a.label.localeCompare(b.label))
-
-			const hasPinnedAndUnpinned = pinnedConfigs.length > 0 && unpinnedConfigs.length > 0
-
-			return [
-				...pinnedConfigs,
-				...(hasPinnedAndUnpinned
-					? [
-							{
-								value: "sep-pinned",
-								label: t("chat:separator"),
-								type: DropdownOptionType.SEPARATOR,
-							},
-						]
-					: []),
-				...unpinnedConfigs,
-				{
-					value: "sep-2",
-					label: t("chat:separator"),
-					type: DropdownOptionType.SEPARATOR,
-				},
-				{
-					value: "settingsButtonClicked",
-					label: t("chat:edit"),
-					type: DropdownOptionType.ACTION,
-				},
-			]
-		}, [listApiConfigMeta, pinnedApiConfigs, t])
 
 		// Helper function to handle API config change
 		// kilocode_change: unused
-		const _handleApiConfigChange = useCallback((value: string) => {
-			if (value === "settingsButtonClicked") {
-				vscode.postMessage({
-					type: "loadApiConfiguration",
-					text: value,
-					values: { section: "providers" },
-				})
-			} else {
-				vscode.postMessage({ type: "loadApiConfigurationById", text: value })
-			}
-		}, [])
 
 		// Helper function to render API config item
 		// kilocode_change: unused
-		const _renderApiConfigItem = useCallback(
-			({ type, value, label, pinned }: any) => {
-				if (type !== DropdownOptionType.ITEM) {
-					return label
-				}
-
-				const config = listApiConfigMeta?.find((c) => c.id === value)
-				const isCurrentConfig = config?.name === currentApiConfigName
-
-				return (
-					<div className="flex justify-between gap-2 w-full h-5">
-						<div
-							className={cn("truncate min-w-0 overflow-hidden", {
-								"font-medium": isCurrentConfig,
-							})}>
-							{label}
-						</div>
-						<div className="flex justify-end w-10 flex-shrink-0">
-							<div
-								className={cn("size-5 p-1", {
-									"block group-hover:hidden": !pinned,
-									hidden: !isCurrentConfig,
-								})}>
-								<Check className="size-3" />
-							</div>
-							<StandardTooltip content={pinned ? t("chat:unpin") : t("chat:pin")}>
-								<Button
-									variant="ghost"
-									size="icon"
-									onClick={(e) => {
-										e.stopPropagation()
-										togglePinnedApiConfig(value)
-										vscode.postMessage({
-											type: "toggleApiConfigPin",
-											text: value,
-										})
-									}}
-									className={cn("size-5", {
-										"hidden group-hover:flex": !pinned,
-										"bg-accent": pinned,
-									})}>
-									<Pin className="size-3 p-0.5 opacity-50" />
-								</Button>
-							</StandardTooltip>
-						</div>
-					</div>
-				)
-			},
-			[listApiConfigMeta, currentApiConfigName, t, togglePinnedApiConfig],
-		)
 
 		// Helper function to render the text area section
 		const renderTextAreaSection = () => (
