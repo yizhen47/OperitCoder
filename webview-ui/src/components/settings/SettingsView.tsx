@@ -256,7 +256,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		includeTaskHistoryInEnhance,
 		imageGenerationProvider,
 		openRouterImageApiKey,
-		kiloCodeImageApiKey,
 		openRouterImageGenerationSelectedModel,
 		reasoningBlockCollapsed,
 		enterBehavior,
@@ -356,7 +355,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 
 	// Temporary way of making sure that the Settings view updates its local state properly when receiving
 	// api keys from providers that support url callbacks. This whole Settings View needs proper with this local state thing later
-	const { kilocodeToken, openRouterApiKey, glamaApiKey, requestyApiKey } = extensionState.apiConfiguration ?? {}
+	const { openRouterApiKey, glamaApiKey, requestyApiKey } = extensionState.apiConfiguration ?? {}
 	useEffect(() => {
 		setCachedState((prevCachedState) => ({
 			...prevCachedState,
@@ -364,13 +363,12 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 				...prevCachedState.apiConfiguration,
 				// Only set specific tokens/keys instead of spreading the entire
 				// `prevCachedState.apiConfiguration` since it may contain unsaved changes
-				kilocodeToken,
 				openRouterApiKey,
 				glamaApiKey,
 				requestyApiKey,
 			},
 		}))
-	}, [kilocodeToken, openRouterApiKey, glamaApiKey, requestyApiKey])
+	}, [openRouterApiKey, glamaApiKey, requestyApiKey])
 
 	useEffect(() => {
 		// Only update if we're not already detecting changes
@@ -498,13 +496,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			}
 
 			return { ...prevState, openRouterImageApiKey: apiKey }
-		})
-	}, [])
-
-	const setKiloCodeImageApiKey = useCallback((apiKey: string) => {
-		setCachedState((prevState) => {
-			setChangeDetected(true)
-			return { ...prevState, kiloCodeImageApiKey: apiKey }
 		})
 	}, [])
 
@@ -636,7 +627,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			vscode.postMessage({ type: "morphApiKey", text: morphApiKey }) // kilocode_change
 			vscode.postMessage({ type: "fastApplyModel", text: fastApplyModel }) // kilocode_change: Fast Apply model selection
 			vscode.postMessage({ type: "fastApplyApiProvider", text: fastApplyApiProvider }) // kilocode_change: Fast Apply model api base url
-			vscode.postMessage({ type: "kiloCodeImageApiKey", text: kiloCodeImageApiKey })
+
 			// kilocode_change start - Auto-purge settings
 			vscode.postMessage({ type: "autoPurgeEnabled", bool: autoPurgeEnabled })
 			vscode.postMessage({ type: "autoPurgeDefaultRetentionDays", value: autoPurgeDefaultRetentionDays })
@@ -1036,7 +1027,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 									setApiConfigurationField={setApiConfigurationField}
 									errorMessage={errorMessage}
 									setErrorMessage={setErrorMessage}
-									currentApiConfigName={editingApiConfigName}
 								/>
 								{/* kilocode_change end - pass editing profile name */}
 							</Section>
@@ -1341,15 +1331,11 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 							setApiConfigurationField={setApiConfigurationField}
 							imageGenerationProvider={imageGenerationProvider}
 							openRouterImageApiKey={openRouterImageApiKey as string | undefined}
-							kiloCodeImageApiKey={kiloCodeImageApiKey}
 							openRouterImageGenerationSelectedModel={
 								openRouterImageGenerationSelectedModel as string | undefined
 							}
-							setImageGenerationProvider={setImageGenerationProvider}
 							setOpenRouterImageApiKey={setOpenRouterImageApiKey}
-							setKiloCodeImageApiKey={setKiloCodeImageApiKey}
 							setImageGenerationSelectedModel={setImageGenerationSelectedModel}
-							currentProfileKilocodeToken={apiConfiguration.kilocodeToken}
 						/>
 					)}
 

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import { describe, it, expect, vi } from "vitest"
 import { ErrorRow } from "../ErrorRow"
 
@@ -13,7 +13,6 @@ vi.mock("react-i18next", () => ({
 				"chat:apiRequest.streamingFailed": "Streaming Failed",
 				"chat:apiRequest.cancelled": "Cancelled",
 				"chat:diffError.title": "Diff Error",
-				"kilocode:settings.provider.login": "Login",
 			}
 			return translations[key] || key
 		},
@@ -53,48 +52,6 @@ describe("ErrorRow", () => {
 				/>,
 			)
 			expect(screen.getByTestId("additional")).toBeInTheDocument()
-		})
-	})
-
-	describe("login button", () => {
-		it("does not show login button by default", () => {
-			render(<ErrorRow type="error" message="Test error message" />)
-			expect(screen.queryByText("Login")).not.toBeInTheDocument()
-		})
-
-		it("shows login button when showLoginButton is true and onLoginClick is provided", () => {
-			const onLoginClick = vi.fn()
-			render(
-				<ErrorRow
-					type="error"
-					message="Test error message"
-					showLoginButton={true}
-					onLoginClick={onLoginClick}
-				/>,
-			)
-			expect(screen.getByText("Login")).toBeInTheDocument()
-		})
-
-		it("does not show login button when showLoginButton is true but onLoginClick is not provided", () => {
-			render(<ErrorRow type="error" message="Test error message" showLoginButton={true} />)
-			expect(screen.queryByText("Login")).not.toBeInTheDocument()
-		})
-
-		it("calls onLoginClick when login button is clicked", () => {
-			const onLoginClick = vi.fn()
-			render(
-				<ErrorRow
-					type="error"
-					message="Test error message"
-					showLoginButton={true}
-					onLoginClick={onLoginClick}
-				/>,
-			)
-
-			const loginButton = screen.getByText("Login")
-			fireEvent.click(loginButton)
-
-			expect(onLoginClick).toHaveBeenCalledTimes(1)
 		})
 	})
 

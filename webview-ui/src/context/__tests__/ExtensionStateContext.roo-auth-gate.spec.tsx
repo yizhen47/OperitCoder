@@ -47,29 +47,4 @@ describe("ExtensionStateContext Roo auth gate", () => {
 		})
 	})
 
-	it("posts requestRooModels when auth flips and provider === 'roo'", async () => {
-		render(
-			<ExtensionStateContextProvider>
-				<div />
-			</ExtensionStateContextProvider>,
-		)
-
-		// Ensure prev false (explicit)
-		postStateMessage({
-			cloudIsAuthenticated: false,
-			apiConfiguration: { apiProvider: "roo" },
-		})
-
-		vi.clearAllMocks()
-
-		// Flip to true with provider roo - should trigger
-		postStateMessage({
-			cloudIsAuthenticated: true,
-			apiConfiguration: { apiProvider: "roo" },
-		})
-
-		await waitFor(() => {
-			expect(vscode.postMessage).toHaveBeenCalledWith({ type: "requestRooModels" })
-		})
-	})
 })

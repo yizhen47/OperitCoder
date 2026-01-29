@@ -11,22 +11,16 @@ vi.mock("@/i18n/TranslationContext", () => ({
 
 // kilocode_change: other settings menu for now, to be made similar later
 describe.skip("ImageGenerationSettings", () => {
-	const mockSetImageGenerationProvider = vi.fn()
 	const mockSetOpenRouterImageApiKey = vi.fn()
-	const mockSetKiloCodeImageApiKey = vi.fn()
 	const mockSetImageGenerationSelectedModel = vi.fn()
 	const mockOnChange = vi.fn()
 
 	const defaultProps = {
 		enabled: false,
 		onChange: mockOnChange,
-		imageGenerationProvider: undefined,
 		openRouterImageApiKey: undefined,
-		kiloCodeImageApiKey: undefined,
 		openRouterImageGenerationSelectedModel: undefined,
-		setImageGenerationProvider: mockSetImageGenerationProvider,
 		setOpenRouterImageApiKey: mockSetOpenRouterImageApiKey,
-		setKiloCodeImageApiKey: mockSetKiloCodeImageApiKey,
 		setImageGenerationSelectedModel: mockSetImageGenerationSelectedModel,
 	}
 
@@ -39,7 +33,6 @@ describe.skip("ImageGenerationSettings", () => {
 			render(<ImageGenerationSettings {...defaultProps} />)
 
 			// Should NOT call setter functions on initial mount to prevent dirty state
-			expect(mockSetImageGenerationProvider).not.toHaveBeenCalled()
 			expect(mockSetOpenRouterImageApiKey).not.toHaveBeenCalled()
 			expect(mockSetImageGenerationSelectedModel).not.toHaveBeenCalled()
 		})
@@ -54,9 +47,7 @@ describe.skip("ImageGenerationSettings", () => {
 			)
 
 			// Should NOT call setter functions on initial mount to prevent dirty state
-			expect(mockSetImageGenerationProvider).not.toHaveBeenCalled()
 			expect(mockSetOpenRouterImageApiKey).not.toHaveBeenCalled()
-			expect(mockSetImageGenerationSelectedModel).not.toHaveBeenCalled()
 		})
 	})
 
@@ -64,7 +55,7 @@ describe.skip("ImageGenerationSettings", () => {
 		it("should call setimageGenerationSettings when user changes API key", async () => {
 			// Set provider to "openrouter" so the API key field renders
 			const { getByPlaceholderText } = render(
-				<ImageGenerationSettings {...defaultProps} enabled={true} imageGenerationProvider="openrouter" />,
+				<ImageGenerationSettings {...defaultProps} enabled={true} />,
 			)
 
 			const apiKeyInput = getByPlaceholderText(
@@ -86,23 +77,12 @@ describe.skip("ImageGenerationSettings", () => {
 		it("should render input fields when enabled is true and provider is openrouter", () => {
 			// Set provider to "openrouter" so the API key field renders
 			const { getByPlaceholderText } = render(
-				<ImageGenerationSettings {...defaultProps} enabled={true} imageGenerationProvider="openrouter" />,
+				<ImageGenerationSettings {...defaultProps} enabled={true} />,
 			)
 
 			expect(
 				getByPlaceholderText("settings:experimental.IMAGE_GENERATION.openRouterApiKeyPlaceholder"),
 			).toBeInTheDocument()
-		})
-
-		// kilocode_change: no roo provider
-		it.skip("should not render API key field when provider is roo", () => {
-			const { queryByPlaceholderText } = render(
-				<ImageGenerationSettings {...defaultProps} enabled={true} imageGenerationProvider="kilocode" />,
-			)
-
-			expect(
-				queryByPlaceholderText("settings:experimental.IMAGE_GENERATION.openRouterApiKeyPlaceholder"),
-			).not.toBeInTheDocument()
 		})
 
 		it("should not render input fields when enabled is false", () => {

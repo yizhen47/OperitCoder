@@ -347,7 +347,6 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		includeDiagnosticMessages: true,
 		maxDiagnosticMessages: 50,
 		openRouterImageApiKey: "",
-		kiloCodeImageApiKey: "",
 		// kilocode_change start - Auto Purge
 		autoPurgeEnabled: false,
 		autoPurgeDefaultRetentionDays: 30,

@@ -14,9 +14,8 @@ import { ExtensionStateContextProvider, useExtensionState } from "./context/Exte
 import ChatView, { ChatViewRef } from "./components/chat/ChatView"
 import HistoryView from "./components/history/HistoryView"
 import SettingsView, { SettingsViewRef } from "./components/settings/SettingsView"
-import WelcomeView from "./components/kilocode/welcome/WelcomeView" // kilocode_change
+import WelcomeViewProvider from "./components/welcome/WelcomeViewProvider"
 import McpView from "./components/mcp/McpView" // kilocode_change
-import AuthView from "./components/kilocode/auth/AuthView" // kilocode_change
 import { MarketplaceView } from "./components/marketplace/MarketplaceView"
 import { HumanRelayDialog } from "./components/human-relay/HumanRelayDialog"
 import BottomControls from "./components/kilocode/BottomControls" // kilocode_change
@@ -31,7 +30,7 @@ import { TooltipProvider } from "./components/ui/tooltip"
 import { STANDARD_TOOLTIP_DELAY } from "./components/ui/standard-tooltip"
 import { MemoryWarningBanner } from "./kilocode/MemoryWarningBanner"
 
-type Tab = "settings" | "history" | "mcp" | "modes" | "chat" | "marketplace" | "account" | "cloud" | "auth" // kilocode_change: add "auth"
+type Tab = "settings" | "history" | "mcp" | "modes" | "chat" | "marketplace" | "account" | "cloud"
 
 interface HumanRelayDialogState {
 	isOpen: boolean
@@ -96,9 +95,6 @@ const App = () => {
 
 	const [showAnnouncement, setShowAnnouncement] = useState(false)
 	const [tab, setTab] = useState<Tab>("chat")
-	const [authReturnTo, setAuthReturnTo] = useState<"chat" | "settings">("chat")
-	const [authProfileName, setAuthProfileName] = useState<string | undefined>(undefined)
-	const [settingsEditingProfile, setSettingsEditingProfile] = useState<string | undefined>(undefined)
 
 	const [humanRelayDialogState, setHumanRelayDialogState] = useState<HumanRelayDialogState>({
 		isOpen: false,
@@ -136,11 +132,7 @@ const App = () => {
 			setCurrentSection(undefined)
 			setCurrentMarketplaceTab(undefined)
 
-			// kilocode_change: start - Bypass unsaved changes check when navigating to auth tab
-			if (newTab === "auth") {
-				setTab(newTab)
-			} else if (settingsRef.current?.checkUnsaveChanges) {
-				// kilocode_change: end
+			if (settingsRef.current?.checkUnsaveChanges) {
 				settingsRef.current.checkUnsaveChanges(() => setTab(newTab))
 			} else {
 				setTab(newTab)
@@ -169,20 +161,10 @@ const App = () => {
 
 				// Handle switchTab action with tab parameter
 				if (message.action === "switchTab" && message.tab) {
-					const targetTab = message.tab as Tab
-					// kilocode_change start - Handle auth tab with returnTo and profileName parameters
-					if (targetTab === "auth") {
-						if (message.values?.returnTo) {
-							const returnTo = message.values.returnTo as "chat" | "settings"
-							setAuthReturnTo(returnTo)
-						}
-						if (message.values?.profileName) {
-							const profileName = message.values.profileName as string
-							setAuthProfileName(profileName)
-							setSettingsEditingProfile(profileName)
-						}
+					if (message.tab === "auth") {
+						return
 					}
-					// kilocode_change end
+					const targetTab = message.tab as Tab
 					switchTab(targetTab)
 					// Extract targetSection from values if provided
 					const targetSection = message.values?.section as string | undefined
@@ -313,9 +295,8 @@ const App = () => {
 
 	// Do not conditionally load ChatView, it's expensive and there's state we
 	// don't want to lose (user input, disableInput, askResponse promise, etc.)
-	// kilocode_change: no WelcomeViewProvider toggle
 	return showWelcome ? (
-		<WelcomeView />
+		<WelcomeViewProvider />
 	) : (
 		<>
 			{/* kilocode_change start */}
@@ -329,11 +310,8 @@ const App = () => {
 					ref={settingsRef}
 					onDone={() => switchTab("chat")}
 					targetSection={currentSection}
-					editingProfile={settingsEditingProfile}
 				/>
 			)}
-			{/* kilocode_change: add authview */}
-			{tab === "auth" && <AuthView returnTo={authReturnTo} profileName={authProfileName} />}
 			{tab === "marketplace" && (
 				<MarketplaceView
 					stateManager={marketplaceStateManager}

@@ -42,11 +42,10 @@ import {
 	fireworksDefaultModelId,
 	featherlessDefaultModelId,
 	ioIntelligenceDefaultModelId,
-	rooDefaultModelId,
 	vercelAiGatewayDefaultModelId,
 	deepInfraDefaultModelId,
 	minimaxDefaultModelId,
-	nanoGptDefaultModelId, //kilocode_change
+	nanoGptDefaultModelId,
 	type ToolProtocol,
 	TOOL_PROTOCOL,
 } from "@roo-code/types"
@@ -56,13 +55,7 @@ import { validateApiConfigurationExcludingModelErrors, getModelValidationError }
 import { useAppTranslation } from "@src/i18n/TranslationContext"
 import { useRouterModels } from "@src/components/ui/hooks/useRouterModels"
 import { useSelectedModel } from "@src/components/ui/hooks/useSelectedModel"
-import { useExtensionState } from "@src/context/ExtensionStateContext"
-// kilocode_change start
-//import {
-//	useOpenRouterModelProviders,
-//	OPENROUTER_DEFAULT_PROVIDER_NAME,
-//} from "@src/components/ui/hooks/useOpenRouterModelProviders"
-// kilocode_change start
+
 import { filterModels } from "./utils/organizationFilters"
 import {
 	Select,
@@ -86,7 +79,7 @@ import {
 	DeepSeek,
 	Doubao,
 	Gemini,
-	Glama, // kilocode_change
+	Glama,
 	Groq,
 	HuggingFace,
 	IOIntelligence,
@@ -94,27 +87,24 @@ import {
 	LiteLLM,
 	Mistral,
 	Moonshot,
-	NanoGpt, // kilocode_change
+	NanoGpt,
 	Ollama,
 	OpenAI,
 	OpenAICompatible,
 	OpenRouter,
 	QwenCode,
 	Requesty,
-	Roo,
 	SambaNova,
 	Unbound,
+	VirtualQuotaFallbackProvider,
 	Vertex,
 	VSCodeLM,
 	XAI,
-	// kilocode_change start
 	GeminiCli,
-	VirtualQuotaFallbackProvider,
 	Synthetic,
 	OvhCloudAiEndpoints,
 	Inception,
 	SapAiCore,
-	// kilocode_change end
 	ZAi,
 	Fireworks,
 	Featherless,
@@ -125,7 +115,6 @@ import {
 
 import { MODELS_BY_PROVIDER, PROVIDERS } from "./constants"
 import { inputEventTransform, noTransform } from "./transforms"
-// import { ModelPicker } from "./ModelPicker" // kilocode_change
 import { ModelInfoView } from "./ModelInfoView"
 import { ApiErrorMessage } from "./ApiErrorMessage"
 import { ThinkingBudget } from "./ThinkingBudget"
@@ -136,11 +125,8 @@ import { TemperatureControl } from "./TemperatureControl"
 import { RateLimitSecondsControl } from "./RateLimitSecondsControl"
 import { ConsecutiveMistakeLimitControl } from "./ConsecutiveMistakeLimitControl"
 import { BedrockCustomArn } from "./providers/BedrockCustomArn"
-import { KiloCode } from "../kilocode/settings/providers/KiloCode" // kilocode_change
-import { RooBalanceDisplay } from "./providers/RooBalanceDisplay"
 import { buildDocLink } from "@src/utils/docLinks"
-import { KiloProviderRouting, KiloProviderRoutingManagedByOrganization } from "./providers/KiloProviderRouting"
-import { RateLimitAfterControl } from "./RateLimitAfterSettings" // kilocode_change
+import { RateLimitAfterControl } from "./RateLimitAfterSettings"
 import { BookOpenText } from "lucide-react"
 
 export interface ApiOptionsProps {
@@ -154,8 +140,6 @@ export interface ApiOptionsProps {
 	fromWelcomeView?: boolean
 	errorMessage: string | undefined
 	setErrorMessage: React.Dispatch<React.SetStateAction<string | undefined>>
-	hideKiloCodeButton?: boolean // kilocode_change
-	currentApiConfigName?: string // kilocode_change
 }
 
 const ApiOptions = ({
@@ -165,12 +149,8 @@ const ApiOptions = ({
 	fromWelcomeView,
 	errorMessage,
 	setErrorMessage,
-	hideKiloCodeButton = false,
-	currentApiConfigName, // kilocode_change
 }: ApiOptionsProps) => {
 	const { t } = useAppTranslation()
-	// kilocode_change - cloud features disabled
-	const { kilocodeDefaultModel } = useExtensionState()
 	const organizationAllowList = { allowAll: true, providers: {} }
 	const cloudIsAuthenticated = false
 
@@ -187,16 +167,11 @@ const ApiOptions = ({
 		}
 	}, [apiConfiguration?.openAiHeaders, customHeaders])
 
-	// Helper to convert array of tuples to object (filtering out empty keys).
-
-	// Debounced effect to update the main configuration when local
-	// customHeaders state stabilizes.
 	useDebounce(
 		() => {
 			const currentConfigHeaders = apiConfiguration?.openAiHeaders || {}
 			const newHeadersObject = convertHeadersToObject(customHeaders)
 
-			// Only update if the processed object is different from the current config.
 			if (JSON.stringify(currentConfigHeaders) !== JSON.stringify(newHeadersObject)) {
 				setApiConfigurationField("openAiHeaders", newHeadersObject)
 			}
@@ -225,11 +200,9 @@ const ApiOptions = ({
 		info: selectedModelInfo,
 	} = useSelectedModel(apiConfiguration)
 
-	// kilocode_change start: queryKey, chutesApiKey, gemini
 	const { data: routerModels, refetch: refetchRouterModels } = useRouterModels({
 		openRouterBaseUrl: apiConfiguration?.openRouterBaseUrl,
 		openRouterApiKey: apiConfiguration?.openRouterApiKey,
-		kilocodeOrganizationId: apiConfiguration?.kilocodeOrganizationId ?? "personal",
 		deepInfraApiKey: apiConfiguration?.deepInfraApiKey,
 		geminiApiKey: apiConfiguration?.geminiApiKey,
 		googleGeminiBaseUrl: apiConfiguration?.googleGeminiBaseUrl,
@@ -237,79 +210,11 @@ const ApiOptions = ({
 		syntheticApiKey: apiConfiguration?.syntheticApiKey,
 	})
 
-	//const { data: openRouterModelProviders } = useOpenRouterModelProviders(
-	//	apiConfiguration?.openRouterModelId,
-	//	apiConfiguration?.openRouterBaseUrl,
-	//	apiConfiguration?.openRouterApiKey,
-	//	{
-	//		enabled:
-	//			!!apiConfiguration?.openRouterModelId &&
-	//			routerModels?.openrouter &&
-	//			Object.keys(routerModels.openrouter).length > 1 &&
-	//			apiConfiguration.openRouterModelId in routerModels.openrouter,
-	//	},
-	//)
-	// kilocode_change end
-
-	// Update `apiModelId` whenever `selectedModelId` changes.
 	useEffect(() => {
-		if (selectedModelId && apiConfiguration.apiModelId !== selectedModelId) {
-			// Pass false as third parameter to indicate this is not a user action
-			// This is an internal sync, not a user-initiated change
-			setApiConfigurationField("apiModelId", selectedModelId, false)
+		if (apiConfiguration?.apiProvider === "roo") {
+			setApiConfigurationField("apiProvider", "openrouter" as any, false)
 		}
-	}, [selectedModelId, setApiConfigurationField, apiConfiguration.apiModelId])
-
-	// Debounced refresh model updates, only executed 250ms after the user
-	// stops typing.
-	useDebounce(
-		() => {
-			if (selectedProvider === "openai") {
-				// Use our custom headers state to build the headers object.
-				const headerObject = convertHeadersToObject(customHeaders)
-
-				vscode.postMessage({
-					type: "requestOpenAiModels",
-					values: {
-						baseUrl: apiConfiguration?.openAiBaseUrl,
-						apiKey: apiConfiguration?.openAiApiKey,
-						customHeaders: {}, // Reserved for any additional headers.
-						openAiHeaders: headerObject,
-					},
-				})
-			} else if (selectedProvider === "ollama") {
-				vscode.postMessage({ type: "requestOllamaModels" })
-			} else if (selectedProvider === "lmstudio") {
-				vscode.postMessage({ type: "requestLmStudioModels" })
-			} else if (selectedProvider === "vscode-lm") {
-				vscode.postMessage({ type: "requestVsCodeLmModels" })
-			} else if (
-				selectedProvider === "litellm" ||
-				selectedProvider === "deepinfra" ||
-				selectedProvider === "chutes" || // kilocode_change
-				selectedProvider === "synthetic" || // kilocode_change
-				selectedProvider === "roo"
-			) {
-				vscode.postMessage({ type: "requestRouterModels" })
-			}
-		},
-		250,
-		[
-			selectedProvider,
-			apiConfiguration?.requestyApiKey,
-			apiConfiguration?.openAiBaseUrl,
-			apiConfiguration?.openAiApiKey,
-			apiConfiguration?.ollamaBaseUrl,
-			apiConfiguration?.lmStudioBaseUrl,
-			apiConfiguration?.litellmBaseUrl,
-			apiConfiguration?.litellmApiKey,
-			apiConfiguration?.deepInfraApiKey,
-			apiConfiguration?.deepInfraBaseUrl,
-			apiConfiguration?.chutesApiKey, // kilocode_change
-			apiConfiguration?.ovhCloudAiEndpointsBaseUrl, // kilocode_change
-			customHeaders,
-		],
-	)
+	}, [apiConfiguration?.apiProvider, setApiConfigurationField])
 
 	useEffect(() => {
 		const apiValidationResult = validateApiConfigurationExcludingModelErrors(
@@ -327,14 +232,10 @@ const ApiOptions = ({
 
 		const filteredModels = filterModels(models, selectedProvider, organizationAllowList)
 
-		// Include the currently selected model even if deprecated (so users can see what they have selected)
-		// But filter out other deprecated models from being newly selectable
 		const availableModels = filteredModels
 			? Object.entries(filteredModels)
 					.filter(([modelId, modelInfo]) => {
-						// Always include the currently selected model
 						if (modelId === selectedModelId) return true
-						// Filter out deprecated models that aren't currently selected
 						return !modelInfo.deprecated
 					})
 					.map(([modelId]) => ({
@@ -350,23 +251,13 @@ const ApiOptions = ({
 		(value: ProviderName) => {
 			setApiConfigurationField("apiProvider", value)
 
-			// It would be much easier to have a single attribute that stores
-			// the modelId, but we have a separate attribute for each of
-			// OpenRouter, Glama, Unbound, and Requesty.
-			// If you switch to one of these providers and the corresponding
-			// modelId is not set then you immediately end up in an error state.
-			// To address that we set the modelId to the default value for th
-			// provider if it's not already set.
 			const validateAndResetModel = (
 				modelId: string | undefined,
 				field: keyof ProviderSettings,
 				defaultValue?: string,
 			) => {
-				// in case we haven't set a default value for a provider
 				if (!defaultValue) return
 
-				// only set default if no model is set, but don't reset invalid models
-				// let users see and decide what to do with invalid model selections
 				const shouldSetDefault = !modelId
 
 				if (shouldSetDefault) {
@@ -374,7 +265,6 @@ const ApiOptions = ({
 				}
 			}
 
-			// Define a mapping object that associates each provider with its model configuration
 			const PROVIDER_MODEL_CONFIG: Partial<
 				Record<
 					ProviderName,
@@ -386,11 +276,9 @@ const ApiOptions = ({
 			> = {
 				deepinfra: { field: "deepInfraModelId", default: deepInfraDefaultModelId },
 				openrouter: { field: "openRouterModelId", default: openRouterDefaultModelId },
-				glama: { field: "glamaModelId", default: glamaDefaultModelId }, // kilocode_change
 				unbound: { field: "unboundModelId", default: unboundDefaultModelId },
 				requesty: { field: "requestyModelId", default: requestyDefaultModelId },
 				litellm: { field: "litellmModelId", default: litellmDefaultModelId },
-				"nano-gpt": { field: "nanoGptModelId", default: nanoGptDefaultModelId }, // kilocode_change
 				anthropic: { field: "apiModelId", default: anthropicDefaultModelId },
 				cerebras: { field: "apiModelId", default: cerebrasDefaultModelId },
 				"claude-code": { field: "apiModelId", default: claudeCodeDefaultModelId },
@@ -419,18 +307,14 @@ const ApiOptions = ({
 				fireworks: { field: "apiModelId", default: fireworksDefaultModelId },
 				featherless: { field: "apiModelId", default: featherlessDefaultModelId },
 				"io-intelligence": { field: "ioIntelligenceModelId", default: ioIntelligenceDefaultModelId },
-				roo: { field: "apiModelId", default: rooDefaultModelId },
 				"vercel-ai-gateway": { field: "vercelAiGatewayModelId", default: vercelAiGatewayDefaultModelId },
 				openai: { field: "openAiModelId" },
 				ollama: { field: "ollamaModelId" },
 				lmstudio: { field: "lmStudioModelId" },
-				// kilocode_change start
-				kilocode: { field: "kilocodeModel", default: kilocodeDefaultModel },
 				"gemini-cli": { field: "apiModelId", default: geminiCliDefaultModelId },
 				synthetic: { field: "apiModelId", default: syntheticDefaultModelId },
 				ovhcloud: { field: "ovhCloudAiEndpointsModelId", default: ovhCloudAiEndpointsDefaultModelId },
 				inception: { field: "inceptionLabsModelId", default: inceptionDefaultModelId },
-				// kilocode_change end
 			}
 
 			const config = PROVIDER_MODEL_CONFIG[value]
@@ -442,7 +326,7 @@ const ApiOptions = ({
 				)
 			}
 		},
-		[setApiConfigurationField, apiConfiguration, kilocodeDefaultModel],
+		[setApiConfigurationField, apiConfiguration],
 	)
 
 	const modelValidationError = useMemo(() => {
@@ -538,15 +422,11 @@ const ApiOptions = ({
 			<div className="flex flex-col gap-1 relative">
 				<div className="flex justify-between items-center">
 					<label className="block font-medium">{t("settings:providers.apiProvider")}</label>
-					{selectedProvider === "roo" && cloudIsAuthenticated ? (
-						<RooBalanceDisplay />
-					) : (
-						docs && (
-							<VSCodeLink href={docs.url} target="_blank" className="flex gap-2">
-								{docs.name}
-								<BookOpenText className="size-4 inline ml-2" />
-							</VSCodeLink>
-						)
+					{docs && (
+						<VSCodeLink href={docs.url} target="_blank" className="flex gap-2">
+							{docs.name}
+							<BookOpenText className="size-4 inline ml-2" />
+						</VSCodeLink>
 					)}
 				</div>
 				<SearchableSelect
@@ -562,20 +442,6 @@ const ApiOptions = ({
 			</div>
 
 			{errorMessage && <ApiErrorMessage errorMessage={errorMessage} />}
-
-			{/* kilocode_change start */}
-			{selectedProvider === "kilocode" && (
-				<KiloCode
-					apiConfiguration={apiConfiguration}
-					setApiConfigurationField={setApiConfigurationField}
-					hideKiloCodeButton={hideKiloCodeButton}
-					currentApiConfigName={currentApiConfigName}
-					routerModels={routerModels}
-					organizationAllowList={organizationAllowList}
-					kilocodeDefaultModel={kilocodeDefaultModel}
-				/>
-			)}
-			{/* kilocode_change end */}
 
 			{selectedProvider === "openrouter" && (
 				<OpenRouter
@@ -918,18 +784,6 @@ const ApiOptions = ({
 				// kilocode_change end
 			}
 
-			{selectedProvider === "roo" && (
-				<Roo
-					apiConfiguration={apiConfiguration}
-					setApiConfigurationField={setApiConfigurationField}
-					routerModels={routerModels}
-					cloudIsAuthenticated={cloudIsAuthenticated}
-					organizationAllowList={organizationAllowList}
-					modelValidationError={modelValidationError}
-					simplifySettings={fromWelcomeView}
-				/>
-			)}
-
 			{selectedProvider === "featherless" && (
 				<Featherless apiConfiguration={apiConfiguration} setApiConfigurationField={setApiConfigurationField} />
 			)}
@@ -1018,23 +872,6 @@ const ApiOptions = ({
 					modelInfo={selectedModelInfo}
 				/>
 			)}
-
-			{
-				// kilocode_change start
-				(selectedProvider === "kilocode" || selectedProvider === "openrouter") &&
-					(apiConfiguration.kilocodeOrganizationId ? (
-						<KiloProviderRoutingManagedByOrganization
-							organizationId={apiConfiguration.kilocodeOrganizationId}
-						/>
-					) : (
-						<KiloProviderRouting
-							apiConfiguration={apiConfiguration}
-							setApiConfigurationField={setApiConfigurationField}
-							kilocodeDefaultModel={kilocodeDefaultModel}
-						/>
-					))
-				// kilocode_change end
-			}
 
 			{!fromWelcomeView && selectedProvider !== "virtual-quota-fallback" /*kilocode_change*/ && (
 				<Collapsible open={isAdvancedSettingsOpen} onOpenChange={setIsAdvancedSettingsOpen}>

@@ -67,19 +67,16 @@ import {
 import { cn } from "@/lib/utils"
 import { SeeNewChangesButtons } from "./kilocode/SeeNewChangesButtons"
 import { PathTooltip } from "../ui/PathTooltip"
-
-// kilocode_change start
-import { LowCreditWarning } from "../kilocode/chat/LowCreditWarning"
-import { NewTaskPreview } from "../kilocode/chat/NewTaskPreview"
 import { KiloChatRowGutterBar } from "../kilocode/chat/KiloChatRowGutterBar"
 import { StandardTooltip } from "../ui"
 import { FastApplyChatDisplay } from "./kilocode/FastApplyChatDisplay"
-import { InvalidModelWarning } from "../kilocode/chat/InvalidModelWarning"
 import { formatFileSize } from "@/lib/formatting-utils"
+import { NewTaskPreview } from "../kilocode/chat/NewTaskPreview"
+import { LowCreditWarning } from "../kilocode/chat/LowCreditWarning"
+import { InvalidModelWarning } from "../kilocode/chat/InvalidModelWarning"
 import ChatTimestamps from "./ChatTimestamps"
+
 import { removeLeadingNonAlphanumeric } from "@/utils/removeLeadingNonAlphanumeric"
-import { KILOCODE_TOKEN_REQUIRED_ERROR } from "@roo/kilocode/errorUtils"
-// kilocode_change end
 
 // Helper function to get previous todos before a specific message
 function getPreviousTodos(messages: ClineMessage[], currentMessageTs: number): any[] {
@@ -1314,30 +1311,13 @@ export const ChatRowContent = ({
 						/>
 					)
 				case "error":
-					// kilocode_change start: Show login button for KiloCode auth errors
-					const isKiloCodeAuthError =
-						apiConfiguration?.apiProvider === "kilocode" &&
-						message.text?.includes(KILOCODE_TOKEN_REQUIRED_ERROR)
 					return (
 						<ErrorRow
 							type="error"
 							message={t("chat:error")}
 							errorDetails={message.text || undefined}
-							showLoginButton={isKiloCodeAuthError}
-							onLoginClick={
-								isKiloCodeAuthError
-									? () => {
-											vscode.postMessage({
-												type: "switchTab",
-												tab: "auth",
-												values: { returnTo: "chat" },
-											})
-										}
-									: undefined
-							}
 						/>
 					)
-				// kilocode_change end
 				case "completion_result":
 					const commitRange = message.metadata?.kiloCode?.commitRange
 					return (

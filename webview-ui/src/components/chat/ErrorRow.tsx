@@ -65,8 +65,6 @@ export interface ErrorRowProps {
 	messageClassName?: string
 	code?: number
 	docsURL?: string // NEW: Optional documentation link
-	showLoginButton?: boolean // kilocode_change
-	onLoginClick?: () => void // kilocode_change
 	errorDetails?: string // Optional detailed error message shown in modal
 }
 
@@ -86,8 +84,6 @@ export const ErrorRow = memo(
 		messageClassName,
 		docsURL,
 		code,
-		showLoginButton = false, // kilocode_change
-		onLoginClick, // kilocode_change
 		errorDetails,
 	}: ErrorRowProps) => {
 		const { t } = useTranslation()
@@ -238,15 +234,6 @@ export const ErrorRow = memo(
 							}>
 							{message}
 						</p>
-						{/* kilocode_change start */}
-						{showLoginButton && onLoginClick && (
-							<div className="ml-6 mt-3">
-								<Button variant="secondary" onClick={onLoginClick}>
-									{t("kilocode:settings.provider.login")}
-								</Button>
-							</div>
-						)}
-						{/* kilocode_change end */}
 						{additionalContent}
 					</div>
 				</div>

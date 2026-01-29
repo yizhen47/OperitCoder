@@ -1,7 +1,6 @@
 import React from "react"
-import { render, screen, fireEvent } from "@src/utils/test-utils"
+import { render, screen } from "@src/utils/test-utils"
 import { ChatRowContent } from "../ChatRow"
-import { vscode } from "@src/utils/vscode"
 
 // Create a variable to hold the mock state
 let mockExtensionState: any = {}
@@ -17,7 +16,6 @@ vi.mock("react-i18next", () => ({
 		t: (key: string) => {
 			const map: Record<string, string> = {
 				"chat:error": "Error",
-				"kilocode:settings.provider.login": "Login",
 			}
 			return map[key] || key
 		},
@@ -71,12 +69,12 @@ function renderChatRow(message: any, apiConfiguration: any = {}) {
 	)
 }
 
-describe("ChatRow - KiloCode auth error login button", () => {
+describe("ChatRow - KiloCode auth error", () => {
 	beforeEach(() => {
 		vi.clearAllMocks()
 	})
 
-	it("shows login button for KiloCode auth error", () => {
+	it("does not show login button for previous KiloCode auth error messages", () => {
 		const message: any = {
 			type: "say",
 			say: "error",
@@ -85,8 +83,7 @@ describe("ChatRow - KiloCode auth error login button", () => {
 		}
 
 		renderChatRow(message, { apiProvider: "kilocode" })
-
-		expect(screen.getByText("Login")).toBeInTheDocument()
+		expect(screen.queryByText("Login")).not.toBeInTheDocument()
 	})
 
 	it("does not show login button for non-KiloCode provider", () => {
@@ -113,25 +110,5 @@ describe("ChatRow - KiloCode auth error login button", () => {
 		renderChatRow(message, { apiProvider: "kilocode" })
 
 		expect(screen.queryByText("Login")).not.toBeInTheDocument()
-	})
-
-	it("navigates to auth tab when login button is clicked", () => {
-		const message: any = {
-			type: "say",
-			say: "error",
-			ts: Date.now(),
-			text: "Cannot complete request, make sure you are connected and logged in with the selected provider.\n\nKiloCode token + baseUrl is required to fetch models",
-		}
-
-		renderChatRow(message, { apiProvider: "kilocode" })
-
-		const loginButton = screen.getByText("Login")
-		fireEvent.click(loginButton)
-
-		expect(vscode.postMessage).toHaveBeenCalledWith({
-			type: "switchTab",
-			tab: "auth",
-			values: { returnTo: "chat" },
-		})
 	})
 })

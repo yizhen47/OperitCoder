@@ -26,16 +26,12 @@ type ExperimentalSettingsProps = HTMLAttributes<HTMLDivElement> & {
 	fastApplyModel?: string
 	fastApplyApiProvider?: string
 	setCachedStateField: SetCachedStateField<"morphApiKey" | "fastApplyModel" | "fastApplyApiProvider">
-	kiloCodeImageApiKey?: string
-	setKiloCodeImageApiKey?: (apiKey: string) => void
-	currentProfileKilocodeToken?: string
 	// kilocode_change end
 	apiConfiguration?: any
 	setApiConfigurationField?: any
 	imageGenerationProvider?: ImageGenerationProvider
 	openRouterImageApiKey?: string
 	openRouterImageGenerationSelectedModel?: string
-	setImageGenerationProvider?: (provider: ImageGenerationProvider) => void
 	setOpenRouterImageApiKey?: (apiKey: string) => void
 	setImageGenerationSelectedModel?: (model: string) => void
 }
@@ -48,7 +44,6 @@ export const ExperimentalSettings = ({
 	imageGenerationProvider,
 	openRouterImageApiKey,
 	openRouterImageGenerationSelectedModel,
-	setImageGenerationProvider,
 	setOpenRouterImageApiKey,
 	setImageGenerationSelectedModel,
 	className,
@@ -57,9 +52,6 @@ export const ExperimentalSettings = ({
 	fastApplyModel, // kilocode_change: Fast Apply model selection
 	fastApplyApiProvider, // kilocode_change: Fast Apply model api base url
 	setCachedStateField,
-	setKiloCodeImageApiKey,
-	kiloCodeImageApiKey,
-	currentProfileKilocodeToken,
 	// kilocode_change end
 	...props
 }: ExperimentalSettingsProps) => {
@@ -124,9 +116,7 @@ export const ExperimentalSettings = ({
 						// kilocode_change end
 						if (
 							config[0] === "IMAGE_GENERATION" &&
-							setImageGenerationProvider &&
 							setOpenRouterImageApiKey &&
-							setKiloCodeImageApiKey &&
 							setImageGenerationSelectedModel
 						) {
 							return (
@@ -138,13 +128,9 @@ export const ExperimentalSettings = ({
 									}
 									imageGenerationProvider={imageGenerationProvider}
 									openRouterImageApiKey={openRouterImageApiKey}
-									kiloCodeImageApiKey={kiloCodeImageApiKey}
 									openRouterImageGenerationSelectedModel={openRouterImageGenerationSelectedModel}
-									setImageGenerationProvider={setImageGenerationProvider}
 									setOpenRouterImageApiKey={setOpenRouterImageApiKey}
-									setKiloCodeImageApiKey={setKiloCodeImageApiKey}
 									setImageGenerationSelectedModel={setImageGenerationSelectedModel}
-									currentProfileKilocodeToken={currentProfileKilocodeToken}
 								/>
 							)
 						}
