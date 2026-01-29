@@ -399,7 +399,7 @@ const ApiOptions = ({
 		<div className="flex flex-col gap-3">
 			{/* kilocode_change start - autocomplete profile type system */}
 			{/* Profile Type Display (read-only for existing profiles) */}
-			{MODEL_SELECTION_ENABLED && (
+			{!fromWelcomeView && MODEL_SELECTION_ENABLED && (
 				<div className="flex flex-col gap-1">
 					<label className="block font-medium mb-1">{t("settings:providers.profileType")}</label>
 					<div className="px-3 py-2 bg-vscode-input-background border border-vscode-input-border rounded text-vscode-input-foreground">

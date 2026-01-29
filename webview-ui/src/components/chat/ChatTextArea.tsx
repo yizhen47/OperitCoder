@@ -231,7 +231,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		}, [])
 		// kilocode_change end: Container width tracking for responsive UI
 
-		const isCompactBottomControls = containerWidth < 250
+		const isCompactBottomControls = containerWidth < 175
 
 		const [searchLoading, setSearchLoading] = useState(false)
 		const [searchRequestId, setSearchRequestId] = useState<string>("")
@@ -455,14 +455,13 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 
 		const handleEnhancePrompt = useCallback(() => {
 			const trimmedInput = inputValue.trim()
-
-			if (trimmedInput) {
-				setIsEnhancingPrompt(true)
-				vscode.postMessage({ type: "enhancePrompt" as const, text: trimmedInput })
-			} else {
-				setInputValue(t("chat:enhancePromptDescription"))
+			if (!trimmedInput || isEnhancingPrompt) {
+				return
 			}
-		}, [inputValue, setInputValue, t])
+
+			setIsEnhancingPrompt(true)
+			vscode.postMessage({ type: "enhancePrompt" as const, text: trimmedInput })
+		}, [inputValue, isEnhancingPrompt])
 
 		// kilocode_change start: Image and speech handlers
 		const showImageWarning = useCallback(
@@ -1530,7 +1529,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						"pr-9",
 						"z-10",
 						"forced-color-adjust-none",
-						"pb-16", // kilocode_change
+						isCompactBottomControls ? "pb-24" : "pb-16", // kilocode_change
 					)}
 					style={{
 						color: "transparent",
@@ -1577,7 +1576,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						"z-[2]",
 						"scrollbar-none",
 						"scrollbar-hide",
-						"pb-16", // kilocode_change: Increased padding to prevent overlap with control bar
+						isCompactBottomControls ? "pb-24" : "pb-16", // kilocode_change: Increased padding to prevent overlap with control bar
 					)}
 					value={displayValue}
 					onChange={(e) => {
@@ -1653,7 +1652,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					<StandardTooltip content={t("chat:enhancePrompt")}>
 						<button
 							aria-label={t("chat:enhancePrompt")}
-							disabled={false}
+							disabled={isEnhancingPrompt || inputValue.trim() === ""}
 							onClick={handleEnhancePrompt}
 							className={cn(
 								"relative inline-flex items-center justify-center",
@@ -1664,7 +1663,9 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 								"hover:bg-[rgba(255,255,255,0.03)] hover:border-[rgba(255,255,255,0.15)]",
 								"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 								"active:bg-[rgba(255,255,255,0.1)]",
-								"cursor-pointer",
+								!(isEnhancingPrompt || inputValue.trim() === "") && "cursor-pointer",
+								(isEnhancingPrompt || inputValue.trim() === "") &&
+									"opacity-40 cursor-not-allowed grayscale-[30%] hover:bg-transparent hover:border-[rgba(255,255,255,0.08)] active:bg-transparent",
 							)}>
 							<WandSparkles className={cn("w-4 h-4", isEnhancingPrompt && "animate-spin")} />
 						</button>
@@ -1689,7 +1690,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 
 					{/* kilocode_change start */}
 					{!isEditMode && (
-						<IndexingStatusBadge className={cn({ hidden: !isCompactBottomControls && containerWidth < 235 })} />
+						<IndexingStatusBadge className={cn({ hidden: !isCompactBottomControls && containerWidth < 175 })} />
 					)}
 
 					<Popover open={showContextPanel} onOpenChange={setShowContextPanel}>
@@ -1852,9 +1853,10 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 
 				{!inputValue && (
 					<div
+						data-testid="chat-text-area-placeholder-bottom"
 						className="absolute left-2 z-30 pr-9 flex items-center h-8"
 						style={{
-							bottom: "0.25rem",
+							bottom: "0.5rem",
 							color: "var(--vscode-tab-inactiveForeground)",
 							userSelect: "none",
 							pointerEvents: "none",
@@ -1964,12 +1966,13 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						{renderTextAreaSection()}
 
 						<div
+							data-testid="chat-text-area-bottom-controls"
 							// kilocode_change start
 							style={{
-								marginTop:
-									isCompactBottomControls && containerWidth < 360
-										? "-52px"
-										: "-38px",
+								position: "absolute",
+								bottom: isEditMode ? "10px" : "0.5rem",
+								left: 0,
+								right: 0,
 								zIndex: 10,
 								paddingLeft: "8px",
 								paddingRight: "8px",
@@ -1980,7 +1983,6 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							className={cn(
 								"flex",
 								isCompactBottomControls ? "flex-wrap items-center gap-1" : "flex-nowrap items-center gap-1",
-								"mt-auto",
 							)}>
 							<div className={cn("shrink-0")}>
 								<StandardTooltip content="Add Context (@)">
@@ -2013,7 +2015,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 												"opacity-40 cursor-not-allowed grayscale-[30%] hover:bg-transparent hover:border-[rgba(255,255,255,0.08)] active:bg-transparent",
 										)}>
 										<Paperclip
-											className={cn("w-4", "h-4", { hidden: !isCompactBottomControls && containerWidth < 235 })}
+											className={cn("w-4", "h-4", { hidden: !isCompactBottomControls && containerWidth < 175 })}
 										/>
 									</button>
 								</StandardTooltip>
@@ -2025,11 +2027,11 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 									onChange={setMode}
 									modeShortcutText={modeShortcutText}
 									customModes={customModes}
-									triggerClassName={
-										isCompactBottomControls
-											? "px-1 py-0.5 text-[11px] [&_svg]:size-3"
-											: undefined
-									}
+									triggerClassName={cn(
+										"min-h-[28px] min-w-[28px] p-1.5 rounded-md",
+										"opacity-60 hover:opacity-100 text-vscode-descriptionForeground hover:text-vscode-foreground",
+										isCompactBottomControls && "[&_svg]:size-3",
+									)}
 								/>
 								{/* kilocode_change end */}
 							</div>
@@ -2045,11 +2047,10 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 									pinnedApiConfigs={pinnedApiConfigs}
 									togglePinnedApiConfig={togglePinnedApiConfig}
 									selectApiConfigDisabled={selectApiConfigDisabled}
-									triggerClassName={
-										isCompactBottomControls
-											? "px-1 py-0.5 text-[11px] [&_svg]:size-3"
-											: undefined
-									}
+									triggerClassName={cn(
+										"min-h-[28px] py-1.5",
+										isCompactBottomControls ? "px-1.5 text-[11px]" : "px-2",
+									)}
 								/>
 							</div>
 

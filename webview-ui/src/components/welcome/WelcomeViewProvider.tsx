@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import type { ProviderSettings } from "@roo-code/types"
 
@@ -16,6 +16,7 @@ const WelcomeViewProvider = () => {
 		useExtensionState()
 	const { t } = useAppTranslation()
 	const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
+	const pendingActivation = useRef<string | null>(null)
 
 	// Memoize the setApiConfigurationField function to pass to ApiOptions
 	const setApiConfigurationFieldForApiOptions = useCallback(
@@ -34,8 +35,23 @@ const WelcomeViewProvider = () => {
 		}
 
 		setErrorMessage(undefined)
-		vscode.postMessage({ type: "upsertApiConfiguration", text: currentApiConfigName, apiConfiguration })
+		const profileName = currentApiConfigName ?? "default"
+		pendingActivation.current = profileName
+		vscode.postMessage({ type: "upsertApiConfiguration", text: profileName, apiConfiguration })
 	}, [apiConfiguration, currentApiConfigName])
+
+	useEffect(() => {
+		const onMessage = (event: MessageEvent) => {
+			const message = event.data
+			if (message?.type === "state" && pendingActivation.current) {
+				const name = pendingActivation.current
+				pendingActivation.current = null
+				vscode.postMessage({ type: "loadApiConfiguration", text: name })
+			}
+		}
+		window.addEventListener("message", onMessage)
+		return () => window.removeEventListener("message", onMessage)
+	}, [])
 
 	return (
 		<Tab>

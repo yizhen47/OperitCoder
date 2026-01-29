@@ -3,8 +3,10 @@ import { defaultModeSlug } from "@roo/modes"
 import { render, screen, fireEvent } from "@src/utils/test-utils"
 import { useExtensionState } from "@src/context/ExtensionStateContext"
 import { useQuery } from "@tanstack/react-query"
+import { act } from "@testing-library/react"
 
 import { ChatTextArea } from "../ChatTextArea"
+import { vscode } from "@src/utils/vscode"
 
 vi.mock("@src/utils/vscode", () => ({
 	vscode: {
@@ -29,6 +31,8 @@ vi.mock("@src/components/ui/hooks/useSelectedModel", () => ({
 }))
 
 describe("ChatTextArea - autocomplete profile filtering", () => {
+	let resizeObserverCallback: ((entries: Array<{ contentRect: { width: number } }>) => void) | undefined
+
 	const defaultProps = {
 		inputValue: "",
 		setInputValue: vi.fn(),
@@ -51,6 +55,18 @@ describe("ChatTextArea - autocomplete profile filtering", () => {
 		vi.clearAllMocks()
 		// Configure useQuery mock to return empty history
 		;(useQuery as ReturnType<typeof vi.fn>).mockReturnValue({ data: { historyItems: [] } })
+
+		resizeObserverCallback = undefined
+		class MockResizeObserver {
+			callback: (entries: Array<{ contentRect: { width: number } }>) => void
+			constructor(callback: (entries: Array<{ contentRect: { width: number } }>) => void) {
+				this.callback = callback
+				resizeObserverCallback = callback
+			}
+			observe() {}
+			disconnect() {}
+		}
+		;(globalThis as any).ResizeObserver = MockResizeObserver
 	})
 
 	it("should filter out autocomplete profiles from the profile list", () => {
@@ -170,6 +186,7 @@ describe("ChatTextArea - autocomplete profile filtering", () => {
 			openedTabs: [],
 			listApiConfigMeta: [],
 			currentApiConfigName: "",
+			pinnedApiConfigs: {},
 			taskHistory: [],
 			taskHistoryVersion: 0,
 			clineMessages: [],
@@ -180,6 +197,110 @@ describe("ChatTextArea - autocomplete profile filtering", () => {
 
 		const sendButton = screen.getByLabelText("chat:sendMessage")
 		expect(sendButton).toBeDisabled()
+	})
+
+	it("should disable enhance prompt button when input is empty", () => {
+		;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
+			filePaths: [],
+			openedTabs: [],
+			listApiConfigMeta: [],
+			currentApiConfigName: "",
+			pinnedApiConfigs: {},
+			taskHistory: [],
+			taskHistoryVersion: 0,
+			clineMessages: [],
+			cwd: "/test/workspace",
+		})
+
+		render(<ChatTextArea {...defaultProps} inputValue="" />)
+
+		const placeholderBottom = screen.getByTestId("chat-text-area-placeholder-bottom") as HTMLDivElement
+		expect(placeholderBottom.style.bottom).toBe("0.5rem")
+
+		const enhanceButton = screen.getByLabelText("chat:enhancePrompt")
+		expect(enhanceButton).toBeDisabled()
+	})
+
+	it("should post enhancePrompt message when enhance prompt button is clicked with non-empty input", () => {
+		;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
+			filePaths: [],
+			openedTabs: [],
+			listApiConfigMeta: [],
+			currentApiConfigName: "",
+			pinnedApiConfigs: {},
+			taskHistory: [],
+			taskHistoryVersion: 0,
+			clineMessages: [],
+			cwd: "/test/workspace",
+		})
+
+		render(<ChatTextArea {...defaultProps} inputValue="Hello" />)
+
+		const enhanceButton = screen.getByLabelText("chat:enhancePrompt")
+		expect(enhanceButton).not.toBeDisabled()
+
+		fireEvent.click(enhanceButton)
+		expect(vscode.postMessage).toHaveBeenCalledWith({ type: "enhancePrompt", text: "Hello" })
+	})
+
+	it("should switch bottom controls to compact layout when container width is below 175", () => {
+		;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
+			filePaths: [],
+			openedTabs: [],
+			listApiConfigMeta: [],
+			currentApiConfigName: "",
+			pinnedApiConfigs: {},
+			taskHistory: [],
+			taskHistoryVersion: 0,
+			clineMessages: [],
+			cwd: "/test/workspace",
+		})
+
+		render(<ChatTextArea {...defaultProps} />)
+		expect(typeof resizeObserverCallback).toBe("function")
+
+		const bottomControls = screen.getByTestId("chat-text-area-bottom-controls") as HTMLDivElement
+		expect(bottomControls.className).toContain("flex-nowrap")
+		expect(bottomControls.style.position).toBe("absolute")
+		expect(bottomControls.style.bottom).toBeTruthy()
+
+		act(() => {
+			resizeObserverCallback?.([{ contentRect: { width: 174 } }])
+		})
+
+		expect(bottomControls.className).toContain("flex-wrap")
+
+		const modeTrigger = screen.getByTestId("dropdown-trigger") as HTMLButtonElement
+		expect(modeTrigger.className).toContain("min-h-[28px]")
+
+		const profileTrigger = screen.getByTestId("kilo-profile-selector-trigger") as HTMLButtonElement
+		expect(profileTrigger.className).toContain("min-h-[28px]")
+	})
+
+	it("should keep bottom controls non-compact at container width 175", () => {
+		;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
+			filePaths: [],
+			openedTabs: [],
+			listApiConfigMeta: [],
+			currentApiConfigName: "",
+			pinnedApiConfigs: {},
+			taskHistory: [],
+			taskHistoryVersion: 0,
+			clineMessages: [],
+			cwd: "/test/workspace",
+		})
+
+		render(<ChatTextArea {...defaultProps} />)
+		expect(typeof resizeObserverCallback).toBe("function")
+
+		const bottomControls = screen.getByTestId("chat-text-area-bottom-controls") as HTMLDivElement
+
+		act(() => {
+			resizeObserverCallback?.([{ contentRect: { width: 175 } }])
+		})
+
+		expect(bottomControls.className).toContain("flex-nowrap")
+		expect(bottomControls.className).not.toContain("flex-wrap")
 	})
 
 	it("should toggle to cancel and call onCancelTask when task is running", () => {

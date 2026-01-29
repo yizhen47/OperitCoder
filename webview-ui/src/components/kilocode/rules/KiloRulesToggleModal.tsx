@@ -38,6 +38,10 @@ const KiloRulesToggleModal: React.FC<KiloRulesToggleModalProps> = ({ hideTrigger
 	const { t } = useTranslation()
 
 	const [isVisible, setIsVisible] = useState(false)
+	// kilocode_change start
+	const previousViewportWidthRef = useRef<number | null>(null)
+	const didInitializePositionRef = useRef(false)
+	// kilocode_change end
 	const buttonRef = useRef<HTMLDivElement>(null)
 	const modalRef = useRef<HTMLDivElement>(null)
 	const { width: viewportWidth, height: viewportHeight } = useWindowSize()
@@ -99,21 +103,58 @@ const KiloRulesToggleModal: React.FC<KiloRulesToggleModalProps> = ({ hideTrigger
 
 	useEffect(() => {
 		if (!isVisible) {
+			// kilocode_change start
+			previousViewportWidthRef.current = null
+			didInitializePositionRef.current = false
+			// kilocode_change end
 			return
 		}
 
+		// Freeze the vertical position after the modal is opened.
+		// We still update arrowPosition on viewport changes to keep the pointer aligned horizontally.
+		const shouldInitializePosition = !didInitializePositionRef.current
+
 		if (hideTrigger || !buttonRef.current) {
 			setArrowPosition(20)
-			setMenuPosition(40)
+			if (shouldInitializePosition) {
+				setMenuPosition(40)
+			}
+			// kilocode_change start
+			previousViewportWidthRef.current = viewportWidth
+			didInitializePositionRef.current = true
+			// kilocode_change end
 			return
 		}
 
 		const buttonRect = buttonRef.current.getBoundingClientRect()
 		const buttonCenter = buttonRect.left + buttonRect.width / 2
 		const rightPosition = document.documentElement.clientWidth - buttonCenter - 5
+		// kilocode_change start
+		const nextMenuPosition = buttonRect.top + 1
+
+		const previousViewportWidth = previousViewportWidthRef.current
+		const isWidthShrinking = previousViewportWidth !== null && viewportWidth < previousViewportWidth
+		// kilocode_change end
 
 		setArrowPosition(rightPosition)
-		setMenuPosition(buttonRect.top + 1)
+		// kilocode_change start
+		if (shouldInitializePosition) {
+			setMenuPosition((prev) => {
+				// On first open, if layout is already in flux (e.g. width shrinking),
+				// preserve the previous behavior of not allowing a sudden downward jump.
+				if (!isWidthShrinking) {
+					return nextMenuPosition
+				}
+				if (prev === 0) {
+					return nextMenuPosition
+				}
+				return Math.min(prev, nextMenuPosition)
+			})
+		}
+
+		previousViewportWidthRef.current = viewportWidth
+		didInitializePositionRef.current = true
+		// kilocode_change end
 	}, [isVisible, viewportWidth, viewportHeight, hideTrigger])
 
 	return (
@@ -137,6 +178,7 @@ const KiloRulesToggleModal: React.FC<KiloRulesToggleModalProps> = ({ hideTrigger
 
 			{isVisible && (
 				<div
+					data-testid="kilo-rules-toggle-modal"
 					className="fixed left-[15px] right-[15px] border border-[var(--vscode-editorGroup-border)] p-3 rounded z-[1000] overflow-y-auto"
 					style={{
 						bottom: `calc(100vh - ${menuPosition}px + 6px)`,
@@ -156,14 +198,20 @@ const KiloRulesToggleModal: React.FC<KiloRulesToggleModalProps> = ({ hideTrigger
 					<div
 						style={{
 							display: "flex",
+							flexWrap: "wrap",
+							columnGap: "8px",
+							rowGap: "8px",
 							justifyContent: "space-between",
+							alignItems: "center",
 							marginBottom: "10px",
 						}}>
 						<div
 							style={{
 								display: "flex",
+								flexWrap: "wrap",
 								gap: "1px",
 								borderBottom: "1px solid var(--vscode-panel-border)",
+								maxWidth: "100%",
 							}}>
 							<StyledTabButton $isActive={currentView === "rule"} onClick={() => setCurrentView("rule")}>
 								{t("kilocode:rules.tabs.rules")}

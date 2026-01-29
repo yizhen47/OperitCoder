@@ -118,6 +118,7 @@ export const KiloProfileSelector = ({
 			<Popover open={open} onOpenChange={setOpen}>
 				<StandardTooltip content={t("chat:selectApiConfig")}>
 					<PopoverTrigger
+						data-testid="kilo-profile-selector-trigger"
 						disabled={selectApiConfigDisabled}
 						className={cn(
 							"w-full min-w-0 max-w-full inline-flex items-center gap-1.5 relative whitespace-nowrap px-1 py-0.5 text-xs",
