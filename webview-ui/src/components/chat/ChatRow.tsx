@@ -329,11 +329,21 @@ const ChatRow = memo(
 						className="fixed z-50 min-w-[180px] rounded-xs border border-vscode-focusBorder bg-vscode-dropdown-background text-vscode-dropdown-foreground shadow-xs p-1"
 						style={{
 							left: Math.min(rawMenuPos.x, window.innerWidth - 200),
-							top: Math.min(rawMenuPos.y, window.innerHeight - 120),
+							top: Math.min(rawMenuPos.y, window.innerHeight - 160),
 						}}
 						onMouseDown={(e) => {
 							e.stopPropagation()
 						}}>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="w-full justify-start px-2 py-1.5 text-sm"
+							onClick={() => {
+								copy(message.text ?? "") // kilocode_change
+								setRawMenuPos(null)
+							}}>
+							复制
+						</Button>
 						<Button
 							variant="ghost"
 							size="sm"

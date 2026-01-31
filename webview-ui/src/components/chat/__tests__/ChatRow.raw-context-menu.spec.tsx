@@ -83,6 +83,8 @@ describe("ChatRow - raw context menu", () => {
 		fireEvent.contextMenu(row)
 
 		expect(screen.getByTestId("message-raw-menu")).toBeInTheDocument()
+		fireEvent.click(screen.getByText("全部复制"))
+		expect(mockWriteText).toHaveBeenCalledWith("ls\nOutput:file1.txt")
 
 		fireEvent.click(screen.getByText("查看源消息"))
 		expect(await screen.findByText("消息原文")).toBeInTheDocument()
