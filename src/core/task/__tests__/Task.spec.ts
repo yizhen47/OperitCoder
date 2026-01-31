@@ -322,7 +322,7 @@ describe("Cline", () => {
 			expect(cline.diffEnabled).toBe(false)
 		})
 
-		it("does not post ask to webview when tool ask is auto-approved", async () => {
+		it("posts ask(tool) to webview when tool ask is auto-approved (isAnswered=true)", async () => {
 			const cline = new Task({
 				provider: mockProvider,
 				apiConfiguration: mockApiConfig,
@@ -341,10 +341,15 @@ describe("Cline", () => {
 			const result = await cline.ask("tool" as any, toolAskText)
 
 			expect(result.response).toBe("yesButtonClicked")
-			expect(mockProvider.postStateToWebview).not.toHaveBeenCalled()
+			expect(mockProvider.postStateToWebview).toHaveBeenCalled()
+			const last = cline.clineMessages.at(-1)
+			expect(last?.type).toBe("ask")
+			expect(last?.ask).toBe("tool")
+			expect(last?.text).toBe(toolAskText)
+			expect(last?.isAnswered).toBe(true)
 		})
 
-		it("does not post ask to webview when sandboxPackageTool activation is auto-approved", async () => {
+		it("posts ask(tool) to webview when sandboxPackageTool activation is auto-approved (isAnswered=true)", async () => {
 			const cline = new Task({
 				provider: mockProvider,
 				apiConfiguration: mockApiConfig,
@@ -369,10 +374,15 @@ describe("Cline", () => {
 			const result = await cline.ask("tool" as any, toolAskText)
 
 			expect(result.response).toBe("yesButtonClicked")
-			expect(mockProvider.postStateToWebview).not.toHaveBeenCalled()
+			expect(mockProvider.postStateToWebview).toHaveBeenCalled()
+			const last = cline.clineMessages.at(-1)
+			expect(last?.type).toBe("ask")
+			expect(last?.ask).toBe("tool")
+			expect(last?.text).toBe(toolAskText)
+			expect(last?.isAnswered).toBe(true)
 		})
 
-		it("does not post ask to webview when sandboxPackageTool is auto-approved", async () => {
+		it("posts ask(tool) to webview when sandboxPackageTool is auto-approved (isAnswered=true)", async () => {
 			const cline = new Task({
 				provider: mockProvider,
 				apiConfiguration: mockApiConfig,
@@ -396,7 +406,39 @@ describe("Cline", () => {
 			const result = await cline.ask("tool" as any, toolAskText)
 
 			expect(result.response).toBe("yesButtonClicked")
-			expect(mockProvider.postStateToWebview).not.toHaveBeenCalled()
+			expect(mockProvider.postStateToWebview).toHaveBeenCalled()
+			const last = cline.clineMessages.at(-1)
+			expect(last?.type).toBe("ask")
+			expect(last?.ask).toBe("tool")
+			expect(last?.text).toBe(toolAskText)
+			expect(last?.isAnswered).toBe(true)
+		})
+
+		it("posts ask(tool) when write tool ask is auto-approved (ensures diff/tool message exists)", async () => {
+			const cline = new Task({
+				provider: mockProvider,
+				apiConfiguration: mockApiConfig,
+				task: "test task",
+				startTask: false,
+				context: mockExtensionContext,
+			})
+
+			mockProvider.getState = vi.fn().mockResolvedValue({
+				autoApprovalEnabled: true,
+				alwaysAllowWrite: true,
+				alwaysAllowWriteOutsideWorkspace: true,
+				alwaysAllowWriteProtected: true,
+			})
+
+			const toolAskText = JSON.stringify({ tool: "editedExistingFile", path: "/mock/workspace/path/file.ts" })
+			const result = await cline.ask("tool" as any, toolAskText)
+
+			expect(result.response).toBe("yesButtonClicked")
+			expect(mockProvider.postStateToWebview).toHaveBeenCalled()
+			const last = cline.clineMessages.at(-1)
+			expect(last?.type).toBe("ask")
+			expect(last?.ask).toBe("tool")
+			expect(last?.isAnswered).toBe(true)
 		})
 
 		it("should use default fuzzy match threshold when not provided", async () => {

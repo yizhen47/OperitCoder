@@ -77,6 +77,10 @@ import { InvalidModelWarning } from "../kilocode/chat/InvalidModelWarning"
 import ChatTimestamps from "./ChatTimestamps"
 
 import { removeLeadingNonAlphanumeric } from "@/utils/removeLeadingNonAlphanumeric"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
+import { Textarea } from "../ui/textarea"
+import { Button } from "../ui/button"
+import { useClipboard } from "../ui/hooks"
 
 // Helper function to get previous todos before a specific message
 function getPreviousTodos(messages: ClineMessage[], currentMessageTs: number): any[] {
@@ -167,8 +171,111 @@ interface ChatRowContentProps extends Omit<ChatRowProps, "onHeightChange"> {}
 const ChatRow = memo(
 	(props: ChatRowProps) => {
 		const { highlighted } = props // kilocode_change: Add highlighted prop
-		const { showTaskTimeline } = useExtensionState() // kilocode_change: Used by KiloChatRowGutterBar
+		const { showTaskTimeline, clineMessages } = useExtensionState() // kilocode_change: Used by KiloChatRowGutterBar
 		const { isLast, onHeightChange, message } = props
+		const { copy } = useClipboard()
+		const [rawMenuPos, setRawMenuPos] = useState<{ x: number; y: number } | null>(null)
+		const [rawDialogOpen, setRawDialogOpen] = useState(false)
+		const [rawDialogView, setRawDialogView] = useState<"raw" | "parsed">("raw")
+		const [rawDialogMessageSource, setRawDialogMessageSource] = useState<"source" | "rendered">("source")
+		const [rawDialogSourceIndex, setRawDialogSourceIndex] = useState(0)
+		const [rawDialogPanel, setRawDialogPanel] = useState<"message" | "context">("message")
+		const [rawDialogSourceTsOverride, setRawDialogSourceTsOverride] = useState<number | null>(null)
+
+		const sourceMessages = useMemo(() => {
+			const idx = clineMessages.findIndex((m) => m.ts === message.ts)
+			if (idx === -1) return [message]
+
+			const base = clineMessages[idx]
+			const collected: ClineMessage[] = [base]
+
+			// If this message is known to be a merged/combined type, collect adjacent source messages.
+			if (base.type === "ask" && base.ask === "command") {
+				for (let i = idx + 1; i < clineMessages.length; i++) {
+					const m = clineMessages[i]
+					if (m.type === "ask" && m.ask === "command") break
+					if (m.ask === "command_output" || m.say === "command_output") collected.push(m)
+				}
+			}
+
+			if (base.type === "say" && base.say === "api_req_started") {
+				for (let i = idx + 1; i < clineMessages.length; i++) {
+					const m = clineMessages[i]
+					if (m.type === "say" && m.say === "api_req_started") break
+					if (m.type === "say" && m.say === "api_req_finished") collected.push(m)
+				}
+			}
+
+			if (base.type === "ask" && base.ask === "use_mcp_server") {
+				for (let i = idx + 1; i < clineMessages.length; i++) {
+					const m = clineMessages[i]
+					if (m.type === "ask" && m.ask === "use_mcp_server") break
+					if (m.type === "say" && m.say === "mcp_server_response") collected.push(m)
+				}
+			}
+
+			return collected
+		}, [clineMessages, message])
+
+		const contextMessages = useMemo(() => {
+			const idx = clineMessages.findIndex((m) => m.ts === message.ts)
+			if (idx === -1) return [message]
+			const radius = 6
+			const start = Math.max(0, idx - radius)
+			const end = Math.min(clineMessages.length, idx + radius + 1)
+			return clineMessages.slice(start, end)
+		}, [clineMessages, message])
+
+		useEffect(() => {
+			if (!rawDialogOpen) return
+			setRawDialogSourceIndex(0)
+			setRawDialogPanel("message")
+			setRawDialogSourceTsOverride(null)
+		}, [rawDialogOpen])
+
+		const selectedSourceMessage = useMemo(() => {
+			if (rawDialogSourceTsOverride !== null) {
+				return clineMessages.find((m) => m.ts === rawDialogSourceTsOverride) ?? message
+			}
+			return sourceMessages[Math.min(rawDialogSourceIndex, sourceMessages.length - 1)]
+		}, [clineMessages, message, rawDialogSourceIndex, rawDialogSourceTsOverride, sourceMessages])
+
+		const displayedMessage = rawDialogMessageSource === "source" ? selectedSourceMessage : message
+		const displayedText = useMemo(() => displayedMessage.text ?? "", [displayedMessage.text])
+		const parsedJsonOrError = useMemo(() => {
+			if (displayedText.trim() === "") {
+				return { ok: true as const, value: "" }
+			}
+			try {
+				const parsed = JSON.parse(displayedText)
+				return { ok: true as const, value: JSON.stringify(parsed, null, 2) }
+			} catch (err) {
+				return {
+					ok: false as const,
+					value: err instanceof Error ? err.message : String(err),
+				}
+			}
+		}, [displayedText])
+
+		useEffect(() => {
+			if (!rawMenuPos) return
+
+			const onKeyDown = (e: KeyboardEvent) => {
+				if (e.key === "Escape") setRawMenuPos(null)
+			}
+
+			const onMouseDown = () => setRawMenuPos(null)
+			const onScroll = () => setRawMenuPos(null)
+
+			window.addEventListener("keydown", onKeyDown)
+			window.addEventListener("mousedown", onMouseDown)
+			window.addEventListener("scroll", onScroll, true)
+			return () => {
+				window.removeEventListener("keydown", onKeyDown)
+				window.removeEventListener("mousedown", onMouseDown)
+				window.removeEventListener("scroll", onScroll, true)
+			}
+		}, [rawMenuPos])
 		const isNonDiffToolRow = useMemo(() => {
 			if (message.type === "say" && message.say === ("tool" as any)) {
 				return true
@@ -197,11 +304,221 @@ const ChatRow = memo(
 		const [chatrow, { height }] = useSize(
 			<div
 				// kilocode_change: add highlighted className
+				data-testid={`chat-row-${message.ts}`}
+				onContextMenu={(e) => {
+					const target = e.target as HTMLElement | null
+					const tag = target?.tagName?.toUpperCase()
+					if (tag === "INPUT" || tag === "TEXTAREA") {
+						return
+					}
+					e.preventDefault()
+					setRawDialogMessageSource("source")
+					setRawDialogSourceIndex(0)
+					setRawDialogPanel("message")
+					setRawDialogSourceTsOverride(null)
+					setRawMenuPos({ x: e.clientX, y: e.clientY })
+				}}
 				className={cn(
 					"px-[15px] pr-[6px] relative",
 					isNonDiffToolRow ? "py-[1px]" : "py-[2px]",
 					highlighted ? "animate-message-highlight" : "",
 				)}>
+				{rawMenuPos && (
+					<div
+						data-testid="message-raw-menu"
+						className="fixed z-50 min-w-[180px] rounded-xs border border-vscode-focusBorder bg-vscode-dropdown-background text-vscode-dropdown-foreground shadow-xs p-1"
+						style={{
+							left: Math.min(rawMenuPos.x, window.innerWidth - 200),
+							top: Math.min(rawMenuPos.y, window.innerHeight - 120),
+						}}
+						onMouseDown={(e) => {
+							e.stopPropagation()
+						}}>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="w-full justify-start px-2 py-1.5 text-sm"
+							onClick={() => {
+								setRawMenuPos(null)
+								setRawDialogMessageSource("source")
+								setRawDialogSourceIndex(0)
+								setRawDialogPanel("message")
+								setRawDialogSourceTsOverride(null)
+								setRawDialogView("raw")
+								setRawDialogOpen(true)
+							}}>
+							查看源消息
+						</Button>
+					</div>
+				)}
+
+				<Dialog open={rawDialogOpen} onOpenChange={setRawDialogOpen}>
+					<DialogContent className="sm:max-w-[800px] overflow-y-auto max-h-[80vh]">
+						<DialogHeader>
+							<DialogTitle>消息原文</DialogTitle>
+						</DialogHeader>
+
+						<div className="flex flex-col gap-3">
+							<div className="text-xs text-vscode-descriptionForeground">
+								<span className="mr-3">type: {message.type}</span>
+								{message.type === "ask" && <span className="mr-3">ask: {message.ask}</span>}
+								{message.type === "say" && <span className="mr-3">say: {message.say}</span>}
+								<span className="mr-3">partial: {String(message.partial === true)}</span>
+								<span>ts: {String(message.ts ?? "")}</span>
+							</div>
+
+							<div className="flex gap-2">
+								<Button
+									variant={rawDialogMessageSource === "source" ? "secondary" : "outline"}
+									size="sm"
+									onClick={() => {
+										setRawDialogMessageSource("source")
+										setRawDialogPanel("message")
+									}}>
+									源消息
+								</Button>
+								<Button
+									variant={rawDialogMessageSource === "rendered" ? "secondary" : "outline"}
+									size="sm"
+									onClick={() => {
+										setRawDialogMessageSource("rendered")
+										setRawDialogPanel("message")
+									}}>
+									渲染消息
+								</Button>
+								<Button
+									variant={rawDialogPanel === "context" ? "secondary" : "outline"}
+									size="sm"
+									onClick={() => {
+										setRawDialogMessageSource("source")
+										setRawDialogPanel("context")
+									}}>
+									上下文
+								</Button>
+							</div>
+
+							<div className="text-xs text-vscode-descriptionForeground">
+								当前查看：{rawDialogMessageSource === "source" ? "源消息" : "渲染消息"}
+								{rawDialogMessageSource === "source" && sourceMessages.length > 1
+									? `（${rawDialogSourceIndex + 1}/${sourceMessages.length}）`
+									: ""}
+							</div>
+
+							{rawDialogPanel === "message" && rawDialogMessageSource === "source" && sourceMessages.length > 1 && (
+								<div className="flex flex-wrap gap-2">
+									{sourceMessages.map((m, idx) => (
+										<Button
+											key={m.ts}
+											variant={idx === rawDialogSourceIndex ? "secondary" : "outline"}
+											size="sm"
+											onClick={() => {
+												setRawDialogSourceTsOverride(null)
+												setRawDialogSourceIndex(idx)
+											}}>
+											{m.type === "ask" ? `ask:${String(m.ask)}` : `say:${String(m.say)}`}
+										</Button>
+									))}
+								</div>
+							)}
+
+							{rawDialogPanel === "context" && (
+								<div className="flex flex-col gap-2">
+									<div className="text-xs text-vscode-descriptionForeground">
+										上下文来源：ExtensionState.clineMessages（按 ts 相邻取前后 6 条）
+									</div>
+									<div className="flex flex-col gap-1">
+										{contextMessages.map((m) => {
+											const label = m.type === "ask" ? `ask:${String(m.ask)}` : `say:${String(m.say)}`
+											const preview = (m.text ?? "").slice(0, 140)
+											return (
+												<div key={m.ts} className="flex items-start gap-2 border border-vscode-foreground/10 rounded-xs p-2">
+													<div className="min-w-[140px] text-xs text-vscode-descriptionForeground">
+														<div>{label}</div>
+														<div>ts: {String(m.ts)}</div>
+													</div>
+													<div className="flex-1 text-xs whitespace-pre-wrap break-words">
+														{preview}
+													</div>
+													<div className="flex flex-col gap-1">
+														<Button
+															variant="outline"
+															size="sm"
+															onClick={() => {
+																setRawDialogMessageSource("source")
+																setRawDialogPanel("message")
+																setRawDialogSourceTsOverride(m.ts)
+																setRawDialogView("raw")
+															}}>
+															查看
+														</Button>
+														<Button
+															variant="outline"
+															size="sm"
+															onClick={() => copy(m.text ?? "")}>
+															复制
+														</Button>
+													</div>
+												</div>
+											)
+										})}
+									</div>
+								</div>
+							)}
+
+							<div className="flex gap-2">
+								<Button
+									variant={rawDialogView === "raw" ? "secondary" : "outline"}
+									size="sm"
+									onClick={() => setRawDialogView("raw")}>
+									原文
+								</Button>
+								<Button
+									variant={rawDialogView === "parsed" ? "secondary" : "outline"}
+									size="sm"
+									onClick={() => setRawDialogView("parsed")}>
+									解析
+								</Button>
+							</div>
+
+							{rawDialogPanel === "message" && (rawDialogView === "raw" ? (
+								<div className="flex flex-col gap-2">
+									<div className="flex items-center justify-between gap-2">
+										<div className="text-sm font-medium">Raw message.text</div>
+										<Button variant="outline" size="sm" onClick={() => copy(displayedText)}>
+											复制
+										</Button>
+									</div>
+									<Textarea
+										className="min-h-[220px] font-mono text-xs whitespace-pre-wrap"
+										value={displayedText}
+										readOnly
+									/>
+								</div>
+							) : (
+								<div className="flex flex-col gap-2">
+									<div className="flex items-center justify-between gap-2">
+										<div className="text-sm font-medium">JSON.parse(displayedText)</div>
+										<Button
+											variant="outline"
+											size="sm"
+											disabled={!parsedJsonOrError.ok}
+											onClick={() => {
+												if (parsedJsonOrError.ok) copy(parsedJsonOrError.value)
+											}}>
+											复制
+										</Button>
+									</div>
+									<Textarea
+										className="min-h-[220px] font-mono text-xs whitespace-pre-wrap"
+										value={parsedJsonOrError.ok ? parsedJsonOrError.value : `解析失败: ${parsedJsonOrError.value}`}
+										readOnly
+									/>
+								</div>
+							))}
+						</div>
+					</DialogContent>
+				</Dialog>
+
 				{showTaskTimeline && <KiloChatRowGutterBar message={message} />}
 				<ChatRowContent {...props} />
 			</div>,

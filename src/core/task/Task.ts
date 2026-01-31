@@ -1146,6 +1146,18 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		const isApprovalAsk =
 			type === "tool" || type === "command" || type === "browser_action_launch" || type === "use_mcp_server"
 		if ((approval.decision === "approve" || approval.decision === "deny") && isApprovalAsk && !partial) {
+			const askTs = await this.nextClineMessageTimestamp_kilocode()
+			await this.addToClineMessages({
+				ts: askTs,
+				type: "ask",
+				ask: type,
+				text,
+				partial: false,
+				progressStatus,
+				isProtected,
+				isAnswered: true,
+			})
+
 			if (approval.decision === "approve") {
 				this.approveAsk()
 			} else {
