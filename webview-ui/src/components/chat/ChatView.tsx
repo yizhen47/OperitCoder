@@ -1735,19 +1735,12 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 	return (
 		<div
 			data-testid="chat-view"
-			className={isHidden ? "hidden" : "fixed top-0 left-0 right-0 bottom-0 flex flex-col overflow-hidden"}>
-			{(showAnnouncement || showAnnouncementModal) && (
-				<Announcement
-					hideAnnouncement={() => {
-						if (showAnnouncementModal) {
-							setShowAnnouncementModal(false)
-						}
-						if (showAnnouncement) {
-							hideAnnouncement()
-						}
-					}}
-				/>
-			)}
+			className={
+				isHidden
+					? "hidden"
+					: "fixed top-0 left-0 right-0 bottom-0 flex flex-col overflow-hidden text-sm"
+			}>
+			{(showAnnouncement || showAnnouncementModal) && <Announcement hideAnnouncement={hideAnnouncement} />}
 			{task ? (
 				<>
 					{/* kilocode_change start */}
