@@ -612,13 +612,18 @@ export const ChatRowContent = ({
 	const handleSaveEdit = useCallback(() => {
 		setIsEditing(false)
 		// Send edited message to backend
+		// If a task is currently streaming, cancel it first so the backend can safely rewind.
+		// The backend also has a safeguard to auto-cancel on edit/delete requests.
+		if (isStreaming) {
+			vscode.postMessage({ type: "cancelTask" })
+		}
 		vscode.postMessage({
 			type: "submitEditedMessage",
 			value: message.ts,
 			editedMessageContent: editedContent,
 			images: editImages,
 		})
-	}, [message.ts, editedContent, editImages])
+	}, [editedContent, editImages, message.ts, isStreaming])
 
 	// Handle image selection for editing
 	const handleSelectImages = useCallback(() => {

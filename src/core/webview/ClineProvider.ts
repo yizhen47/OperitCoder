@@ -98,7 +98,7 @@ import { getSystemPromptFilePath } from "../prompts/sections/custom-system-promp
 
 import { webviewMessageHandler } from "./webviewMessageHandler"
 import { checkSpeechToTextAvailable } from "./speechToTextCheck" // kilocode_change
-import type { ClineMessage, TodoItem } from "@roo-code/types"
+import type { ClineMessage, QueuedMessage, TodoItem } from "@roo-code/types"
 import { readApiMessages, saveApiMessages, saveTaskMessages } from "../task-persistence"
 import { readTaskMessages } from "../task-persistence/taskMessages"
 import { getNonce } from "./getNonce"
@@ -2962,12 +2962,21 @@ ${prompt}
 		return task
 	}
 
-	public async cancelTask(): Promise<void> {
+	public async cancelTask(options?: { preserveQueuedMessages?: boolean }): Promise<void> {
 		const task = this.getCurrentTask()
 
 		if (!task) {
 			return
 		}
+		// kilocode_change start
+		const preserveQueuedMessages = options?.preserveQueuedMessages === true
+		const queuedMessagesSnapshot: QueuedMessage[] = preserveQueuedMessages ? task.queuedMessages.slice() : []
+		if (preserveQueuedMessages) {
+			// Prevent Task.dispose() from clearing the queue while we cancel.
+			// We'll restore the queue onto the rehydrated task instance below.
+			task.preserveQueuedMessagesOnDispose = true
+		}
+		// kilocode_change end
 
 		console.log(`[cancelTask] cancelling task ${task.taskId}.${task.instanceId}`)
 
@@ -3112,7 +3121,17 @@ ${prompt}
 		}
 
 		// Clears task again, so we need to abortTask manually above.
-		await this.createTaskWithHistoryItem({ ...historyItem, rootTask, parentTask })
+		const rehydratedTask = await this.createTaskWithHistoryItem({ ...historyItem, rootTask, parentTask })
+		// kilocode_change start
+		if (preserveQueuedMessages && queuedMessagesSnapshot.length > 0 && rehydratedTask) {
+			try {
+				rehydratedTask.messageQueueService.setMessages(queuedMessagesSnapshot)
+			} catch (error) {
+				const errorMessage = error instanceof Error ? error.message : String(error)
+				this.log(`[cancelTask] Failed to restore queued messages after cancel: ${errorMessage}`)
+			}
+		}
+		// kilocode_change end
 	}
 
 	// Clear the current task without treating it as a subtask.

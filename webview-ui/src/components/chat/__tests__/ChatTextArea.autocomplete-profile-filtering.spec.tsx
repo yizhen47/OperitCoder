@@ -221,6 +221,72 @@ describe("ChatTextArea - autocomplete profile filtering", () => {
 		expect(enhanceButton).toBeDisabled()
 	})
 
+	it("should send processQueuedMessages when input is empty, queue has items, and Enter is pressed", async () => {
+		;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
+			filePaths: [],
+			openedTabs: [],
+			customModes: [],
+			localWorkflows: [],
+			globalWorkflows: [],
+			listApiConfigMeta: [],
+			currentApiConfigName: "",
+			pinnedApiConfigs: {},
+			taskHistory: [],
+			taskHistoryVersion: 0,
+			clineMessages: [],
+			cwd: "/test/workspace",
+			messageQueue: [{ id: "q1", text: "queued", images: [] }],
+		})
+
+		const onSend = vi.fn()
+		render(<ChatTextArea {...defaultProps} onSend={onSend} inputValue="" selectedImages={[]} />)
+
+		const textarea = screen.getByRole("textbox")
+		await act(async () => {
+			fireEvent.keyDown(textarea, { key: "Enter", code: "Enter" })
+		})
+
+		expect(vscode.postMessage).toHaveBeenCalledWith({ type: "processQueuedMessages" })
+		expect(onSend).not.toHaveBeenCalled()
+	})
+
+	it("should not send processQueuedMessages when a task is running", async () => {
+		;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
+			filePaths: [],
+			openedTabs: [],
+			customModes: [],
+			localWorkflows: [],
+			globalWorkflows: [],
+			listApiConfigMeta: [],
+			currentApiConfigName: "",
+			pinnedApiConfigs: {},
+			taskHistory: [],
+			taskHistoryVersion: 0,
+			clineMessages: [],
+			cwd: "/test/workspace",
+			messageQueue: [{ id: "q1", text: "queued", images: [] }],
+		})
+
+		const onSend = vi.fn()
+		render(
+			<ChatTextArea
+				{...defaultProps}
+				onSend={onSend}
+				inputValue=""
+				selectedImages={[]}
+				isTaskRunning={true}
+			/>,
+		)
+
+		const textarea = screen.getByRole("textbox")
+		await act(async () => {
+			fireEvent.keyDown(textarea, { key: "Enter", code: "Enter" })
+		})
+
+		expect(vscode.postMessage).not.toHaveBeenCalledWith({ type: "processQueuedMessages" })
+		expect(onSend).not.toHaveBeenCalled()
+	})
+
 	it("should post enhancePrompt message when enhance prompt button is clicked with non-empty input", () => {
 		;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
 			filePaths: [],

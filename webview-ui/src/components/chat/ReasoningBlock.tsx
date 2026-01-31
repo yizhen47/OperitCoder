@@ -310,10 +310,10 @@ export const ReasoningBlock = ({ content, ts, isPartial, metadata }: ReasoningBl
 					ref={contentRef}
 					data-testid="reasoning-content"
 					className={cn(
-						"reasoning-small mt-1 ml-2 scrollable rounded-md border border-vscode-panel-border/50 bg-vscode-editor-background/30 text-vscode-descriptionForeground transition-all duration-200 ease-out",
+						"reasoning-small ml-2 scrollable rounded-md text-vscode-descriptionForeground transition-all duration-200 ease-out",
 						isCollapsed
-							? "max-h-0 overflow-hidden opacity-0 -translate-y-1 px-0 py-0 pointer-events-none"
-							: "max-h-40 overflow-y-auto opacity-100 translate-y-0 px-3 py-2 pointer-events-auto",
+							? "max-h-0 overflow-hidden opacity-0 -translate-y-1 mt-0 px-0 py-0 border-0 bg-transparent pointer-events-none"
+							: "max-h-40 overflow-y-auto opacity-100 translate-y-0 mt-1 px-3 py-2 border border-vscode-panel-border/50 bg-vscode-editor-background/30 pointer-events-auto",
 					)}>
 					<MarkdownBlock markdown={content} />
 				</div>

@@ -174,6 +174,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			experiments, // kilocode_change: For speechToText experiment flag
 			speechToTextStatus, // kilocode_change: Speech-to-text availability status with failure reason
 			apiConfiguration,
+			messageQueue = [],
 		} = useExtensionState()
 
 		const { id: modelId, info: model } = useSelectedModel(apiConfiguration)
@@ -785,6 +786,10 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					event.preventDefault()
 
 					const trimmedInput = inputValue.trim()
+					if (!isTaskRunning && trimmedInput.length === 0 && selectedImages.length === 0 && messageQueue.length > 0) {
+						vscode.postMessage({ type: "processQueuedMessages" })
+						return
+					}
 
 					const preventFlow = handleSessionCommand(trimmedInput, setInputValue)
 
@@ -862,6 +867,9 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				handleMentionSelect,
 				selectedType,
 				inputValue,
+				selectedImages,
+				messageQueue,
+				isTaskRunning,
 				cursorPosition,
 				setInputValue,
 				justDeletedSpaceAfterMention,

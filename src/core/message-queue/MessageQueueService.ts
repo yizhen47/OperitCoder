@@ -83,6 +83,11 @@ export class MessageQueueService extends EventEmitter<QueueEvents> {
 		return message
 	}
 
+	public setMessages(messages: QueuedMessage[]): void {
+		this._messages = messages.slice()
+		this.emit("stateChanged", this._messages)
+	}
+
 	public get messages(): QueuedMessage[] {
 		return this._messages
 	}
@@ -91,8 +96,11 @@ export class MessageQueueService extends EventEmitter<QueueEvents> {
 		return this._messages.length === 0
 	}
 
-	public dispose(): void {
-		this._messages = []
+	public dispose(options?: { clearMessages?: boolean }): void {
+		const clearMessages = options?.clearMessages !== false
+		if (clearMessages) {
+			this._messages = []
+		}
 		this.removeAllListeners()
 	}
 }

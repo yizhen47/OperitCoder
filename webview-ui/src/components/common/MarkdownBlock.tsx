@@ -16,6 +16,8 @@ interface MarkdownBlockProps {
 }
 
 const StyledMarkdown = styled.div`
+	display: flow-root;
+
 	* {
 		font-weight: 400;
 	}
@@ -93,7 +95,7 @@ const StyledMarkdown = styled.div`
 	}
 
 	li {
-		margin: 0.5em 0;
+		margin: 0.25em 0;
 	}
 
 	ol,
@@ -120,7 +122,15 @@ const StyledMarkdown = styled.div`
 
 	p {
 		white-space: pre-wrap;
-		margin: 1em 0 0.25em;
+		margin: 0.5em 0 0.25em;
+	}
+
+	> :first-child {
+		margin-top: 0;
+	}
+
+	> :last-child {
+		margin-bottom: 0;
 	}
 
 	/* Prevent layout shifts during streaming */

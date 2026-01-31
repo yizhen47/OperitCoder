@@ -211,6 +211,7 @@ describe("ClineProvider flicker-free cancel", () => {
 			isStreaming: false,
 			didFinishAbortingStream: false,
 			clineMessages: [],
+			queuedMessages: [],
 			dispose: vi.fn(),
 			on: vi.fn(),
 			off: vi.fn(),
@@ -222,6 +223,8 @@ describe("ClineProvider flicker-free cancel", () => {
 			emit: vi.fn(),
 			on: vi.fn(),
 			off: vi.fn(),
+			isInitialized: true,
+			submitUserMessage: vi.fn().mockResolvedValue(undefined),
 		}
 
 		// Mock Task constructor
@@ -397,5 +400,26 @@ describe("ClineProvider flicker-free cancel", () => {
 
 		await expect(provider.cancelTask()).resolves.toBeUndefined()
 		expect(mockTask1.cancelCurrentRequest).toHaveBeenCalledTimes(1)
+	})
+
+	it("should preserve queued messages after cancel when preserveQueuedMessages is true", async () => {
+		;(provider as any).clineStack = [mockTask1]
+
+		const queued = [
+			{ id: "m1", timestamp: 1, text: "first", images: [] },
+			{ id: "m2", timestamp: 2, text: "second", images: ["img.png"] },
+		]
+		mockTask1.queuedMessages = queued
+
+		// Mock the rehydrated task's queue setter
+		mockTask2.messageQueueService = { setMessages: vi.fn() }
+		provider.createTaskWithHistoryItem = vi.fn().mockResolvedValue(mockTask2)
+
+		await provider.cancelTask({ preserveQueuedMessages: true })
+
+		expect(mockTask2.messageQueueService.setMessages).toHaveBeenCalledTimes(1)
+		expect(mockTask2.messageQueueService.setMessages).toHaveBeenCalledWith(queued)
+		// Should not auto-submit queued messages
+		expect(mockTask2.submitUserMessage).not.toHaveBeenCalled()
 	})
 })

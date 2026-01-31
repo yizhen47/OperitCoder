@@ -343,6 +343,8 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 	// Message Queue Service
 	public readonly messageQueueService: MessageQueueService
 	private messageQueueStateChangedHandler: (() => void) | undefined
+	// kilocode_change: when true, Task.dispose will keep queued messages instead of clearing them
+	public preserveQueuedMessagesOnDispose = false
 
 	// Streaming
 	isWaitingForFirstChunk = false
@@ -2206,7 +2208,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 				this.messageQueueStateChangedHandler = undefined
 			}
 
-			this.messageQueueService.dispose()
+			this.messageQueueService.dispose({ clearMessages: !this.preserveQueuedMessagesOnDispose })
 		} catch (error) {
 			console.error("Error disposing message queue:", error)
 		}

@@ -15,6 +15,17 @@ vi.mock("@src/context/ExtensionStateContext", () => ({
 }))
 
 describe("MarkdownBlock", () => {
+	it("should prevent paragraph margin collapse by using flow-root on the root container", async () => {
+		const markdown = "First paragraph.\n\nSecond paragraph."
+		const { container } = render(<MarkdownBlock markdown={markdown} />)
+
+		await screen.findByText(/First paragraph/, { exact: false })
+
+		const root = container.firstElementChild as HTMLElement | null
+		expect(root).not.toBeNull()
+		expect(root).toHaveStyle({ display: "flow-root" })
+	})
+
 	it("should correctly handle URLs with trailing punctuation", async () => {
 		const markdown = "Check out this link: https://example.com."
 		const { container } = render(<MarkdownBlock markdown={markdown} />)

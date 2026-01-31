@@ -1490,8 +1490,19 @@ export const webviewMessageHandler = async (
 			break
 		}
 		case "cancelTask":
-			await provider.cancelTask()
+			await provider.cancelTask({ preserveQueuedMessages: true })
 			break
+		case "processQueuedMessages": {
+			const task = provider.getCurrentTask()
+			if (task) {
+				const queued = task.messageQueueService.dequeueMessage()
+				if (queued) {
+					// Inject directly into the task loop to avoid the webview re-queueing logic.
+					task.handleWebviewAskResponse("messageResponse", queued.text, queued.images)
+				}
+			}
+			break
+		}
 		case "cancelAutoApproval":
 			// Cancel any pending auto-approval timeout for the current task
 			provider.getCurrentTask()?.cancelAutoApprovalTimeout()
@@ -1939,9 +1950,14 @@ export const webviewMessageHandler = async (
 			}
 			break
 		case "deleteMessage": {
-			if (!provider.getCurrentTask()) {
+			const currentTask = provider.getCurrentTask()
+			if (!currentTask) {
 				await vscode.window.showErrorMessage(t("common:errors.message.no_active_task_to_delete"))
 				break
+			}
+
+			if (currentTask.isStreaming || currentTask.isWaitingForFirstChunk) {
+				await provider.cancelTask({ preserveQueuedMessages: true })
 			}
 
 			if (typeof message.value !== "number" || !message.value) {
@@ -1953,6 +1969,14 @@ export const webviewMessageHandler = async (
 			break
 		}
 		case "submitEditedMessage": {
+			const currentTask = provider.getCurrentTask()
+			if (
+				currentTask &&
+				(currentTask.isStreaming || currentTask.isWaitingForFirstChunk)
+			) {
+				await provider.cancelTask({ preserveQueuedMessages: true })
+			}
+
 			if (
 				provider.getCurrentTask() &&
 				typeof message.value === "number" &&
