@@ -74,6 +74,18 @@ If you like VS Code, or you used closed-source AI code editors before and now ha
 
 ## Changelog
 
+### 0.0.4
+
+- **Fix queue cancellation**: the cancel button now correctly cancels queued messages.
+- **Resend UX improvement**: resending a message no longer requires pressing cancel first.
+- **Enter to send queued messages**: added support for sending queued messages via Enter.
+- **Fix resend enqueue bug**: fixed an issue where “resend” was incorrectly added to the queue.
+- **AI message spacing tweaks**: reduced spacing in the thinking component for a denser layout.
+- **Queue enqueue/clear conditions**: clarified and fixed when queued messages are added and cleared.
+- **Unified typography and spacing**: consistent font sizes and improved spacing for a cleaner look. (`943c4685cc`)
+- **Fix API config edit navigation in dialog**: fixed routing issues when editing API config. (`1311485310`)
+- **Fix frontend diff rendering**: add/remove files are now shown as diffs; fixed diff display issues. (`817bf5a735`)
+
 ### 0.0.3
 
 - **Removed Kilo Gateway / login entry points**: settings no longer show related providers/token validation; chat errors/prompts no longer show login buttons.
