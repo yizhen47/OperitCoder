@@ -487,5 +487,28 @@
 		"updated": "已更新待办事项列表",
 		"completed": "已完成",
 		"started": "已开始"
+	},
+	"rawMessage": {
+		"menu": {
+			"copyAll": "复制",
+			"viewSourceMessage": "查看源消息"
+		},
+		"actions": {
+			"copy": "复制"
+		},
+		"dialog": {
+			"title": "消息原文",
+			"sourceMessage": "源消息",
+			"renderedMessage": "渲染消息",
+			"context": "上下文",
+			"currentlyViewing": "当前查看：",
+			"contextSource": "上下文来源：ExtensionState.clineMessages（按 ts 相邻取前后 6 条）",
+			"view": "查看",
+			"raw": "原文",
+			"parsed": "解析",
+			"rawMessageText": "Raw message.text",
+			"jsonParseMessageText": "JSON.parse(displayedText)",
+			"parseFailed": "解析失败: {{error}}"
+		}
 	}
 }

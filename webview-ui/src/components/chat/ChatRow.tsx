@@ -174,6 +174,7 @@ const ChatRow = memo(
 		const { showTaskTimeline, clineMessages } = useExtensionState() // kilocode_change: Used by KiloChatRowGutterBar
 		const { isLast, onHeightChange, message } = props
 		const { copy } = useClipboard()
+		const { t } = useTranslation()
 		const [rawMenuPos, setRawMenuPos] = useState<{ x: number; y: number } | null>(null)
 		const [rawDialogOpen, setRawDialogOpen] = useState(false)
 		const [rawDialogView, setRawDialogView] = useState<"raw" | "parsed">("raw")
@@ -342,7 +343,7 @@ const ChatRow = memo(
 								copy(message.text ?? "") // kilocode_change
 								setRawMenuPos(null)
 							}}>
-							复制
+							{t("chat:rawMessage.menu.copyAll")}
 						</Button>
 						<Button
 							variant="ghost"
@@ -357,7 +358,7 @@ const ChatRow = memo(
 								setRawDialogView("raw")
 								setRawDialogOpen(true)
 							}}>
-							查看源消息
+							{t("chat:rawMessage.menu.viewSourceMessage")}
 						</Button>
 					</div>
 				)}
@@ -365,7 +366,7 @@ const ChatRow = memo(
 				<Dialog open={rawDialogOpen} onOpenChange={setRawDialogOpen}>
 					<DialogContent className="sm:max-w-[800px] overflow-y-auto max-h-[80vh]">
 						<DialogHeader>
-							<DialogTitle>消息原文</DialogTitle>
+							<DialogTitle>{t("chat:rawMessage.dialog.title")}</DialogTitle>
 						</DialogHeader>
 
 						<div className="flex flex-col gap-3">
@@ -385,7 +386,7 @@ const ChatRow = memo(
 										setRawDialogMessageSource("source")
 										setRawDialogPanel("message")
 									}}>
-									源消息
+									{t("chat:rawMessage.dialog.sourceMessage")}
 								</Button>
 								<Button
 									variant={rawDialogMessageSource === "rendered" ? "secondary" : "outline"}
@@ -394,7 +395,7 @@ const ChatRow = memo(
 										setRawDialogMessageSource("rendered")
 										setRawDialogPanel("message")
 									}}>
-									渲染消息
+									{t("chat:rawMessage.dialog.renderedMessage")}
 								</Button>
 								<Button
 									variant={rawDialogPanel === "context" ? "secondary" : "outline"}
@@ -403,12 +404,15 @@ const ChatRow = memo(
 										setRawDialogMessageSource("source")
 										setRawDialogPanel("context")
 									}}>
-									上下文
+									{t("chat:rawMessage.dialog.context")}
 								</Button>
 							</div>
 
 							<div className="text-xs text-vscode-descriptionForeground">
-								当前查看：{rawDialogMessageSource === "source" ? "源消息" : "渲染消息"}
+								{t("chat:rawMessage.dialog.currentlyViewing")}
+								{rawDialogMessageSource === "source"
+									? t("chat:rawMessage.dialog.sourceMessage")
+									: t("chat:rawMessage.dialog.renderedMessage")}
 								{rawDialogMessageSource === "source" && sourceMessages.length > 1
 									? `（${rawDialogSourceIndex + 1}/${sourceMessages.length}）`
 									: ""}
@@ -433,9 +437,7 @@ const ChatRow = memo(
 
 							{rawDialogPanel === "context" && (
 								<div className="flex flex-col gap-2">
-									<div className="text-xs text-vscode-descriptionForeground">
-										上下文来源：ExtensionState.clineMessages（按 ts 相邻取前后 6 条）
-									</div>
+									<div className="text-xs text-vscode-descriptionForeground">{t("chat:rawMessage.dialog.contextSource")}</div>
 									<div className="flex flex-col gap-1">
 										{contextMessages.map((m) => {
 											const label = m.type === "ask" ? `ask:${String(m.ask)}` : `say:${String(m.say)}`
@@ -446,9 +448,7 @@ const ChatRow = memo(
 														<div>{label}</div>
 														<div>ts: {String(m.ts)}</div>
 													</div>
-													<div className="flex-1 text-xs whitespace-pre-wrap break-words">
-														{preview}
-													</div>
+													<div className="flex-1 text-xs whitespace-pre-wrap break-words">{preview}</div>
 													<div className="flex flex-col gap-1">
 														<Button
 															variant="outline"
@@ -459,13 +459,10 @@ const ChatRow = memo(
 																setRawDialogSourceTsOverride(m.ts)
 																setRawDialogView("raw")
 															}}>
-															查看
+															{t("chat:rawMessage.dialog.view")}
 														</Button>
-														<Button
-															variant="outline"
-															size="sm"
-															onClick={() => copy(m.text ?? "")}>
-															复制
+														<Button variant="outline" size="sm" onClick={() => copy(m.text ?? "")}>
+															{t("chat:rawMessage.actions.copy")}
 														</Button>
 													</div>
 												</div>
@@ -480,22 +477,22 @@ const ChatRow = memo(
 									variant={rawDialogView === "raw" ? "secondary" : "outline"}
 									size="sm"
 									onClick={() => setRawDialogView("raw")}>
-									原文
+									{t("chat:rawMessage.dialog.raw")}
 								</Button>
 								<Button
 									variant={rawDialogView === "parsed" ? "secondary" : "outline"}
 									size="sm"
 									onClick={() => setRawDialogView("parsed")}>
-									解析
+									{t("chat:rawMessage.dialog.parsed")}
 								</Button>
 							</div>
 
 							{rawDialogPanel === "message" && (rawDialogView === "raw" ? (
 								<div className="flex flex-col gap-2">
 									<div className="flex items-center justify-between gap-2">
-										<div className="text-sm font-medium">Raw message.text</div>
+										<div className="text-sm font-medium">{t("chat:rawMessage.dialog.rawMessageText")}</div>
 										<Button variant="outline" size="sm" onClick={() => copy(displayedText)}>
-											复制
+											{t("chat:rawMessage.actions.copy")}
 										</Button>
 									</div>
 									<Textarea
@@ -507,7 +504,7 @@ const ChatRow = memo(
 							) : (
 								<div className="flex flex-col gap-2">
 									<div className="flex items-center justify-between gap-2">
-										<div className="text-sm font-medium">JSON.parse(displayedText)</div>
+										<div className="text-sm font-medium">{t("chat:rawMessage.dialog.jsonParseMessageText")}</div>
 										<Button
 											variant="outline"
 											size="sm"
@@ -515,12 +512,16 @@ const ChatRow = memo(
 											onClick={() => {
 												if (parsedJsonOrError.ok) copy(parsedJsonOrError.value)
 											}}>
-											复制
+											{t("chat:rawMessage.actions.copy")}
 										</Button>
 									</div>
 									<Textarea
 										className="min-h-[220px] font-mono text-xs whitespace-pre-wrap"
-										value={parsedJsonOrError.ok ? parsedJsonOrError.value : `解析失败: ${parsedJsonOrError.value}`}
+										value={
+											parsedJsonOrError.ok
+												? parsedJsonOrError.value
+												: t("chat:rawMessage.dialog.parseFailed", { error: parsedJsonOrError.value })
+										}
 										readOnly
 									/>
 								</div>

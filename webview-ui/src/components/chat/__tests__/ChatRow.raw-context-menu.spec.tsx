@@ -83,12 +83,12 @@ describe("ChatRow - raw context menu", () => {
 		fireEvent.contextMenu(row)
 
 		expect(screen.getByTestId("message-raw-menu")).toBeInTheDocument()
-		fireEvent.click(screen.getByText("全部复制"))
+		fireEvent.click(screen.getByText("chat:rawMessage.menu.copyAll"))
 		expect(mockWriteText).toHaveBeenCalledWith("ls\nOutput:file1.txt")
 
-		fireEvent.click(screen.getByText("查看源消息"))
-		expect(await screen.findByText("消息原文")).toBeInTheDocument()
-		expect(screen.getByText("Raw message.text")).toBeInTheDocument()
+		fireEvent.click(screen.getByText("chat:rawMessage.menu.viewSourceMessage"))
+		expect(await screen.findByText("chat:rawMessage.dialog.title")).toBeInTheDocument()
+		expect(screen.getByText("chat:rawMessage.dialog.rawMessageText")).toBeInTheDocument()
 		// Should show source message selector buttons for combined sequences
 		expect(screen.getByText("ask:command")).toBeInTheDocument()
 		expect(screen.getByText("say:command_output")).toBeInTheDocument()
