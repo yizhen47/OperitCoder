@@ -168,8 +168,21 @@ const App = () => {
 					switchTab(targetTab)
 					// Extract targetSection from values if provided
 					const targetSection = message.values?.section as string | undefined
+					const editingProfile = message.values?.editingProfile as string | undefined
 					setCurrentSection(targetSection)
 					setCurrentMarketplaceTab(undefined)
+					if (targetTab === "settings" && editingProfile) {
+						setTimeout(() => {
+							window.postMessage(
+								{
+									type: "action",
+									action: "settingsButtonClicked",
+									values: { editingProfile },
+								},
+								"*",
+							)
+						}, 100)
+					}
 				} else {
 					// Handle other actions using the mapping
 					const newTab = tabsByMessageAction[message.action]

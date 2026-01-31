@@ -234,9 +234,12 @@ export const KiloProfileSelector = ({
 									className="w-full text-left py-2 px-3 text-sm hover:bg-vscode-list-hoverBackground"
 									onClick={() => {
 										vscode.postMessage({
-											type: "loadApiConfiguration",
-											text: "settingsButtonClicked",
-											values: { section: "providers" },
+											type: "switchTab",
+											tab: "settings",
+											values: {
+												section: "providers",
+												editingProfile: currentApiConfigName,
+											},
 										})
 										setOpen(false)
 									}}>

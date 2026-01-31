@@ -38,6 +38,10 @@ export const ApiConfigSelector = ({
 	const [searchValue, setSearchValue] = useState("")
 	const portalContainer = useRooPortal("roo-portal")
 
+	const selectedConfigName = useMemo(() => {
+		return listApiConfigMeta.find((c) => c.id === value)?.name
+	}, [listApiConfigMeta, value])
+
 	// Create searchable items for fuzzy search.
 	const searchableItems = useMemo(
 		() =>
@@ -81,9 +85,16 @@ export const ApiConfigSelector = ({
 	)
 
 	const handleEditClick = useCallback(() => {
-		vscode.postMessage({ type: "switchTab", tab: "settings" })
+		vscode.postMessage({
+			type: "switchTab",
+			tab: "settings",
+			values: {
+				section: "providers",
+				editingProfile: selectedConfigName,
+			},
+		})
 		setOpen(false)
-	}, [])
+	}, [selectedConfigName])
 
 	const renderConfigItem = useCallback(
 		(config: { id: string; name: string; modelId?: string }, isPinned: boolean) => {

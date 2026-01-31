@@ -13,6 +13,9 @@ vi.mock("react-i18next", () => ({
 				"chat:apiRequest.streamingFailed": "Streaming Failed",
 				"chat:apiRequest.cancelled": "Cancelled",
 				"chat:diffError.title": "Diff Error",
+				"chat:errorDetails.title": "Error Details",
+				"chat:errorDetails.copyToClipboard": "Copy",
+				"chat:errorDetails.copied": "Copied",
 			}
 			return translations[key] || key
 		},
@@ -74,6 +77,23 @@ describe("ErrorRow", () => {
 		it("renders cancelled type with correct title", () => {
 			render(<ErrorRow type="cancelled" message="Test message" />)
 			expect(screen.getByText("Cancelled")).toBeInTheDocument()
+		})
+	})
+
+	describe("errorDetails", () => {
+		it("toggles inline details section when clicking the details button", async () => {
+			render(<ErrorRow type="error" message="Test message" errorDetails="DETAILS" />)
+
+			// Closed by default
+			expect(screen.queryByText("DETAILS")).not.toBeInTheDocument()
+
+			// Open
+			screen.getByLabelText("Error Details").click()
+			expect(await screen.findByText("DETAILS")).toBeInTheDocument()
+
+			// Close
+			screen.getByLabelText("Error Details").click()
+			expect(screen.queryByText("DETAILS")).not.toBeInTheDocument()
 		})
 	})
 })

@@ -6,7 +6,6 @@ import { useCopyToClipboard } from "@src/utils/clipboard"
 import { vscode } from "@src/utils/vscode"
 import CodeBlock from "../kilocode/common/CodeBlock" // kilocode_change
 import { Button } from "@src/components/ui" // kilocode_change
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@src/components/ui/dialog"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui"
 
 /**
@@ -89,7 +88,7 @@ export const ErrorRow = memo(
 		const { t } = useTranslation()
 		const [isExpanded, setIsExpanded] = useState(defaultExpanded)
 		const [showCopySuccess, setShowCopySuccess] = useState(false)
-		const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
+		const [isDetailsExpanded, setIsDetailsExpanded] = useState(false)
 		const [showDetailsCopySuccess, setShowDetailsCopySuccess] = useState(false)
 		const { copyWithFeedback } = useCopyToClipboard()
 
@@ -153,6 +152,14 @@ export const ErrorRow = memo(
 			[errorDetails, copyWithFeedback],
 		)
 
+		const handleToggleDetails = useCallback(
+			(e: React.MouseEvent) => {
+				e.stopPropagation()
+				setIsDetailsExpanded((prev) => !prev)
+			},
+			[],
+		)
+
 		const errorTitle = getDefaultTitle()
 
 		// For diff_error type with expandable content
@@ -214,7 +221,7 @@ export const ErrorRow = memo(
 									<Tooltip>
 										<TooltipTrigger asChild>
 											<button
-												onClick={() => setIsDetailsDialogOpen(true)}
+												onClick={handleToggleDetails}
 												className="transition-opacity opacity-0 group-hover:opacity-100 cursor-pointer"
 												aria-label={t("chat:errorDetails.title")}>
 												<Info className="size-4" />
@@ -235,39 +242,35 @@ export const ErrorRow = memo(
 							{message}
 						</p>
 						{additionalContent}
+						{errorDetails && isDetailsExpanded && (
+							<div className="mt-2">
+								<div className="flex items-center justify-between gap-2">
+									<div className="text-xs text-vscode-descriptionForeground cursor-default">
+										{t("chat:errorDetails.title")}
+									</div>
+									<Button variant="secondary" onClick={handleCopyDetails}>
+										{showDetailsCopySuccess ? (
+											<>
+												<Check className="size-3" />
+												{t("chat:errorDetails.copied")}
+											</>
+										) : (
+											<>
+												<Copy className="size-3" />
+												{t("chat:errorDetails.copyToClipboard")}
+											</>
+										)}
+									</Button>
+								</div>
+								<div className="mt-2 max-h-96 overflow-auto px-3 bg-vscode-editor-background rounded-xl border border-vscode-editorGroup-border">
+									<pre className="font-mono text-sm whitespace-pre-wrap break-words bg-transparent">
+										{errorDetails}
+									</pre>
+								</div>
+							</div>
+						)}
 					</div>
 				</div>
-
-				{/* Error Details Dialog */}
-				{errorDetails && (
-					<Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-						<DialogContent className="max-w-2xl">
-							<DialogHeader>
-								<DialogTitle>{t("chat:errorDetails.title")}</DialogTitle>
-							</DialogHeader>
-							<div className="max-h-96 overflow-auto px-3 bg-vscode-editor-background rounded-xl border border-vscode-editorGroup-border">
-								<pre className="font-mono text-sm whitespace-pre-wrap break-words bg-transparent">
-									{errorDetails}
-								</pre>
-							</div>
-							<DialogFooter>
-								<Button variant="secondary" onClick={handleCopyDetails}>
-									{showDetailsCopySuccess ? (
-										<>
-											<Check className="size-3" />
-											{t("chat:errorDetails.copied")}
-										</>
-									) : (
-										<>
-											<Copy className="size-3" />
-											{t("chat:errorDetails.copyToClipboard")}
-										</>
-									)}
-								</Button>
-							</DialogFooter>
-						</DialogContent>
-					</Dialog>
-				)}
 			</>
 		)
 	},

@@ -344,6 +344,10 @@ describe("ApiConfigSelector", () => {
 		expect(vi.mocked(vscode.postMessage)).toHaveBeenCalledWith({
 			type: "switchTab",
 			tab: "settings",
+			values: {
+				section: "providers",
+				editingProfile: "Config 1",
+			},
 		})
 	})
 

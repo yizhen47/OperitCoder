@@ -115,4 +115,34 @@ describe("KiloProfileSelector", () => {
 		// While config is switching, the model panel should show loading
 		expect(screen.getByText("common:ui.loading")).toBeInTheDocument()
 	})
+
+	test("clicking edit navigates to settings providers and targets the current profile", () => {
+		render(
+			<KiloProfileSelector
+				currentConfigId="config1"
+				currentModelId="model-1"
+				currentApiConfigName="Config 1"
+				apiConfiguration={baseApiConfiguration}
+				displayName="Config 1"
+				listApiConfigMeta={[
+					{ id: "config1", name: "Config 1" },
+					{ id: "config2", name: "Config 2" },
+				]}
+				pinnedApiConfigs={{}}
+				togglePinnedApiConfig={vi.fn()}
+				initiallyOpen={true}
+			/>,
+		)
+
+		fireEvent.click(screen.getByText("chat:edit"))
+
+		expect(vscode.postMessage).toHaveBeenCalledWith({
+			type: "switchTab",
+			tab: "settings",
+			values: {
+				section: "providers",
+				editingProfile: "Config 1",
+			},
+		})
+	})
 })
