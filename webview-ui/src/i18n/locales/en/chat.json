@@ -277,7 +277,9 @@
 	},
 	"mcp": {
 		"wantsToUseTool": "Operit Coder wants to use a tool on the {{serverName}} MCP server",
-		"wantsToAccessResource": "Operit Coder wants to access a resource on the {{serverName}} MCP server"
+		"wantsToAccessResource": "Operit Coder wants to access a resource on the {{serverName}} MCP server",
+		"callingTool": "Calling MCP tool...",
+		"accessingResource": "Accessing MCP resource..."
 	},
 	"modes": {
 		"wantsToSwitch": "Operit Coder wants to switch to {{mode}} mode",

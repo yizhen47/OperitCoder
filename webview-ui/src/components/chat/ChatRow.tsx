@@ -320,10 +320,11 @@ const ChatRow = memo(
 					setRawMenuPos({ x: e.clientX, y: e.clientY })
 				}}
 				className={cn(
-					"px-[15px] pr-[6px] relative",
-					isNonDiffToolRow ? "py-[1px]" : "py-[2px]",
-					highlighted ? "animate-message-highlight" : "",
-				)}>
+						"px-[15px] pr-[6px] relative",
+						isNonDiffToolRow ? "py-[1px]" : "py-[2px]",
+						isLast ? "pb-0" : "",
+						highlighted ? "animate-message-highlight" : "",
+					)}>
 				{rawMenuPos && (
 					<div
 						data-testid="message-raw-menu"
@@ -577,6 +578,17 @@ export const ChatRowContent = ({
 	const { mcpServers, alwaysAllowMcp, currentCheckpoint, mode, apiConfiguration, clineMessages, showTimestamps } =
 		useExtensionState()
 
+	// kilocode_change: 添加组件挂载/卸载日志追踪
+	const isMountedRef = useRef(true)
+	useEffect(() => {
+		isMountedRef.current = true
+		console.log(`[ChatRowContent] Mounted - ts: ${message.ts}, type: ${message.type}`)
+		return () => {
+			isMountedRef.current = false
+			console.log(`[ChatRowContent] Unmounted - ts: ${message.ts}, type: ${message.type}`)
+		}
+	}, [message.ts, message.type])
+
 	const { info: model } = useSelectedModel(apiConfiguration)
 	const [isEditing, setIsEditing] = useState(false)
 	const [editedContent, setEditedContent] = useState("")
@@ -695,7 +707,7 @@ export const ChatRowContent = ({
 			case "command":
 				return [
 					isCommandExecuting ? (
-						<ProgressIndicator />
+						<ProgressIndicator statusText={t("chat:commandExecution.runningWithStatus")} />
 					) : (
 						<TerminalSquare className="size-4" aria-label="Terminal icon" />
 					),
@@ -708,9 +720,13 @@ export const ChatRowContent = ({
 				if (mcpServerUse === undefined) {
 					return [null, null]
 				}
+				const statusText =
+					mcpServerUse.type === "use_mcp_tool"
+						? t("chat:mcp.callingTool")
+						: t("chat:mcp.accessingResource")
 				return [
 					isMcpServerResponding ? (
-						<ProgressIndicator />
+						<ProgressIndicator statusText={statusText} />
 					) : (
 						<span
 							className="codicon codicon-server"
@@ -759,7 +775,7 @@ export const ChatRowContent = ({
 					) : apiRequestFailedMessage ? (
 						getIconSpan("error", errorColor)
 					) : (
-						<ProgressIndicator />
+						<ProgressIndicator statusText={t("chat:apiRequest.streamingConnecting")} />
 					),
 					apiReqCancelReason !== null && apiReqCancelReason !== undefined ? (
 						apiReqCancelReason === "user_cancelled" ? (

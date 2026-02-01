@@ -41,6 +41,7 @@ import Announcement from "./Announcement"
 import BrowserActionRow from "./BrowserActionRow"
 import BrowserSessionStatusRow from "./BrowserSessionStatusRow"
 import ChatRow from "./ChatRow"
+import { ChatRowErrorBoundary } from "./ChatRowErrorBoundary" // kilocode_change: 添加错误边界
 import { ChatTextArea } from "./ChatTextArea"
 // import TaskHeader from "./TaskHeader"// kilocode_change
 // import KiloTaskHeader from "../kilocode/KiloTaskHeader" // kilocode_change
@@ -52,6 +53,7 @@ import { CheckpointWarning } from "./CheckpointWarning"
 import { IdeaSuggestionsBox } from "../kilocode/chat/IdeaSuggestionsBox" // kilocode_change
 import { KilocodeNotifications } from "../kilocode/KilocodeNotifications" // kilocode_change
 import { QueuedMessages } from "./QueuedMessages"
+import { ChatViewDebug } from "./ChatViewDebug" // kilocode_change: 添加调试组件
 import { buildDocLink } from "@/utils/docLinks"
 // import DismissibleUpsell from "../common/DismissibleUpsell" // kilocode_change: unused
 // import { useCloudUpsell } from "@src/hooks/useCloudUpsell" // kilocode_change: unused
@@ -649,6 +651,39 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		return false
 	}, [modifiedMessages, clineAsk, enableButtons, primaryButtonText])
 
+	const streamingStatusText = useMemo(() => {
+		if (!isStreaming) {
+			return undefined
+		}
+
+		const lastMessage = modifiedMessages.at(-1)
+		if (!lastMessage) {
+			return t("common:ui.loading")
+		}
+
+		if (lastMessage.progressStatus?.text) {
+			return lastMessage.progressStatus.text
+		}
+
+		if (lastMessage.type === "say" && lastMessage.say === "mcp_server_request_started") {
+			return t("chat:mcp.callingTool", { defaultValue: t("common:ui.loading") })
+		}
+
+		if (lastMessage.type === "say" && lastMessage.say === "condense_context" && lastMessage.partial === true) {
+			return t("chat:contextManagement.condensation.inProgress", { defaultValue: t("common:ui.loading") })
+		}
+
+		if (
+			lastMessage.type === "say" &&
+			(lastMessage.say === "text" || lastMessage.say === "reasoning") &&
+			lastMessage.partial === true
+		) {
+			return t("chat:apiRequest.streamingReceiving", { defaultValue: t("chat:apiRequest.streaming") })
+		}
+
+		return t("chat:apiRequest.streamingConnecting", { defaultValue: t("chat:apiRequest.streaming") })
+	}, [isStreaming, modifiedMessages, t])
+
 	// kilocode_change start: keep cancel UI visible after user clicks cancel
 	// Clicking cancel should disable repeated cancels, but it should not flip the UI
 	// into "send" mode while the task is still cancelling.
@@ -712,7 +747,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		const shouldAnimate = isStreaming && !wasStreaming
 		return (
 			<div
-				className={`flex items-center justify-start pl-4 py-4 ${shouldAnimate ? "animate-fade-in" : ""}`}
+				className={`flex items-center justify-start pl-4 ${isStreaming ? "py-4" : ""} ${shouldAnimate ? "animate-fade-in" : ""}`}
 			>
 				{isStreaming && (
 					<div className="flex items-center gap-2 text-sm text-vscode-descriptionForeground">
@@ -730,12 +765,12 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 								style={{ animationDuration: "1.4s", animationDelay: "400ms" }}
 							/>
 						</div>
-						<span>{t("chat:loading")}</span>
+						<span>{streamingStatusText ?? t("common:ui.loading")}</span>
 					</div>
 				)}
 			</div>
 		)
-	}, [isStreaming, wasStreaming, t])
+	}, [isStreaming, wasStreaming, streamingStatusText, t])
 
 	const virtuosoComponents = useMemo(() => ({ Footer: virtuosoFooter }), [virtuosoFooter])
 	// kilocode_change end
@@ -1856,15 +1891,18 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 
 			{task && (
 				<>
+					{/* kilocode_change: 在开发模式下添加调试组件 */}
+					{process.env.NODE_ENV === "development" && <ChatViewDebug />}
 					<div className="grow flex flex-col min-h-0" ref={scrollContainerRef}>
 						<div className="flex-auto min-h-0">
-							<Virtuoso
-								ref={virtuosoRef}
-								key={task.ts}
-								className="scrollable grow overflow-y-scroll"
-								increaseViewportBy={{ top: 400, bottom: 400 }} // kilocode_change: use more modest numbers to see if they reduce gray screen incidence
+							<ChatRowErrorBoundary>
+								<Virtuoso
+									ref={virtuosoRef}
+									key={task.ts}
+									className="scrollable grow overflow-y-scroll"
+									increaseViewportBy={{ top: 400, bottom: 0 }} // kilocode_change: remove bottom viewport to fix spacing at bottom
 								data={groupedMessages}
-								computeItemKey={(_index: number, item: ClineMessage) => item.ts} // kilocode_change
+								computeItemKey={(_index: number, item: ClineMessage) => String(item.ts)} // kilocode_change: 返回稳定的字符串key
 								itemContent={itemContent}
 								followOutput={(isAtBottom: boolean) => isAtBottom || stickyFollowRef.current}
 								atBottomStateChange={(isAtBottom: boolean) => {
@@ -1874,8 +1912,10 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 								}}
 								atBottomThreshold={10}
 								initialTopMostItemIndex={groupedMessages.length - 1}
+								overscan={200} // kilocode_change: 添加overscan以提升性能
 								components={virtuosoComponents}
 							/>
+							</ChatRowErrorBoundary>
 						</div>
 					</div>
 					<div className={`flex-initial min-h-0 ${!areButtonsVisible ? "mb-1" : ""}`}>

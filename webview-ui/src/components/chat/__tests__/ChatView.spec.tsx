@@ -77,16 +77,24 @@ vi.mock("react-virtuoso", () => ({
 		computeItemKey?: (index: number, item: ClineMessage) => React.Key
 	}) {
 		lastVirtuosoProps = { data, itemContent, computeItemKey, ...rest }
+		const Footer = (rest as any)?.components?.Footer
 		return (
-			<div data-testid="virtuoso-item-list">
-				{data.map((item, index) => (
-					<div
-						key={computeItemKey ? computeItemKey(index, item) : item.ts}
-						data-testid={`virtuoso-item-${index}`}
-					>
-						{itemContent(index, item)}
+			<div>
+				<div data-testid="virtuoso-item-list">
+					{data.map((item, index) => (
+						<div
+							key={computeItemKey ? computeItemKey(index, item) : item.ts}
+							data-testid={`virtuoso-item-${index}`}
+						>
+							{itemContent(index, item)}
+						</div>
+					))}
+				</div>
+				{Footer ? (
+					<div data-testid="virtuoso-footer">
+						<Footer />
 					</div>
-				))}
+				) : null}
 			</div>
 		)
 	},
@@ -309,6 +317,98 @@ describe("ChatView - Streaming Indicator Stability Tests", () => {
 				text: "follow-up while api_req_started still pending",
 				images: [],
 			})
+		})
+	})
+})
+
+describe("ChatView - Loading Footer Status", () => {
+	beforeEach(() => vi.clearAllMocks())
+
+	it("shows connecting status text while streaming before partial response arrives", async () => {
+		renderChatView()
+
+		mockPostMessage({
+			clineMessages: [
+				{
+					type: "say",
+					say: "task",
+					ts: Date.now() - 2000,
+					text: "Initial task",
+				},
+				{
+					type: "say",
+					say: "api_req_started",
+					ts: Date.now() - 1000,
+					text: JSON.stringify({ apiProtocol: "anthropic" }),
+				},
+			],
+		})
+
+		await waitFor(() => {
+			expect(document.querySelector('[data-testid="virtuoso-footer"]')?.textContent).toContain(
+				"chat:apiRequest.streamingConnecting",
+			)
+		})
+	})
+
+	it("shows receiving status text while assistant text is streaming", async () => {
+		renderChatView()
+
+		mockPostMessage({
+			clineMessages: [
+				{
+					type: "say",
+					say: "task",
+					ts: Date.now() - 2000,
+					text: "Initial task",
+				},
+				{
+					type: "say",
+					say: "text",
+					ts: Date.now() - 1000,
+					text: "partial",
+					partial: true,
+				},
+			],
+		})
+
+		await waitFor(() => {
+			expect(document.querySelector('[data-testid="virtuoso-footer"]')?.textContent).toContain(
+				"chat:apiRequest.streamingReceiving",
+			)
+		})
+	})
+
+	it("shows MCP calling status when MCP server request is started", async () => {
+		renderChatView()
+
+		mockPostMessage({
+			clineMessages: [
+				{
+					type: "say",
+					say: "task",
+					ts: Date.now() - 2000,
+					text: "Initial task",
+				},
+				{
+					type: "say",
+					say: "api_req_started",
+					ts: Date.now() - 1500,
+					text: JSON.stringify({ apiProtocol: "anthropic" }),
+				},
+				{
+					type: "say",
+					say: "mcp_server_request_started",
+					ts: Date.now() - 1000,
+					text: "{}",
+				},
+			],
+		})
+
+		await waitFor(() => {
+			expect(document.querySelector('[data-testid="virtuoso-footer"]')?.textContent).toContain(
+				"chat:mcp.callingTool",
+			)
 		})
 	})
 })

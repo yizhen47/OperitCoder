@@ -21,7 +21,6 @@ const BottomControls: React.FC<BottomControlsProps> = ({ showApiConfig = false }
 			<div className="fixed top-0 left-0 z-[1000]">
 				<KiloRulesToggleModal hideTrigger />
 			</div>
-			<div className="h-6" />
 		</>
 	)
 }

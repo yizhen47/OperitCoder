@@ -255,7 +255,9 @@
 	},
 	"mcp": {
 		"wantsToUseTool": "Operit Coder想在{{serverName}} MCP上使用工具",
-		"wantsToAccessResource": "Operit Coder想访问{{serverName}} MCP服务上的资源"
+		"wantsToAccessResource": "Operit Coder想访问{{serverName}} MCP服务上的资源",
+		"callingTool": "正在调用MCP工具...",
+		"accessingResource": "正在访问MCP资源..."
 	},
 	"modes": {
 		"wantsToSwitch": "即将切换至{{mode}}模式",

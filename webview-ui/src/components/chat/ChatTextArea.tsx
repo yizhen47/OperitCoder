@@ -63,6 +63,7 @@ interface ChatTextAreaProps {
 	selectedImages: string[]
 	setSelectedImages: React.Dispatch<React.SetStateAction<string[]>>
 	onSend: () => void
+	onCondenseContext?: () => void
 	isTaskRunning?: boolean
 	onCancelTask?: () => void
 	cancelDisabled?: boolean
@@ -139,6 +140,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			selectedImages,
 			setSelectedImages,
 			onSend,
+			onCondenseContext,
 			onSelectImages,
 			shouldDisableImages,
 			onHeightChange,
@@ -1623,7 +1625,8 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 								<Button
 									variant="ghost"
 									size="sm"
-									onClick={() => vscode.postMessage({ type: "condense" })}
+									disabled={!onCondenseContext}
+									onClick={() => onCondenseContext?.()}
 									className="w-full mt-3 text-xs hover:bg-[rgba(255,255,255,0.05)]">
 									{t("chat:task.condenseContext")}
 								</Button>
