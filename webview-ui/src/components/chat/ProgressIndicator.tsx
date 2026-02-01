@@ -1,4 +1,8 @@
-export const ProgressIndicator = () => (
+interface ProgressIndicatorProps {
+	statusText?: string
+}
+
+export const ProgressIndicator = ({ statusText }: ProgressIndicatorProps) => (
 	<div
 		style={{
 			display: "flex",
@@ -32,6 +36,17 @@ export const ProgressIndicator = () => (
 				animation: "pulse 1.4s ease-in-out 0.4s infinite",
 			}}
 		/>
+		{statusText && (
+			<span
+				style={{
+					marginLeft: "6px",
+					fontSize: "12px",
+					color: "var(--vscode-descriptionForeground)",
+					whiteSpace: "nowrap",
+				}}>
+				{statusText}
+			</span>
+		)}
 		<style>{`
 			@keyframes pulse {
 				0%, 100% { opacity: 0.3; }

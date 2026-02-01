@@ -1861,7 +1861,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							<Virtuoso
 								ref={virtuosoRef}
 								key={task.ts}
-								className="scrollable grow overflow-y-scroll mb-1"
+								className="scrollable grow overflow-y-scroll"
 								increaseViewportBy={{ top: 400, bottom: 400 }} // kilocode_change: use more modest numbers to see if they reduce gray screen incidence
 								data={groupedMessages}
 								computeItemKey={(_index: number, item: ClineMessage) => item.ts} // kilocode_change

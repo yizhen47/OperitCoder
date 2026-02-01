@@ -144,6 +144,8 @@
 		"title": "API请求",
 		"failed": "API请求失败",
 		"streaming": "API请求...",
+		"streamingConnecting": "正在连接AI服务...",
+		"streamingReceiving": "正在接收AI响应...",
 		"cancelled": "API请求已取消",
 		"streamingFailed": "API流式传输失败",
 		"errorTitle": "API 错误 {{code}}",
@@ -227,6 +229,7 @@
 	"commandOutput": "命令输出",
 	"commandExecution": {
 		"running": "正在运行",
+		"runningWithStatus": "正在执行命令...",
 		"abort": "中止",
 		"pid": "PID: {{pid}}",
 		"exitStatus": "已退出，状态码 {{exitCode}}",
