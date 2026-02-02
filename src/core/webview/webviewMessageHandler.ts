@@ -1306,7 +1306,8 @@ export const webviewMessageHandler = async (
 			break
 		}
 		case "requestOpenAiModels":
-			if (message?.values?.baseUrl && message?.values?.apiKey) {
+			// kilocode_change start: allow model discovery without apiKey
+			if (message?.values?.baseUrl) {
 				const openAiModels = await getOpenAiModels(
 					message?.values?.baseUrl,
 					message?.values?.apiKey,
@@ -1315,6 +1316,7 @@ export const webviewMessageHandler = async (
 
 				provider.postMessageToWebview({ type: "openAiModels", openAiModels })
 			}
+			// kilocode_change end
 
 			break
 		case "requestVsCodeLmModels":

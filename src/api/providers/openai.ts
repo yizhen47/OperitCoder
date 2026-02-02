@@ -583,9 +583,30 @@ export async function getOpenAiModels(baseUrl?: string, apiKey?: string, openAiH
 			config["headers"] = headers
 		}
 
-		const response = await axios.get(`${trimmedBaseUrl}/models`, config)
-		const modelsArray = response.data?.data?.map((model: any) => model.id) || []
-		return [...new Set<string>(modelsArray)]
+		// kilocode_change start: normalize URL & fallback for OpenAI-compatible endpoints
+		const normalizedBaseUrl = trimmedBaseUrl.replace(/\/+$/, "")
+
+		const fetchModels = async (modelsUrl: string) => {
+			const response = await axios.get(modelsUrl, config)
+			const modelsArray = response.data?.data?.map((model: any) => model.id) || []
+			return [...new Set<string>(modelsArray)]
+		}
+
+		const primaryUrl = `${normalizedBaseUrl}/models`
+		try {
+			return await fetchModels(primaryUrl)
+		} catch (error) {
+			// If the user provides a host-only base URL (e.g. http://localhost:1234),
+			// many OpenAI-compatible servers expose the API under /v1.
+			if (axios.isAxiosError(error) && error.response?.status === 404) {
+				const v1BaseUrl = normalizedBaseUrl.endsWith("/v1") ? normalizedBaseUrl : `${normalizedBaseUrl}/v1`
+				const fallbackUrl = `${v1BaseUrl}/models`
+				return await fetchModels(fallbackUrl)
+			}
+
+			throw error
+		}
+		// kilocode_change end
 	} catch (error) {
 		return []
 	}

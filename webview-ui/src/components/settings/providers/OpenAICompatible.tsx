@@ -3,6 +3,8 @@ import { useEvent } from "react-use"
 import { Checkbox } from "vscrui"
 import { VSCodeButton, VSCodeTextField } from "@vscode/webview-ui-toolkit/react"
 
+import { vscode } from "@src/utils/vscode" // kilocode_change
+
 import {
 	type ProviderSettings,
 	type ModelInfo,
@@ -120,6 +122,29 @@ export const OpenAICompatible = ({
 	}, [])
 
 	useEvent("message", onMessage)
+
+	// kilocode_change start: request model list from extension
+	useEffect(() => {
+		const baseUrl = apiConfiguration?.openAiBaseUrl?.trim()
+		if (!baseUrl) {
+			setOpenAiModels(null)
+			return
+		}
+
+		const timer = setTimeout(() => {
+			vscode.postMessage({
+				type: "requestOpenAiModels",
+				values: {
+					baseUrl,
+					apiKey: apiConfiguration?.openAiApiKey,
+					openAiHeaders: apiConfiguration?.openAiHeaders,
+				},
+			})
+		}, 300)
+
+		return () => clearTimeout(timer)
+	}, [apiConfiguration?.openAiBaseUrl, apiConfiguration?.openAiApiKey, apiConfiguration?.openAiHeaders])
+	// kilocode_change end
 
 	return (
 		<>

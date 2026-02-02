@@ -1173,6 +1173,20 @@ describe("getOpenAiModels", () => {
 		expect(result).toEqual(["model-1", "model-2"])
 	})
 
+	it("should normalize trailing slash in baseUrl", async () => {
+		const mockResponse = {
+			data: {
+				data: [{ id: "model-1" }],
+			},
+		}
+		vi.mocked(axios.get).mockResolvedValueOnce(mockResponse)
+
+		const result = await getOpenAiModels("https://api.example.com/v1/", "test-key")
+
+		expect(axios.get).toHaveBeenCalledWith("https://api.example.com/v1/models", expect.any(Object))
+		expect(result).toEqual(["model-1"])
+	})
+
 	it("should handle baseUrl with leading spaces", async () => {
 		const mockResponse = {
 			data: {
@@ -1252,6 +1266,26 @@ describe("getOpenAiModels", () => {
 		const result = await getOpenAiModels("https://api.example.com/v1", "test-key")
 
 		expect(result).toEqual([])
+	})
+
+	it("should fallback to /v1/models when baseUrl is host-only and /models returns 404", async () => {
+		const notFoundError = {
+			isAxiosError: true,
+			response: { status: 404 },
+		}
+		vi.mocked(axios.get)
+			.mockRejectedValueOnce(notFoundError)
+			.mockResolvedValueOnce({
+				data: {
+					data: [{ id: "model-1" }],
+				},
+			})
+
+		const result = await getOpenAiModels("http://localhost:1234", "test-key")
+
+		expect(axios.get).toHaveBeenNthCalledWith(1, "http://localhost:1234/models", expect.any(Object))
+		expect(axios.get).toHaveBeenNthCalledWith(2, "http://localhost:1234/v1/models", expect.any(Object))
+		expect(result).toEqual(["model-1"])
 	})
 
 	it("should deduplicate model IDs", async () => {
