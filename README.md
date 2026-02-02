@@ -74,6 +74,12 @@
 
 ## 更新日志
 
+### 0.0.6
+
+- **OpenAI Compatible 模型列表获取优化**：允许仅填写 `baseUrl` 也能请求模型列表（不强制要求 `apiKey`）。
+- **OpenAI Compatible baseUrl 兼容增强**：自动规范化 `baseUrl`（去除末尾多余 `/`），并在访问 `.../models` 返回 404 时自动 fallback 到 `.../v1/models`。
+- **补充单元测试**：为 `getOpenAiModels` 的 URL 规范化与 404 fallback 增加测试覆盖。
+
 ### 0.0.4
 
 - **消息队列取消修复**：取消按钮现在会正确取消队列中的消息。
