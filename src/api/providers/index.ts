@@ -20,6 +20,7 @@ export { MistralHandler } from "./mistral"
 export { NanoGptHandler } from "./nano-gpt" // kilocode_change
 export { OpenAiNativeHandler } from "./openai-native"
 export { OpenAiHandler } from "./openai"
+export { OpenAiCompatibleResponsesHandler } from "./openai-response" // kilocode_change
 export { OpenRouterHandler } from "./openrouter"
 export { QwenCodeHandler } from "./qwen-code"
 export { RequestyHandler } from "./requesty"

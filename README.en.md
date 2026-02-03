@@ -74,6 +74,20 @@ If you like VS Code, or you used closed-source AI code editors before and now ha
 
 ## Changelog
 
+### 0.0.7
+
+- **Manual condense context button**: the "Condense context" button at the bottom of the chat dialog can now trigger context condensation even when the auto-condense threshold is not reached.
+- **New OpenAI Compatible (Responses) provider**: added a dedicated Responses provider entry in settings.
+- **Non-streaming Responses API support**: when streaming is disabled, Responses requests now use non-streaming mode and parse results correctly.
+- **Reasoning summary toggle for Responses**: added `enableResponsesReasoningSummary` (enabled by default) to control whether reasoning summary is requested/shown.
+- **Build and tool detection fixes**: fixed build failure caused by importing `NATIVE_TOOL_DEFAULTS`, and exported `isMcpTool` for MCP tool detection.
+
+### 0.0.5
+
+- **Clearer loading animation**: improved the loading-state animation and feedback to be more legible.
+- **Fix smart context compression**: fixed issues in the smart context compression logic.
+- **Fix React DOM reconciliation error**: fixed an error when trying to remove a child node that does not belong to its parent.
+
 ### 0.0.4
 
 - **Fix queue cancellation**: the cancel button now correctly cancels queued messages.

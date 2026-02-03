@@ -110,6 +110,11 @@ function validateModelsAndKeysProvided(apiConfiguration: ProviderSettings): stri
 				return i18next.t("settings:validation.openAi")
 			}
 			break
+		case "openai-responses": // kilocode_change
+			if (!apiConfiguration.openAiBaseUrl || !apiConfiguration.openAiApiKey || !apiConfiguration.openAiModelId) {
+				return i18next.t("settings:validation.openAi")
+			}
+			break
 		case "ollama":
 			if (!apiConfiguration.ollamaModelId) {
 				return i18next.t("settings:validation.modelId")
@@ -245,6 +250,10 @@ function validateProviderAgainstOrganizationSettings(
 function getModelIdForProvider(apiConfiguration: ProviderSettings, provider: ProviderName): string | undefined {
 	if (provider === "vscode-lm") {
 		return apiConfiguration.vsCodeLmModelSelector?.id
+	}
+
+	if (provider === "openai" || provider === "openai-responses") { // kilocode_change
+		return apiConfiguration.openAiModelId
 	}
 
 	if (isCustomProvider(provider) || isFauxProvider(provider)) {

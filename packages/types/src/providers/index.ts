@@ -129,6 +129,8 @@ export function getProviderDefaultModelId(
 			return mistralDefaultModelId
 		case "openai":
 			return "" // OpenAI provider uses custom model configuration
+		case "openai-responses": // kilocode_change
+			return "" // OpenAI Responses provider uses custom model configuration
 		case "ollama":
 			return "" // Ollama uses dynamic model selection
 		case "lmstudio":

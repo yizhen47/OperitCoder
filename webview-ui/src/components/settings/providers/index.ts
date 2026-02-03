@@ -17,6 +17,7 @@ export { NanoGpt } from "./NanoGpt" // kilocode_change
 export { Ollama } from "./Ollama"
 export { OpenAI } from "./OpenAI"
 export { OpenAICompatible } from "./OpenAICompatible"
+export { OpenAICompatibleResponses } from "./OpenAICompatibleResponses" // kilocode_change
 export { OpenRouter } from "./OpenRouter"
 export { QwenCode } from "./QwenCode"
 export { Requesty } from "./Requesty"

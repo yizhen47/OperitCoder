@@ -22,6 +22,10 @@ export const MCP_TOOL_SEPARATOR = "--"
  */
 export const MCP_TOOL_PREFIX = "mcp"
 
+export function isMcpTool(toolName: string): boolean { // kilocode_change
+	return toolName.startsWith(`${MCP_TOOL_PREFIX}${MCP_TOOL_SEPARATOR}`)
+}
+
 /**
  * Sanitize a name to be safe for use in API function names.
  * This removes special characters and ensures the name starts correctly.

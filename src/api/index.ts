@@ -14,6 +14,7 @@ import {
 	VertexHandler,
 	AnthropicVertexHandler,
 	OpenAiHandler,
+	OpenAiCompatibleResponsesHandler, // kilocode_change
 	LmStudioHandler,
 	GeminiHandler,
 	OpenAiNativeHandler,
@@ -171,6 +172,10 @@ export function buildApiHandler(configuration: ProviderSettings): ApiHandler {
 				: new VertexHandler(options)
 		case "openai":
 			return new OpenAiHandler(options)
+		// kilocode_change start
+		case "openai-responses":
+			return new OpenAiCompatibleResponsesHandler(options)
+		// kilocode_change end
 		case "ollama":
 			return new NativeOllamaHandler(options)
 		case "lmstudio":

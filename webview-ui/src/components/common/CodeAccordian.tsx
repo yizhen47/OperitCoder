@@ -1,4 +1,4 @@
-import { memo, useMemo, useCallback } from "react"
+import { memo, useMemo, useCallback, useEffect, useRef, type MouseEvent } from "react"
 import { VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react"
 import { type ToolProgressStatus } from "@roo-code/types"
 import { getLanguageFromPath } from "@src/utils/getLanguageFromPath"
@@ -48,6 +48,16 @@ const CodeAccordian = ({
 	const inferredLanguage = useMemo(() => language ?? (path ? getLanguageFromPath(path) : "txt"), [path, language])
 	const source = useMemo(() => String(code).trim() /*kilocode_change: coerce to string*/, [code])
 	const hasHeader = Boolean(path || header)
+	const clickTimeoutRef = useRef<number | undefined>(undefined)
+
+	useEffect(() => {
+		return () => {
+			if (clickTimeoutRef.current !== undefined) {
+				window.clearTimeout(clickTimeoutRef.current)
+				clickTimeoutRef.current = undefined
+			}
+		}
+	}, [])
 
 	// Use provided diff stats only (render-only)
 	const derivedStats = useMemo(() => {
@@ -67,10 +77,51 @@ const CodeAccordian = ({
 		}
 	}, [checkpointTs, commitHash])
 
+	const handleHeaderClick = useCallback(() => {
+		if (clickTimeoutRef.current !== undefined) {
+			window.clearTimeout(clickTimeoutRef.current)
+		}
+
+		clickTimeoutRef.current = window.setTimeout(() => {
+			onToggleExpand()
+			clickTimeoutRef.current = undefined
+		}, 200)
+	}, [onToggleExpand])
+
+	const handleHeaderDoubleClick = useCallback(
+		(e: MouseEvent<HTMLDivElement>) => {
+			e.preventDefault()
+			e.stopPropagation()
+
+			if (clickTimeoutRef.current !== undefined) {
+				window.clearTimeout(clickTimeoutRef.current)
+				clickTimeoutRef.current = undefined
+			}
+
+			if (onJumpToFile) {
+				onJumpToFile()
+				return
+			}
+
+			if (path) {
+				const trimmedPath = path.trim()
+				const normalizedPath =
+					trimmedPath.startsWith("a/") ||
+					trimmedPath.startsWith("b/") ||
+					trimmedPath.startsWith("a\\") ||
+					trimmedPath.startsWith("b\\")
+						? trimmedPath.slice(2)
+						: trimmedPath
+				vscode.postMessage({ type: "openFile", text: normalizedPath })
+			}
+		},
+		[onJumpToFile, path],
+	)
+
 	return (
-		<ToolUseBlock>
+		<ToolUseBlock onDoubleClick={handleHeaderDoubleClick}>
 			{hasHeader && (
-				<ToolUseBlockHeader onClick={onToggleExpand} className="group">
+				<ToolUseBlockHeader onClick={handleHeaderClick} onDoubleClick={handleHeaderDoubleClick} className="group">
 					{/* kilocode_change: checkpoint restore button - positioned at far left */}
 					{checkpointTs && commitHash && (
 						<button

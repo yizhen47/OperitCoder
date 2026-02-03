@@ -103,7 +103,9 @@ export const isInternalProvider = (key: string): key is InternalProvider =>
  * Custom providers are completely configurable within Roo Code settings.
  */
 
-export const customProviders = ["openai"] as const
+// kilocode_change start
+export const customProviders = ["openai", "openai-responses"] as const
+// kilocode_change end
 
 export type CustomProvider = (typeof customProviders)[number]
 
@@ -199,6 +201,9 @@ const baseProviderSettingsSchema = z.object({
 	rateLimitSeconds: z.number().optional(),
 	rateLimitAfter: z.boolean().optional(), // kilocode_change
 	consecutiveMistakeLimit: z.number().min(0).optional(),
+	// kilocode_change start
+	enableResponsesReasoningSummary: z.boolean().optional(),
+	// kilocode_change end
 
 	// Model reasoning.
 	enableReasoningEffort: z.boolean().optional(),
@@ -549,6 +554,7 @@ export const providerSettingsSchemaDiscriminated = z.discriminatedUnion("apiProv
 	bedrockSchema.merge(z.object({ apiProvider: z.literal("bedrock") })),
 	vertexSchema.merge(z.object({ apiProvider: z.literal("vertex") })),
 	openAiSchema.merge(z.object({ apiProvider: z.literal("openai") })),
+	openAiSchema.merge(z.object({ apiProvider: z.literal("openai-responses") })), // kilocode_change
 	ollamaSchema.merge(z.object({ apiProvider: z.literal("ollama") })),
 	vsCodeLmSchema.merge(z.object({ apiProvider: z.literal("vscode-lm") })),
 	lmStudioSchema.merge(z.object({ apiProvider: z.literal("lmstudio") })),
@@ -881,6 +887,7 @@ export const MODELS_BY_PROVIDER: Record<
 	unbound: { id: "unbound", label: "Unbound", models: [] },
 	"sap-ai-core": { id: "sap-ai-core", label: "SAP AI Core", models: [] }, // kilocode_change
 
+
 	// kilocode_change start
 	ovhcloud: { id: "ovhcloud", label: "OVHcloud AI Endpoints", models: [] },
 	inception: { id: "inception", label: "Inception", models: [] },
@@ -894,4 +901,9 @@ export const MODELS_BY_PROVIDER: Record<
 	// Local providers; models discovered from localhost endpoints.
 	lmstudio: { id: "lmstudio", label: "LM Studio", models: [] },
 	ollama: { id: "ollama", label: "Ollama", models: [] },
+	"openai-responses": {
+		id: "openrouter",
+		label: "",
+		models: []
+	}
 }

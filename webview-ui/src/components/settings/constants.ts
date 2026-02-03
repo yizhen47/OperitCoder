@@ -73,6 +73,7 @@ export const PROVIDERS = [
 	{ value: "moonshot", label: "Moonshot" },
 	{ value: "openai-native", label: "OpenAI" },
 	{ value: "openai", label: "OpenAI Compatible" },
+	{ value: "openai-responses", label: "OpenAI Compatible (Responses)" }, // kilocode_change
 	{ value: "qwen-code", label: "Qwen Code" },
 	{ value: "vertex", label: "GCP Vertex AI" },
 	{ value: "bedrock", label: "Amazon Bedrock" },

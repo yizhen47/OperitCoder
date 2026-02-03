@@ -73,3 +73,5 @@ qdrant_storage/
 ./plans/
 
 temp
+
+.windsurf

@@ -57,6 +57,8 @@ export class ProfileValidator {
 		switch (profile.apiProvider) {
 			case "openai":
 				return profile.openAiModelId
+			case "openai-responses": // kilocode_change
+				return profile.openAiModelId
 			case "anthropic":
 			case "openai-native":
 			case "bedrock":

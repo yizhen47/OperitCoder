@@ -91,6 +91,7 @@ import {
 	Ollama,
 	OpenAI,
 	OpenAICompatible,
+	OpenAICompatibleResponses, // kilocode_change
 	OpenRouter,
 	QwenCode,
 	Requesty,
@@ -309,6 +310,7 @@ const ApiOptions = ({
 				"io-intelligence": { field: "ioIntelligenceModelId", default: ioIntelligenceDefaultModelId },
 				"vercel-ai-gateway": { field: "vercelAiGatewayModelId", default: vercelAiGatewayDefaultModelId },
 				openai: { field: "openAiModelId" },
+				"openai-responses": { field: "openAiModelId", default: "gpt-4o" }, // kilocode_change
 				ollama: { field: "ollamaModelId" },
 				lmstudio: { field: "lmStudioModelId" },
 				"gemini-cli": { field: "apiModelId", default: geminiCliDefaultModelId },
@@ -364,6 +366,7 @@ const ApiOptions = ({
 		const slugs: Record<string, string> = {
 			"openai-native": "openai",
 			openai: "openai-compatible",
+			"openai-responses": "openai-compatible-responses", // kilocode_change
 		}
 
 		const slug = slugs[selectedProvider] || selectedProvider
@@ -382,7 +385,10 @@ const ApiOptions = ({
 
 	// Show the tool protocol selector when model supports native tools.
 	// For OpenAI Compatible providers we always show it so users can force XML/native explicitly.
-	const showToolProtocolSelector = selectedProvider === "openai" || selectedModelInfo?.supportsNativeTools === true
+	const showToolProtocolSelector =
+		selectedProvider === "openai" ||
+		selectedProvider === "openai-responses" || // kilocode_change
+		selectedModelInfo?.supportsNativeTools === true
 
 	// Convert providers to SearchableSelect options
 	// kilocode_change start: no organizationAllowList
@@ -605,6 +611,16 @@ const ApiOptions = ({
 
 			{selectedProvider === "openai" && (
 				<OpenAICompatible
+					apiConfiguration={apiConfiguration}
+					setApiConfigurationField={setApiConfigurationField}
+					organizationAllowList={organizationAllowList}
+					modelValidationError={modelValidationError}
+					simplifySettings={fromWelcomeView}
+				/>
+			)}
+
+			{selectedProvider === "openai-responses" && ( // kilocode_change
+				<OpenAICompatibleResponses
 					apiConfiguration={apiConfiguration}
 					setApiConfigurationField={setApiConfigurationField}
 					organizationAllowList={organizationAllowList}
