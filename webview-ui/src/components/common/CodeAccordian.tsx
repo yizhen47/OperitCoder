@@ -98,11 +98,6 @@ const CodeAccordian = ({
 				clickTimeoutRef.current = undefined
 			}
 
-			if (onJumpToFile) {
-				onJumpToFile()
-				return
-			}
-
 			if (path) {
 				const trimmedPath = path.trim()
 				const normalizedPath =
@@ -112,10 +107,25 @@ const CodeAccordian = ({
 					trimmedPath.startsWith("b\\")
 						? trimmedPath.slice(2)
 						: trimmedPath
-				vscode.postMessage({ type: "openFile", text: normalizedPath })
+
+				if (inferredLanguage === "diff") {
+					vscode.postMessage({
+						type: "openDiffView",
+						text: normalizedPath,
+						values: { diff: source },
+					})
+					return
+				}
+
+				vscode.postMessage({ type: "openFile", text: normalizedPath, values: { beside: true } })
+				return
+			}
+
+			if (onJumpToFile) {
+				onJumpToFile()
 			}
 		},
-		[onJumpToFile, path],
+		[inferredLanguage, onJumpToFile, path, source],
 	)
 
 	return (

@@ -8,6 +8,7 @@ interface OpenFileOptions {
 	create?: boolean
 	content?: string
 	line?: number
+	beside?: boolean // kilocode_change
 }
 
 export async function openFile(filePath: string, options: OpenFileOptions = {}) {
@@ -142,6 +143,9 @@ export async function openFile(filePath: string, options: OpenFileOptions = {}) 
 		await vscode.window.showTextDocument(document, {
 			preview: false,
 			selection,
+			// kilocode_change start
+			viewColumn: options.beside ? vscode.ViewColumn.Beside : undefined,
+			// kilocode_change end
 		})
 	} catch (error) {
 		if (error instanceof Error) {

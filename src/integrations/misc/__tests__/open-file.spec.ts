@@ -25,6 +25,9 @@ vi.mock("vscode", () => ({
 	commands: {
 		executeCommand: vi.fn(),
 	},
+	ViewColumn: {
+		Beside: 2,
+	},
 	FileType: {
 		Directory: 2,
 		File: 1,
@@ -234,5 +237,26 @@ describe("openFile", () => {
 			)
 			expect(vscode.workspace.openTextDocument).toHaveBeenCalled()
 		})
+	})
+
+	it("should open beside when beside option is true", async () => {
+		const testPath = "./test.txt"
+		const mockDocument = { uri: { fsPath: testPath } }
+
+		vi.mocked(vscode.workspace.fs.stat).mockResolvedValue({
+			type: vscode.FileType.File,
+			ctime: 0,
+			mtime: 0,
+			size: 0,
+		})
+		vi.mocked(vscode.workspace.openTextDocument).mockResolvedValue(mockDocument as any)
+		vi.mocked(vscode.window.showTextDocument).mockResolvedValue({} as any)
+
+		await openFile(testPath, { beside: true })
+
+		expect(vscode.window.showTextDocument).toHaveBeenCalledWith(
+			mockDocument,
+			expect.objectContaining({ viewColumn: vscode.ViewColumn.Beside, preview: false }),
+		)
 	})
 })

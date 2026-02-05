@@ -95,6 +95,7 @@ export interface WebviewMessage {
 		| "openImage"
 		| "saveImage"
 		| "openFile"
+		| "openDiffView" // kilocode_change
 		| "openMention"
 		| "cancelTask"
 		| "processQueuedMessages"

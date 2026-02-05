@@ -81,6 +81,7 @@
 - **Responses API 支持非流式**：当关闭流式输出时，Responses 请求会使用非流式模式并正确解析结果。
 - **Responses 推理摘要开关**：新增 `enableResponsesReasoningSummary`（默认开启），用于控制是否请求/显示 reasoning summary。
 - **修复构建与工具识别问题**：修复 `NATIVE_TOOL_DEFAULTS` 导入导致的构建失败，并补充导出 `isMcpTool` 用于识别 MCP 工具。
+- **AI 编辑文件双击打开 Diff**：在 AI “编辑/改动文件”的文件条目上双击，可直接打开 VS Code 的 Diff 视图预览修改前后差异。
 
 ### 0.0.6
 

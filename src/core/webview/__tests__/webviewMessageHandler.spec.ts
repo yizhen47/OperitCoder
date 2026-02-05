@@ -5,6 +5,16 @@ import type { Mock } from "vitest"
 // Mock dependencies - must come before imports
 vi.mock("../../../api/providers/fetchers/modelCache")
 
+vi.mock("diff", () => ({
+	parsePatch: vi.fn(() => [
+		{
+			oldFileName: "a/src/foo.ts",
+			newFileName: "b/src/foo.ts",
+		},
+	]),
+	applyPatch: vi.fn(() => "new content"),
+}))
+
 import { webviewMessageHandler } from "../webviewMessageHandler"
 import type { ClineProvider } from "../ClineProvider"
 import { getModels } from "../../../api/providers/fetchers/modelCache"
@@ -50,6 +60,18 @@ vi.mock("vscode", () => ({
 	},
 	workspace: {
 		workspaceFolders: [{ uri: { fsPath: "/mock/workspace" } }],
+		textDocuments: [],
+	},
+	commands: {
+		executeCommand: vi.fn(),
+	},
+	ViewColumn: {
+		Beside: 2,
+	},
+	Uri: {
+		parse: vi.fn((uri: string) => ({
+			with: vi.fn((opts: any) => ({ uri, ...opts })),
+		})),
 	},
 }))
 
@@ -74,14 +96,17 @@ vi.mock("../../../i18n", () => ({
 vi.mock("fs/promises", () => {
 	const mockRm = vi.fn().mockResolvedValue(undefined)
 	const mockMkdir = vi.fn().mockResolvedValue(undefined)
+	const mockReadFile = vi.fn().mockResolvedValue("old content")
 
 	return {
 		default: {
 			rm: mockRm,
 			mkdir: mockMkdir,
+			readFile: mockReadFile,
 		},
 		rm: mockRm,
 		mkdir: mockMkdir,
+		readFile: mockReadFile,
 	}
 })
 
@@ -90,7 +115,7 @@ import * as fs from "fs/promises"
 import * as os from "os"
 import * as path from "path"
 import * as fsUtils from "../../../utils/fs"
-import { getWorkspacePath } from "../../../utils/path"
+import { arePathsEqual, getWorkspacePath } from "../../../utils/path"
 import { ensureSettingsDirectoryExists } from "../../../utils/globalContext"
 import type { ModeConfig } from "@roo-code/types"
 
@@ -918,5 +943,29 @@ describe("webviewMessageHandler - mcpEnabled", () => {
 
 		expect((mockClineProvider as any).getMcpHub).toHaveBeenCalledTimes(1)
 		expect(mockClineProvider.postStateToWebview).toHaveBeenCalledTimes(1)
+	})
+})
+
+describe("webviewMessageHandler - openDiffView", () => {
+	beforeEach(() => {
+		vi.clearAllMocks()
+		;(mockClineProvider as any).cwd = "/mock/workspace"
+		vi.mocked(arePathsEqual).mockImplementation((a: string, b: string) => a === b)
+	})
+
+	it("opens vscode diff preview for unified diff", async () => {
+		await webviewMessageHandler(mockClineProvider, {
+			type: "openDiffView",
+			text: "src/foo.ts",
+			values: { diff: "diff --git a/src/foo.ts b/src/foo.ts" },
+		} as any)
+
+		expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
+			"vscode.diff",
+			expect.any(Object),
+			expect.any(Object),
+			expect.stringContaining("Diff Preview"),
+			expect.objectContaining({ viewColumn: vscode.ViewColumn.Beside }),
+		)
 	})
 })

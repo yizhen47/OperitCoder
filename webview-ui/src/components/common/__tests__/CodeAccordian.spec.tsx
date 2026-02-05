@@ -34,7 +34,11 @@ describe("CodeAccordian", () => {
 
 		fireEvent.dblClick(header)
 
-		expect(vscode.postMessage).toHaveBeenCalledWith({ type: "openFile", text: "src/foo.ts" })
+		expect(vscode.postMessage).toHaveBeenCalledWith({
+			type: "openDiffView",
+			text: "src/foo.ts",
+			values: { diff: "diff --git a/src/foo.ts b/src/foo.ts" },
+		})
 	})
 
 	it("should not toggle expand when header is double clicked", async () => {
@@ -59,7 +63,7 @@ describe("CodeAccordian", () => {
 		expect(onToggleExpand).not.toHaveBeenCalled()
 	})
 
-	it("should call onJumpToFile on header double click when provided", async () => {
+	it("should prefer diff preview on header double click even when onJumpToFile is provided", async () => {
 		const onJumpToFile = vi.fn()
 
 		const props: CodeAccordianProps = {
@@ -78,8 +82,12 @@ describe("CodeAccordian", () => {
 
 		fireEvent.dblClick(header)
 
-		expect(onJumpToFile).toHaveBeenCalledTimes(1)
-		expect(vscode.postMessage).not.toHaveBeenCalled()
+		expect(onJumpToFile).not.toHaveBeenCalled()
+		expect(vscode.postMessage).toHaveBeenCalledWith({
+			type: "openDiffView",
+			text: "src/foo.ts",
+			values: { diff: "diff --git a/src/foo.ts b/src/foo.ts" },
+		})
 	})
 
 	it("should normalize unified diff a/ prefix on header double click", async () => {
@@ -98,6 +106,10 @@ describe("CodeAccordian", () => {
 
 		fireEvent.dblClick(header)
 
-		expect(vscode.postMessage).toHaveBeenCalledWith({ type: "openFile", text: "src/foo.ts" })
+		expect(vscode.postMessage).toHaveBeenCalledWith({
+			type: "openDiffView",
+			text: "src/foo.ts",
+			values: { diff: "diff --git a/src/foo.ts b/src/foo.ts" },
+		})
 	})
 })

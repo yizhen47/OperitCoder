@@ -4,6 +4,7 @@ import * as os from "os"
 import * as fs from "fs/promises"
 import pWaitFor from "p-wait-for"
 import * as vscode from "vscode"
+import * as diff from "diff" // kilocode_change
 // kilocode_change start
 import axios from "axios"
 import { fastApplyApiProviderSchema, getKiloUrlFromToken, isGlobalStateKey } from "@roo-code/types"
@@ -65,6 +66,7 @@ import { openFile } from "../../integrations/misc/open-file"
 import { openImage, saveImage } from "../../integrations/misc/image-handler"
 import { selectImages } from "../../integrations/misc/process-images"
 import { getTheme } from "../../integrations/theme/getTheme"
+import { DIFF_VIEW_URI_SCHEME } from "../../integrations/editor/DiffViewProvider" // kilocode_change
 import { discoverChromeHostUrl, tryChromeHostUrl } from "../../services/browser/browserDiscovery"
 import { searchWorkspaceFiles } from "../../services/search/file-search"
 import { fileExistsAtPath } from "../../utils/fs"
@@ -76,7 +78,7 @@ import { exportSettings, importSettingsWithFeedback } from "../config/importExpo
 import { getOpenAiModels } from "../../api/providers/openai"
 import { getVsCodeLmModels } from "../../api/providers/vscode-lm"
 import { openMention } from "../mentions"
-import { getWorkspacePath } from "../../utils/path"
+import { arePathsEqual, getWorkspacePath } from "../../utils/path" // kilocode_change
 import { Mode, defaultModeSlug } from "../../shared/modes"
 import { getModels, flushModels } from "../../api/providers/fetchers/modelCache"
 import { GetModelsOptions } from "../../shared/api"
@@ -1395,8 +1397,77 @@ export const webviewMessageHandler = async (
 			if (!path.isAbsolute(filePath)) {
 				filePath = path.join(getCurrentCwd(), filePath)
 			}
-			openFile(filePath, message.values as { create?: boolean; content?: string; line?: number })
+			openFile(filePath, message.values as { create?: boolean; content?: string; line?: number; beside?: boolean }) // kilocode_change
 			break
+		case "openDiffView": {
+			let relPath: string = message.text!
+			if (!path.isAbsolute(relPath)) {
+				relPath = path.join(getCurrentCwd(), relPath)
+			}
+
+			const patchText = String((message.values as any)?.diff ?? "")
+			if (!patchText) {
+				await vscode.window.showErrorMessage("Missing diff content")
+				break
+			}
+
+			let originalContent = ""
+			try {
+				const openDoc = vscode.workspace.textDocuments.find(
+					(doc) => doc.uri.scheme === "file" && arePathsEqual(doc.uri.fsPath, relPath),
+				)
+				originalContent = openDoc ? openDoc.getText() : await fs.readFile(relPath, "utf-8")
+			} catch (error) {
+				await vscode.window.showErrorMessage(
+					`Failed to read file for diff view: ${error instanceof Error ? error.message : String(error)}`,
+				)
+				break
+			}
+
+			let newContent: string | false = false
+			try {
+				const patches = diff.parsePatch(patchText)
+				const normalizedRel = relPath.replace(/^[ab][\\/]/, "")
+				const patch =
+					patches.find((p) => {
+						const candidate = String(p.newFileName || p.oldFileName || "")
+						return candidate.endsWith(normalizedRel) || candidate.endsWith(path.basename(relPath))
+					}) ?? patches[0]
+
+				if (!patch) {
+					throw new Error("No patch found")
+				}
+
+				newContent = diff.applyPatch(originalContent, patch)
+			} catch (error) {
+				await vscode.window.showErrorMessage(
+					`Failed to apply diff for preview: ${error instanceof Error ? error.message : String(error)}`,
+				)
+				break
+			}
+
+			if (newContent === false) {
+				await vscode.window.showErrorMessage("Failed to apply diff for preview")
+				break
+			}
+
+			const fileName = path.basename(relPath)
+			const originalUri = vscode.Uri.parse(`${DIFF_VIEW_URI_SCHEME}:${fileName}`).with({
+				query: Buffer.from(originalContent).toString("base64"),
+			})
+			const modifiedUri = vscode.Uri.parse(`${DIFF_VIEW_URI_SCHEME}:${fileName}`).with({
+				query: Buffer.from(newContent).toString("base64"),
+			})
+
+			await vscode.commands.executeCommand(
+				"vscode.diff",
+				originalUri,
+				modifiedUri,
+				`${fileName}: Diff Preview`,
+				{ preview: false, viewColumn: vscode.ViewColumn.Beside },
+			)
+			break
+		}
 		case "openMention":
 			openMention(getCurrentCwd(), message.text)
 			break
