@@ -30,6 +30,7 @@ import { useSelectedModel } from "@src/components/ui/hooks/useSelectedModel"
 // import RooHero from "@src/components/welcome/RooHero" // kilocode_change: unused
 // import RooTips from "@src/components/welcome/RooTips" // kilocode_change: unused
 import { StandardTooltip } from "@src/components/ui"
+import { buildChatRowTestId, computeScrollDelta, selectAnchorTsFromRects } from "./scrollAnchor" // kilocode_change
 
 // import VersionIndicator from "../common/VersionIndicator" // kilocode_change: unused
 import { OrganizationSelector } from "../kilocode/common/OrganizationSelector"
@@ -181,9 +182,13 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 	const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({})
 	const prevExpandedRowsRef = useRef<Record<number, boolean>>()
 	const scrollContainerRef = useRef<HTMLDivElement>(null)
+	const virtuosoScrollerRef = useRef<HTMLDivElement | null>(null) // kilocode_change
+	const [scrollerVersion, setScrollerVersion] = useState(0) // kilocode_change
 	const stickyFollowRef = useRef<boolean>(false)
 	const [showScrollToBottom, setShowScrollToBottom] = useState(false)
 	const [isAtBottom, setIsAtBottom] = useState(false)
+	const centerAnchorRef = useRef<{ ts: string; topInViewport: number } | null>(null) // kilocode_change
+	const resizeRestoreRafRef = useRef<number | null>(null) // kilocode_change
 	const lastTtsRef = useRef<string>("")
 	const [wasStreaming, setWasStreaming] = useState<boolean>(false)
 	const [checkpointWarning, setCheckpointWarning] = useState<
@@ -742,6 +747,129 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		}
 	}, [didClickCancel, isTaskRunningForInput])
 
+	// kilocode_change start
+	const VirtuosoScroller = useMemo(() => {
+		return forwardRef<HTMLDivElement, any>((props, ref) => {
+			return (
+				<div
+					{...props}
+					ref={(node) => {
+						if (node !== virtuosoScrollerRef.current) {
+							virtuosoScrollerRef.current = node
+							setScrollerVersion((v) => v + 1)
+						}
+						if (typeof ref === "function") {
+							ref(node)
+						} else if (ref && typeof ref === "object") {
+							;(ref as React.MutableRefObject<HTMLDivElement | null>).current = node
+						}
+					}}
+				/>
+			)
+		})
+	}, [])
+
+	const updateCenterAnchorFromDom = useCallback(() => {
+		const scroller = virtuosoScrollerRef.current
+		if (!scroller) return
+
+		const scrollerRect = scroller.getBoundingClientRect()
+		if (scrollerRect.height <= 0) return
+		const centerY = scrollerRect.top + scrollerRect.height / 2
+
+		const rowEls = Array.from(scroller.querySelectorAll<HTMLElement>("[data-testid^=\"chat-row-\"]"))
+		if (rowEls.length === 0) return
+
+		const rects = rowEls.map((el) => {
+			const testId = el.dataset.testid
+			const ts = (testId && testId.startsWith("chat-row-") ? testId.slice("chat-row-".length) : null) ?? ""
+			const r = el.getBoundingClientRect()
+			return { ts, top: r.top, bottom: r.bottom, topInViewport: r.top - scrollerRect.top }
+		})
+
+		const anchorTs = selectAnchorTsFromRects(rects, centerY)
+		if (!anchorTs) return
+
+		const anchorRect = rects.find((r) => r.ts === anchorTs)
+		if (!anchorRect) return
+
+		centerAnchorRef.current = { ts: anchorTs, topInViewport: anchorRect.topInViewport }
+	}, [])
+
+	const restoreCenterAnchorFromDom = useCallback(() => {
+		if (isAtBottom || stickyFollowRef.current) return
+		const scroller = virtuosoScrollerRef.current
+		const anchor = centerAnchorRef.current
+		if (!scroller || !anchor) return
+
+		const scrollerRect = scroller.getBoundingClientRect()
+		const anchorEl = scroller.querySelector<HTMLElement>(`[data-testid=\"${buildChatRowTestId(anchor.ts)}\"]`)
+		if (!anchorEl) return
+
+		const anchorRect = anchorEl.getBoundingClientRect()
+		const currentTopInViewport = anchorRect.top - scrollerRect.top
+		const delta = computeScrollDelta(anchor.topInViewport, currentTopInViewport)
+		if (Math.abs(delta) < 0.5) return
+		scroller.scrollTop += delta
+	}, [isAtBottom])
+
+	const scheduleRestoreCenterAnchor = useCallback(() => {
+		if (resizeRestoreRafRef.current !== null) {
+			cancelAnimationFrame(resizeRestoreRafRef.current)
+			resizeRestoreRafRef.current = null
+		}
+		resizeRestoreRafRef.current = requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				restoreCenterAnchorFromDom()
+				resizeRestoreRafRef.current = null
+			})
+		})
+	}, [restoreCenterAnchorFromDom])
+
+	useEffect(() => {
+		const scroller = virtuosoScrollerRef.current
+		if (!scroller) return
+		if (typeof ResizeObserver === "undefined") return
+
+		let prevWidth = scroller.clientWidth
+		let prevHeight = scroller.clientHeight
+		const ro = new ResizeObserver(() => {
+			const nextWidth = scroller.clientWidth
+			const nextHeight = scroller.clientHeight
+			if (nextWidth !== prevWidth || nextHeight !== prevHeight) {
+				prevWidth = nextWidth
+				prevHeight = nextHeight
+				scheduleRestoreCenterAnchor()
+			}
+		})
+		ro.observe(scroller)
+		return () => ro.disconnect()
+	}, [scrollerVersion, scheduleRestoreCenterAnchor])
+
+	useEvent("resize", scheduleRestoreCenterAnchor, window)
+
+	useEffect(() => {
+		const scroller = virtuosoScrollerRef.current
+		if (!scroller) return
+
+		let rafId: number | null = null
+		const onScroll = () => {
+			if (rafId !== null) return
+			rafId = requestAnimationFrame(() => {
+				rafId = null
+				updateCenterAnchorFromDom()
+			})
+		}
+
+		scroller.addEventListener("scroll", onScroll, { passive: true })
+		updateCenterAnchorFromDom()
+		return () => {
+			scroller.removeEventListener("scroll", onScroll)
+			if (rafId !== null) cancelAnimationFrame(rafId)
+		}
+	}, [scrollerVersion, updateCenterAnchorFromDom])
+	// kilocode_change end
+
 	// kilocode_change start: prevent loading footer flicker
 	const virtuosoFooter = useCallback(() => {
 		const shouldAnimate = isStreaming && !wasStreaming
@@ -772,7 +900,10 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		)
 	}, [isStreaming, wasStreaming, streamingStatusText, t])
 
-	const virtuosoComponents = useMemo(() => ({ Footer: virtuosoFooter }), [virtuosoFooter])
+	const virtuosoComponents = useMemo(
+		() => ({ Footer: virtuosoFooter, Scroller: VirtuosoScroller }),
+		[virtuosoFooter, VirtuosoScroller],
+	) // kilocode_change
 	// kilocode_change end
 
 	const markFollowUpAsAnswered = useCallback(() => {
@@ -1488,7 +1619,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 
 	// Also disable sticky follow when the chat container is scrolled away from bottom
 	useEffect(() => {
-		const el = scrollContainerRef.current
+		const el = virtuosoScrollerRef.current // kilocode_change
 		if (!el) return
 		const onScroll = () => {
 			// Consider near-bottom within a small threshold consistent with Virtuoso settings
