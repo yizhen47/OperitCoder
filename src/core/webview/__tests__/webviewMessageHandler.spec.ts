@@ -950,7 +950,7 @@ describe("webviewMessageHandler - openDiffView", () => {
 	beforeEach(() => {
 		vi.clearAllMocks()
 		;(mockClineProvider as any).cwd = "/mock/workspace"
-		vi.mocked(arePathsEqual).mockImplementation((a: string, b: string) => a === b)
+		vi.mocked(arePathsEqual).mockImplementation((a?: string, b?: string) => a === b)
 	})
 
 	it("opens vscode diff preview for unified diff", async () => {

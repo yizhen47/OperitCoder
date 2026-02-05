@@ -1054,6 +1054,7 @@ export const PROVIDER_DEFAULT_MODELS: Record<ProviderName, string> = {
 	kilocode: "anthropic/claude-sonnet-4",
 	anthropic: "claude-3-5-sonnet-20241022",
 	"openai-native": "gpt-4o",
+	"openai-responses": "gpt-4o", // kilocode_change
 	openrouter: "anthropic/claude-3-5-sonnet",
 	bedrock: "anthropic.claude-3-5-sonnet-20241022-v2:0",
 	gemini: "gemini-1.5-pro-latest",

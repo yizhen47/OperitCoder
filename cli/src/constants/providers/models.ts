@@ -137,6 +137,7 @@ export const PROVIDER_TO_ROUTER_NAME: Record<ProviderName, RouterName | null> = 
 	bedrock: null,
 	vertex: null,
 	openai: null,
+	"openai-responses": null, // kilocode_change
 	"vscode-lm": null,
 	gemini: null,
 	"openai-native": null,
@@ -189,6 +190,7 @@ export const PROVIDER_MODEL_FIELD: Record<ProviderName, string | null> = {
 	bedrock: null,
 	vertex: null,
 	openai: null,
+	"openai-responses": null, // kilocode_change
 	"vscode-lm": "vsCodeLmModelSelector",
 	gemini: null,
 	"openai-native": null,
