@@ -893,7 +893,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 								style={{ animationDuration: "1.4s", animationDelay: "400ms" }}
 							/>
 						</div>
-						<span>{streamingStatusText ?? t("common:ui.loading")}</span>
+						<span className="chat-loading-text">{streamingStatusText ?? t("common:ui.loading")}</span>
 					</div>
 				)}
 			</div>

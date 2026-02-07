@@ -75,3 +75,4 @@ qdrant_storage/
 temp
 
 .windsurf
+.changeset

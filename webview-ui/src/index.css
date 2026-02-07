@@ -509,6 +509,43 @@ input[cmdk-input]:focus {
 	animation: pulse 1.5s ease-in-out infinite;
 }
 
+/* kilocode_change start - Chat loading text shimmer */
+@keyframes chat-loading-shimmer {
+	from {
+		background-position: 200% -200%;
+	}
+	to {
+		background-position: -200% 200%;
+	}
+}
+
+.chat-loading-text {
+	font-weight: 600;
+	color: var(--vscode-descriptionForeground);
+	background-image: linear-gradient(
+		120deg,
+		rgba(110, 110, 110, 0.95) 0%,
+		rgba(170, 170, 170, 0.95) 35%,
+		rgba(230, 230, 230, 0.95) 50%,
+		rgba(170, 170, 170, 0.95) 65%,
+		rgba(110, 110, 110, 0.95) 100%
+	);
+	background-size: 250% 250%;
+	background-position: 200% -200%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	animation: chat-loading-shimmer 8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.chat-loading-text {
+		animation: none;
+		background-position: 50% 50%;
+	}
+}
+/* kilocode_change end - Chat loading text shimmer */
+
 /* Transition utilities */
 .transition-all {
 	transition-property: all;
