@@ -1,0 +1,171 @@
+/*
+  Operit -> AI 请求体详细对照（JSONC，带注释，不能直接发送）
+  主要来源：
+    - OpenAIProvider.createRequestBodyInternal / buildMessagesAndCountTokens
+    - DeepseekProvider.createRequestBody
+    - ChatUtils / buildContentField
+    - examples/ai_chat.ts（示例工具）
+*/
+
+// ============================================================================
+// A. App 内 OpenAIProvider 通用请求体（主路径）
+// ============================================================================
+{
+  "model": "<modelName>",
+  "stream": true,
+
+  // [可选] 动态模型参数：仅当该参数启用时出现，字段名来自 ModelParameter.apiName
+  // 例如："temperature"、"top_p"、"max_tokens"、"presence_penalty"、"frequency_penalty" 等
+  // "temperature": 0.7,
+  // "max_tokens": 1024,
+
+  // [可选] Tool Call：enableToolCall=true 且 availableTools 非空时附带
+  // "tools": [ { "type": "function", "function": { ... } } ],
+  // "tool_choice": "auto",
+
+  "messages": [
+    // 角色来自历史记录 + 当前消息（若当前消息不在历史末尾会追加）
+    // 角色映射："ai" -> "assistant"，"tool" -> "user"，"summary" -> "user"
+    // 连续同角色（非 system）会被合并为一条消息
+
+    {
+      "role": "system",
+      "content": "<system message if exists>"
+    },
+
+    {
+      "role": "user",
+      "content": "<user text>"
+    }
+  ]
+}
+
+// ============================================================================
+// B. messages.content 的形态（纯文本 vs 多模态）
+// ============================================================================
+// 1) 纯文本（默认）
+{ "role": "user", "content": "纯文本" }
+
+// 2) 多模态（当 supportsVision / supportsAudio / supportsVideo 为真，且文本里包含媒体链接时）
+//    content 会变成数组，包含 text + image_url / input_audio / video_url
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "image_url",
+      "image_url": { "url": "data:image/png;base64,<base64>" }
+    },
+    {
+      "type": "input_audio",
+      "input_audio": { "data": "<base64>", "format": "mp3" }
+    },
+    {
+      "type": "video_url",
+      "video_url": { "url": "data:video/mp4;base64,<base64>" }
+    },
+    {
+      "type": "text",
+      "text": "去掉媒体链接后的纯文本"
+    }
+  ]
+}
+// 说明：
+// - 若模型不支持对应模态，会移除链接并保留纯文本；若纯文本为空，会放入“图片/音频/视频已省略”的占位文本。
+
+// ============================================================================
+// C. Tool Call 场景（enableToolCall=true 且 tools 非空）
+// ============================================================================
+// 1) 顶层工具定义
+{
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "<tool_name>",
+        "description": "<tool description + details>",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "paramA": { "type": "string", "description": "..." }
+          },
+          "required": ["paramA"]
+        }
+      }
+    }
+  ],
+  "tool_choice": "auto"
+}
+
+// 2) assistant 消息携带 tool_calls（由 XML <tool>...</tool> 转换而来）
+{
+  "role": "assistant",
+  "content": "<assistant text>" ,
+  "tool_calls": [
+    {
+      "id": "call_<tool>_<hash>_<index>",
+      "type": "function",
+      "function": {
+        "name": "<tool_name>",
+        "arguments": "{\"paramA\":\"value\"}"
+      }
+    }
+  ]
+}
+
+// 3) user 消息中的 <tool_result> 会被转换为 role="tool" 的消息
+//    tool_call_id 来自上一条 assistant 的 tool_calls；如果结果不足，会补 "User cancelled"
+{
+  "role": "tool",
+  "tool_call_id": "call_<tool>_<hash>_<index>",
+  "content": "<tool_result content>"
+}
+
+// ============================================================================
+// D. DeepseekProvider 特殊附加（reasoning_content / thinking）
+// ============================================================================
+// 1) 顶层：当 enableThinking=true 时添加
+{
+  "thinking": { "type": "enabled" }
+}
+
+// 2) assistant 消息：总是带 reasoning_content（来自 <think> 标签内容）
+{
+  "role": "assistant",
+  "reasoning_content": "<content inside <think>...>",
+  "content": "<assistant text without <think>/<search>>"
+  // 若启用 Tool Call，同样会携带 tool_calls 字段
+}
+
+// ============================================================================
+// E. <think>/<search> 标签的处理规则
+// ============================================================================
+// - OpenAIProvider 默认会从 assistant 消息中移除 <think>/<thinking>/<search> 标签内容
+//   （除非 preserveThinkInHistory=true，则保留原始内容）
+// - DeepseekProvider 会提取 <think> 内容写入 reasoning_content，并从 content 中移除
+
+// ============================================================================
+// F. examples/ai_chat.ts（示例工具）的请求体（和 App 不同）
+// ============================================================================
+{
+  "model": "<env AI_MODEL_NAME>",
+  "messages": [
+    {
+      "role": "system",
+      "content": "<system_prompt + anti-list 指令>"
+    },
+    { "role": "user", "content": "<user message>" }
+  ],
+  "temperature": 0.7,
+  // [可选]
+  "max_tokens": 1024,
+  // [可选]
+  "functions": [ { /* OpenAI function schema */ } ]
+}
+
+// ============================================================================
+// G. HTTP 头（非请求体，但实际会随请求发送）
+// ============================================================================
+// - Authorization: Bearer <api_key>
+// - Content-Type: application/json
+// - customHeaders（用户设置的自定义头）
+
