@@ -33,7 +33,6 @@
 	},
 	"notifications": {
 		"toolRequest": "工具请求等待批准",
-		"browserAction": "浏览器操作等待批准",
 		"command": "命令等待批准"
 	},
 	"settings": {
@@ -181,9 +180,6 @@
 	"taskTimeline": {
 		"tooltip": {
 			"messageTypes": {
-				"browser_action": "浏览器操作",
-				"browser_action_result": "浏览器操作结果",
-				"browser_action_launch": "浏览器启动",
 				"command": "命令执行",
 				"checkpoint_saved": "检查点已保存",
 				"completion_result": "完成结果",

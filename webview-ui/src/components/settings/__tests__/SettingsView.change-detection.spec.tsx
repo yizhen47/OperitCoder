@@ -75,9 +75,6 @@ vi.mock("../Section", () => ({
 }))
 
 // Mock all settings components
-vi.mock("../BrowserSettings", () => ({
-	BrowserSettings: () => null,
-}))
 vi.mock("../CheckpointSettings", () => ({
 	CheckpointSettings: () => null,
 }))
@@ -128,7 +125,6 @@ describe("SettingsView - Change Detection Fix", () => {
 		allowedMaxRequests: undefined,
 		allowedMaxCost: undefined,
 		language: "en",
-		alwaysAllowBrowser: false,
 		alwaysAllowExecute: false,
 		alwaysAllowMcp: false,
 		alwaysAllowModeSwitch: false,
@@ -139,8 +135,6 @@ describe("SettingsView - Change Detection Fix", () => {
 		alwaysApproveResubmit: false,
 		autoCondenseContext: false,
 		autoCondenseContextPercent: 50,
-		browserToolEnabled: false,
-		browserViewportSize: "1280x720",
 		enableCheckpoints: false,
 		diffEnabled: true,
 		experiments: {},
@@ -149,8 +143,6 @@ describe("SettingsView - Change Detection Fix", () => {
 		maxWorkspaceFiles: 200,
 		mcpEnabled: false,
 		requestDelaySeconds: 0,
-		remoteBrowserHost: "",
-		screenshotQuality: 75,
 		soundEnabled: false,
 		ttsEnabled: false,
 		ttsSpeed: 1.0,
@@ -168,7 +160,6 @@ describe("SettingsView - Change Detection Fix", () => {
 		terminalZdotdir: false,
 		writeDelayMs: 0,
 		showRooIgnoredFiles: false,
-		remoteBrowserEnabled: false,
 		maxReadFileLine: -1,
 		maxImageFileSize: 5,
 		maxTotalImageSize: 20,

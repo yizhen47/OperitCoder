@@ -125,11 +125,6 @@ describe("Session State Machine", () => {
 			expect(machine.getState()).toBe("waiting_approval")
 		})
 
-		it("should transition to waiting_approval on complete ask:browser_action_launch", () => {
-			machine.send({ type: "ask_browser_action_launch", partial: false })
-			expect(machine.getState()).toBe("waiting_approval")
-		})
-
 		it("should transition to waiting_approval on complete ask:use_mcp_server", () => {
 			machine.send({ type: "ask_use_mcp_server", partial: false })
 			expect(machine.getState()).toBe("waiting_approval")

@@ -30,7 +30,6 @@
 		"toolNames": {
 			"read": "Číst soubory",
 			"edit": "Upravit soubory",
-			"browser": "Použít prohlížeč",
 			"command": "Spustit příkazy",
 			"mcp": "Použít MCP"
 		},

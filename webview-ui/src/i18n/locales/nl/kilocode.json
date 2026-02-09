@@ -33,7 +33,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Toolverzoek wacht op goedkeuring",
-		"browserAction": "Browseractie wacht op goedkeuring",
 		"command": "Commando wacht op goedkeuring"
 	},
 	"settings": {
@@ -182,11 +181,8 @@
 		"tooltip": {
 			"clickToScroll": "Bekijk {{messageType}} (#{{messageNumber}})",
 			"messageTypes": {
-				"browser_action_result": "resultaat van browseractie",
-				"browser_action_launch": "browser opstarten",
 				"checkpoint_saved": "controlepunt opgeslagen",
 				"command": "opdrachtuitvoering",
-				"browser_action": "browseractie",
 				"command_output": "opdrachtuitvoer",
 				"completion_result": "voltooiingsresultaat",
 				"error": "foutmelding",

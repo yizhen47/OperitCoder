@@ -4,7 +4,8 @@ import { z } from "zod"
  * ToolGroup
  */
 
-export const toolGroups = ["read", "edit", "browser", "command", "mcp", "modes"] as const
+// kilocode_change: browser tool group removed
+export const toolGroups = ["read", "edit", "command", "mcp", "modes"] as const
 
 export const toolGroupsSchema = z.enum(toolGroups)
 
@@ -24,7 +25,7 @@ export const toolNames = [
 	"apply_patch",
 	"search_files",
 	"list_files",
-	"browser_action",
+	// kilocode_change: browser_action removed
 	"use_mcp_tool",
 	"sandbox_package_tool",
 	"activate_sandbox_package", // kilocode_change

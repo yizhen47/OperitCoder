@@ -17,7 +17,7 @@ interface BuildToolsOptions {
 	experiments: Record<string, boolean> | undefined
 	apiConfiguration: ProviderSettings | undefined
 	maxReadFileLine: number
-	browserToolEnabled: boolean
+	// kilocode_change: browserToolEnabled removed
 	// kilocode_change start
 	state?: ClineProviderState
 	activatedExamplePackages?: string[]
@@ -42,7 +42,6 @@ export async function buildNativeToolsArray(options: BuildToolsOptions): Promise
 		experiments,
 		apiConfiguration,
 		maxReadFileLine,
-		browserToolEnabled,
 		modelInfo,
 		diffEnabled,
 	} = options
@@ -56,7 +55,6 @@ export async function buildNativeToolsArray(options: BuildToolsOptions): Promise
 	// Build settings object for tool filtering
 	const filterSettings = {
 		todoListEnabled: apiConfiguration?.todoListEnabled ?? true,
-		browserToolEnabled: browserToolEnabled ?? true,
 		modelInfo,
 		diffEnabled,
 	}

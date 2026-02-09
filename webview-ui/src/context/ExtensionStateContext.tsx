@@ -114,11 +114,9 @@ export interface ExtensionStateContextType extends ExtensionState {
 	setAlwaysAllowExecute: (value: boolean) => void
 	alwaysAllowPkgTools?: boolean // kilocode_change
 	setAlwaysAllowPkgTools: (value: boolean) => void // kilocode_change
-	setAlwaysAllowBrowser: (value: boolean) => void
 	setAlwaysAllowMcp: (value: boolean) => void
 	setAlwaysAllowModeSwitch: (value: boolean) => void
 	setAlwaysAllowSubtasks: (value: boolean) => void
-	setBrowserToolEnabled: (value: boolean) => void
 	setShowRooIgnoredFiles: (value: boolean) => void
 	setShowAutoApproveMenu: (value: boolean) => void // kilocode_change
 	setShowAnnouncement: (value: boolean) => void
@@ -140,11 +138,8 @@ export interface ExtensionStateContextType extends ExtensionState {
 	setEnableCheckpoints: (value: boolean) => void
 	checkpointTimeout: number
 	setCheckpointTimeout: (value: number) => void
-	setBrowserViewportSize: (value: string) => void
 	setFuzzyMatchThreshold: (value: number) => void
 	setWriteDelayMs: (value: number) => void
-	screenshotQuality?: number
-	setScreenshotQuality: (value: number) => void
 	terminalOutputLineLimit?: number
 	setTerminalOutputLineLimit: (value: number) => void
 	terminalOutputCharacterLimit?: number
@@ -184,8 +179,6 @@ export interface ExtensionStateContextType extends ExtensionState {
 	maxWorkspaceFiles: number
 	setMaxWorkspaceFiles: (value: number) => void
 	setTelemetrySetting: (value: TelemetrySetting) => void
-	remoteBrowserEnabled?: boolean
-	setRemoteBrowserEnabled: (value: boolean) => void
 	awsUsePromptCache?: boolean
 	setAwsUsePromptCache: (value: boolean) => void
 	maxReadFileLine: number
@@ -256,7 +249,6 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		deniedCommands: [],
 		soundEnabled: false,
 		soundVolume: 0.5,
-		isBrowserSessionActive: false,
 		ttsEnabled: false,
 		ttsSpeed: 1.0,
 		diffEnabled: false,
@@ -265,8 +257,6 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		fuzzyMatchThreshold: 1.0,
 		language: "en", // Default language code
 		writeDelayMs: 1000,
-		browserViewportSize: "900x600",
-		screenshotQuality: 75,
 		terminalOutputLineLimit: 500,
 		terminalOutputCharacterLimit: 50000,
 		terminalShellIntegrationTimeout: 4000,
@@ -298,7 +288,6 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		maxOpenTabsContext: 20,
 		maxWorkspaceFiles: 200,
 		cwd: "",
-		browserToolEnabled: true,
 		telemetrySetting: "disabled",
 		showRooIgnoredFiles: true, // Default to showing .rooignore'd files with lock symbol (current behavior).
 		showAutoApproveMenu: false, // kilocode_change
@@ -696,7 +685,6 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		ttsSpeed: state.ttsSpeed,
 		fuzzyMatchThreshold: state.fuzzyMatchThreshold,
 		writeDelayMs: state.writeDelayMs,
-		screenshotQuality: state.screenshotQuality,
 		routerModels: extensionRouterModels,
 		// kilocode_change: cloudIsAuthenticated removed
 		// kilocode_change: cloudOrganizations removed
@@ -723,7 +711,6 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		setAlwaysAllowExecute: (value) => setState((prevState) => ({ ...prevState, alwaysAllowExecute: value })),
 		alwaysAllowPkgTools: state.alwaysAllowPkgTools, // kilocode_change
 		setAlwaysAllowPkgTools: (value) => setState((prevState) => ({ ...prevState, alwaysAllowPkgTools: value })), // kilocode_change
-		setAlwaysAllowBrowser: (value) => setState((prevState) => ({ ...prevState, alwaysAllowBrowser: value })),
 		setAlwaysAllowMcp: (value) => setState((prevState) => ({ ...prevState, alwaysAllowMcp: value })),
 		setAlwaysAllowModeSwitch: (value) => setState((prevState) => ({ ...prevState, alwaysAllowModeSwitch: value })),
 		setAlwaysAllowSubtasks: (value) => setState((prevState) => ({ ...prevState, alwaysAllowSubtasks: value })),
@@ -742,11 +729,8 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		setDiffEnabled: (value) => setState((prevState) => ({ ...prevState, diffEnabled: value })),
 		setEnableCheckpoints: (value) => setState((prevState) => ({ ...prevState, enableCheckpoints: value })),
 		setCheckpointTimeout: (value) => setState((prevState) => ({ ...prevState, checkpointTimeout: value })),
-		setBrowserViewportSize: (value: string) =>
-			setState((prevState) => ({ ...prevState, browserViewportSize: value })),
 		setFuzzyMatchThreshold: (value) => setState((prevState) => ({ ...prevState, fuzzyMatchThreshold: value })),
 		setWriteDelayMs: (value) => setState((prevState) => ({ ...prevState, writeDelayMs: value })),
-		setScreenshotQuality: (value) => setState((prevState) => ({ ...prevState, screenshotQuality: value })),
 		setTerminalOutputLineLimit: (value) =>
 			setState((prevState) => ({ ...prevState, terminalOutputLineLimit: value })),
 		setTerminalOutputCharacterLimit: (value) =>
@@ -797,10 +781,8 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		setCustomModes: (value) => setState((prevState) => ({ ...prevState, customModes: value })),
 		setMaxOpenTabsContext: (value) => setState((prevState) => ({ ...prevState, maxOpenTabsContext: value })),
 		setMaxWorkspaceFiles: (value) => setState((prevState) => ({ ...prevState, maxWorkspaceFiles: value })),
-		setBrowserToolEnabled: (value) => setState((prevState) => ({ ...prevState, browserToolEnabled: value })),
 		setTelemetrySetting: (value) => setState((prevState) => ({ ...prevState, telemetrySetting: value })),
 		setShowRooIgnoredFiles: (value) => setState((prevState) => ({ ...prevState, showRooIgnoredFiles: value })),
-		setRemoteBrowserEnabled: (value) => setState((prevState) => ({ ...prevState, remoteBrowserEnabled: value })),
 		setAwsUsePromptCache: (value) => setState((prevState) => ({ ...prevState, awsUsePromptCache: value })),
 		setMaxReadFileLine: (value) => setState((prevState) => ({ ...prevState, maxReadFileLine: value })),
 		setMaxImageFileSize: (value) => setState((prevState) => ({ ...prevState, maxImageFileSize: value })),

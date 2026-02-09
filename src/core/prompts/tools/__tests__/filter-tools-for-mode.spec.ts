@@ -20,6 +20,7 @@ vi.mock("../../../../services/code-index/managed/ManagedIndexer", () => ({
 // kilocode_change end
 
 describe("filterNativeToolsForMode", () => {
+	// kilocode_change: browser_action removed from test tools
 	const mockNativeTools: OpenAI.Chat.ChatCompletionTool[] = [
 		{
 			type: "function",
@@ -56,14 +57,6 @@ describe("filterNativeToolsForMode", () => {
 		{
 			type: "function",
 			function: {
-				name: "browser_action",
-				description: "Browser action",
-				parameters: {},
-			},
-		},
-		{
-			type: "function",
-			function: {
 				name: "ask_followup_question",
 				description: "Ask question",
 				parameters: {},
@@ -79,12 +72,12 @@ describe("filterNativeToolsForMode", () => {
 		},
 	]
 
-	it("should filter tools for architect mode (read, browser, mcp only)", () => {
+	it("should filter tools for architect mode (read, mcp only)", () => {
 		const architectMode: ModeConfig = {
 			slug: "architect",
 			name: "Architect",
 			roleDefinition: "Test",
-			groups: ["read", "browser", "mcp"] as const,
+			groups: ["read", "mcp"] as const,
 		}
 
 		const filtered = filterNativeToolsForMode(
@@ -109,9 +102,6 @@ describe("filterNativeToolsForMode", () => {
 		// Should NOT include command tools
 		expect(toolNames).not.toContain("execute_command")
 
-		// Should include browser tools
-		expect(toolNames).toContain("browser_action")
-
 		// Should ALWAYS include always-available tools
 		expect(toolNames).toContain("ask_followup_question")
 		expect(toolNames).toContain("attempt_completion")
@@ -122,7 +112,7 @@ describe("filterNativeToolsForMode", () => {
 			slug: "code",
 			name: "Code",
 			roleDefinition: "Test",
-			groups: ["read", "edit", "browser", "command", "mcp"] as const,
+			groups: ["read", "edit", "command", "mcp"] as const,
 		}
 
 		const filtered = filterNativeToolsForMode(mockNativeTools, "code", [codeMode], {}, undefined, {}, undefined)
@@ -134,7 +124,6 @@ describe("filterNativeToolsForMode", () => {
 		expect(toolNames).toContain("write_to_file")
 		expect(toolNames).toContain("apply_diff")
 		expect(toolNames).toContain("execute_command")
-		expect(toolNames).toContain("browser_action")
 		expect(toolNames).toContain("ask_followup_question")
 		expect(toolNames).toContain("attempt_completion")
 	})
@@ -185,7 +174,7 @@ describe("filterNativeToolsForMode", () => {
 			slug: "code",
 			name: "Code",
 			roleDefinition: "Test",
-			groups: ["read", "edit", "browser", "command", "mcp"] as const,
+			groups: ["read", "edit", "command", "mcp"] as const,
 		}
 
 		const mockCodebaseSearchTool: OpenAI.Chat.ChatCompletionTool = {
@@ -218,7 +207,7 @@ describe("filterNativeToolsForMode", () => {
 			slug: "code",
 			name: "Code",
 			roleDefinition: "Test",
-			groups: ["read", "edit", "browser", "command", "mcp"] as const,
+			groups: ["read", "edit", "command", "mcp"] as const,
 		}
 
 		const mockAccessMcpResourceTool: OpenAI.Chat.ChatCompletionTool = {
@@ -251,7 +240,7 @@ describe("filterNativeToolsForMode", () => {
 			slug: "code",
 			name: "Code",
 			roleDefinition: "Test",
-			groups: ["read", "edit", "browser", "command", "mcp"] as const,
+			groups: ["read", "edit", "command", "mcp"] as const,
 		}
 
 		const mockAccessMcpResourceTool: OpenAI.Chat.ChatCompletionTool = {
@@ -294,7 +283,7 @@ describe("filterNativeToolsForMode", () => {
 			slug: "code",
 			name: "Code",
 			roleDefinition: "Test",
-			groups: ["read", "edit", "browser", "command", "mcp"] as const,
+			groups: ["read", "edit", "command", "mcp"] as const,
 		}
 
 		const mockAccessMcpResourceTool: OpenAI.Chat.ChatCompletionTool = {
@@ -337,7 +326,7 @@ describe("filterNativeToolsForMode", () => {
 			slug: "code",
 			name: "Code",
 			roleDefinition: "Test",
-			groups: ["read", "edit", "browser", "command", "mcp"] as const,
+			groups: ["read", "edit", "command", "mcp"] as const,
 		}
 
 		const mockTodoTool: OpenAI.Chat.ChatCompletionTool = {
@@ -371,7 +360,7 @@ describe("filterNativeToolsForMode", () => {
 			slug: "code",
 			name: "Code",
 			roleDefinition: "Test",
-			groups: ["read", "edit", "browser", "command", "mcp"] as const,
+			groups: ["read", "edit", "command", "mcp"] as const,
 		}
 
 		const mockImageTool: OpenAI.Chat.ChatCompletionTool = {
@@ -403,7 +392,7 @@ describe("filterNativeToolsForMode", () => {
 			slug: "code",
 			name: "Code",
 			roleDefinition: "Test",
-			groups: ["read", "edit", "browser", "command", "mcp"] as const,
+			groups: ["read", "edit", "command", "mcp"] as const,
 		}
 
 		const mockSlashCommandTool: OpenAI.Chat.ChatCompletionTool = {
@@ -538,14 +527,14 @@ describe("filterMcpToolsForMode", () => {
 			slug: "code",
 			name: "Code",
 			roleDefinition: "Test",
-			groups: ["read", "edit", "browser", "command", "mcp"] as const,
+			groups: ["read", "edit", "command", "mcp"] as const,
 		}
 
 		const architectMode: ModeConfig = {
 			slug: "architect",
 			name: "Architect",
 			roleDefinition: "Test",
-			groups: ["read", "browser", "mcp"] as const,
+			groups: ["read", "mcp"] as const,
 		}
 
 		it("should return original tools when modelInfo is undefined", () => {
@@ -793,7 +782,7 @@ describe("filterMcpToolsForMode", () => {
 				slug: "code",
 				name: "Code",
 				roleDefinition: "Test",
-				groups: ["read", "edit", "browser", "command", "mcp"] as const,
+				groups: ["read", "edit", "command", "mcp"] as const,
 			}
 
 			const modelInfo: ModelInfo = {
@@ -841,7 +830,7 @@ describe("filterMcpToolsForMode", () => {
 				slug: "architect",
 				name: "Architect",
 				roleDefinition: "Test",
-				groups: ["read", "browser"] as const, // No edit group
+				groups: ["read"] as const, // No edit group
 			}
 
 			const modelInfo: ModelInfo = {
@@ -866,7 +855,7 @@ describe("filterMcpToolsForMode", () => {
 				slug: "code",
 				name: "Code",
 				roleDefinition: "Test",
-				groups: ["read", "edit", "browser", "command", "mcp"] as const,
+				groups: ["read", "edit", "command", "mcp"] as const,
 			}
 
 			const modelInfo: ModelInfo = {
@@ -892,7 +881,7 @@ describe("filterMcpToolsForMode", () => {
 				slug: "code",
 				name: "Code",
 				roleDefinition: "Test",
-				groups: ["read", "edit", "browser", "command", "mcp"] as const,
+				groups: ["read", "edit", "command", "mcp"] as const,
 			}
 
 			const modelInfo: ModelInfo = {

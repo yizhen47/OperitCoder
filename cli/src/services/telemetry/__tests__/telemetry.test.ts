@@ -293,7 +293,6 @@ describe("TelemetryService", () => {
 		service.trackApprovalAutoApproved("tool", "readFile", 100)
 		service.trackApprovalAutoRejected("command", "rm -rf")
 		service.trackApprovalManualApproved("tool", "writeFile", 500)
-		service.trackApprovalManualRejected("tool", "browser_action", 300)
 		expect(service).toBeDefined()
 	})
 

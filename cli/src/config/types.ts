@@ -18,13 +18,6 @@ export interface AutoApprovalWriteConfig {
 }
 
 /**
- * Auto approval configuration for browser operations
- */
-export interface AutoApprovalBrowserConfig {
-	enabled?: boolean
-}
-
-/**
  * Auto approval configuration for retry operations
  */
 export interface AutoApprovalRetryConfig {
@@ -84,7 +77,6 @@ export interface AutoApprovalConfig {
 	enabled?: boolean
 	read?: AutoApprovalReadConfig
 	write?: AutoApprovalWriteConfig
-	browser?: AutoApprovalBrowserConfig
 	retry?: AutoApprovalRetryConfig
 	mcp?: AutoApprovalMcpConfig
 	mode?: AutoApprovalModeConfig

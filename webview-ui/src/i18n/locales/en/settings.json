@@ -25,7 +25,6 @@
 		"modes": "Modes",
 		"mcp": "MCP Servers",
 		"autoApprove": "Auto-Approve",
-		"browser": "Browser",
 		"checkpoints": "Checkpoints",
 		"display": "Display",
 		"examplePackages": "Sandbox Packages",
@@ -235,10 +234,6 @@
 		"delete": {
 			"label": "Delete",
 			"description": "Automatically delete files and directories without requiring approval"
-		},
-		"browser": {
-			"label": "Browser",
-			"description": "Automatically perform browser actions without requiring approval. Note: Only applies when the model supports computer use"
 		},
 		"retry": {
 			"label": "Retry",
@@ -566,10 +561,6 @@
 				"label": "Image Support",
 				"description": "Is this model capable of processing and understanding images?"
 			},
-			"computerUse": {
-				"label": "Computer Use",
-				"description": "Is this model capable of interacting with a browser?"
-			},
 			"promptCache": {
 				"label": "Prompt Caching",
 				"description": "Is this model capable of caching prompts?"
@@ -653,34 +644,6 @@
 			"description": "This provider uses OAuth authentication from the Qwen service and does not require API keys.",
 			"instructions": "Please follow the official documentation to obtain the authorization file and place it in the specified path.",
 			"setupLink": "Qwen Official Documentation"
-		}
-	},
-	"browser": {
-		"enable": {
-			"label": "Enable browser tool",
-			"description": "When enabled, Operit Coder can use a browser to interact with websites when using models that support computer use. <0>Learn more</0>"
-		},
-		"viewport": {
-			"label": "Viewport size",
-			"description": "Select the viewport size for browser interactions. This affects how websites are displayed and interacted with.",
-			"options": {
-				"largeDesktop": "Large Desktop (1280x800)",
-				"smallDesktop": "Small Desktop (900x600)",
-				"tablet": "Tablet (768x1024)",
-				"mobile": "Mobile (360x640)"
-			}
-		},
-		"screenshotQuality": {
-			"label": "Screenshot quality",
-			"description": "Adjust the WebP quality of browser screenshots. Higher values provide clearer screenshots but increase token usage."
-		},
-		"remote": {
-			"label": "Use remote browser connection",
-			"description": "Connect to a Chrome browser running with remote debugging enabled (--remote-debugging-port=9222).",
-			"urlPlaceholder": "Custom URL (e.g., http://localhost:9222)",
-			"testButton": "Test Connection",
-			"testingButton": "Testing...",
-			"instructions": "Enter the DevTools Protocol host address or leave empty to auto-discover Chrome local instances. The Test Connection button will try the custom URL if provided, or auto-discover if the field is empty."
 		}
 	},
 	"checkpoints": {

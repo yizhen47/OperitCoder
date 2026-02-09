@@ -24,7 +24,6 @@ import {
 	Package,
 	Plug,
 	Server,
-	SquareMousePointer,
 	SquareTerminal,
 	type LucideIcon,
 	Users2,
@@ -72,7 +71,6 @@ import { SectionHeader } from "./SectionHeader"
 import ApiConfigManager from "./ApiConfigManager"
 import ApiOptions from "./ApiOptions"
 import { AutoApproveSettings } from "./AutoApproveSettings"
-import { BrowserSettings } from "./BrowserSettings"
 import { CheckpointSettings } from "./CheckpointSettings"
 import { DisplaySettings } from "./DisplaySettings" // kilocode_change
 import { NotificationSettings } from "./NotificationSettings"
@@ -106,7 +104,6 @@ const sectionNames = [
 	"providers",
 	"autoApprove",
 	"slashCommands",
-	"browser",
 	"checkpoints",
 	"ghost", // kilocode_change
 	"display", // kilocode_change
@@ -175,7 +172,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		allowedMaxRequests,
 		allowedMaxCost,
 		language,
-		alwaysAllowBrowser,
 		alwaysAllowExecute,
 		alwaysAllowPkgTools, // kilocode_change
 		alwaysAllowMcp,
@@ -187,8 +183,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		alwaysApproveResubmit,
 		autoCondenseContext,
 		autoCondenseContextPercent,
-		browserToolEnabled,
-		browserViewportSize,
 		enableCheckpoints,
 		checkpointTimeout,
 		diffEnabled,
@@ -201,8 +195,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		maxWorkspaceFiles,
 		mcpEnabled,
 		requestDelaySeconds,
-		remoteBrowserHost,
-		screenshotQuality,
 		soundEnabled,
 		ttsEnabled,
 		ttsSpeed,
@@ -219,7 +211,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		terminalZdotdir,
 		writeDelayMs,
 		showRooIgnoredFiles,
-		remoteBrowserEnabled,
 		maxReadFileLine,
 		showAutoApproveMenu, // kilocode_change
 		yoloMode, // kilocode_change
@@ -538,7 +529,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 					alwaysAllowWriteProtected: alwaysAllowWriteProtected ?? undefined,
 					alwaysAllowExecute: alwaysAllowExecute ?? undefined,
 					alwaysAllowPkgTools: alwaysAllowPkgTools ?? undefined, // kilocode_change
-					alwaysAllowBrowser: alwaysAllowBrowser ?? undefined,
 					alwaysAllowMcp,
 					alwaysAllowModeSwitch,
 					allowedCommands: allowedCommands ?? [],
@@ -550,7 +540,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 					allowedMaxCost: allowedMaxCost ?? null,
 					autoCondenseContext,
 					autoCondenseContextPercent,
-					browserToolEnabled: browserToolEnabled ?? true,
 					soundEnabled: soundEnabled ?? true,
 					soundVolume: soundVolume ?? 0.5,
 					ttsEnabled,
@@ -558,12 +547,8 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 					diffEnabled: diffEnabled ?? true,
 					enableCheckpoints: enableCheckpoints ?? false,
 					checkpointTimeout: checkpointTimeout ?? DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
-					browserViewportSize: browserViewportSize ?? "900x600",
-					remoteBrowserHost: remoteBrowserEnabled ? remoteBrowserHost : undefined,
-					remoteBrowserEnabled: remoteBrowserEnabled ?? false,
 					fuzzyMatchThreshold: fuzzyMatchThreshold ?? 1.0,
 					writeDelayMs,
-					screenshotQuality: screenshotQuality ?? 75,
 					terminalOutputLineLimit: terminalOutputLineLimit ?? 500,
 					terminalOutputCharacterLimit: terminalOutputCharacterLimit ?? 50_000,
 					terminalShellIntegrationTimeout: terminalShellIntegrationTimeout ?? 30_000,
@@ -760,7 +745,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			{ id: "modes", icon: Users2 },
 			{ id: "autoApprove", icon: CheckCheck },
 			// { id: "slashCommands", icon: SquareSlash }, // kilocode_change: needs work to be re-introduced
-			{ id: "browser", icon: SquareMousePointer },
 			{ id: "checkpoints", icon: GitBranch },
 			{ id: "display", icon: Monitor }, // kilocode_change
 			{ id: "ghost" as const, icon: Bot }, // kilocode_change
@@ -1044,7 +1028,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 							alwaysAllowWrite={alwaysAllowWrite}
 							alwaysAllowWriteOutsideWorkspace={alwaysAllowWriteOutsideWorkspace}
 							alwaysAllowWriteProtected={alwaysAllowWriteProtected}
-							alwaysAllowBrowser={alwaysAllowBrowser}
 							alwaysApproveResubmit={alwaysApproveResubmit}
 							requestDelaySeconds={requestDelaySeconds}
 							alwaysAllowMcp={alwaysAllowMcp}
@@ -1065,18 +1048,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 
 					{/* Slash Commands Section */}
 					{activeTab === "slashCommands" && <SlashCommandsSettings />}
-
-					{/* Browser Section */}
-					{activeTab === "browser" && (
-						<BrowserSettings
-							browserToolEnabled={browserToolEnabled}
-							browserViewportSize={browserViewportSize}
-							screenshotQuality={screenshotQuality}
-							remoteBrowserHost={remoteBrowserHost}
-							remoteBrowserEnabled={remoteBrowserEnabled}
-							setCachedStateField={setCachedStateField}
-						/>
-					)}
 
 					{/* Checkpoints Section */}
 					{activeTab === "checkpoints" && (

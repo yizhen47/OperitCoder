@@ -305,13 +305,7 @@ export function filterNativeToolsForMode(
 		allowedToolNames.delete("run_slash_command")
 	}
 
-	// Conditionally exclude browser_action if disabled in settings
-	if (
-		settings?.browserToolEnabled === false ||
-		modelInfo?.supportsImages === false // kilocode_change
-	) {
-		allowedToolNames.delete("browser_action")
-	}
+	// kilocode_change: browser_action removed
 
 	// kilocode_change start
 	if (state && isFastApplyAvailable(state)) {
@@ -414,10 +408,7 @@ export function isToolAllowedInMode(
 		return true
 	}
 
-	// Check for browser_action being disabled by user settings
-	if (toolName === "browser_action" && settings?.browserToolEnabled === false) {
-		return false
-	}
+	// kilocode_change: browser_action removed
 
 	// Check if the tool is allowed by the mode's groups
 	// Resolve to canonical name and check that single value

@@ -16,9 +16,6 @@ describe("Auto Approval Configuration", () => {
 					outside: true,
 					protected: false,
 				},
-				browser: {
-					enabled: false,
-				},
 				retry: {
 					enabled: false,
 					delay: 10,
@@ -55,10 +52,6 @@ describe("Auto Approval Configuration", () => {
 			expect(DEFAULT_AUTO_APPROVAL.write?.protected).toBe(false)
 		})
 
-		it("should have safe defaults for browser operations", () => {
-			expect(DEFAULT_AUTO_APPROVAL.browser?.enabled).toBe(false)
-		})
-
 		it("should have safe defaults for followup questions", () => {
 			expect(DEFAULT_AUTO_APPROVAL.question?.enabled).toBe(false)
 		})
@@ -83,9 +76,6 @@ describe("Auto Approval Configuration", () => {
 					enabled: true,
 					outside: false,
 					protected: false,
-				},
-				browser: {
-					enabled: true,
 				},
 				retry: {
 					enabled: true,

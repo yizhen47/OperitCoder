@@ -289,10 +289,6 @@ function buildGatekeeperPrompt(
 		case "read_file": {
 			return { preApproved: true, systemPrompt: "", userPrompt: "" }
 		}
-		case "browser_action":
-			actionDescription += `Action: ${toolParams.action}\n`
-			if (toolParams.url) actionDescription += `URL: ${toolParams.url}\n`
-			break
 		case "use_mcp_tool":
 			actionDescription += `Server: ${toolParams.server_name}\n`
 			actionDescription += `Tool: ${toolParams.tool_name}\n`

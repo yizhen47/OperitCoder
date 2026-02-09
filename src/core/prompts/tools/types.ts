@@ -6,7 +6,7 @@ export type ToolArgs = {
 	cwd: string
 	supportsComputerUse: boolean
 	diffStrategy?: DiffStrategy
-	browserViewportSize?: string
+	// kilocode_change: browser viewport size removed
 	mcpHub?: McpHub
 	toolOptions?: any
 	partialReadsEnabled?: boolean

@@ -30,7 +30,6 @@
 		"toolNames": {
 			"read": "Read Files",
 			"edit": "Edit Files",
-			"browser": "Use Browser",
 			"command": "Run Commands",
 			"mcp": "Use MCP"
 		},

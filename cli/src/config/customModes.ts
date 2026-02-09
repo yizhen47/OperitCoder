@@ -104,7 +104,7 @@ function parseCustomModes(content: string, source: "global" | "project"): ModeCo
 					slug: m.slug as string,
 					name: m.name as string,
 					roleDefinition: (m.roleDefinition as string) || (m.systemPrompt as string) || "",
-					groups: (m.groups as ModeConfig["groups"]) || ["read", "edit", "browser", "command", "mcp"],
+					groups: (m.groups as ModeConfig["groups"]) || ["read", "edit", "command", "mcp"],
 					customInstructions:
 						(m.customInstructions as string) || (m.rules ? (m.rules as string[]).join("\n") : undefined),
 					source: (m.source as ModeConfig["source"]) || source,

@@ -344,43 +344,6 @@
 		"careers": "Ngoài ra, <careersLink>chúng tôi đang tuyển dụng!</careersLink>",
 		"socialLinks": "Tham gia với chúng tôi trên <xLink>X</xLink>, <discordLink>Discord</discordLink>, hoặc <redditLink>r/KiloCode</redditLink> 🚀"
 	},
-	"browser": {
-		"session": "Phiên trình duyệt",
-		"rooWantsToUse": "Operit Coder muốn sử dụng trình duyệt",
-		"consoleLogs": "Nhật ký bảng điều khiển",
-		"noNewLogs": "(Không có nhật ký mới)",
-		"screenshot": "Ảnh chụp màn hình trình duyệt",
-		"cursor": "con trỏ",
-		"navigation": {
-			"step": "Bước {{current}} / {{total}}",
-			"previous": "Trước",
-			"next": "Tiếp"
-		},
-		"sessionStarted": "Phiên trình duyệt đã bắt đầu",
-		"actions": {
-			"title": "Hành động trình duyệt: ",
-			"launched": "Trình duyệt đã khởi chạy",
-			"launch": "Khởi chạy trình duyệt tại {{url}}",
-			"clicked": "Đã nhấp ({{coordinate}})",
-			"click": "Nhấp ({{coordinate}})",
-			"typed": "Đã gõ: {{text}}",
-			"type": "Gõ \"{{text}}\"",
-			"pressed": "Đã nhấn: {{key}}",
-			"press": "Nhấn {{key}}",
-			"scrolledDown": "Đã cuộn xuống",
-			"scrollDown": "Cuộn xuống",
-			"scrolledUp": "Đã cuộn lên",
-			"scrollUp": "Cuộn lên",
-			"hovered": "Đã di chuột ({{coordinate}})",
-			"hover": "Di chuột ({{coordinate}})",
-			"resized": "Đã thay đổi kích thước: {{size}}",
-			"resize": "Thay đổi kích thước thành {{size}}",
-			"screenshotSaved": "Ảnh chụp màn hình đã được lưu",
-			"screenshot": "Lưu ảnh chụp màn hình vào {{path}}",
-			"closed": "Trình duyệt đã đóng",
-			"close": "Đóng trình duyệt"
-		}
-	},
 	"codeblock": {
 		"tooltips": {
 			"expand": "Mở rộng khối mã",

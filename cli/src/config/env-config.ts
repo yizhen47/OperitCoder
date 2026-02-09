@@ -48,12 +48,6 @@ function buildAutoApprovalFromEnv(): AutoApprovalConfig {
 				DEFAULT_AUTO_APPROVAL.write?.protected ?? false,
 			)!,
 		},
-		browser: {
-			enabled: parseBoolean(
-				process.env[ENV_VARS.AUTO_APPROVAL_BROWSER_ENABLED],
-				DEFAULT_AUTO_APPROVAL.browser?.enabled ?? false,
-			)!,
-		},
 		retry: {
 			enabled: parseBoolean(
 				process.env[ENV_VARS.AUTO_APPROVAL_RETRY_ENABLED],
@@ -159,14 +153,6 @@ function applyAutoApprovalOverrides(config: CLIConfig): CLIConfig {
 		}
 		hasOverrides = true
 		logs.info(`Config override: autoApproval.write settings updated`, "EnvConfig")
-	}
-
-	// Browser settings
-	const browserEnabled = parseBoolean(process.env[ENV_VARS.AUTO_APPROVAL_BROWSER_ENABLED])
-	if (browserEnabled !== undefined) {
-		autoApproval.browser = { ...autoApproval.browser, enabled: browserEnabled }
-		hasOverrides = true
-		logs.info(`Config override: autoApproval.browser.enabled set to "${browserEnabled}"`, "EnvConfig")
 	}
 
 	// Retry settings

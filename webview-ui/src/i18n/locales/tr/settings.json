@@ -25,7 +25,6 @@
 		"modes": "Modlar",
 		"mcp": "MCP Sunucuları",
 		"autoApprove": "Oto-Onay",
-		"browser": "Bilgisayar Erişimi",
 		"checkpoints": "Kontrol Noktaları",
 		"display": "Göster",
 		"notifications": "Bildirimler",
@@ -210,10 +209,6 @@
 				"label": "Korumalı dosyaları dahil et",
 				"description": "Operit Coder'nun korumalı dosyaları (.kilocodeignore ve .kilocode/ yapılandırma dosyaları gibi) onay gerektirmeden oluşturmasına ve düzenlemesine izin ver."
 			}
-		},
-		"browser": {
-			"label": "Tarayıcı",
-			"description": "Onay gerektirmeden otomatik olarak tarayıcı eylemleri gerçekleştir. Not: Yalnızca model bilgisayar kullanımını desteklediğinde geçerlidir"
 		},
 		"retry": {
 			"label": "Yeniden Dene",
@@ -501,10 +496,6 @@
 				"label": "Görüntü Desteği",
 				"description": "Bu model görüntüleri işleyip anlayabilir mi?"
 			},
-			"computerUse": {
-				"label": "Bilgisayar Kullanımı",
-				"description": "Bu model bir tarayıcıyla etkileşim kurabilir mi?"
-			},
 			"promptCache": {
 				"label": "İstem Önbelleği",
 				"description": "Bu model istemleri önbelleğe alabilir mi?"
@@ -548,10 +539,9 @@
 			"none": "Yok",
 			"minimal": "Minimal (en hızlı)",
 			"high": "Yüksek",
-			"xhigh": "Çok yüksek",
+			"xhigh": "Ekstra Yüksek",
 			"medium": "Orta",
-			"low": "Düşük",
-			"xhigh": "Ekstra Yüksek"
+			"low": "Düşük"
 		},
 		"verbosity": {
 			"label": "Çıktı Ayrıntı Düzeyi",
@@ -624,34 +614,6 @@
 			"supportedProvidersDesc1": "SAP AI Core sağlayıcısı şu anda yalnızca aşağıdaki LLM sağlayıcıları için temel modelleri desteklemektedir:",
 			"supportedProvidersDesc2": "Daha fazla modele erişim için Orkestrasyon Moduna geçmeyi düşünün.",
 			"supportedProvidersDesc3": "Orkestrasyon Modu hakkında daha fazla bilgi edinin"
-		}
-	},
-	"browser": {
-		"enable": {
-			"label": "Tarayıcı aracını etkinleştir",
-			"description": "Etkinleştirildiğinde, Operit Coder bilgisayar kullanımını destekleyen modeller kullanırken web siteleriyle etkileşim kurmak için bir tarayıcı kullanabilir. <0>Daha fazla bilgi</0>"
-		},
-		"viewport": {
-			"label": "Görünüm alanı boyutu",
-			"description": "Tarayıcı etkileşimleri için görünüm alanı boyutunu seçin. Bu, web sitelerinin nasıl görüntülendiğini ve etkileşime girdiğini etkiler.",
-			"options": {
-				"largeDesktop": "Büyük Masaüstü (1280x800)",
-				"smallDesktop": "Küçük Masaüstü (900x600)",
-				"tablet": "Tablet (768x1024)",
-				"mobile": "Mobil (360x640)"
-			}
-		},
-		"screenshotQuality": {
-			"label": "Ekran görüntüsü kalitesi",
-			"description": "Tarayıcı ekran görüntülerinin WebP kalitesini ayarlayın. Daha yüksek değerler daha net ekran görüntüleri sağlar ancak token kullanımını artırır."
-		},
-		"remote": {
-			"label": "Uzak tarayıcı bağlantısı kullan",
-			"description": "Uzaktan hata ayıklama etkinleştirilmiş olarak çalışan bir Chrome tarayıcısına bağlanın (--remote-debugging-port=9222).",
-			"urlPlaceholder": "Özel URL (örn. http://localhost:9222)",
-			"testButton": "Bağlantıyı Test Et",
-			"testingButton": "Test Ediliyor...",
-			"instructions": "DevTools protokolü ana bilgisayar adresini girin veya yerel Chrome örneklerini otomatik olarak keşfetmek için boş bırakın. Bağlantıyı Test Et düğmesi, sağlanmışsa özel URL'yi deneyecek veya alan boşsa otomatik olarak keşfedecektir."
 		}
 	},
 	"checkpoints": {

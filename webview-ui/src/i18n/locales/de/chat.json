@@ -343,43 +343,6 @@
 		"careers": "Außerdem, <careersLink>wir stellen ein!</careersLink>",
 		"socialLinks": "Folge uns auf <xLink>X</xLink>, <discordLink>Discord</discordLink> oder <redditLink>r/KiloCode</redditLink> 🚀"
 	},
-	"browser": {
-		"session": "Browser-Sitzung",
-		"rooWantsToUse": "Operit Coder möchte den Browser verwenden",
-		"consoleLogs": "Konsolenprotokolle",
-		"noNewLogs": "(Keine neuen Protokolle)",
-		"screenshot": "Browser-Screenshot",
-		"cursor": "Cursor",
-		"navigation": {
-			"step": "Schritt {{current}} von {{total}}",
-			"previous": "Zurück",
-			"next": "Weiter"
-		},
-		"sessionStarted": "Browser-Sitzung gestartet",
-		"actions": {
-			"title": "Browser-Aktion: ",
-			"launched": "Browser gestartet",
-			"launch": "Browser starten auf {{url}}",
-			"clicked": "Geklickt auf: {{coordinate}}",
-			"click": "Klicken ({{coordinate}})",
-			"typed": "Eingegeben: {{text}}",
-			"type": "Eingeben \"{{text}}\"",
-			"pressed": "{{key}} gedrückt",
-			"press": "{{key}} drücken",
-			"scrolledDown": "Nach unten gescrollt",
-			"scrollDown": "Nach unten scrollen",
-			"scrolledUp": "Nach oben gescrollt",
-			"scrollUp": "Nach oben scrollen",
-			"hovered": "Gehovered auf: {{coordinate}}",
-			"hover": "Hover ({{coordinate}})",
-			"resized": "Größe geändert auf: {{size}}",
-			"resize": "Größe ändern auf {{size}}",
-			"screenshotSaved": "Screenshot gespeichert",
-			"screenshot": "Screenshot speichern unter {{path}}",
-			"closed": "Browser geschlossen",
-			"close": "Browser schließen"
-		}
-	},
 	"codeblock": {
 		"tooltips": {
 			"expand": "Code-Block erweitern",

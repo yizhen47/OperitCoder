@@ -526,25 +526,6 @@ describe("gatekeeper", () => {
 				expect(streamResponseFromHandler).not.toHaveBeenCalled()
 			})
 
-			it("should build prompt for browser_action tool", async () => {
-				const { streamResponseFromHandler } = await import("../../../../utils/single-completion-handler")
-				vi.mocked(streamResponseFromHandler).mockResolvedValue({
-					text: "yes",
-					usage: { type: "usage", inputTokens: 100, outputTokens: 10 },
-				})
-
-				await evaluateGatekeeperApproval(mockTask as Task, "browser_action", {
-					action: "launch",
-					url: "https://example.com",
-				})
-
-				expect(streamResponseFromHandler).toHaveBeenCalledWith(
-					expect.any(Object),
-					expect.stringContaining("Action: launch"),
-					expect.any(String),
-				)
-			})
-
 			it("should build prompt for use_mcp_tool", async () => {
 				const { streamResponseFromHandler } = await import("../../../../utils/single-completion-handler")
 				vi.mocked(streamResponseFromHandler).mockResolvedValue({

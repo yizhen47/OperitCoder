@@ -4,7 +4,7 @@ import { apply_diff } from "./apply_diff"
 import applyPatch from "./apply_patch"
 import askFollowupQuestion from "./ask_followup_question"
 import attemptCompletion from "./attempt_completion"
-import browserAction from "./browser_action"
+// kilocode_change: browser_action removed
 import codebaseSearch from "./codebase_search"
 import executeCommand from "./execute_command"
 import fetchInstructions from "./fetch_instructions"
@@ -59,7 +59,7 @@ export function getNativeTools(partialReadsEnabled: boolean = true): OpenAI.Chat
 		applyPatch,
 		askFollowupQuestion,
 		attemptCompletion,
-		browserAction,
+		// kilocode_change: browser_action removed
 		codebaseSearch,
 		executeCommand,
 		fetchInstructions,

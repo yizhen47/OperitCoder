@@ -25,7 +25,6 @@
 		"modes": "الأنماط",
 		"mcp": "خوادم MCP",
 		"autoApprove": "الموافقة التلقائية",
-		"browser": "المتصفح",
 		"checkpoints": "نقاط الحفظ",
 		"display": "العرض",
 		"notifications": "الإشعارات",
@@ -235,10 +234,6 @@
 				"label": "تشمل الملفات المحمية",
 				"description": "اسمح لـ Operit Coder يعدل ملفات إعدادات مصغرة بدون موافقة."
 			}
-		},
-		"browser": {
-			"label": "المتصفح",
-			"description": "تنفيذ إجراءات المتصبح تلقائيًا (للنماذج الداعمة)"
 		},
 		"retry": {
 			"label": "إعادة المحاولة",
@@ -566,10 +561,6 @@
 				"label": "دعم الصور",
 				"description": "هل النموذج يفهم الصور؟"
 			},
-			"computerUse": {
-				"label": "استخدام الكمبيوتر",
-				"description": "هل النموذج يقدر يتفاعل مع المتصفح؟"
-			},
 			"promptCache": {
 				"label": "تخزين الموجهات",
 				"description": "هل النموذج يدعم تخزين الموجهات؟"
@@ -691,34 +682,6 @@
 	},
 	"kiloRemoteControl": {
 		"description": "تفعيل التحكم عن بُعد للمهام"
-	},
-	"browser": {
-		"enable": {
-			"label": "تفعيل أداة المتصفح",
-			"description": "إذا تم التفعيل، Operit Coder يقدر يستخدم المتصفح مع النماذج الداعمة. <0>تعرف أكثر</0>"
-		},
-		"viewport": {
-			"label": "حجم العرض",
-			"description": "اختر حجم الشاشة لتفاعلات المتصفح.",
-			"options": {
-				"largeDesktop": "سطح مكتب كبير (1280×800)",
-				"smallDesktop": "سطح مكتب صغير (900×600)",
-				"tablet": "جهاز لوحي (768×1024)",
-				"mobile": "جوال (360×640)"
-			}
-		},
-		"screenshotQuality": {
-			"label": "جودة اللقطة",
-			"description": "اضبط جودة WebP للقطات. القيمة الأعلى أوضح لكن تزيد استهلاك التوكن."
-		},
-		"remote": {
-			"label": "استخدام اتصال متصفح بعيد",
-			"description": "اتصال بـ Chrome مع remote debugging.",
-			"urlPlaceholder": "رابط مخصص (مثال http://localhost:9222)",
-			"testButton": "اختبار الاتصال",
-			"testingButton": "جارٍ الاختبار...",
-			"instructions": "أدخل عنوان DevTools أو اتركه فاضي للاكتشاف التلقائي."
-		}
 	},
 	"checkpoints": {
 		"timeout": {

@@ -33,7 +33,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Werkzeuganfrage wartet auf Genehmigung",
-		"browserAction": "Browseraktion wartet auf Genehmigung",
 		"command": "Befehl wartet auf Genehmigung"
 	},
 	"settings": {
@@ -174,9 +173,6 @@
 	"taskTimeline": {
 		"tooltip": {
 			"messageTypes": {
-				"browser_action_launch": "Browser-Start",
-				"browser_action_result": "Browser-Aktionsergebnis",
-				"browser_action": "Browser-Aktion",
 				"command": "Befehlsausführung",
 				"completion_result": "Fertigstellungsergebnis",
 				"condense_context": "Kontext verdichten",

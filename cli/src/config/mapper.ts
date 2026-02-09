@@ -57,7 +57,6 @@ export function mapConfigToExtensionState(
 				autoApprovalEnabled &&
 				(autoApproval?.write?.enabled ?? false) &&
 				(autoApproval?.write?.protected ?? false),
-			alwaysAllowBrowser: autoApprovalEnabled && (autoApproval?.browser?.enabled ?? false),
 			alwaysApproveResubmit: autoApprovalEnabled && (autoApproval?.retry?.enabled ?? false),
 			requestDelaySeconds: autoApproval?.retry?.delay ?? 10,
 			alwaysAllowMcp: autoApprovalEnabled && (autoApproval?.mcp?.enabled ?? false),

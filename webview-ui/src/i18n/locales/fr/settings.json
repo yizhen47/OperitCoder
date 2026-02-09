@@ -25,7 +25,6 @@
 		"modes": "Modes",
 		"mcp": "Serveurs MCP",
 		"autoApprove": "Auto-approbation",
-		"browser": "Accès ordinateur",
 		"checkpoints": "Points de contrôle",
 		"display": "Afficher",
 		"notifications": "Notifications",
@@ -206,10 +205,6 @@
 				"label": "Inclure les fichiers protégés",
 				"description": "Permettre à Operit Coder de créer et modifier des fichiers protégés (comme .kilocodeignore et les fichiers de configuration .kilocode/) sans nécessiter d'approbation."
 			}
-		},
-		"browser": {
-			"label": "Navigateur",
-			"description": "Effectuer automatiquement des actions du navigateur sans nécessiter d'approbation. Remarque : S'applique uniquement lorsque le modèle prend en charge l'utilisation de l'ordinateur"
 		},
 		"retry": {
 			"label": "Réessayer",
@@ -509,10 +504,6 @@
 				"label": "Support des images",
 				"description": "Ce modèle est-il capable de traiter et de comprendre les images ?"
 			},
-			"computerUse": {
-				"label": "Utilisation de l'ordinateur",
-				"description": "Ce modèle est-il capable d'interagir avec un navigateur ?"
-			},
 			"promptCache": {
 				"label": "Mise en cache des prompts",
 				"description": "Ce modèle est-il capable de mettre en cache les prompts ?"
@@ -558,8 +549,7 @@
 			"high": "Élevé",
 			"xhigh": "Très élevé",
 			"medium": "Moyen",
-			"low": "Faible",
-			"xhigh": "Très élevé"
+			"low": "Faible"
 		},
 		"verbosity": {
 			"label": "Verbosité de la sortie",
@@ -623,34 +613,6 @@
 			"supportedProvidersDesc1": "Le fournisseur SAP AI Core ne prend actuellement en charge que les modèles de fondation pour les fournisseurs LLM suivants :",
 			"supportedProvidersDesc2": "Envisagez de passer au mode Orchestration pour accéder à plus de modèles.",
 			"supportedProvidersDesc3": "En savoir plus sur le mode Orchestration"
-		}
-	},
-	"browser": {
-		"enable": {
-			"label": "Activer l'outil de navigateur",
-			"description": "Lorsque cette option est activée, Operit Coder peut utiliser un navigateur pour interagir avec des sites web lors de l'utilisation de modèles qui prennent en charge l'utilisation de l'ordinateur. <0>En savoir plus</0>"
-		},
-		"viewport": {
-			"label": "Taille de la fenêtre d'affichage",
-			"description": "Sélectionnez la taille de la fenêtre d'affichage pour les interactions du navigateur. Cela affecte la façon dont les sites web sont affichés et dont on interagit avec eux.",
-			"options": {
-				"largeDesktop": "Grand bureau (1280x800)",
-				"smallDesktop": "Petit bureau (900x600)",
-				"tablet": "Tablette (768x1024)",
-				"mobile": "Mobile (360x640)"
-			}
-		},
-		"screenshotQuality": {
-			"label": "Qualité des captures d'écran",
-			"description": "Ajustez la qualité WebP des captures d'écran du navigateur. Des valeurs plus élevées fournissent des captures plus claires mais augmentent l'utilisation de token."
-		},
-		"remote": {
-			"label": "Utiliser une connexion de navigateur distant",
-			"description": "Se connecter à un navigateur Chrome exécuté avec le débogage à distance activé (--remote-debugging-port=9222).",
-			"urlPlaceholder": "URL personnalisée (ex. http://localhost:9222)",
-			"testButton": "Tester la connexion",
-			"testingButton": "Test en cours...",
-			"instructions": "Entrez l'adresse hôte du protocole DevTools ou laissez vide pour découvrir automatiquement les instances Chrome locales. Le bouton Tester la connexion essaiera l'URL personnalisée si fournie, ou découvrira automatiquement si le champ est vide."
 		}
 	},
 	"checkpoints": {

@@ -30,7 +30,6 @@
 		"toolNames": {
 			"read": "Bestanden lezen",
 			"edit": "Bestanden bewerken",
-			"browser": "Browser gebruiken",
 			"command": "Commando's uitvoeren",
 			"mcp": "MCP gebruiken"
 		},

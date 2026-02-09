@@ -22,7 +22,6 @@ import { kiloCodeMetaDataSchema } from "./kilocode/kilocode.js"
  * - `resume_task`: Confirmation needed to resume a previously paused task
  * - `resume_completed_task`: Confirmation needed to resume a task that was already marked as completed
  * - `mistake_limit_reached`: Too many errors encountered, needs user guidance on how to proceed
- * - `browser_action_launch`: Permission to open or interact with a browser
  * - `use_mcp_server`: Permission to use Model Context Protocol (MCP) server functionality
  * - `auto_approval_max_req_reached`: Auto-approval limit has been reached, manual approval required
  */
@@ -36,7 +35,7 @@ export const clineAsks = [
 	"resume_task",
 	"resume_completed_task",
 	"mistake_limit_reached",
-	"browser_action_launch",
+	// kilocode_change: browser_action_launch removed
 	"use_mcp_server",
 	"auto_approval_max_req_reached",
 	// kilocode_change start
@@ -104,7 +103,7 @@ export const interactiveAsks = [
 	"followup",
 	"command",
 	"tool",
-	"browser_action_launch",
+	// kilocode_change: browser_action_launch removed
 	"use_mcp_server",
 ] as const satisfies readonly ClineAsk[]
 
@@ -154,8 +153,6 @@ export function isNonBlockingAsk(ask: ClineAsk): ask is NonBlockingAsk {
  * - `user_feedback_diff`: Diff-formatted feedback from user showing requested changes
  * - `command_output`: Output from an executed command
  * - `shell_integration_warning`: Warning about shell integration issues or limitations
- * - `browser_action`: Action performed in the browser
- * - `browser_action_result`: Result of a browser action
  * - `mcp_server_request_started`: MCP server request has been initiated
  * - `mcp_server_response`: Response received from MCP server
  * - `subtask_result`: Result of a completed subtask
@@ -182,9 +179,7 @@ export const clineSays = [
 	"user_feedback_diff",
 	"command_output",
 	"shell_integration_warning",
-	"browser_action",
-	"browser_action_result",
-	"browser_session_status",
+	// kilocode_change: browser action says removed
 	"mcp_server_request_started",
 	"mcp_server_response",
 	"subtask_result",

@@ -306,7 +306,6 @@ export const lastAskMessageAtom = atom<ExtensionChatMessage | null>((get) => {
 		"tool",
 		"command",
 		"command_output",
-		"browser_action_launch",
 		"use_mcp_server",
 		"payment_required_prompt",
 		"checkpoint_restore",

@@ -34,10 +34,6 @@ export const TASK_TIMELINE_MESSAGE_TYPES: Record<string, TaskTimelineMessageType
 		color: taskTimelineColorPalette.SUCCESS,
 		translationKey: "kilocode:taskTimeline.tooltip.messageTypes.completion_result",
 	},
-	"ask:browser_action_launch": {
-		color: taskTimelineColorPalette.SYSTEM_GENERAL_TOOL,
-		translationKey: "kilocode:taskTimeline.tooltip.messageTypes.browser_action_launch",
-	},
 	"ask:use_mcp_server": {
 		color: taskTimelineColorPalette.SYSTEM_GENERAL_TOOL,
 		translationKey: "kilocode:taskTimeline.tooltip.messageTypes.use_mcp_server",
@@ -67,14 +63,6 @@ export const TASK_TIMELINE_MESSAGE_TYPES: Record<string, TaskTimelineMessageType
 	"say:command_output": {
 		color: taskTimelineColorPalette.SYSTEM_GENERAL_TOOL,
 		translationKey: "kilocode:taskTimeline.tooltip.messageTypes.command_output",
-	},
-	"say:browser_action": {
-		color: taskTimelineColorPalette.SYSTEM_GENERAL_TOOL,
-		translationKey: "kilocode:taskTimeline.tooltip.messageTypes.browser_action",
-	},
-	"say:browser_action_result": {
-		color: taskTimelineColorPalette.SYSTEM_GENERAL_TOOL,
-		translationKey: "kilocode:taskTimeline.tooltip.messageTypes.browser_action_result",
 	},
 	"say:completion_result": {
 		color: taskTimelineColorPalette.SUCCESS,

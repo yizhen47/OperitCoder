@@ -12,7 +12,6 @@ export type AutoApprovalState =
 	| "alwaysAllowReadOnly"
 	| "alwaysAllowWrite"
 	| "alwaysAllowDelete" // kilocode_change
-	| "alwaysAllowBrowser"
 	| "alwaysApproveResubmit"
 	| "alwaysAllowMcp"
 	| "alwaysAllowModeSwitch"
@@ -88,9 +87,7 @@ export async function checkAutoApproval({
 		}
 	}
 
-	if (ask === "browser_action_launch") {
-		return state.alwaysAllowBrowser === true ? { decision: "approve" } : { decision: "ask" }
-	}
+	// kilocode_change: browser_action_launch removed
 
 	if (ask === "use_mcp_server") {
 		if (!text) {

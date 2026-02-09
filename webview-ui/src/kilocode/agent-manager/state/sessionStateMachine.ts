@@ -28,7 +28,6 @@ type ApiReqStartedEvent = { type: "api_req_started" }
 type SayTextEvent = { type: "say_text"; partial: boolean }
 type AskToolEvent = { type: "ask_tool"; partial: boolean }
 type AskCommandEvent = { type: "ask_command"; partial: boolean }
-type AskBrowserActionLaunchEvent = { type: "ask_browser_action_launch"; partial: boolean }
 type AskUseMcpServerEvent = { type: "ask_use_mcp_server"; partial: boolean }
 type AskFollowupEvent = { type: "ask_followup"; partial: boolean }
 type AskCompletionResultEvent = { type: "ask_completion_result" }
@@ -51,7 +50,6 @@ export type SessionEvent =
 	| SayTextEvent
 	| AskToolEvent
 	| AskCommandEvent
-	| AskBrowserActionLaunchEvent
 	| AskUseMcpServerEvent
 	| AskFollowupEvent
 	| AskCompletionResultEvent
@@ -269,7 +267,6 @@ function transitionFromStreaming(event: SessionEvent): TransitionResult {
 		// Approval-required asks (only on complete)
 		case "ask_tool":
 		case "ask_command":
-		case "ask_browser_action_launch":
 		case "ask_use_mcp_server":
 			if (event.partial) {
 				return { nextState: SessionState.streaming }

@@ -206,7 +206,6 @@ describe.skip("SYSTEM_PROMPT", () => {
 			false, // supportsComputerUse
 			undefined, // mcpHub
 			undefined, // diffStrategy
-			undefined, // browserViewportSize
 			defaultModeSlug, // mode
 			undefined, // customModePrompts
 			undefined, // customModes
@@ -242,7 +241,6 @@ describe.skip("SYSTEM_PROMPT", () => {
 			false, // supportsComputerUse
 			undefined, // mcpHub
 			new MultiSearchReplaceDiffStrategy(), // diffStrategy - include to test apply_diff
-			undefined, // browserViewportSize
 			defaultModeSlug, // mode
 			undefined, // customModePrompts
 			undefined, // customModes

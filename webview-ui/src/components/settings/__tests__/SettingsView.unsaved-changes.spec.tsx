@@ -76,9 +76,6 @@ vi.mock("../ApiOptions", () => ({
 vi.mock("../AutoApproveSettings", () => ({
 	AutoApproveSettings: vi.fn(() => <div>AutoApproveSettings</div>),
 }))
-vi.mock("../BrowserSettings", () => ({
-	BrowserSettings: vi.fn(() => <div>BrowserSettings</div>),
-}))
 vi.mock("../CheckpointSettings", () => ({
 	CheckpointSettings: vi.fn(() => <div>CheckpointSettings</div>),
 }))
@@ -138,7 +135,6 @@ describe("SettingsView - Unsaved Changes Detection", () => {
 		allowedMaxRequests: undefined,
 		allowedMaxCost: undefined,
 		language: "en",
-		alwaysAllowBrowser: false,
 		alwaysAllowExecute: false,
 		alwaysAllowMcp: false,
 		alwaysAllowModeSwitch: false,
@@ -149,8 +145,6 @@ describe("SettingsView - Unsaved Changes Detection", () => {
 		alwaysApproveResubmit: false,
 		autoCondenseContext: false,
 		autoCondenseContextPercent: 50,
-		browserToolEnabled: false,
-		browserViewportSize: "1280x720",
 		enableCheckpoints: false,
 		diffEnabled: true,
 		experiments: {},
@@ -159,8 +153,6 @@ describe("SettingsView - Unsaved Changes Detection", () => {
 		maxWorkspaceFiles: 200,
 		mcpEnabled: false,
 		requestDelaySeconds: 0,
-		remoteBrowserHost: "",
-		screenshotQuality: 75,
 		soundEnabled: false,
 		ttsEnabled: false,
 		ttsSpeed: 1.0,
@@ -178,7 +170,6 @@ describe("SettingsView - Unsaved Changes Detection", () => {
 		terminalZdotdir: false,
 		writeDelayMs: 0,
 		showRooIgnoredFiles: false,
-		remoteBrowserEnabled: false,
 		maxReadFileLine: -1,
 		maxImageFileSize: 5,
 		maxTotalImageSize: 20,

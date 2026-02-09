@@ -116,14 +116,6 @@ function getToolApprovalDecision(
 			return isCIMode ? { action: "auto-reject", message: CI_MODE_MESSAGES.AUTO_REJECTED } : { action: "manual" }
 		}
 
-		// Browser operations
-		if (tool === "browser_action") {
-			if (config.browser?.enabled) {
-				return { action: "auto-approve" }
-			}
-			return isCIMode ? { action: "auto-reject", message: CI_MODE_MESSAGES.AUTO_REJECTED } : { action: "manual" }
-		}
-
 		// MCP operations
 		if (tool === "use_mcp_tool" || tool === "use_mcp_server" || tool === "access_mcp_resource") {
 			if (config.mcp?.enabled) {

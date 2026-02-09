@@ -26,7 +26,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Sol·licitud d'eina pendent d'aprovació",
-		"browserAction": "Acció del navegador pendent d'aprovació",
 		"command": "Ordre pendent d'aprovació"
 	},
 	"settings": {
@@ -167,9 +166,6 @@
 	"taskTimeline": {
 		"tooltip": {
 			"messageTypes": {
-				"browser_action_launch": "iniciar navegador",
-				"browser_action": "acció del navegador",
-				"browser_action_result": "resultat de l'acció del navegador",
 				"checkpoint_saved": "punt de control desat",
 				"condense_context": "condensar context",
 				"command_output": "sortida de comanda",

@@ -36,7 +36,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Tool request waiting for approval",
-		"browserAction": "Browser action waiting for approval",
 		"command": "Command waiting for approval"
 	},
 	"imageWarnings": {
@@ -182,9 +181,6 @@
 		"tooltip": {
 			"clickToScroll": "View {{messageType}} (#{{messageNumber}})",
 			"messageTypes": {
-				"browser_action_launch": "browser launch",
-				"browser_action_result": "browser action result",
-				"browser_action": "browser action",
 				"checkpoint_saved": "checkpoint saved",
 				"command": "command execution",
 				"command_output": "command output",

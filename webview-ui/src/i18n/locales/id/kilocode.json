@@ -26,7 +26,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Permintaan tool menunggu persetujuan",
-		"browserAction": "Aksi browser menunggu persetujuan",
 		"command": "Perintah menunggu persetujuan"
 	},
 	"settings": {
@@ -168,9 +167,6 @@
 		"tooltip": {
 			"clickToScroll": "Lihat {{messageType}} (#{{messageNumber}})",
 			"messageTypes": {
-				"browser_action": "aksi peramban",
-				"browser_action_result": "hasil tindakan peramban",
-				"browser_action_launch": "peluncuran browser",
 				"command_output": "hasil perintah",
 				"checkpoint_saved": "pos pemeriksaan tersimpan",
 				"completion_result": "hasil penyelesaian",

@@ -30,7 +30,6 @@
 		"toolNames": {
 			"read": "Baca File",
 			"edit": "Edit File",
-			"browser": "Gunakan Browser",
 			"command": "Jalankan Perintah",
 			"mcp": "Gunakan MCP"
 		},
@@ -200,10 +199,6 @@
 		"tools": {
 			"label": "Tools yang Tersedia",
 			"description": "Pilih tools mana yang dapat digunakan mode ini."
-		},
-		"description": {
-			"label": "Deskripsi singkat (untuk manusia)",
-			"description": "Deskripsi singkat yang ditampilkan di dropdown pemilih mode."
 		},
 		"customInstructions": {
 			"label": "Instruksi Kustom (opsional)",

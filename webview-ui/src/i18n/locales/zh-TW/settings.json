@@ -25,7 +25,6 @@
 		"modes": "模式",
 		"mcp": "MCP 伺服器",
 		"autoApprove": "自動核准",
-		"browser": "電腦存取",
 		"checkpoints": "檢查點",
 		"display": "顯示",
 		"examplePackages": "沙盒套件",
@@ -224,10 +223,6 @@
 				"label": "包含受保護的檔案",
 				"description": "允許 Operit Coder 建立和編輯受保護的檔案（如 .kilocodeignore 和 .kilocode/ 設定檔），無需核准。"
 			}
-		},
-		"browser": {
-			"label": "瀏覽器",
-			"description": "自動執行瀏覽器操作而無需核准 — 注意：僅適用於模型支援電腦使用時"
 		},
 		"retry": {
 			"label": "重試",
@@ -519,10 +514,6 @@
 				"label": "影像支援",
 				"description": "此模型是否能夠處理和理解影像？"
 			},
-			"computerUse": {
-				"label": "電腦使用",
-				"description": "此模型是否能夠與瀏覽器互動？（例如 Claude Sonnet）"
-			},
 			"promptCache": {
 				"label": "提示快取",
 				"description": "此模型是否能夠快取提示？"
@@ -641,34 +632,6 @@
 		"autocompleteLabel": "(自動完成)",
 		"autocomplete": {
 			"onlyOneAllowed": "只允許一個自動完成設定檔。設定檔「{{existingName}}」已設定為自動完成。請先變更其類型或刪除它。"
-		}
-	},
-	"browser": {
-		"enable": {
-			"label": "啟用瀏覽器工具",
-			"description": "啟用後，Operit Coder 可在使用支援電腦使用的模型時使用瀏覽器與網站互動。 <0>了解更多</0>"
-		},
-		"viewport": {
-			"label": "視窗大小",
-			"description": "選擇瀏覽器互動的視窗大小。這會影響網站的顯示方式和互動方式。",
-			"options": {
-				"largeDesktop": "大型桌面 (1280x800)",
-				"smallDesktop": "小型桌面 (900x600)",
-				"tablet": "平板 (768x1024)",
-				"mobile": "行動裝置 (360x640)"
-			}
-		},
-		"screenshotQuality": {
-			"label": "截圖品質",
-			"description": "調整瀏覽器截圖的 WebP 品質。數值越高截圖越清晰，但會增加 token 用量。"
-		},
-		"remote": {
-			"label": "使用遠端瀏覽器連線",
-			"description": "連線到啟用遠端除錯的 Chrome 瀏覽器（--remote-debugging-port=9222）。",
-			"urlPlaceholder": "自訂 URL（例如 http://localhost:9222）",
-			"testButton": "測試連線",
-			"testingButton": "測試中...",
-			"instructions": "請輸入 DevTools Protocol 主機位址，或留空以自動偵測本機 Chrome 執行個體。「測試連線」按鈕將嘗試連線至您提供的自訂 URL，若未提供則會自動偵測。"
 		}
 	},
 	"checkpoints": {

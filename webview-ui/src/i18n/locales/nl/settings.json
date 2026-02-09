@@ -25,7 +25,6 @@
 		"modes": "Modi",
 		"mcp": "MCP-servers",
 		"autoApprove": "Auto-goedkeuren",
-		"browser": "Browser",
 		"checkpoints": "Checkpoints",
 		"display": "Weergeven",
 		"notifications": "Meldingen",
@@ -209,10 +208,6 @@
 		"delete": {
 			"label": "Verwijderen",
 			"description": "Automatisch bestanden en mappen verwijderen zonder goedkeuring"
-		},
-		"browser": {
-			"label": "Browser",
-			"description": "Automatisch browseracties uitvoeren zonder goedkeuring. Let op: geldt alleen als het model computergebruik ondersteunt."
 		},
 		"retry": {
 			"label": "Opnieuw proberen",
@@ -526,10 +521,6 @@
 				"label": "Ondersteuning voor afbeeldingen",
 				"description": "Kan dit model afbeeldingen verwerken en begrijpen?"
 			},
-			"computerUse": {
-				"label": "Computergebruik",
-				"description": "Kan dit model met een browser werken?"
-			},
 			"promptCache": {
 				"label": "Prompt caching",
 				"description": "Kan dit model prompts cachen?"
@@ -573,10 +564,9 @@
 			"none": "Geen",
 			"minimal": "Minimaal (Snelst)",
 			"high": "Hoog",
-			"xhigh": "Zeer hoog",
+			"xhigh": "Extra Hoog",
 			"medium": "Middel",
-			"low": "Laag",
-			"xhigh": "Extra Hoog"
+			"low": "Laag"
 		},
 		"verbosity": {
 			"label": "Uitvoerbaarheid",
@@ -623,34 +613,6 @@
 		"autocompleteLabel": "(Automatisch aanvullen)",
 		"autocomplete": {
 			"onlyOneAllowed": "Er is slechts één automatisch aanvullen profiel toegestaan. Profiel \"{{existingName}}\" is al geconfigureerd voor automatisch aanvullen. Wijzig eerst het type of verwijder het."
-		}
-	},
-	"browser": {
-		"enable": {
-			"label": "Browserhulpmiddel inschakelen",
-			"description": "Indien ingeschakeld, kan Operit Coder een browser gebruiken om te interageren met websites wanneer modellen computergebruik ondersteunen. <0>Meer informatie</0>"
-		},
-		"viewport": {
-			"label": "Viewport-grootte",
-			"description": "Selecteer de viewport-grootte voor browserinteracties. Dit beïnvloedt hoe websites worden weergegeven en gebruikt.",
-			"options": {
-				"largeDesktop": "Groot bureaublad (1280x800)",
-				"smallDesktop": "Klein bureaublad (900x600)",
-				"tablet": "Tablet (768x1024)",
-				"mobile": "Mobiel (360x640)"
-			}
-		},
-		"screenshotQuality": {
-			"label": "Screenshotkwaliteit",
-			"description": "Pas de WebP-kwaliteit van browserscreenshots aan. Hogere waarden geven duidelijkere screenshots maar verhogen het tokengebruik."
-		},
-		"remote": {
-			"label": "Gebruik externe browserverbinding",
-			"description": "Verbind met een Chrome-browser die draait met remote debugging ingeschakeld (--remote-debugging-port=9222).",
-			"urlPlaceholder": "Aangepaste URL (bijv. http://localhost:9222)",
-			"testButton": "Verbinding testen",
-			"testingButton": "Bezig met testen...",
-			"instructions": "Voer het DevTools Protocol hostadres in of laat leeg om lokale Chrome-instanties automatisch te detecteren. De knop Verbinding testen probeert de aangepaste URL als opgegeven, of detecteert automatisch als het veld leeg is."
 		}
 	},
 	"checkpoints": {

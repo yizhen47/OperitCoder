@@ -13,7 +13,7 @@ import { shouldUseSingleFileRead } from "@roo-code/types"
 import { getWriteToFileDescription } from "./write-to-file"
 import { getSearchFilesDescription } from "./search-files"
 import { getListFilesDescription } from "./list-files"
-import { getBrowserActionDescription } from "./browser-action"
+// kilocode_change: browser_action removed
 import { getAskFollowupQuestionDescription } from "./ask-followup-question"
 import { getAttemptCompletionDescription } from "./attempt-completion"
 import { getUseMcpToolDescription } from "./use-mcp-tool"
@@ -53,7 +53,7 @@ const toolDescriptionMap: Record<string, (args: ToolArgs) => string | undefined>
 	write_to_file: (args) => getWriteToFileDescription(args),
 	search_files: (args) => getSearchFilesDescription(args),
 	list_files: (args) => getListFilesDescription(args),
-	browser_action: (args) => getBrowserActionDescription(args),
+	// kilocode_change: browser_action removed
 	ask_followup_question: () => getAskFollowupQuestionDescription(),
 	attempt_completion: (args) => getAttemptCompletionDescription(args),
 	use_mcp_tool: (args) => getUseMcpToolDescription(args),
@@ -79,7 +79,6 @@ export function getToolDescriptionsForMode(
 	supportsComputerUse: boolean,
 	codeIndexManager?: CodeIndexManager,
 	diffStrategy?: DiffStrategy,
-	browserViewportSize?: string,
 	mcpHub?: McpHub,
 	customModes?: ModeConfig[],
 	experiments?: Record<string, boolean>,
@@ -94,7 +93,6 @@ export function getToolDescriptionsForMode(
 		cwd,
 		supportsComputerUse,
 		diffStrategy,
-		browserViewportSize,
 		mcpHub,
 		partialReadsEnabled,
 		settings: {
@@ -197,7 +195,7 @@ export {
 	getWriteToFileDescription,
 	getSearchFilesDescription,
 	getListFilesDescription,
-	getBrowserActionDescription,
+	// kilocode_change: browser_action removed
 	getAskFollowupQuestionDescription,
 	getAttemptCompletionDescription,
 	getUseMcpToolDescription,

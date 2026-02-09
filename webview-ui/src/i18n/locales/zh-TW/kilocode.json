@@ -28,7 +28,6 @@
 	},
 	"notifications": {
 		"toolRequest": "工具請求等待核准",
-		"browserAction": "瀏覽器動作等待核准",
 		"command": "指令等待核准"
 	},
 	"settings": {
@@ -177,9 +176,6 @@
 		"tooltip": {
 			"clickToScroll": "查看 {{messageType}} (#{{messageNumber}})",
 			"messageTypes": {
-				"browser_action_result": "瀏覽器操作結果",
-				"browser_action": "瀏覽器操作",
-				"browser_action_launch": "瀏覽器啟動",
 				"checkpoint_saved": "檢查點已儲存",
 				"command": "指令執行",
 				"completion_result": "完成結果",

@@ -25,7 +25,6 @@
 		"modes": "模式",
 		"mcp": "MCP 服务器",
 		"autoApprove": "自动批准",
-		"browser": "计算机交互",
 		"checkpoints": "存档点",
 		"display": "显示",
 		"examplePackages": "沙盒包",
@@ -227,10 +226,6 @@
 				"label": "包含受保护的文件",
 				"description": "允许 Operit Coder 创建和编辑受保护的文件（如 .kilocodeignore 和 .kilocode/ 配置文件），无需批准。"
 			}
-		},
-		"browser": {
-			"label": "浏览器",
-			"description": "自动执行浏览器操作而无需批准 — 注意：仅当模型支持计算机功能调用时适用"
 		},
 		"retry": {
 			"label": "重试",
@@ -548,10 +543,6 @@
 				"label": "图像支持",
 				"description": "此模型是否能够处理和理解图像？"
 			},
-			"computerUse": {
-				"label": "计算机功能调用",
-				"description": "此模型是否能够与浏览器交互？（例如 Claude Sonnet）。"
-			},
 			"promptCache": {
 				"label": "提示缓存",
 				"description": "此模型是否能够缓存提示？"
@@ -644,34 +635,6 @@
 		"autocompleteLabel": "(自动补全)",
 		"autocomplete": {
 			"onlyOneAllowed": "只允许一个自动补全配置。配置「{{existingName}}」已配置为自动补全。请先更改其类型或删除它。"
-		}
-	},
-	"browser": {
-		"enable": {
-			"label": "启用浏览器工具",
-			"description": "启用后，若模型支持计算机功能调用，Operit Coder 可以使用浏览器与网站交互。 <0>了解更多</0>"
-		},
-		"viewport": {
-			"label": "视口大小",
-			"description": "选择浏览器交互的视口大小。这会影响网站的显示方式和交互方式。",
-			"options": {
-				"largeDesktop": "大桌面 (1280x800)",
-				"smallDesktop": "小桌面 (900x600)",
-				"tablet": "平板 (768x1024)",
-				"mobile": "移动设备 (360x640)"
-			}
-		},
-		"screenshotQuality": {
-			"label": "截图质量",
-			"description": "调整浏览器的截图质量。更高的值提供更清晰的截图，但会增加 token 消耗。"
-		},
-		"remote": {
-			"label": "使用远程浏览器连接",
-			"description": "连接到启用远程调试的 Chrome 浏览器 (--remote-debugging-port=9222)。",
-			"urlPlaceholder": "自定义 URL（例如 http://localhost:9222）",
-			"testButton": "测试连接",
-			"testingButton": "测试中...",
-			"instructions": "输入 DevTools 协议主机地址或留空以自动发现本地 Chrome 实例。测试连接按钮将尝试使用自定义 URL（如果提供），或者如果字段为空则自动发现。"
 		}
 	},
 	"checkpoints": {

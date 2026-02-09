@@ -26,7 +26,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Żądanie narzędzia oczekuje na zatwierdzenie",
-		"browserAction": "Akcja przeglądarki oczekuje na zatwierdzenie",
 		"command": "Polecenie oczekuje na zatwierdzenie"
 	},
 	"settings": {
@@ -175,10 +174,7 @@
 		"tooltip": {
 			"clickToScroll": "Wyświetl {{messageType}} (nr {{messageNumber}})",
 			"messageTypes": {
-				"browser_action_result": "wynik działania przeglądarki",
-				"browser_action": "akcja przeglądarki",
 				"checkpoint_saved": "punkt kontrolny zapisany",
-				"browser_action_launch": "uruchomienie przeglądarki",
 				"command": "wykonanie polecenia",
 				"command_output": "wynik polecenia",
 				"completion_result": "wynik wykonania",

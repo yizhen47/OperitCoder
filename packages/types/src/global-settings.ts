@@ -78,7 +78,7 @@ export const globalSettingsSchema = z.object({
 	alwaysAllowWriteProtected: z.boolean().optional(),
 	alwaysAllowDelete: z.boolean().optional(), // kilocode_change
 	writeDelayMs: z.number().min(0).optional(),
-	alwaysAllowBrowser: z.boolean().optional(),
+	// kilocode_change: browser auto-approval removed
 	alwaysApproveResubmit: z.boolean().optional(),
 	requestDelaySeconds: z.number().optional(),
 	alwaysAllowMcp: z.boolean().optional(),
@@ -129,8 +129,7 @@ export const globalSettingsSchema = z.object({
 	 */
 	maxDiagnosticMessages: z.number().optional(),
 
-	browserToolEnabled: z.boolean().optional(),
-	browserViewportSize: z.string().optional(),
+	// kilocode_change: browser settings removed
 	showAutoApproveMenu: z.boolean().optional(), // kilocode_change
 	showTaskTimeline: z.boolean().optional(), // kilocode_change
 	sendMessageOnEnter: z.boolean().optional(), // kilocode_change: Enter key behavior
@@ -140,10 +139,7 @@ export const globalSettingsSchema = z.object({
 	globalWorkflowToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
 	localRulesToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
 	globalRulesToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
-	screenshotQuality: z.number().optional(),
-	remoteBrowserEnabled: z.boolean().optional(),
-	remoteBrowserHost: z.string().optional(),
-	cachedChromeHostUrl: z.string().optional(),
+	// kilocode_change: browser settings removed
 
 	enableCheckpoints: z.boolean().optional(),
 	checkpointTimeout: z
@@ -361,7 +357,7 @@ export const EVALS_SETTINGS: RooCodeSettings = {
 	alwaysAllowWriteProtected: false,
 	alwaysAllowDelete: true, // kilocode_change
 	writeDelayMs: 1000,
-	alwaysAllowBrowser: true,
+	// kilocode_change: browser auto-approval removed
 	alwaysApproveResubmit: true,
 	requestDelaySeconds: 10,
 	alwaysAllowMcp: true,
@@ -377,10 +373,7 @@ export const EVALS_SETTINGS: RooCodeSettings = {
 	commandTimeoutAllowlist: [],
 	preventCompletionWithOpenTodos: false,
 
-	browserToolEnabled: false,
-	browserViewportSize: "900x600",
-	screenshotQuality: 75,
-	remoteBrowserEnabled: false,
+	// kilocode_change: browser defaults removed
 
 	ttsEnabled: false,
 	ttsSpeed: 1,

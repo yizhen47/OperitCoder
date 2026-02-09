@@ -19,9 +19,6 @@ const createBaseConfig = (): AutoApprovalConfig => ({
 		outside: false,
 		protected: false,
 	},
-	browser: {
-		enabled: false,
-	},
 	retry: {
 		enabled: false,
 		delay: 5,
@@ -155,22 +152,6 @@ describe("approvalDecision", () => {
 				const config = { ...createBaseConfig(), write: { enabled: false, outside: false, protected: true } }
 				const decision = getApprovalDecision(message, config, false)
 				expect(decision.action).toBe("auto-approve")
-			})
-		})
-
-		describe("tool requests - browser operations", () => {
-			it("should auto-approve browser actions when config enabled", () => {
-				const message = createMessage("tool", JSON.stringify({ tool: "browser_action" }))
-				const config = { ...createBaseConfig(), browser: { enabled: true } }
-				const decision = getApprovalDecision(message, config, false)
-				expect(decision.action).toBe("auto-approve")
-			})
-
-			it("should auto-reject browser actions in CI mode when disabled", () => {
-				const message = createMessage("tool", JSON.stringify({ tool: "browser_action" }))
-				const config = createBaseConfig()
-				const decision = getApprovalDecision(message, config, true)
-				expect(decision.action).toBe("auto-reject")
 			})
 		})
 
@@ -492,13 +473,6 @@ describe("approvalDecision", () => {
 
 			it("should auto-approve command execution in YOLO mode", () => {
 				const message = createMessage("command", JSON.stringify({ command: "npm install" }))
-				const config = createBaseConfig()
-				const decision = getApprovalDecision(message, config, false, true)
-				expect(decision.action).toBe("auto-approve")
-			})
-
-			it("should auto-approve browser actions in YOLO mode", () => {
-				const message = createMessage("tool", JSON.stringify({ tool: "browser_action" }))
 				const config = createBaseConfig()
 				const decision = getApprovalDecision(message, config, false, true)
 				expect(decision.action).toBe("auto-approve")

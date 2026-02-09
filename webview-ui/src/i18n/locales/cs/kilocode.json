@@ -33,7 +33,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Požadavek na nástroj čeká na schválení",
-		"browserAction": "Akce prohlížeče čeká na schválení",
 		"command": "Příkaz čeká na schválení"
 	},
 	"settings": {
@@ -175,9 +174,6 @@
 		"tooltip": {
 			"clickToScroll": "Zobrazit {{messageType}} (#{{messageNumber}})",
 			"messageTypes": {
-				"browser_action_launch": "spuštění prohlížeče",
-				"browser_action_result": "výsledek akce prohlížeče",
-				"browser_action": "akce prohlížeče",
 				"checkpoint_saved": "uložený kontrolní bod",
 				"command": "provedení příkazu",
 				"command_output": "výstup příkazu",

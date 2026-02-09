@@ -173,7 +173,7 @@ export interface WebviewMessage {
 		| "codebaseIndexEnabled"
 		| "telemetrySetting"
 		| "testBrowserConnection"
-		| "browserConnectionResult"
+		// kilocode_change: browser messages removed
 		| "allowVeryLargeReads" // kilocode_change
 		| "showFeedbackOptions" // kilocode_change
 		| "fetchMcpMarketplace" // kilocode_change
@@ -277,11 +277,7 @@ export interface WebviewMessage {
 		| "requestManagedIndexerState" // kilocode_change
 		| "allowedCommands"
 		| "deniedCommands"
-		| "killBrowserSession"
-		| "openBrowserSessionPanel"
-		| "showBrowserSessionPanelAtStep"
-		| "refreshBrowserSessionPanel"
-		| "browserPanelDidLaunch"
+		// kilocode_change: browser panel actions removed
 		| "addTaskToHistory" // kilocode_change
 		| "sessionShare" // kilocode_change
 		| "shareTaskSession" // kilocode_change

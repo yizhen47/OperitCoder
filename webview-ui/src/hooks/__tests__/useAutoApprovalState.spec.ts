@@ -8,7 +8,6 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowReadOnly: false,
 				alwaysAllowWrite: false,
 				alwaysAllowExecute: false,
-				alwaysAllowBrowser: false,
 				alwaysAllowMcp: false,
 				alwaysAllowModeSwitch: false,
 				alwaysAllowSubtasks: false,
@@ -27,7 +26,6 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowReadOnly: undefined,
 				alwaysAllowWrite: undefined,
 				alwaysAllowExecute: undefined,
-				alwaysAllowBrowser: undefined,
 				alwaysAllowMcp: undefined,
 				alwaysAllowModeSwitch: undefined,
 				alwaysAllowSubtasks: undefined,
@@ -46,7 +44,6 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowReadOnly: true,
 				alwaysAllowWrite: false,
 				alwaysAllowExecute: false,
-				alwaysAllowBrowser: false,
 				alwaysAllowMcp: false,
 				alwaysAllowModeSwitch: false,
 				alwaysAllowSubtasks: false,
@@ -65,7 +62,6 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowReadOnly: true,
 				alwaysAllowWrite: true,
 				alwaysAllowExecute: true,
-				alwaysAllowBrowser: false,
 				alwaysAllowMcp: false,
 				alwaysAllowModeSwitch: false,
 				alwaysAllowSubtasks: false,
@@ -84,7 +80,6 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowReadOnly: true,
 				alwaysAllowWrite: true,
 				alwaysAllowExecute: true,
-				alwaysAllowBrowser: true,
 				alwaysAllowMcp: true,
 				alwaysAllowModeSwitch: true,
 				alwaysAllowSubtasks: true,
@@ -129,7 +124,6 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowReadOnly: false,
 				alwaysAllowWrite: false,
 				alwaysAllowExecute: false,
-				alwaysAllowBrowser: false,
 				alwaysAllowMcp: false,
 				alwaysAllowModeSwitch: false,
 				alwaysAllowSubtasks: false,
@@ -271,7 +265,6 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowReadOnly: 1 as any, // truthy non-boolean
 				alwaysAllowWrite: "" as any, // falsy non-boolean
 				alwaysAllowExecute: null as any, // falsy non-boolean
-				alwaysAllowBrowser: "yes" as any, // truthy non-boolean
 			}
 
 			const { result } = renderHook(() => useAutoApprovalState(toggles, true))

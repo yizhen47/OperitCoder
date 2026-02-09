@@ -23,7 +23,6 @@ import {
 	autoApproveWriteAtom,
 	autoApproveWriteOutsideAtom,
 	autoApproveWriteProtectedAtom,
-	autoApproveBrowserAtom,
 	autoApproveRetryAtom,
 	autoApproveRetryDelayAtom,
 	autoApproveMcpAtom,
@@ -76,7 +75,6 @@ export function useApprovalMonitor(): void {
 	const autoApproveWrite = useAtomValue(autoApproveWriteAtom)
 	const autoApproveWriteOutside = useAtomValue(autoApproveWriteOutsideAtom)
 	const autoApproveWriteProtected = useAtomValue(autoApproveWriteProtectedAtom)
-	const autoApproveBrowser = useAtomValue(autoApproveBrowserAtom)
 	const autoApproveRetry = useAtomValue(autoApproveRetryAtom)
 	const autoApproveRetryDelay = useAtomValue(autoApproveRetryDelayAtom)
 	const autoApproveMcp = useAtomValue(autoApproveMcpAtom)
@@ -107,9 +105,6 @@ export function useApprovalMonitor(): void {
 			enabled: autoApproveWrite,
 			outside: autoApproveWriteOutside,
 			protected: autoApproveWriteProtected,
-		},
-		browser: {
-			enabled: autoApproveBrowser,
 		},
 		retry: {
 			enabled: autoApproveRetry,

@@ -325,15 +325,6 @@ export const autoApproveWriteProtectedAtom = atom((get) => {
 })
 
 /**
- * Derived atom to check if browser operations should be auto-approved
- */
-export const autoApproveBrowserAtom = atom((get) => {
-	const enabled = get(autoApprovalEnabledAtom)
-	const autoApproval = get(autoApprovalConfigAtom)
-	return enabled && (autoApproval?.browser?.enabled ?? false)
-})
-
-/**
  * Derived atom to check if retry operations should be auto-approved
  */
 export const autoApproveRetryAtom = atom((get) => {

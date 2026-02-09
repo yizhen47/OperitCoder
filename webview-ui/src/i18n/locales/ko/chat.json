@@ -343,43 +343,6 @@
 		"careers": "그리고, <careersLink>채용 중입니다!</careersLink>",
 		"socialLinks": "<xLink>X</xLink>, <discordLink>Discord</discordLink>, 또는 <redditLink>r/KiloCode</redditLink>에서 만나요 🚀"
 	},
-	"browser": {
-		"session": "브라우저 세션",
-		"rooWantsToUse": "Operit Coder가 브라우저를 사용하고 싶어합니다",
-		"consoleLogs": "콘솔 로그",
-		"noNewLogs": "(새 로그 없음)",
-		"screenshot": "브라우저 스크린샷",
-		"cursor": "커서",
-		"navigation": {
-			"step": "단계 {{current}} / {{total}}",
-			"previous": "이전",
-			"next": "다음"
-		},
-		"sessionStarted": "브라우저 세션 시작됨",
-		"actions": {
-			"title": "브라우저 작업: ",
-			"launched": "브라우저 실행됨",
-			"launch": "{{url}}에서 브라우저 실행",
-			"clicked": "클릭함: {{coordinate}}",
-			"click": "클릭 ({{coordinate}})",
-			"typed": "입력함: {{text}}",
-			"type": "입력 \"{{text}}\"",
-			"pressed": "{{key}} 누름",
-			"press": "{{key}} 누르기",
-			"scrolledDown": "아래로 스크롤됨",
-			"scrollDown": "아래로 스크롤",
-			"scrolledUp": "위로 스크롤됨",
-			"scrollUp": "위로 스크롤",
-			"hovered": "가리킴: {{coordinate}}",
-			"hover": "가리키기 ({{coordinate}})",
-			"resized": "크기 조정됨: {{size}}",
-			"resize": "크기를 {{size}}로 조정",
-			"screenshotSaved": "스크린샷 저장됨",
-			"screenshot": "스크린샷을 {{path}}에 저장",
-			"closed": "브라우저 닫음",
-			"close": "브라우저 닫기"
-		}
-	},
 	"codeblock": {
 		"tooltips": {
 			"expand": "코드 블록 확장",

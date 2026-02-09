@@ -25,7 +25,6 @@
 		"modes": "Režimy",
 		"mcp": "MCP servery",
 		"autoApprove": "Automatické schválení",
-		"browser": "Prohlížeč",
 		"checkpoints": "Kontrolní body",
 		"display": "Zobrazení",
 		"notifications": "Oznámení",
@@ -221,10 +220,6 @@
 				"label": "Zahrnout chráněné soubory",
 				"description": "Povolit Operit Coder vytvářet a upravovat chráněné soubory (jako .kilocodeignore a konfigurační soubory .kilocode/) bez nutnosti schválení."
 			}
-		},
-		"browser": {
-			"label": "Prohlížeč",
-			"description": "Automaticky provádět akce prohlížeče bez nutnosti schválení. Poznámka: Platí pouze v případě, že model podporuje používání počítače"
 		},
 		"retry": {
 			"label": "Zkusit znovu",
@@ -557,10 +552,6 @@
 				"label": "Podpora obrázků",
 				"description": "Je tento model schopen zpracovávat a rozumět obrázkům?"
 			},
-			"computerUse": {
-				"label": "Použití počítače",
-				"description": "Je tento model schopen interagovat s prohlížečem? (např. Claude 3.7 Sonnet)."
-			},
 			"promptCache": {
 				"label": "Ukládání výzev do mezipaměti",
 				"description": "Je tento model schopen ukládat výzvy do mezipaměti?"
@@ -678,34 +669,6 @@
 	},
 	"kiloRemoteControl": {
 		"description": "Povolit vzdálené ovládání úkolů"
-	},
-	"browser": {
-		"enable": {
-			"label": "Povolit nástroj prohlížeče",
-			"description": "Pokud je povoleno, Operit Coder může používat prohlížeč k interakci s webovými stránkami při používání modelů, které podporují používání počítače. <0>Dozvědět se více</0>"
-		},
-		"viewport": {
-			"label": "Velikost zobrazení",
-			"description": "Vyberte velikost zobrazení pro interakce s prohlížečem. To ovlivňuje, jak se webové stránky zobrazují a jak s nimi interagujete.",
-			"options": {
-				"largeDesktop": "Velký desktop (1280x800)",
-				"smallDesktop": "Malý desktop (900x600)",
-				"tablet": "Tablet (768x1024)",
-				"mobile": "Mobilní (360x640)"
-			}
-		},
-		"screenshotQuality": {
-			"label": "Kvalita snímku obrazovky",
-			"description": "Upravte kvalitu snímků obrazovky prohlížeče ve formátu WebP. Vyšší hodnoty poskytují jasnější snímky obrazovky, ale zvyšují spotřebu tokenů."
-		},
-		"remote": {
-			"label": "Použít vzdálené připojení prohlížeče",
-			"description": "Připojte se k prohlížeči Chrome, který běží s povoleným vzdáleným laděním (--remote-debugging-port=9222).",
-			"urlPlaceholder": "Vlastní URL (např. http://localhost:9222)",
-			"testButton": "Testovat připojení",
-			"testingButton": "Testování...",
-			"instructions": "Zadejte adresu hostitele protokolu DevTools nebo ponechte prázdné pro automatické zjištění místních instancí Chrome. Tlačítko Testovat připojení se pokusí o vlastní URL, pokud je zadáno, nebo o automatické zjištění, pokud je pole prázdné."
-		}
 	},
 	"checkpoints": {
 		"timeout": {

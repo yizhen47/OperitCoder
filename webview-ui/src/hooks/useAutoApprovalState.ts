@@ -5,7 +5,6 @@ interface AutoApprovalToggles {
 	alwaysAllowWrite?: boolean
 	alwaysAllowExecute?: boolean
 	alwaysAllowPkgTools?: boolean // kilocode_change
-	alwaysAllowBrowser?: boolean
 	alwaysAllowMcp?: boolean
 	alwaysAllowModeSwitch?: boolean
 	alwaysAllowSubtasks?: boolean

@@ -343,43 +343,6 @@
 		"careers": "A més, <careersLink>estem contractant!</careersLink>",
 		"socialLinks": "Uneix-te a nosaltres a <xLink>X</xLink>, <discordLink>Discord</discordLink>, o <redditLink>r/KiloCode</redditLink> 🚀"
 	},
-	"browser": {
-		"session": "Sessió del navegador",
-		"rooWantsToUse": "Operit Coder vol utilitzar el navegador",
-		"consoleLogs": "Registres de consola",
-		"noNewLogs": "(Cap registre nou)",
-		"screenshot": "Captura de pantalla del navegador",
-		"cursor": "cursor",
-		"navigation": {
-			"step": "Pas {{current}} de {{total}}",
-			"previous": "Anterior",
-			"next": "Següent"
-		},
-		"sessionStarted": "Sessió de navegador iniciada",
-		"actions": {
-			"title": "Acció del navegador: ",
-			"launched": "Navegador iniciat",
-			"launch": "Iniciar navegador a {{url}}",
-			"clicked": "Fet clic ({{coordinate}})",
-			"click": "Clic ({{coordinate}})",
-			"typed": "Escrit: {{text}}",
-			"type": "Escriure \"{{text}}\"",
-			"pressed": "Premut: {{key}}",
-			"press": "Prem {{key}}",
-			"scrolledDown": "Desplaçat avall",
-			"scrollDown": "Desplaçar avall",
-			"scrolledUp": "Desplaçat amunt",
-			"scrollUp": "Desplaçar amunt",
-			"hovered": "Planat sobre ({{coordinate}})",
-			"hover": "Plana sobre ({{coordinate}})",
-			"resized": "Mida canviada a: {{size}}",
-			"resize": "Canvia la mida a {{size}}",
-			"screenshotSaved": "Captura de pantalla guardada",
-			"screenshot": "Guarda la captura de pantalla a {{path}}",
-			"closed": "Navegador tancat",
-			"close": "Tancar navegador"
-		}
-	},
 	"codeblock": {
 		"tooltips": {
 			"expand": "Expandir bloc de codi",

@@ -33,7 +33,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Yêu cầu công cụ đang chờ phê duyệt",
-		"browserAction": "Hành động trình duyệt đang chờ phê duyệt",
 		"command": "Lệnh đang chờ phê duyệt"
 	},
 	"settings": {
@@ -174,9 +173,6 @@
 	"taskTimeline": {
 		"tooltip": {
 			"messageTypes": {
-				"browser_action_launch": "khởi chạy trình duyệt",
-				"browser_action": "hành động trình duyệt",
-				"browser_action_result": "kết quả hành động trình duyệt",
 				"checkpoint_saved": "đã lưu điểm kiểm tra",
 				"command_output": "kết quả lệnh",
 				"command": "thực thi lệnh",

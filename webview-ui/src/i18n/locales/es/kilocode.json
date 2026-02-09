@@ -26,7 +26,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Solicitud de herramienta pendiente de aprobación",
-		"browserAction": "Acción del navegador pendiente de aprobación",
 		"command": "Comando pendiente de aprobación"
 	},
 	"settings": {
@@ -175,11 +174,8 @@
 		"tooltip": {
 			"clickToScroll": "Ver {{messageType}} (#{{messageNumber}})",
 			"messageTypes": {
-				"browser_action_launch": "lanzamiento del navegador",
-				"browser_action": "acción del navegador",
 				"checkpoint_saved": "punto de control guardado",
 				"command_output": "salida del comando",
-				"browser_action_result": "resultado de la acción del navegador",
 				"command": "ejecución de comandos",
 				"condense_context": "condensar contexto",
 				"mcp_server_response": "Respuesta del servidor MCP",

@@ -29,7 +29,6 @@
 	},
 	"notifications": {
 		"toolRequest": "طلب أداة بانتظار الموافقة",
-		"browserAction": "طلب استخدام المتصفح بانتظار الموافقة",
 		"command": "أمر بانتظار الموافقة"
 	},
 	"settings": {
@@ -177,9 +176,6 @@
 		"tooltip": {
 			"clickToScroll": "عرض {{messageType}} (رقم {{messageNumber}})",
 			"messageTypes": {
-				"browser_action_launch": "تشغيل المتصفح",
-				"browser_action_result": "نتيجة المتصفح",
-				"browser_action": "إجراء المتصفح",
 				"checkpoint_saved": "تم حفظ نقطة التوقف",
 				"command": "تنفيذ الأمر",
 				"command_output": "ناتج الأمر",

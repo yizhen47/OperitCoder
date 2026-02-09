@@ -33,7 +33,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Demande d'outil en attente d'approbation",
-		"browserAction": "Action du navigateur en attente d'approbation",
 		"command": "Commande en attente d'approbation"
 	},
 	"settings": {
@@ -182,9 +181,6 @@
 		"tooltip": {
 			"clickToScroll": "Voir {{messageType}} (#{{messageNumber}})",
 			"messageTypes": {
-				"browser_action_result": "résultat de l'action du navigateur",
-				"browser_action_launch": "lancement du navigateur",
-				"browser_action": "action du navigateur",
 				"completion_result": "résultat de complétion",
 				"command_output": "sortie de commande",
 				"checkpoint_saved": "point de sauvegarde enregistré",

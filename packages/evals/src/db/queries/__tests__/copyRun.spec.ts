@@ -138,7 +138,7 @@ describe("copyRun", () => {
 		const toolError3 = await createToolError({
 			runId: sourceRunId,
 			taskId: null,
-			toolName: "browser_action",
+			toolName: "read_file", // kilocode_change: browser_action removed
 			error: "Browser connection timeout",
 		})
 
@@ -234,8 +234,8 @@ describe("copyRun", () => {
 		expect(taskToolErrors).toHaveLength(2)
 		expect(runToolErrors).toHaveLength(1)
 
-		const browserError = runToolErrors.find((te) => te.toolName === "browser_action")!
-		expect(browserError.error).toBe("Browser connection timeout")
+		const runError = runToolErrors.find((te) => te.toolName === "read_file")!
+		expect(runError.error).toBe("Browser connection timeout")
 
 		await db.delete(schema.toolErrors).where(eq(schema.toolErrors.runId, newRunId))
 		await db.delete(schema.tasks).where(eq(schema.tasks.runId, newRunId))

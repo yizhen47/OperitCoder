@@ -100,20 +100,6 @@ describe("mapConfigToExtensionState", () => {
 			expect(state.alwaysAllowWriteProtected).toBe(false)
 		})
 
-		it("should set browser settings correctly", () => {
-			const config: CLIConfig = {
-				...baseConfig,
-				autoApproval: {
-					enabled: true,
-					browser: { enabled: true },
-				},
-			}
-
-			const state = mapConfigToExtensionState(config)
-
-			expect(state.alwaysAllowBrowser).toBe(true)
-		})
-
 		it("should set execute settings correctly", () => {
 			const config: CLIConfig = {
 				...baseConfig,
@@ -233,7 +219,6 @@ describe("mapConfigToExtensionState", () => {
 			expect(state.alwaysAllowWrite).toBe(false)
 			expect(state.alwaysAllowWriteOutsideWorkspace).toBe(false)
 			expect(state.alwaysAllowWriteProtected).toBe(false)
-			expect(state.alwaysAllowBrowser).toBe(false)
 			expect(state.alwaysAllowMcp).toBe(false)
 			expect(state.alwaysAllowModeSwitch).toBe(false)
 			expect(state.alwaysAllowSubtasks).toBe(false)

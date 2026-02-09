@@ -150,8 +150,6 @@ export function messageToEvent(msg: ClineMessage): SessionEvent | null {
 				return { type: "ask_tool", partial }
 			case "command":
 				return { type: "ask_command", partial }
-			case "browser_action_launch":
-				return { type: "ask_browser_action_launch", partial }
 			case "use_mcp_server":
 				return { type: "ask_use_mcp_server", partial }
 

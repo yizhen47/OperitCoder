@@ -33,7 +33,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Solicitação de ferramenta aguardando aprovação",
-		"browserAction": "Ação do navegador aguardando aprovação",
 		"command": "Comando aguardando aprovação"
 	},
 	"settings": {
@@ -175,9 +174,6 @@
 		"tooltip": {
 			"clickToScroll": "Ver {{messageType}} (#{{messageNumber}})",
 			"messageTypes": {
-				"browser_action_result": "resultado da ação do navegador",
-				"browser_action_launch": "iniciar navegador",
-				"browser_action": "ação do navegador",
 				"command": "execução de comando",
 				"checkpoint_saved": "ponto de verificação salvo",
 				"command_output": "saída do comando",

@@ -64,34 +64,6 @@ export function setupCommonMocks() {
 		},
 	}))
 
-	vi.mock("../../../services/browser/BrowserSession", () => ({
-		BrowserSession: vi.fn().mockImplementation(() => ({
-			testConnection: vi.fn().mockImplementation(async (url) => {
-				if (url === "http://localhost:9222") {
-					return {
-						success: true,
-						message: "Successfully connected to Chrome",
-						endpoint: "ws://localhost:9222/devtools/browser/123",
-					}
-				} else {
-					return {
-						success: false,
-						message: "Failed to connect to Chrome",
-						endpoint: undefined,
-					}
-				}
-			}),
-		})),
-	}))
-
-	vi.mock("../../../services/browser/browserDiscovery", () => ({
-		discoverChromeHostUrl: vi.fn().mockResolvedValue("http://localhost:9222"),
-		tryChromeHostUrl: vi.fn().mockImplementation(async (url) => {
-			return url === "http://localhost:9222"
-		}),
-		testBrowserConnection: vi.fn(),
-	}))
-
 	const mockAddCustomInstructions = vi.fn().mockResolvedValue("Combined instructions")
 	;(vi.mocked(import("../core/prompts/sections/custom-instructions")) as any).addCustomInstructions =
 		mockAddCustomInstructions

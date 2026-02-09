@@ -351,43 +351,6 @@
 		"careers": "此外，<careersLink>我们正在招聘！</careersLink>",
 		"socialLinks": "在 <xLink>X</xLink>、<discordLink>Discord</discordLink> 或 <redditLink>r/KiloCode</redditLink> 上关注我们 🚀"
 	},
-	"browser": {
-		"session": "浏览器会话",
-		"rooWantsToUse": "Operit Coder想使用浏览器",
-		"consoleLogs": "控制台日志",
-		"noNewLogs": "(没有新日志)",
-		"screenshot": "浏览器截图",
-		"cursor": "光标",
-		"navigation": {
-			"step": "步骤 {{current}} / {{total}}",
-			"previous": "上一步",
-			"next": "下一步"
-		},
-		"sessionStarted": "浏览器会话已启动",
-		"actions": {
-			"title": "浏览器操作: ",
-			"launched": "浏览器已启动",
-			"launch": "访问 {{url}}",
-			"clicked": "点击位置: {{coordinate}}",
-			"click": "点击 ({{coordinate}})",
-			"typed": "输入: {{text}}",
-			"type": "输入 \"{{text}}\"",
-			"pressed": "已按 {{key}}",
-			"press": "按 {{key}}",
-			"scrolledDown": "已向下滚动",
-			"scrollDown": "向下滚动",
-			"scrolledUp": "已向上滚动",
-			"scrollUp": "向上滚动",
-			"hovered": "悬停位置: {{coordinate}}",
-			"hover": "悬停 ({{coordinate}})",
-			"resized": "大小已更改: {{size}}",
-			"resize": "调整大小为 {{size}}",
-			"screenshotSaved": "截图已保存",
-			"screenshot": "将截图保存到 {{path}}",
-			"closed": "浏览器已关闭",
-			"close": "关闭浏览器"
-		}
-	},
 	"codeblock": {
 		"tooltips": {
 			"expand": "展开代码块",

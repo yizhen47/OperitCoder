@@ -129,7 +129,6 @@ const groupedMessages = useMemo(() => {
 }, [
   isCondensing,
   visibleMessages,
-  isBrowserSessionMessage,
   condensingMessageTs,
   olderMessagesCollapsed,
   OLDER_MESSAGES_AUTO_COLLAPSE_THRESHOLD,

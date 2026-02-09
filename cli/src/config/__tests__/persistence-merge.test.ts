@@ -91,7 +91,7 @@ describe("Config Persistence - Merge with Defaults", () => {
 				read: {
 					enabled: false,
 				},
-				// Missing: write, browser, retry, etc.
+				// Missing: write, retry, etc.
 			},
 		}
 
@@ -103,7 +103,6 @@ describe("Config Persistence - Merge with Defaults", () => {
 		expect(result.config.autoApproval?.read?.enabled).toBe(false)
 		expect(result.config.autoApproval?.read?.outside).toBe(DEFAULT_AUTO_APPROVAL.read?.outside)
 		expect(result.config.autoApproval?.write).toEqual(DEFAULT_AUTO_APPROVAL.write)
-		expect(result.config.autoApproval?.browser).toEqual(DEFAULT_AUTO_APPROVAL.browser)
 		expect(result.config.autoApproval?.retry).toEqual(DEFAULT_AUTO_APPROVAL.retry)
 		expect(result.config.autoApproval?.execute).toEqual(DEFAULT_AUTO_APPROVAL.execute)
 		expect(result.config.autoApproval?.question).toEqual(DEFAULT_AUTO_APPROVAL.question)

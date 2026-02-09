@@ -201,7 +201,7 @@ export class KilocodeEventProcessor {
 				// Approval-required asks → waiting_approval
 				case "tool":
 				case "command":
-				case "browser_action_launch":
+				// kilocode_change: browser_action_launch removed
 				case "use_mcp_server":
 					this.postStateEvent(sessionId, { eventType: `ask_${payload.ask}`, partial })
 					break

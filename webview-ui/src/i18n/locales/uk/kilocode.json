@@ -33,7 +33,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Запит інструменту очікує на схвалення",
-		"browserAction": "Дія браузера очікує на схвалення",
 		"command": "Команда очікує на схвалення"
 	},
 	"settings": {
@@ -182,9 +181,6 @@
 		"tooltip": {
 			"clickToScroll": "Переглянути {{messageType}} (#{{messageNumber}})",
 			"messageTypes": {
-				"browser_action_launch": "запуск браузера",
-				"browser_action_result": "результат дії браузера",
-				"browser_action": "дія браузера",
 				"checkpoint_saved": "збережено контрольну точку",
 				"command": "виконання команди",
 				"command_output": "вивід команди",

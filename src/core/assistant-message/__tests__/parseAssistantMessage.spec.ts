@@ -200,17 +200,6 @@ const isEmptyTextContent = (block: AssistantMessageContent) =>
 			})
 
 			it("should handle tool use with no parameters", () => {
-				const message = "<browser_action></browser_action>"
-				const result = parser(message).filter((block) => !isEmptyTextContent(block))
-
-				expect(result).toHaveLength(1)
-				const toolUse = result[0] as ToolUse
-				expect(toolUse.type).toBe("tool_use")
-				expect(toolUse.name).toBe("browser_action")
-				expect(Object.keys(toolUse.params).length).toBe(0)
-				expect(toolUse.partial).toBe(false)
-			})
-
 			it("should handle nested tool tags that aren't actually nested", () => {
 				const message =
 					"<execute_command><command>echo '<read_file><path>test.txt</path></read_file>'</command></execute_command>"

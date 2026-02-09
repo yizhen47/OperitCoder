@@ -92,8 +92,6 @@ function mapToStateMachineEvent(eventType: string, partial?: boolean): SessionEv
 			return { type: "ask_tool", partial: partial ?? false }
 		case "ask_command":
 			return { type: "ask_command", partial: partial ?? false }
-		case "ask_browser_action_launch":
-			return { type: "ask_browser_action_launch", partial: partial ?? false }
 		case "ask_use_mcp_server":
 			return { type: "ask_use_mcp_server", partial: partial ?? false }
 

@@ -1111,6 +1111,7 @@ ${prompt}
 			}
 		}
 
+		// kilocode_change: browser session fields removed
 		const {
 			apiConfiguration,
 			diffEnabled: enableDiff,
@@ -2204,7 +2205,6 @@ ${prompt}
 			alwaysAllowExecute,
 			allowedCommands,
 			deniedCommands,
-			alwaysAllowBrowser,
 			alwaysAllowMcp,
 			alwaysAllowModeSwitch,
 			alwaysAllowSubtasks,
@@ -2222,11 +2222,7 @@ ${prompt}
 			checkpointTimeout,
 			// taskHistory, // kilocode_change
 			soundVolume,
-			browserViewportSize,
-			screenshotQuality,
-			remoteBrowserHost,
-			remoteBrowserEnabled,
-			cachedChromeHostUrl,
+			// kilocode_change: browser settings removed
 			writeDelayMs,
 			terminalOutputLineLimit,
 			terminalOutputCharacterLimit,
@@ -2257,7 +2253,7 @@ ${prompt}
 			experiments,
 			maxOpenTabsContext,
 			maxWorkspaceFiles,
-			browserToolEnabled,
+			// kilocode_change: browser settings removed
 			telemetrySetting,
 			showRooIgnoredFiles,
 			language,
@@ -2305,7 +2301,6 @@ ${prompt}
 			featureRoomoteControlEnabled,
 			yoloMode, // kilocode_change
 			yoloGatekeeperApiConfigId, // kilocode_change: AI gatekeeper for YOLO mode
-			isBrowserSessionActive,
 			enabledExamplePackages, // kilocode_change
 			disabledExamplePackages, // kilocode_change
 			examplePackages, // kilocode_change
@@ -2353,13 +2348,11 @@ ${prompt}
 			alwaysAllowWriteProtected: alwaysAllowWriteProtected ?? false,
 			alwaysAllowDelete: alwaysAllowDelete ?? false, // kilocode_change
 			alwaysAllowExecute: alwaysAllowExecute ?? true,
-			alwaysAllowBrowser: alwaysAllowBrowser ?? true,
 			alwaysAllowMcp: alwaysAllowMcp ?? true,
 			alwaysAllowModeSwitch: alwaysAllowModeSwitch ?? true,
 			alwaysAllowSubtasks: alwaysAllowSubtasks ?? true,
 			alwaysAllowPkgTools: alwaysAllowPkgTools ?? true, // kilocode_change
 			alwaysAllowUpdateTodoList: alwaysAllowUpdateTodoList ?? true,
-			isBrowserSessionActive,
 			yoloMode: yoloMode ?? false, // kilocode_change
 			allowedMaxRequests,
 			allowedMaxCost,
@@ -2391,11 +2384,6 @@ ${prompt}
 			allowedCommands: mergedAllowedCommands,
 			deniedCommands: mergedDeniedCommands,
 			soundVolume: soundVolume ?? 0.5,
-			browserViewportSize: browserViewportSize ?? "900x600",
-			screenshotQuality: screenshotQuality ?? 75,
-			remoteBrowserHost,
-			remoteBrowserEnabled: remoteBrowserEnabled ?? false,
-			cachedChromeHostUrl: cachedChromeHostUrl,
 			writeDelayMs: writeDelayMs ?? DEFAULT_WRITE_DELAY_MS,
 			terminalOutputLineLimit: terminalOutputLineLimit ?? 500,
 			terminalOutputCharacterLimit: terminalOutputCharacterLimit ?? DEFAULT_TERMINAL_OUTPUT_CHARACTER_LIMIT,
@@ -2431,7 +2419,6 @@ ${prompt}
 			maxOpenTabsContext: maxOpenTabsContext ?? 20,
 			maxWorkspaceFiles: maxWorkspaceFiles ?? 200,
 			cwd,
-			browserToolEnabled: browserToolEnabled ?? true,
 			telemetrySetting,
 			showRooIgnoredFiles: showRooIgnoredFiles ?? false,
 			showAutoApproveMenu: showAutoApproveMenu ?? false, // kilocode_change
@@ -2565,8 +2552,6 @@ ${prompt}
 		}
 
 		// kilocode_change: organization allow list removed
-		// Get actual browser session state
-		const isBrowserSessionActive = this.getCurrentTask()?.browserSession?.isSessionActive() ?? false
 
 		// Return the same structure as before.
 		return {
@@ -2585,14 +2570,13 @@ ${prompt}
 			alwaysAllowWriteProtected: stateValues.alwaysAllowWriteProtected ?? false,
 			alwaysAllowDelete: stateValues.alwaysAllowDelete ?? false, // kilocode_change
 			alwaysAllowExecute: stateValues.alwaysAllowExecute ?? true,
-			alwaysAllowBrowser: stateValues.alwaysAllowBrowser ?? true,
+			// kilocode_change: browser auto-approval removed
 			alwaysAllowMcp: stateValues.alwaysAllowMcp ?? true,
 			alwaysAllowModeSwitch: stateValues.alwaysAllowModeSwitch ?? true,
 			alwaysAllowSubtasks: stateValues.alwaysAllowSubtasks ?? true,
 			alwaysAllowFollowupQuestions: stateValues.alwaysAllowFollowupQuestions ?? false,
 			alwaysAllowPkgTools: stateValues.alwaysAllowPkgTools ?? true, // kilocode_change
 			alwaysAllowUpdateTodoList: stateValues.alwaysAllowUpdateTodoList ?? true, // kilocode_change
-			isBrowserSessionActive,
 			yoloMode: stateValues.yoloMode ?? false, // kilocode_change
 			followupAutoApproveTimeoutMs: stateValues.followupAutoApproveTimeoutMs ?? 60000,
 			diagnosticsEnabled: stateValues.diagnosticsEnabled ?? true,
@@ -2610,11 +2594,6 @@ ${prompt}
 			enableCheckpoints: stateValues.enableCheckpoints ?? true,
 			checkpointTimeout: stateValues.checkpointTimeout ?? DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
 			soundVolume: stateValues.soundVolume,
-			browserViewportSize: stateValues.browserViewportSize ?? "900x600",
-			screenshotQuality: stateValues.screenshotQuality ?? 75,
-			remoteBrowserHost: stateValues.remoteBrowserHost,
-			remoteBrowserEnabled: stateValues.remoteBrowserEnabled ?? true,
-			cachedChromeHostUrl: stateValues.cachedChromeHostUrl as string | undefined,
 			fuzzyMatchThreshold: stateValues.fuzzyMatchThreshold ?? 1.0,
 			writeDelayMs: stateValues.writeDelayMs ?? DEFAULT_WRITE_DELAY_MS,
 			terminalOutputLineLimit: stateValues.terminalOutputLineLimit ?? 500,
@@ -2703,7 +2682,6 @@ ${prompt}
 			maxOpenTabsContext: stateValues.maxOpenTabsContext ?? 20,
 			maxWorkspaceFiles: stateValues.maxWorkspaceFiles ?? 200,
 			openRouterUseMiddleOutTransform: stateValues.openRouterUseMiddleOutTransform,
-			browserToolEnabled: stateValues.browserToolEnabled ?? true,
 			telemetrySetting: stateValues.telemetrySetting || "unset",
 			showRooIgnoredFiles: stateValues.showRooIgnoredFiles ?? false,
 			showAutoApproveMenu: stateValues.showAutoApproveMenu ?? false, // kilocode_change
@@ -3550,7 +3528,6 @@ ${prompt}
 				return {
 					autoApprove: {
 						autoApprovalEnabled: !!state.autoApprovalEnabled,
-						alwaysAllowBrowser: !!state.alwaysAllowBrowser,
 						alwaysAllowExecute: !!state.alwaysAllowExecute,
 						alwaysAllowFollowupQuestions: !!state.alwaysAllowFollowupQuestions,
 						alwaysAllowMcp: !!state.alwaysAllowMcp,

@@ -133,9 +133,7 @@ export interface ExtensionMessage {
 		| "humanRelayResponse"
 		| "humanRelayCancel"
 		| "insertTextToChatArea" // kilocode_change
-		| "browserToolEnabled"
-		| "browserConnectionResult"
-		| "remoteBrowserEnabled"
+		// kilocode_change: browser messages removed
 		| "ttsStart"
 		| "ttsStop"
 		| "maxReadFileLine"
@@ -194,8 +192,6 @@ export interface ExtensionMessage {
 		| "interactionRequired"
 		| "managedIndexerState" // kilocode_change
 		| "managedIndexerEnabled" // kilocode_change
-		| "browserSessionUpdate"
-		| "browserSessionNavigate"
 		| "organizationSwitchResult"
 		| "showTimestamps" // kilocode_change
 		| "apiMessagesSaved" // kilocode_change: File save event for API messages
@@ -364,9 +360,7 @@ export interface ExtensionMessage {
 			}
 		}
 	}> // kilocode_change end: Managed Indexer
-	browserSessionMessages?: ClineMessage[] // For browser session panel updates
-	isBrowserSessionActive?: boolean // For browser session panel updates
-	stepIndex?: number // For browserSessionNavigate: the target step index to display
+	// kilocode_change: browser session panel fields removed
 	// kilocode_change start: Device auth data
 	deviceAuthCode?: string
 	deviceAuthVerificationUrl?: string
@@ -393,7 +387,6 @@ export type ExtensionState = Pick<
 	| "alwaysAllowWriteOutsideWorkspace"
 	| "alwaysAllowWriteProtected"
 	| "alwaysAllowDelete" // kilocode_change
-	| "alwaysAllowBrowser"
 	| "alwaysApproveResubmit"
 	| "alwaysAllowMcp"
 	| "alwaysAllowModeSwitch"
@@ -407,14 +400,10 @@ export type ExtensionState = Pick<
 	| "deniedCommands"
 	| "allowedMaxRequests"
 	| "allowedMaxCost"
-	| "browserToolEnabled"
-	| "browserViewportSize"
+	// kilocode_change: browser settings removed
 	| "showAutoApproveMenu" // kilocode_change
 	| "hideCostBelowThreshold" // kilocode_change
-	| "screenshotQuality"
-	| "remoteBrowserEnabled"
-	| "cachedChromeHostUrl"
-	| "remoteBrowserHost"
+	// kilocode_change: browser settings removed
 	| "ttsEnabled"
 	| "ttsSpeed"
 	| "soundEnabled"
@@ -530,7 +519,7 @@ export type ExtensionState = Pick<
 	hideCostBelowThreshold?: number // kilocode_change
 
 	// kilocode_change: cloud features removed
-	isBrowserSessionActive: boolean // Actual browser session state
+	// kilocode_change: browser session state removed
 
 	autoCondenseContext: boolean
 	autoCondenseContextPercent: number
@@ -676,37 +665,7 @@ export interface ClineSayTool {
 }
 
 // Must keep in sync with system prompt.
-export const browserActions = [
-	"launch",
-	"click",
-	"hover",
-	"type",
-	"press",
-	"scroll_down",
-	"scroll_up",
-	"resize",
-	"close",
-	"screenshot",
-] as const
-
-export type BrowserAction = (typeof browserActions)[number]
-
-export interface ClineSayBrowserAction {
-	action: BrowserAction
-	coordinate?: string
-	size?: string
-	text?: string
-	executedCoordinate?: string
-}
-
-export type BrowserActionResult = {
-	screenshot?: string
-	logs?: string
-	currentUrl?: string
-	currentMousePosition?: string
-	viewportWidth?: number
-	viewportHeight?: number
-}
+// kilocode_change: browser action types removed
 
 export interface ClineAskUseMcpServer {
 	serverName: string

@@ -207,17 +207,6 @@ describe("AssistantMessageParser (streaming)", () => {
 			expect((result[0] as TextContent).content).toBe(message)
 		})
 
-		it("should handle tool use with no parameters", () => {
-			const message = "<browser_action></browser_action>"
-			const result = streamChunks(parser, message).filter((block) => !isEmptyTextContent(block))
-			expect(result).toHaveLength(1)
-			const toolUse = result[0] as ToolUse
-			expect(toolUse.type).toBe("tool_use")
-			expect(toolUse.name).toBe("browser_action")
-			expect(Object.keys(toolUse.params).length).toBe(0)
-			expect(toolUse.partial).toBe(false)
-		})
-
 		it("should handle a tool use with a parameter containing XML-like content", () => {
 			const message = "<search_files><regex><div>.*</div></regex><path>src</path></search_files>"
 			const result = streamChunks(parser, message).filter((block) => !isEmptyTextContent(block))

@@ -990,9 +990,6 @@ export class ExtensionHost extends EventEmitter {
 		if (configState.alwaysAllowWriteProtected !== undefined) {
 			autoApprovalSettings.alwaysAllowWriteProtected = configState.alwaysAllowWriteProtected
 		}
-		if (configState.alwaysAllowBrowser !== undefined) {
-			autoApprovalSettings.alwaysAllowBrowser = configState.alwaysAllowBrowser
-		}
 		if (configState.alwaysApproveResubmit !== undefined) {
 			autoApprovalSettings.alwaysApproveResubmit = configState.alwaysApproveResubmit
 		}

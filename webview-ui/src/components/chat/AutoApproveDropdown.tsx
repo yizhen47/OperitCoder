@@ -36,7 +36,6 @@ export const AutoApproveDropdown = ({ disabled = false, triggerClassName = "" }:
 		setAlwaysAllowWrite,
 		setAlwaysAllowExecute,
 		setAlwaysAllowPkgTools, // kilocode_change
-		setAlwaysAllowBrowser,
 		setAlwaysAllowMcp,
 		setAlwaysAllowModeSwitch,
 		setAlwaysAllowSubtasks,
@@ -75,9 +74,6 @@ export const AutoApproveDropdown = ({ disabled = false, triggerClassName = "" }:
 					setAlwaysAllowPkgTools(value)
 					break
 				// kilocode_change end
-				case "alwaysAllowBrowser":
-					setAlwaysAllowBrowser(value)
-					break
 				case "alwaysAllowMcp":
 					setAlwaysAllowMcp(value)
 					break
@@ -110,7 +106,6 @@ export const AutoApproveDropdown = ({ disabled = false, triggerClassName = "" }:
 			setAlwaysAllowWrite,
 			setAlwaysAllowExecute,
 			setAlwaysAllowPkgTools, // kilocode_change
-			setAlwaysAllowBrowser,
 			setAlwaysAllowMcp,
 			setAlwaysAllowModeSwitch,
 			setAlwaysAllowSubtasks,

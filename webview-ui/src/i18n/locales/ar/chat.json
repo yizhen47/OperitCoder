@@ -403,51 +403,7 @@
 		"autoSelectCountdown": "سيتم الاختيار تلقائياً خلال {{count}}ث",
 		"countdownDisplay": "{{count}}ث"
 	},
-	"browserAnnouncement": "تحديث Browser Use 2.0 يُحسِّن تجربة التصفح في الدردشة بجلسات دائمة، تغذية راجعة أوضح، لوحة متصفح مخصصة، ووصف أوضح للإجراءات",
-	"browserAnnouncementDesc": "الآن يمكنك الحفاظ على جلسات المتصفح بين الطلبات، تتبع أفعال المتصفح بشكل أفضل، والحصول على تجربة تصفح أكثر سلاسة",
-	"browserSession": "جلسة المتصفح",
-	"browserActionPress": "ضغط المفتاح",
-	"browserActionPressDesc": "ضغط مفتاح معين في لوحة المفاتيح",
-	"browserActionHover": "التمرير فوق",
-	"browserActionHoverDesc": "تحريك الماوس فوق عنصر",
 	"rooCloudAnnouncement": "موفر Roo Code Cloud الآن يقدم نماذج مدفوعة: اشترِ رصيداً واستخدمه للوكلاء السحابيين والاستنتاج",
-	"browser": {
-		"session": "جلسة المتصفح",
-		"rooWantsToUse": "Operit Coder يريد استخدام المتصفح:",
-		"consoleLogs": "سجلات الكونسول",
-		"noNewLogs": "(لا توجد سجلات جديدة)",
-		"screenshot": "لقطة شاشة للمتصفح",
-		"cursor": "المؤشر",
-		"navigation": {
-			"step": "خطوة {{current}} من {{total}}",
-			"previous": "السابق",
-			"next": "التالي"
-		},
-		"sessionStarted": "بدأت جلسة التصفح",
-		"actions": {
-			"title": "إجراء تصفح: ",
-			"launched": "تم فتح المتصفح",
-			"launch": "فتح المتصفح على {{url}}",
-			"clicked": "نقرة عند: {{coordinate}}",
-			"click": "نقرة ({{coordinate}})",
-			"typed": "تم كتابة: {{text}}",
-			"type": "كتابة \"{{text}}\"",
-			"pressed": "تم ضغط المفتاح: {{key}}",
-			"press": "ضغط {{key}}",
-			"scrolledDown": "تم التمرير لأسفل",
-			"scrollDown": "تمرير لأسفل",
-			"scrolledUp": "تم التمرير لأعلى",
-			"scrollUp": "تمرير لأعلى",
-			"hovered": "تم التمرير عند: {{coordinate}}",
-			"hover": "تمرير ({{coordinate}})",
-			"resized": "تم تغيير الحجم إلى: {{size}}",
-			"resize": "تغيير الحجم إلى {{size}}",
-			"screenshotSaved": "تم حفظ لقطة الشاشة",
-			"screenshot": "حفظ لقطة شاشة في {{path}}",
-			"closed": "تم إغلاق المتصفح",
-			"close": "إغلاق المتصفح"
-		}
-	},
 	"codeblock": {
 		"tooltips": {
 			"expand": "توسيع كتلة الكود",

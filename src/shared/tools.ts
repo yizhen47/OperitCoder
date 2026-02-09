@@ -6,7 +6,6 @@ import type {
 	ToolGroup,
 	ToolName,
 	FileEntry,
-	BrowserActionParams,
 	GenerateImageParams,
 } from "@roo-code/types"
 
@@ -112,7 +111,7 @@ export type NativeToolArgs = {
 		question: string
 		follow_up: Array<{ text: string; mode?: string }>
 	}
-	browser_action: BrowserActionParams
+	// kilocode_change: browser_action removed
 	codebase_search: { query: string; path?: string }
 	fetch_instructions: { task: string }
 	generate_image: GenerateImageParams
@@ -232,11 +231,6 @@ export interface ListFilesToolUse extends ToolUse<"list_files"> {
 	params: Partial<Pick<Record<ToolParamName, string>, "path" | "recursive">>
 }
 
-export interface BrowserActionToolUse extends ToolUse<"browser_action"> {
-	name: "browser_action"
-	params: Partial<Pick<Record<ToolParamName, string>, "action" | "url" | "coordinate" | "text" | "size" | "path">>
-}
-
 export interface UseMcpToolToolUse extends ToolUse<"use_mcp_tool"> {
 	name: "use_mcp_tool"
 	params: Partial<Pick<Record<ToolParamName, string>, "server_name" | "tool_name" | "arguments">>
@@ -308,7 +302,7 @@ export const TOOL_DISPLAY_NAMES: Record<ToolName, string> = {
 	apply_patch: "apply patches using codex format",
 	search_files: "search files",
 	list_files: "list files",
-	browser_action: "use a browser",
+	// kilocode_change: browser_action removed
 	use_mcp_tool: "use mcp tools",
 	sandbox_package_tool: "use sandbox packages",
 	activate_sandbox_package: "activate sandbox packages", // kilocode_change
@@ -340,9 +334,7 @@ export const TOOL_GROUPS: Record<ToolGroup, ToolGroupConfig> = {
 		],
 		customTools: ["search_and_replace", "search_replace", "apply_patch"],
 	},
-	browser: {
-		tools: ["browser_action"],
-	},
+	// kilocode_change: browser tool group removed
 	command: {
 		tools: ["execute_command"],
 	},

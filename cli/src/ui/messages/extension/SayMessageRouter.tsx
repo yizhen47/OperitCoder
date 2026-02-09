@@ -17,7 +17,6 @@ import {
 	SayCondenseContextMessage,
 	SayCondenseContextErrorMessage,
 	SayCodebaseSearchResultMessage,
-	SayBrowserActionResultMessage,
 	SayUserEditTodosMessage,
 	SayImageMessage,
 	SayMcpServerRequestStartedMessage,
@@ -84,9 +83,6 @@ export const SayMessageRouter: React.FC<MessageComponentProps> = ({ message }) =
 
 		case "codebase_search_result":
 			return <SayCodebaseSearchResultMessage message={message} />
-
-		case "browser_action_result":
-			return <SayBrowserActionResultMessage message={message} />
 
 		case "user_edit_todos":
 			return <SayUserEditTodosMessage message={message} />

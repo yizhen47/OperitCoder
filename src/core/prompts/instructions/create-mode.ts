@@ -9,6 +9,7 @@ export async function createModeInstructions(context: vscode.ExtensionContext | 
 	const settingsDir = await getSettingsDirectoryPath(context.globalStorageUri.fsPath)
 	const customModesPath = path.join(settingsDir, GlobalFileNames.customModes)
 
+	// kilocode_change: browser group removed from example
 	return `
 Custom modes can be configured in two ways:
   1. Globally via '${customModesPath}' (created automatically on startup)
@@ -55,7 +56,6 @@ customModes:
       # - - edit
       #   - fileRegex: \\.md$
       #     description: Markdown files only  # Edit group that only allows editing markdown files
-      - browser  # Browser group (browser_action)
       - command  # Command group (execute_command)
       - mcp      # MCP group (use_mcp_tool, access_mcp_resource)
     customInstructions: Additional instructions for the Designer mode  # Optional`

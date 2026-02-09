@@ -33,7 +33,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Запрос инструмента ожидает утверждения",
-		"browserAction": "Действие браузера ожидает утверждения",
 		"command": "Команда ожидает утверждения"
 	},
 	"settings": {
@@ -174,9 +173,6 @@
 	"taskTimeline": {
 		"tooltip": {
 			"messageTypes": {
-				"browser_action_launch": "запуск браузера",
-				"browser_action_result": "результат действия в браузере",
-				"browser_action": "действие в браузере",
 				"command": "выполнение команды",
 				"command_output": "вывод команды",
 				"checkpoint_saved": "контрольная точка сохранена",

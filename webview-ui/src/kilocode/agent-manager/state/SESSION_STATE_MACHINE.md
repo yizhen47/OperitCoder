@@ -90,7 +90,6 @@ This document defines the state machine for Agent Manager sessions. The state ma
 | `ask:mistake_limit_reached`   | Extension message | Too many errors                      |
 | `ask:payment_required_prompt` | Extension message | Credits/billing needed               |
 | `ask:invalid_model`           | Extension message | Model configuration invalid          |
-| `ask:browser_action_launch`   | Extension message | Browser action approval needed       |
 | `ask:use_mcp_server`          | Extension message | MCP server usage approval needed     |
 | `process_exit`                | CLI               | CLI process terminated               |
 | `process_error`               | CLI               | CLI process error                    |

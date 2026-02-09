@@ -25,7 +25,6 @@
 		"modes": "Tryby",
 		"mcp": "Serwery MCP",
 		"autoApprove": "Auto-zatwierdzanie",
-		"browser": "Dostęp komputera",
 		"checkpoints": "Punkty kontrolne",
 		"display": "Wyświetl",
 		"notifications": "Powiadomienia",
@@ -209,10 +208,6 @@
 		"delete": {
 			"label": "Usuń",
 			"description": "Automatycznie usuwaj pliki i katalogi bez konieczności zatwierdzania"
-		},
-		"browser": {
-			"label": "Przeglądarka",
-			"description": "Automatycznie wykonuj akcje przeglądarki bez konieczności zatwierdzania. Uwaga: Dotyczy tylko gdy model obsługuje używanie komputera"
 		},
 		"retry": {
 			"label": "Ponów",
@@ -526,10 +521,6 @@
 				"label": "Obsługa obrazów",
 				"description": "Czy model jest w stanie przetwarzać i rozumieć obrazy?"
 			},
-			"computerUse": {
-				"label": "Użycie komputera",
-				"description": "Czy model jest w stanie wchodzić w interakcję z przeglądarką?"
-			},
 			"promptCache": {
 				"label": "Buforowanie podpowiedzi",
 				"description": "Czy model jest w stanie buforować podpowiedzi?"
@@ -575,8 +566,7 @@
 			"high": "Wysoki",
 			"xhigh": "Bardzo wysoki",
 			"medium": "Średni",
-			"low": "Niski",
-			"xhigh": "Bardzo wysoki"
+			"low": "Niski"
 		},
 		"verbosity": {
 			"label": "Szczegółowość danych wyjściowych",
@@ -623,34 +613,6 @@
 		"autocompleteLabel": "(Autouzupełnianie)",
 		"autocomplete": {
 			"onlyOneAllowed": "Dozwolony jest tylko jeden profil autouzupełniania. Profil \"{{existingName}}\" jest już skonfigurowany do autouzupełniania. Najpierw zmień jego typ lub usuń go."
-		}
-	},
-	"browser": {
-		"enable": {
-			"label": "Włącz narzędzie przeglądarki",
-			"description": "Gdy włączone, Operit Coder może używać przeglądarki do interakcji ze stronami internetowymi podczas korzystania z modeli obsługujących używanie komputera. <0>Dowiedz się więcej</0>"
-		},
-		"viewport": {
-			"label": "Rozmiar viewportu",
-			"description": "Wybierz rozmiar viewportu dla interakcji przeglądarki. Wpływa to na sposób wyświetlania stron internetowych i interakcji z nimi.",
-			"options": {
-				"largeDesktop": "Duży pulpit (1280x800)",
-				"smallDesktop": "Mały pulpit (900x600)",
-				"tablet": "Tablet (768x1024)",
-				"mobile": "Telefon (360x640)"
-			}
-		},
-		"screenshotQuality": {
-			"label": "Jakość zrzutów ekranu",
-			"description": "Dostosuj jakość WebP zrzutów ekranu przeglądarki. Wyższe wartości zapewniają wyraźniejsze zrzuty ekranu, ale zwiększają zużycie token."
-		},
-		"remote": {
-			"label": "Użyj zdalnego połączenia przeglądarki",
-			"description": "Połącz się z przeglądarką Chrome uruchomioną z włączonym zdalnym debugowaniem (--remote-debugging-port=9222).",
-			"urlPlaceholder": "Niestandardowy URL (np. http://localhost:9222)",
-			"testButton": "Testuj połączenie",
-			"testingButton": "Testowanie...",
-			"instructions": "Wprowadź adres hosta protokołu DevTools lub pozostaw puste, aby automatycznie wykryć lokalne instancje Chrome. Przycisk Test Połączenia spróbuje użyć niestandardowego URL, jeśli podany, lub automatycznie wykryje, jeśli pole jest puste."
 		}
 	},
 	"checkpoints": {

@@ -33,7 +33,6 @@
 	},
 	"notifications": {
 		"toolRequest": "Richiesta strumento in attesa di approvazione",
-		"browserAction": "Azione del browser in attesa di approvazione",
 		"command": "Comando in attesa di approvazione"
 	},
 	"settings": {
@@ -174,9 +173,6 @@
 	"taskTimeline": {
 		"tooltip": {
 			"messageTypes": {
-				"browser_action_launch": "avvio del browser",
-				"browser_action": "azione del browser",
-				"browser_action_result": "risultato dell'azione del browser",
 				"checkpoint_saved": "checkpoint salvato",
 				"command_output": "output del comando",
 				"condense_context": "contesto condensato",

@@ -282,12 +282,10 @@ export class TelemetryClient {
 	private getToolCategory(toolName: string): string {
 		const readTools = ["readFile", "listFiles", "searchFiles", "listCodeDefinitionNames"]
 		const writeTools = ["editedExistingFile", "appliedDiff", "newFileCreated", "insertContent", "searchAndReplace"]
-		const browserTools = ["browser_action"]
 		const mcpTools = ["use_mcp_tool", "access_mcp_resource"]
 
 		if (readTools.includes(toolName)) return "read"
 		if (writeTools.includes(toolName)) return "write"
-		if (browserTools.includes(toolName)) return "browser"
 		if (mcpTools.includes(toolName)) return "mcp"
 
 		return "other"

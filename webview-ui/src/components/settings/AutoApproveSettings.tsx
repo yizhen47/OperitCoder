@@ -23,7 +23,6 @@ type AutoApproveSettingsProps = HTMLAttributes<HTMLDivElement> & {
 	alwaysAllowWrite?: boolean
 	alwaysAllowWriteOutsideWorkspace?: boolean
 	alwaysAllowWriteProtected?: boolean
-	alwaysAllowBrowser?: boolean
 	alwaysApproveResubmit?: boolean
 	requestDelaySeconds: number
 	alwaysAllowMcp?: boolean
@@ -48,7 +47,6 @@ type AutoApproveSettingsProps = HTMLAttributes<HTMLDivElement> & {
 		| "alwaysAllowWriteOutsideWorkspace"
 		| "alwaysAllowWriteProtected"
 		| "alwaysAllowDelete" // kilocode_change
-		| "alwaysAllowBrowser"
 		| "alwaysApproveResubmit"
 		| "requestDelaySeconds"
 		| "alwaysAllowMcp"
@@ -75,7 +73,6 @@ export const AutoApproveSettings = ({
 	alwaysAllowWrite,
 	alwaysAllowWriteOutsideWorkspace,
 	alwaysAllowWriteProtected,
-	alwaysAllowBrowser,
 	alwaysApproveResubmit,
 	requestDelaySeconds,
 	alwaysAllowMcp,
@@ -203,7 +200,6 @@ export const AutoApproveSettings = ({
 					<AutoApproveToggle
 						alwaysAllowReadOnly={alwaysAllowReadOnly}
 						alwaysAllowWrite={alwaysAllowWrite}
-						alwaysAllowBrowser={alwaysAllowBrowser}
 						alwaysApproveResubmit={alwaysApproveResubmit}
 						alwaysAllowMcp={alwaysAllowMcp}
 						alwaysAllowModeSwitch={alwaysAllowModeSwitch}

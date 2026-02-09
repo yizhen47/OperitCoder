@@ -33,7 +33,6 @@
 	},
 	"notifications": {
 		"toolRequest": "도구 요청 승인 대기 중",
-		"browserAction": "브라우저 작업 승인 대기 중",
 		"command": "명령 승인 대기 중"
 	},
 	"settings": {
@@ -182,10 +181,7 @@
 		"tooltip": {
 			"clickToScroll": "{{messageType}} (#{{messageNumber}}) 보기",
 			"messageTypes": {
-				"browser_action": "브라우저 작업",
 				"checkpoint_saved": "체크포인트 저장됨",
-				"browser_action_launch": "브라우저 실행",
-				"browser_action_result": "브라우저 작업 결과",
 				"command_output": "명령어 출력",
 				"command": "명령어 실행",
 				"condense_context": "컨텍스트 요약",

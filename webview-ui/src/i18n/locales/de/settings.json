@@ -25,7 +25,6 @@
 		"modes": "Modi",
 		"mcp": "MCP-Server",
 		"autoApprove": "Auto-Genehmigung",
-		"browser": "Computerzugriff",
 		"checkpoints": "Kontrollpunkte",
 		"display": "Anzeigen",
 		"notifications": "Benachrichtigungen",
@@ -205,10 +204,6 @@
 				"label": "Geschützte Dateien einbeziehen",
 				"description": "Operit Coder erlauben, geschützte Dateien (wie .kilocodeignore und .kilocode/ Konfigurationsdateien) ohne Genehmigung zu erstellen und zu bearbeiten."
 			}
-		},
-		"browser": {
-			"label": "Browser",
-			"description": "Browser-Aktionen automatisch ohne Genehmigung durchführen. Hinweis: Gilt nur, wenn das Modell Computer-Nutzung unterstützt"
 		},
 		"retry": {
 			"label": "Wiederholung",
@@ -535,10 +530,6 @@
 				"label": "Bildunterstützung",
 				"description": "Ist dieses Modell in der Lage, Bilder zu verarbeiten und zu verstehen?"
 			},
-			"computerUse": {
-				"label": "Computer-Nutzung",
-				"description": "Ist dieses Modell in der Lage, mit einem Browser zu interagieren?"
-			},
 			"promptCache": {
 				"label": "Prompt-Caching",
 				"description": "Ist dieses Modell in der Lage, Prompts zu cachen?"
@@ -584,8 +575,7 @@
 			"high": "Hoch",
 			"xhigh": "Sehr hoch",
 			"medium": "Mittel",
-			"low": "Niedrig",
-			"xhigh": "Sehr hoch"
+			"low": "Niedrig"
 		},
 		"verbosity": {
 			"label": "Ausgabe-Ausführlichkeit",
@@ -623,34 +613,6 @@
 			"description": "Dieser Anbieter verwendet OAuth-Authentifizierung vom Qwen-Service und benötigt keine API-Schlüssel.",
 			"instructions": "Bitte folge der offiziellen Dokumentation, um die Autorisierungsdatei zu erhalten und sie im angegebenen Pfad zu platzieren.",
 			"setupLink": "Qwen Offizielle Dokumentation"
-		}
-	},
-	"browser": {
-		"enable": {
-			"label": "Browser-Tool aktivieren",
-			"description": "Wenn aktiviert, kann Operit Coder einen Browser verwenden, um mit Websites zu interagieren, wenn Modelle verwendet werden, die Computer-Nutzung unterstützen. <0>Mehr erfahren</0>"
-		},
-		"viewport": {
-			"label": "Viewport-Größe",
-			"description": "Wähle die Viewport-Größe für Browser-Interaktionen. Dies beeinflusst, wie Websites angezeigt und mit ihnen interagiert wird.",
-			"options": {
-				"largeDesktop": "Großer Desktop (1280x800)",
-				"smallDesktop": "Kleiner Desktop (900x600)",
-				"tablet": "Tablet (768x1024)",
-				"mobile": "Mobil (360x640)"
-			}
-		},
-		"screenshotQuality": {
-			"label": "Screenshot-Qualität",
-			"description": "Passe die WebP-Qualität von Browser-Screenshots an. Höhere Werte bieten klarere Screenshots, erhöhen aber den Token-Verbrauch."
-		},
-		"remote": {
-			"label": "Remote-Browser-Verbindung verwenden",
-			"description": "Verbindung zu einem Chrome-Browser herstellen, der mit aktiviertem Remote-Debugging läuft (--remote-debugging-port=9222).",
-			"urlPlaceholder": "Benutzerdefinierte URL (z.B. http://localhost:9222)",
-			"testButton": "Verbindung testen",
-			"testingButton": "Teste...",
-			"instructions": "Gib die DevTools-Protokoll-Host-Adresse ein oder lasse das Feld leer, um Chrome lokale Instanzen automatisch zu erkennen. Die Schaltfläche 'Verbindung testen' versucht die benutzerdefinierte URL, wenn angegeben, oder erkennt automatisch, wenn das Feld leer ist."
 		}
 	},
 	"checkpoints": {

@@ -39,8 +39,7 @@ import { OrganizationSelector } from "../kilocode/common/OrganizationSelector"
 
 import HistoryPreview from "../history/HistoryPreview"
 import Announcement from "./Announcement"
-import BrowserActionRow from "./BrowserActionRow"
-import BrowserSessionStatusRow from "./BrowserSessionStatusRow"
+// kilocode_change: browser rows removed
 import ChatRow from "./ChatRow"
 import { ChatRowErrorBoundary } from "./ChatRowErrorBoundary" // kilocode_change: 添加错误边界
 import { ChatTextArea } from "./ChatTextArea"
@@ -114,7 +113,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		// cloudIsAuthenticated, // kilocode_change
 		messageQueue = [],
 		sendMessageOnEnter, // kilocode_change
-		isBrowserSessionActive,
+		// kilocode_change: browser session state removed
 	} = useExtensionState()
 
 	const messagesRef = useRef(messages)
@@ -402,13 +401,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 									break
 							}
 							break
-						case "browser_action_launch":
-							setSendingDisabled(isPartial)
-							setClineAsk("browser_action_launch")
-							setEnableButtons(!isPartial)
-							setPrimaryButtonText(t("chat:approve.title"))
-							setSecondaryButtonText(t("chat:reject.title"))
-							break
+						// kilocode_change: browser_action_launch removed
 						case "command":
 							setSendingDisabled(isPartial)
 							setClineAsk("command")
@@ -510,8 +503,6 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 						case "api_req_finished":
 						case "error":
 						case "text":
-						case "browser_action":
-						case "browser_action_result":
 						case "command_output":
 						case "mcp_server_request_started":
 						case "mcp_server_response":
@@ -996,7 +987,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 					) {
 						case "followup":
 						case "tool":
-						case "browser_action_launch":
+						// kilocode_change: browser_action_launch removed
 						case "command": // User can provide feedback to a tool or command use.
 						case "command_output": // User can send input to command stdin.
 						case "use_mcp_server":
@@ -1059,7 +1050,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				case "api_req_failed":
 				case "command":
 				case "tool":
-				case "browser_action_launch":
+				// kilocode_change: browser_action_launch removed
 				case "use_mcp_server":
 				case "mistake_limit_reached":
 				case "report_bug":
@@ -1151,7 +1142,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 					break
 				case "command":
 				case "tool":
-				case "browser_action_launch":
+				// kilocode_change: browser_action_launch removed
 				case "use_mcp_server":
 					// Only send text/images if they exist
 					if (trimmedInput || (images && images.length > 0)) {
@@ -1444,43 +1435,11 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		setWasStreaming(isStreaming)
 	}, [isStreaming, lastMessage, wasStreaming, messages.length])
 
-	// Compute current browser session messages for the top banner (not grouped into chat stream)
-	// Find the FIRST browser session from the beginning to show ALL sessions
-	const browserSessionStartIndex = useMemo(() => {
-		for (let i = 0; i < messages.length; i++) {
-			if (messages[i].ask === "browser_action_launch") {
-				return i
-			}
-		}
-		return -1
-	}, [messages])
-
-	const _browserSessionMessages = useMemo<ClineMessage[]>(() => {
-		if (browserSessionStartIndex === -1) return []
-		return messages.slice(browserSessionStartIndex)
-	}, [browserSessionStartIndex, messages])
-
-	// Show globe toggle only when in a task that has a browser session (active or inactive)
-	const showBrowserDockToggle = useMemo(
-		() => Boolean(task && (browserSessionStartIndex !== -1 || isBrowserSessionActive)),
-		[task, browserSessionStartIndex, isBrowserSessionActive],
-	)
-
-	const isBrowserSessionMessage = useCallback((message: ClineMessage): boolean => {
-		// Only the launch ask should be hidden from chat (it's shown in the drawer header)
-		if (message.type === "ask" && message.ask === "browser_action_launch") {
-			return true
-		}
-		// browser_action_result messages are paired with browser_action and should not appear independently
-		if (message.type === "say" && message.say === "browser_action_result") {
-			return true
-		}
-		return false
-	}, [])
+	// kilocode_change: browser session banner removed
 
 	const groupedMessages = useMemo(() => {
-		// Only filter out the launch ask and result messages - browser actions appear in chat
-		const base: ClineMessage[] = visibleMessages.filter((msg) => !isBrowserSessionMessage(msg))
+		// kilocode_change: browser session filtering removed
+		const base: ClineMessage[] = visibleMessages
 
 		let result: ClineMessage[] = base
 
@@ -1519,7 +1478,6 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 	}, [
 		isCondensing,
 		visibleMessages,
-		isBrowserSessionMessage,
 		condensingMessageTs,
 		olderMessagesCollapsed,
 		OLDER_MESSAGES_AUTO_COLLAPSE_THRESHOLD,
@@ -1751,33 +1709,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				)
 			}
 
-			// Check if this is a browser action message
-			if (messageOrGroup.type === "say" && messageOrGroup.say === "browser_action") {
-				// Find the corresponding result message by looking for the next browser_action_result after this action's timestamp
-				const nextMessage = modifiedMessages.find(
-					(m) => m.ts > messageOrGroup.ts && m.say === "browser_action_result",
-				)
-
-				// Calculate action index and total count
-				const browserActions = modifiedMessages.filter((m) => m.say === "browser_action")
-				const actionIndex = browserActions.findIndex((m) => m.ts === messageOrGroup.ts) + 1
-				const totalActions = browserActions.length
-
-				return (
-					<BrowserActionRow
-						key={messageOrGroup.ts}
-						message={messageOrGroup}
-						nextMessage={nextMessage}
-						actionIndex={actionIndex}
-						totalActions={totalActions}
-					/>
-				)
-			}
-
-			// Check if this is a browser session status message
-			if (messageOrGroup.type === "say" && messageOrGroup.say === "browser_session_status") {
-				return <BrowserSessionStatusRow key={messageOrGroup.ts} message={messageOrGroup} />
-			}
+			// kilocode_change: browser action rows removed
 
 			// regular message
 			return (

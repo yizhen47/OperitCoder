@@ -33,7 +33,6 @@
 	},
 	"notifications": {
 		"toolRequest": "คำขอใช้เครื่องมือรอการอนุมัติ",
-		"browserAction": "การดำเนินการของเบราว์เซอร์รอการอนุมัติ",
 		"command": "คำสั่งรอการอนุมัติ"
 	},
 	"settings": {
@@ -182,9 +181,6 @@
 		"tooltip": {
 			"clickToScroll": "ดู {{messageType}} (#{{messageNumber}})",
 			"messageTypes": {
-				"browser_action_launch": "เปิดเบราว์เซอร์",
-				"browser_action_result": "ผลลัพธ์การดำเนินการของเบราว์เซอร์",
-				"browser_action": "การดำเนินการของเบราว์เซอร์",
 				"checkpoint_saved": "บันทึก checkpoint แล้ว",
 				"command": "การดำเนินการคำสั่ง",
 				"command_output": "ผลลัพธ์คำสั่ง",

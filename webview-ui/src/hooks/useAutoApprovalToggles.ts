@@ -12,7 +12,6 @@ export function useAutoApprovalToggles() {
 		alwaysAllowDelete, // kilocode_change
 		alwaysAllowExecute,
 		alwaysAllowPkgTools, // kilocode_change
-		alwaysAllowBrowser,
 		alwaysAllowMcp,
 		alwaysAllowModeSwitch,
 		alwaysAllowSubtasks,
@@ -28,7 +27,6 @@ export function useAutoApprovalToggles() {
 			alwaysAllowDelete, // kilocode_change
 			alwaysAllowExecute,
 			alwaysAllowPkgTools, // kilocode_change
-			alwaysAllowBrowser,
 			alwaysAllowMcp,
 			alwaysAllowModeSwitch,
 			alwaysAllowSubtasks,
@@ -42,7 +40,6 @@ export function useAutoApprovalToggles() {
 			alwaysAllowDelete, // kilocode_change
 			alwaysAllowExecute,
 			alwaysAllowPkgTools, // kilocode_change
-			alwaysAllowBrowser,
 			alwaysAllowMcp,
 			alwaysAllowModeSwitch,
 			alwaysAllowSubtasks,

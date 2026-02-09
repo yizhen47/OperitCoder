@@ -67,7 +67,7 @@ import { t } from "../../i18n"
 import { ClineApiReqCancelReason, ClineApiReqInfo } from "../../shared/ExtensionMessage"
 import { getApiMetrics, hasTokenUsageChanged, hasToolUsageChanged } from "../../shared/getApiMetrics"
 import { ClineAskResponse } from "../../shared/WebviewMessage"
-import { defaultModeSlug, getModeBySlug, getGroupName } from "../../shared/modes"
+import { defaultModeSlug, getModeBySlug } from "../../shared/modes"
 import { DiffStrategy, type ToolUse, type ToolParamName, toolParamNames } from "../../shared/tools"
 import { EXPERIMENT_IDS, experiments } from "../../shared/experiments"
 import { getModelMaxOutputTokens } from "../../shared/api"
@@ -78,7 +78,7 @@ import { sanitizeMcpName } from "../../utils/mcp-name"
 
 // services
 import { UrlContentFetcher } from "../../services/browser/UrlContentFetcher"
-import { BrowserSession } from "../../services/browser/BrowserSession"
+// kilocode_change: browser session removed
 import { McpHub } from "../../services/mcp/McpHub"
 import { McpServerManager } from "../../services/mcp/McpServerManager"
 import { RepoPerTaskCheckpointService } from "../../services/checkpoints"
@@ -281,8 +281,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 	urlContentFetcher: UrlContentFetcher
 	terminalProcess?: RooTerminalProcess
 
-	// Computer User
-	browserSession: BrowserSession
+	// kilocode_change: browser session removed
 
 	// Editing
 	diffViewProvider: DiffViewProvider
@@ -477,28 +476,6 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		this.autoApprovalHandler = new AutoApprovalHandler()
 
 		this.urlContentFetcher = new UrlContentFetcher(provider.context)
-		this.browserSession = new BrowserSession(provider.context, (isActive: boolean) => {
-			// Add a message to indicate browser session status change
-			this.say("browser_session_status", isActive ? "Browser session opened" : "Browser session closed")
-			// Broadcast to browser panel
-			this.broadcastBrowserSessionUpdate()
-
-			// When a browser session becomes active, automatically open/reveal the Browser Session tab
-			if (isActive) {
-				try {
-					// Lazy-load to avoid circular imports at module load time
-					const { BrowserSessionPanelManager } = require("../webview/BrowserSessionPanelManager")
-					const providerRef = this.providerRef.deref()
-					if (providerRef) {
-						BrowserSessionPanelManager.getInstance(providerRef)
-							.show()
-							.catch(() => {})
-					}
-				} catch (err) {
-					console.error("[Task] Failed to auto-open Browser Session panel:", err)
-				}
-			}
-		})
 		this.diffEnabled = enableDiff
 		this.fuzzyMatchThreshold = fuzzyMatchThreshold
 		this.consecutiveMistakeLimit = consecutiveMistakeLimit ?? DEFAULT_CONSECUTIVE_MISTAKE_LIMIT
@@ -1145,8 +1122,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		const provider = this.providerRef.deref()
 		const state = provider ? await provider.getState() : undefined
 		const approval = await checkAutoApproval({ state, ask: type, text, isProtected })
-		const isApprovalAsk =
-			type === "tool" || type === "command" || type === "browser_action_launch" || type === "use_mcp_server"
+		const isApprovalAsk = type === "tool" || type === "command" || type === "use_mcp_server"
 		if ((approval.decision === "approve" || approval.decision === "deny") && isApprovalAsk && !partial) {
 			const askTs = await this.nextClineMessageTimestamp_kilocode()
 			await this.addToClineMessages({
@@ -1366,12 +1342,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 
 			if (message) {
 				// Check if this is a tool approval ask that needs to be handled.
-				if (
-					type === "tool" ||
-					type === "command" ||
-					type === "browser_action_launch" ||
-					type === "use_mcp_server"
-				) {
+				if (type === "tool" || type === "command" || type === "use_mcp_server") {
 					// For tool approvals, we need to approve first, then send
 					// the message if there's text/images.
 					this.handleWebviewAskResponse("yesButtonClicked", message.text, message.images)
@@ -1788,10 +1759,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 			})
 		}
 
-		// Broadcast browser session updates to panel when browser-related messages are added
-		if (type === "browser_action" || type === "browser_action_result" || type === "browser_session_status") {
-			this.broadcastBrowserSessionUpdate()
-		}
+		// kilocode_change: browser session updates removed
 	}
 
 	async sayAndCreateMissingParamError(toolName: ToolName, paramName: string, relPath?: string) {
@@ -2235,21 +2203,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 			console.error("Error closing URL content fetcher browser:", error)
 		}
 
-		try {
-			this.browserSession.closeBrowser()
-		} catch (error) {
-			console.error("Error closing browser session:", error)
-		}
-		// Also close the Browser Session panel when the task is disposed
-		try {
-			const provider = this.providerRef.deref()
-			if (provider) {
-				const { BrowserSessionPanelManager } = require("../webview/BrowserSessionPanelManager")
-				BrowserSessionPanelManager.getInstance(provider).dispose()
-			}
-		} catch (error) {
-			console.error("Error closing browser session panel:", error)
-		}
+		// kilocode_change: browser session cleanup removed
 
 		try {
 			if (this.rooIgnoreController) {
@@ -3769,14 +3723,12 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		const state = await this.providerRef.deref()?.getState()
 
 		const {
-			browserViewportSize,
 			mode,
 			customModes,
 			customModePrompts,
 			customInstructions,
 			experiments,
 			enableMcpServerCreation,
-			browserToolEnabled,
 			language,
 			maxConcurrentFileReads,
 			maxReadFileLine,
@@ -3790,16 +3742,9 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 				throw new Error("Provider not available")
 			}
 
-			// Align browser tool enablement with generateSystemPrompt: require model image support,
-			// mode to include the browser group, and the user setting to be enabled.
-			const modeConfig = getModeBySlug(mode ?? defaultModeSlug, customModes)
-			const modeSupportsBrowser = modeConfig?.groups.some((group) => getGroupName(group) === "browser") ?? false
-
-			// Check if model supports browser capability (images)
+			// Check if model supports image capability
 			const modelInfo = this.api.getModel().info
-			const modelSupportsBrowser = (modelInfo as any)?.supportsImages === true
-
-			const canUseBrowserTool = modelSupportsBrowser && modeSupportsBrowser && (browserToolEnabled ?? true)
+			const supportsComputerUse = (modelInfo as any)?.supportsImages === true
 
 			// Resolve the tool protocol based on profile, model, and provider settings
 			const toolProtocol = resolveToolProtocol(apiConfiguration ?? this.apiConfiguration, modelInfo)
@@ -3807,10 +3752,9 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 			return SYSTEM_PROMPT(
 				provider.context,
 				this.cwd,
-				canUseBrowserTool,
+				supportsComputerUse,
 				mcpHub,
 				this.diffStrategy,
-				browserViewportSize ?? "900x600",
 				mode ?? defaultModeSlug,
 				customModePrompts,
 				customModes,
@@ -4198,7 +4142,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 				experiments: state?.experiments,
 				apiConfiguration,
 				maxReadFileLine: state?.maxReadFileLine ?? -1,
-				browserToolEnabled: state?.browserToolEnabled ?? true,
+				// kilocode_change: browser_tool_enabled removed
 				// kilocode_change start
 				state,
 				activatedExamplePackages: this.getActivatedExamplePackages(),
@@ -4701,41 +4645,6 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 			this._messageManager = new MessageManager(this)
 		}
 		return this._messageManager
-	}
-
-	/**
-	 * Broadcast browser session updates to the browser panel (if open)
-	 */
-	private broadcastBrowserSessionUpdate(): void {
-		const provider = this.providerRef.deref()
-		if (!provider) {
-			return
-		}
-
-		try {
-			const { BrowserSessionPanelManager } = require("../webview/BrowserSessionPanelManager")
-			const panelManager = BrowserSessionPanelManager.getInstance(provider)
-
-			// Get browser session messages
-			const browserSessionStartIndex = this.clineMessages.findIndex(
-				(m) =>
-					m.ask === "browser_action_launch" ||
-					(m.say === "browser_session_status" && m.text?.includes("opened")),
-			)
-
-			const browserSessionMessages =
-				browserSessionStartIndex !== -1 ? this.clineMessages.slice(browserSessionStartIndex) : []
-
-			const isBrowserSessionActive = this.browserSession?.isSessionActive() ?? false
-
-			// Update the panel asynchronously
-			panelManager.updateBrowserSession(browserSessionMessages, isBrowserSessionActive).catch((error: Error) => {
-				console.error("Failed to broadcast browser session update:", error)
-			})
-		} catch (error) {
-			// Silently fail if panel manager is not available
-			console.debug("Browser panel not available for update:", error)
-		}
 	}
 
 	/**

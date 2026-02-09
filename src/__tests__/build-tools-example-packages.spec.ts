@@ -76,7 +76,6 @@ describe("buildNativeToolsArray example package toggles", () => {
 			experiments: {},
 			apiConfiguration: { todoListEnabled: true } as any,
 			maxReadFileLine: -1,
-			browserToolEnabled: false,
 			state: {
 				enabledExamplePackages: [],
 				disabledExamplePackages: ["alpha"],

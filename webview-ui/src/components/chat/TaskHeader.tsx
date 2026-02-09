@@ -62,7 +62,7 @@ const TaskHeader = ({
 	todos,
 }: TaskHeaderProps) => {
 	const { t } = useTranslation()
-	const { apiConfiguration, currentTaskItem, clineMessages, isBrowserSessionActive } = useExtensionState()
+	const { apiConfiguration, currentTaskItem, clineMessages } = useExtensionState()
 	const { id: modelId, info: model } = useSelectedModel(apiConfiguration)
 	const [isTaskExpanded, setIsTaskExpanded] = useState(false)
 	// kilocode_change - removed cloud upsell functionality
@@ -100,17 +100,7 @@ const TaskHeader = ({
 	const textRef = useRef<HTMLDivElement>(null)
 	const contextWindow = model?.contextWindow || 1
 
-	// Detect if this task had any browser session activity so we can show a grey globe when inactive
-	const browserSessionStartIndex = useMemo(() => {
-		const msgs = clineMessages || []
-		for (let i = 0; i < msgs.length; i++) {
-			const m = msgs[i] as any
-			if (m?.ask === "browser_action_launch") return i
-		}
-		return -1
-	}, [clineMessages])
-
-	const showBrowserGlobe = browserSessionStartIndex !== -1 || !!isBrowserSessionActive
+	// kilocode_change: browser session indicator removed
 
 	const condenseButton = (
 		<LucideIconButton
@@ -254,39 +244,7 @@ const TaskHeader = ({
 							</StandardTooltip>
 							{!!totalCost && <span>${totalCost.toFixed(2)}</span>}
 						</div>
-						{showBrowserGlobe && (
-							<div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-								<StandardTooltip content={t("chat:browser.session")}>
-									<Button
-										variant="ghost"
-										size="sm"
-										aria-label={t("chat:browser.session")}
-										onClick={() => vscode.postMessage({ type: "openBrowserSessionPanel" } as any)}
-										className={cn(
-											"relative h-5 w-5 p-0",
-											"text-vscode-foreground opacity-85",
-											"hover:opacity-100 hover:bg-[rgba(255,255,255,0.03)]",
-											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
-										)}>
-										<Globe
-											className="w-4 h-4"
-											style={{
-												color: isBrowserSessionActive
-													? "#4ade80"
-													: "var(--vscode-descriptionForeground)",
-											}}
-										/>
-									</Button>
-								</StandardTooltip>
-								{isBrowserSessionActive && (
-									<span
-										className="text-sm font-medium"
-										style={{ color: "var(--vscode-testing-iconPassed)" }}>
-										Active
-									</span>
-								)}
-							</div>
-						)}
+						{/* kilocode_change: browser session toggle removed */}
 					</div>
 				)}
 				{/* Expanded state: Show task text and images */}

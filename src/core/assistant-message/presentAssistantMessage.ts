@@ -29,7 +29,7 @@ import { searchAndReplaceTool } from "../tools/SearchAndReplaceTool"
 import { searchReplaceTool } from "../tools/SearchReplaceTool"
 import { applyPatchTool } from "../tools/ApplyPatchTool"
 import { searchFilesTool } from "../tools/SearchFilesTool"
-import { browserActionTool } from "../tools/BrowserActionTool"
+// kilocode_change: browser_action removed
 import { executeCommandTool } from "../tools/ExecuteCommandTool"
 import { useMcpToolTool } from "../tools/UseMcpToolTool"
 import { accessMcpResourceTool } from "../tools/accessMcpResourceTool"
@@ -955,8 +955,6 @@ async function handleToolUse(cline: Task, toolBlock: ToolUse): Promise<void> {
 				return `[${toolBlock.name}]`
 			case "list_files":
 				return `[${toolBlock.name} for '${toolBlock.params.path}']`
-			case "browser_action":
-				return `[${toolBlock.name} for '${toolBlock.params.action}']`
 			case "use_mcp_tool":
 				return `[${toolBlock.name} for '${toolBlock.params.server_name}']`
 			case "access_mcp_resource":
@@ -1094,33 +1092,7 @@ async function handleToolUse(cline: Task, toolBlock: ToolUse): Promise<void> {
 		toolProtocol,
 	}
 
-	// Keep browser open during an active session so other tools can run.
-	// Session is active if we've seen any browser_action_result and the last browser_action is not "close".
-	try {
-		const messages = cline.clineMessages || []
-		const hasStarted = messages.some((m: any) => m.say === "browser_action_result")
-		let isClosed = false
-		for (let i = messages.length - 1; i >= 0; i--) {
-			const m = messages[i]
-			if (m.say === "browser_action") {
-				try {
-					const act = JSON.parse(m.text || "{}")
-					isClosed = act.action === "close"
-				} catch {}
-				break
-			}
-		}
-		const sessionActive = hasStarted && !isClosed
-		// Only auto-close when no active browser session is present, and this isn't a browser_action
-		if (!sessionActive && toolBlock.name !== "browser_action") {
-			await cline.browserSession.closeBrowser()
-		}
-	} catch {
-		// On any unexpected error, fall back to conservative behavior
-		if (toolBlock.name !== "browser_action") {
-			await cline.browserSession.closeBrowser()
-		}
-	}
+	// kilocode_change: browser session handling removed
 
 	if (!toolBlock.partial) {
 		cline.recordToolUsage(toolBlock.name)
@@ -1300,16 +1272,7 @@ async function handleToolUse(cline: Task, toolBlock: ToolUse): Promise<void> {
 		case "search_files":
 			await searchFilesTool.handle(cline, toolBlock as ToolUse<"search_files">, commonCallbacks)
 			break
-		case "browser_action":
-			await browserActionTool(
-				cline,
-				toolBlock as ToolUse<"browser_action">,
-				askApproval,
-				handleError,
-				pushToolResult,
-				removeClosingTag,
-			)
-			break
+		// kilocode_change: browser_action removed
 		case "execute_command":
 			await executeCommandTool.handle(cline, toolBlock as ToolUse<"execute_command">, commonCallbacks)
 			break

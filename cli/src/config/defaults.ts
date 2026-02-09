@@ -15,9 +15,6 @@ export const DEFAULT_AUTO_APPROVAL: AutoApprovalConfig = {
 		outside: true,
 		protected: false,
 	},
-	browser: {
-		enabled: false,
-	},
 	retry: {
 		enabled: false,
 		delay: 10,

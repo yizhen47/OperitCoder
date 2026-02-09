@@ -30,7 +30,6 @@ export default [
 		files: [
 			"src/components/chat/ChatRow.tsx",
 			"src/components/chat/ChatView.tsx",
-			"src/components/chat/BrowserSessionRow.tsx",
 			"src/components/history/useTaskSearch.ts",
 		],
 		rules: {
