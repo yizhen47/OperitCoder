@@ -815,6 +815,29 @@ describe("ClineProvider", () => {
 		])
 	})
 
+	test("switchActiveTask keeps active task tab order stable", async () => {
+		const taskOne = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
+		const taskTwo = new Task({ ...defaultTaskOptions, historyItem: { id: "task-2" } as any })
+
+		await provider.addClineToStack(taskOne)
+		await provider.addClineToStack(taskTwo)
+
+		vi.spyOn(provider as any, "getTaskHistory").mockReturnValue([
+			{ id: "task-1", task: "Task One" },
+			{ id: "task-2", task: "Task Two" },
+		])
+
+		const initialState = await (provider as any).getStateToPostToWebview()
+		expect(initialState.activeTasks?.map((task) => task.id)).toEqual(["task-1", "task-2"])
+
+		await provider.switchActiveTask("task-1")
+
+		const nextState = await (provider as any).getStateToPostToWebview()
+		expect(nextState.activeTasks?.map((task) => task.id)).toEqual(["task-1", "task-2"])
+		expect(nextState.activeTasks?.[0].isCurrent).toBe(true)
+		expect(nextState.activeTasks?.[1].isCurrent).toBe(false)
+	})
+
 	test("getStateToPostToWebview groups delegated child tasks under conversation root", async () => {
 		const rootTask = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
 		const childTask = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1-child" } as any })

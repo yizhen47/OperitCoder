@@ -188,6 +188,7 @@ export class ClineProvider
 	private recentTasksCache?: string[]
 	private pendingOperations: Map<string, PendingEditOperation> = new Map()
 	private static readonly PENDING_OPERATION_TIMEOUT_MS = 30000 // 30 seconds
+	private activeTaskTabOrder: string[] = []
 
 	public isViewLaunched = false
 	public settingsImportedAt?: number
@@ -504,9 +505,13 @@ export class ClineProvider
 
 		const currentTask = this.getCurrentTask()
 		const conversations = new Map<string, { rootTask: Task; activeTask: Task }>()
+		const conversationIdsInStack: string[] = []
 
 		for (const task of this.clineStack) {
 			const conversationId = this.getConversationRootId(task)
+			if (!conversationIdsInStack.includes(conversationId)) {
+				conversationIdsInStack.push(conversationId)
+			}
 			const existing = conversations.get(conversationId)
 			if (!existing) {
 				conversations.set(conversationId, {
@@ -518,7 +523,28 @@ export class ClineProvider
 			existing.activeTask = task
 		}
 
-		return Array.from(conversations.entries()).map(([conversationId, value], index) => {
+		if (this.activeTaskTabOrder.length === 0) {
+			this.activeTaskTabOrder = [...conversationIdsInStack]
+		} else {
+			for (const conversationId of conversationIdsInStack) {
+				if (!this.activeTaskTabOrder.includes(conversationId)) {
+					this.activeTaskTabOrder.push(conversationId)
+				}
+			}
+		}
+
+		const activeConversationIds = new Set(conversations.keys())
+		this.activeTaskTabOrder = this.activeTaskTabOrder.filter((conversationId) =>
+			activeConversationIds.has(conversationId),
+		)
+
+		const orderedTabs: ActiveTaskTab[] = []
+
+		for (const [index, conversationId] of this.activeTaskTabOrder.entries()) {
+			const value = conversations.get(conversationId)
+			if (!value) {
+				continue
+			}
 			const historyItem = taskHistory.find((item) => item.id === conversationId)
 			const title =
 				historyItem?.task?.trim() ||
@@ -532,7 +558,7 @@ export class ClineProvider
 					(message.say === "text" || message.say === "reasoning" || message.say === "completion_result"),
 			)
 
-			return {
+			orderedTabs.push({
 				id: conversationId,
 				title,
 				status,
@@ -540,11 +566,20 @@ export class ClineProvider
 				isRunning:
 					value.activeTask.isStreaming === true && !!value.activeTask.currentRequestAbortController,
 				latestAssistantMessageTs: latestAssistantMessage?.ts,
-			}
-		})
+			})
+		}
+
+		return orderedTabs
 	}
 
 	public async switchActiveTask(taskId: string): Promise<void> {
+		if (this.isCurrentTaskEmptyDraft()) {
+			const currentTask = this.getCurrentTask()
+			if (currentTask && this.getConversationRootId(currentTask) !== taskId) {
+				await this.removeClineFromStack()
+			}
+		}
+
 		const targetIndex = findLastIndex(this.clineStack, (task) => this.getConversationRootId(task) === taskId)
 		if (targetIndex === -1) {
 			await this.showTaskWithId(taskId)
@@ -1930,6 +1965,13 @@ ${prompt}
 	}
 
 	async showTaskWithId(id: string) {
+		if (this.isCurrentTaskEmptyDraft()) {
+			const currentTask = this.getCurrentTask()
+			if (currentTask && currentTask.taskId !== id) {
+				await this.removeClineFromStack()
+			}
+		}
+
 		if (id === this.getCurrentTask()?.taskId) {
 			await this.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
 			return

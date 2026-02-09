@@ -32,7 +32,7 @@ export const TaskTabsBar = ({ tasks }: TaskTabsBarProps) => {
 						className={cn(
 							"group shrink-0 flex items-center rounded-md max-w-[280px] border text-xs transition-colors",
 							task.isCurrent
-								? "bg-vscode-tab-activeBackground text-vscode-tab-activeForeground border-vscode-focusBorder"
+								? "bg-vscode-button-background text-vscode-button-foreground border-vscode-focusBorder"
 								: "bg-vscode-tab-inactiveBackground text-vscode-tab-inactiveForeground border-vscode-panel-border hover:bg-vscode-list-hoverBackground",
 						)}>
 						<button
