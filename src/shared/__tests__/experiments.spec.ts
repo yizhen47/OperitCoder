@@ -32,6 +32,16 @@ describe("experiments", () => {
 		})
 	})
 
+	// kilocode_change start
+	describe("MULTIPLE_CONCURRENT_TASKS", () => {
+		it("is configured correctly", () => {
+			expect(EXPERIMENT_IDS.MULTIPLE_CONCURRENT_TASKS).toBe("multipleConcurrentTasks")
+			expect(experimentConfigsMap.MULTIPLE_CONCURRENT_TASKS).toMatchObject({
+				enabled: false,
+			})
+		})
+	})
+
 	describe("isEnabled", () => {
 		it("returns false when POWER_STEERING experiment is not enabled", () => {
 			const experiments: Record<ExperimentId, boolean> = {
@@ -43,6 +53,7 @@ describe("experiments", () => {
 				imageGeneration: false,
 				runSlashCommand: false,
 				multipleNativeToolCalls: false,
+				multipleConcurrentTasks: false, // kilocode_change
 			}
 			expect(Experiments.isEnabled(experiments, EXPERIMENT_IDS.POWER_STEERING)).toBe(false)
 		})
@@ -57,6 +68,7 @@ describe("experiments", () => {
 				imageGeneration: false,
 				runSlashCommand: false,
 				multipleNativeToolCalls: false,
+				multipleConcurrentTasks: false, // kilocode_change
 			}
 			expect(Experiments.isEnabled(experiments, EXPERIMENT_IDS.POWER_STEERING)).toBe(true)
 		})
@@ -71,8 +83,10 @@ describe("experiments", () => {
 				imageGeneration: false,
 				runSlashCommand: false,
 				multipleNativeToolCalls: false,
+				multipleConcurrentTasks: false, // kilocode_change
 			}
 			expect(Experiments.isEnabled(experiments, EXPERIMENT_IDS.POWER_STEERING)).toBe(false)
 		})
 	})
+	// kilocode_change end
 })

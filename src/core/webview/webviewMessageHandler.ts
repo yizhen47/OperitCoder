@@ -579,9 +579,17 @@ export const webviewMessageHandler = async (
 			// agentically running promises in old instance don't affect our new
 			// task. This essentially creates a fresh slate for the new task.
 			try {
-				await provider.createTask(message.text, message.images)
-				// Task created successfully - notify the UI to reset
+				const hasInput = Boolean(message.text?.trim()) || Boolean(message.images?.length)
+				if (!hasInput) {
+					// kilocode_change: create a draft task tab without immediately starting model inference
+					await provider.createTask(undefined, undefined, undefined, { startTask: false } as any)
+				} else {
+					await provider.createTask(message.text, message.images)
+				}
+				await provider.postStateToWebview() // kilocode_change: refresh active task tabs immediately
+				// Task created successfully - notify the UI to reset and ensure chat tab is focused
 				await provider.postMessageToWebview({ type: "invoke", invoke: "newChat" })
+				await provider.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
 			} catch (error) {
 				// For all errors, reset the UI and show error
 				await provider.postMessageToWebview({ type: "invoke", invoke: "newChat" })
@@ -600,10 +608,16 @@ export const webviewMessageHandler = async (
 			await provider.updateCustomInstructions(message.text)
 			break
 
-		case "askResponse":
-			if (message.askResponse === "messageResponse" && !provider.getCurrentTask()) {
+		case "askResponse": {
+			const currentTask = provider.getCurrentTask()
+			const isDraftTask = Boolean(currentTask && currentTask.clineMessages.length === 0 && !currentTask.isInitialized)
+			if (message.askResponse === "messageResponse" && (!currentTask || isDraftTask)) {
 				try {
+					if (isDraftTask) {
+						await provider.removeClineFromStack()
+					}
 					await provider.createTask(message.text, message.images)
+					await provider.postStateToWebview() // kilocode_change: refresh active task tabs immediately
 					await provider.postMessageToWebview({ type: "invoke", invoke: "newChat" })
 				} catch (error) {
 					await provider.postMessageToWebview({ type: "invoke", invoke: "newChat" })
@@ -614,8 +628,9 @@ export const webviewMessageHandler = async (
 				break
 			}
 
-			provider.getCurrentTask()?.handleWebviewAskResponse(message.askResponse!, message.text, message.images)
+			currentTask?.handleWebviewAskResponse(message.askResponse!, message.text, message.images)
 			break
+		}
 
 		case "updateSettings":
 			if (message.updatedSettings) {
@@ -753,6 +768,12 @@ export const webviewMessageHandler = async (
 			break
 		case "showTaskWithId":
 			provider.showTaskWithId(message.text!)
+			break
+		case "switchActiveTask": // kilocode_change
+			await provider.switchActiveTask(message.text!)
+			break
+		case "closeActiveTask": // kilocode_change
+			await provider.closeActiveTask(message.text!)
 			break
 		case "condenseTaskContextRequest":
 			provider.condenseTaskContext(message.text!)

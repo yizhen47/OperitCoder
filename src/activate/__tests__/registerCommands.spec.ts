@@ -1,6 +1,7 @@
 import type { Mock } from "vitest"
 import * as vscode from "vscode"
 import { ClineProvider } from "../../core/webview/ClineProvider"
+import { experimentDefault } from "../../shared/experiments"
 
 import { getVisibleProviderOrLog, registerCommands, setPanel } from "../registerCommands"
 
@@ -28,6 +29,14 @@ vi.mock("vscode", () => ({
 }))
 
 vi.mock("../../core/webview/ClineProvider")
+
+vi.mock("@roo-code/telemetry", () => ({
+	TelemetryService: {
+		instance: {
+			captureTitleButtonClicked: vi.fn(),
+		},
+	},
+}))
 
 // Mock AgentManagerProvider to avoid spinning up the full implementation.
 vi.mock("../../core/kilocode/agent-manager/AgentManagerProvider", () => ({
@@ -151,13 +160,111 @@ describe("title bar command routing", () => {
 		vi.clearAllMocks()
 	})
 
-	it("plusButtonClickedSidebar targets the sidebar provider", async () => {
+	it("plusButtonClickedSidebar uses draft-task flow when concurrent tasks are enabled", async () => {
 		const mockSidebarProvider = {
+			getState: vi.fn().mockResolvedValue({
+				experiments: { ...experimentDefault, multipleConcurrentTasks: true },
+			}),
+			createTask: vi.fn().mockResolvedValue(undefined),
+			postStateToWebview: vi.fn().mockResolvedValue(undefined),
 			removeClineFromStack: vi.fn().mockResolvedValue(undefined),
 			refreshWorkspace: vi.fn().mockResolvedValue(undefined),
 			postMessageToWebview: vi.fn().mockResolvedValue(undefined),
 		} as any
 		const mockTabProvider = {
+			getState: vi.fn().mockResolvedValue({
+				experiments: { ...experimentDefault, multipleConcurrentTasks: true },
+			}),
+			createTask: vi.fn().mockResolvedValue(undefined),
+			postStateToWebview: vi.fn().mockResolvedValue(undefined),
+			removeClineFromStack: vi.fn().mockResolvedValue(undefined),
+			refreshWorkspace: vi.fn().mockResolvedValue(undefined),
+			postMessageToWebview: vi.fn().mockResolvedValue(undefined),
+		} as any
+
+		;(ClineProvider.getVisibleInstance as Mock).mockReturnValue(mockTabProvider)
+		;(ClineProvider as any).getInstanceForView = (ClineProvider as any).getInstanceForView ?? vi.fn()
+		;((ClineProvider as any).getInstanceForView as Mock).mockImplementation((view: any) => {
+			return view?.active === true ? mockTabProvider : mockSidebarProvider
+		})
+
+		const mockTabPanel = { active: true } as unknown as vscode.WebviewPanel
+		const mockSidebarView = { visible: true } as unknown as vscode.WebviewView
+		setPanel(mockTabPanel, "tab")
+		setPanel(mockSidebarView, "sidebar")
+
+		registerCommands({ context: mockContext, outputChannel: mockOutputChannel, provider: {} as any })
+		const cb = registeredCallbacks.get("operit-coder.plusButtonClickedSidebar")
+		expect(cb).toBeTruthy()
+		await cb?.()
+
+		expect(mockSidebarProvider.createTask).toHaveBeenCalledWith(undefined, undefined, undefined, { startTask: false })
+		expect(mockSidebarProvider.postMessageToWebview).toHaveBeenCalledWith({ type: "invoke", invoke: "newChat" })
+		expect(mockSidebarProvider.removeClineFromStack).not.toHaveBeenCalled()
+		expect(mockTabProvider.createTask).not.toHaveBeenCalled()
+	})
+
+	it("plusButtonClickedTab uses draft-task flow when concurrent tasks are enabled", async () => {
+		const mockSidebarProvider = {
+			getState: vi.fn().mockResolvedValue({
+				experiments: { ...experimentDefault, multipleConcurrentTasks: true },
+			}),
+			createTask: vi.fn().mockResolvedValue(undefined),
+			postStateToWebview: vi.fn().mockResolvedValue(undefined),
+			removeClineFromStack: vi.fn().mockResolvedValue(undefined),
+			refreshWorkspace: vi.fn().mockResolvedValue(undefined),
+			postMessageToWebview: vi.fn().mockResolvedValue(undefined),
+		} as any
+		const mockTabProvider = {
+			getState: vi.fn().mockResolvedValue({
+				experiments: { ...experimentDefault, multipleConcurrentTasks: true },
+			}),
+			createTask: vi.fn().mockResolvedValue(undefined),
+			postStateToWebview: vi.fn().mockResolvedValue(undefined),
+			removeClineFromStack: vi.fn().mockResolvedValue(undefined),
+			refreshWorkspace: vi.fn().mockResolvedValue(undefined),
+			postMessageToWebview: vi.fn().mockResolvedValue(undefined),
+		} as any
+
+		;(ClineProvider.getVisibleInstance as Mock).mockReturnValue(mockSidebarProvider)
+		;(ClineProvider as any).getInstanceForView = (ClineProvider as any).getInstanceForView ?? vi.fn()
+		;((ClineProvider as any).getInstanceForView as Mock).mockImplementation((view: any) => {
+			return view?.active === true ? mockTabProvider : mockSidebarProvider
+		})
+
+		const mockTabPanel = { active: true } as unknown as vscode.WebviewPanel
+		const mockSidebarView = { visible: true } as unknown as vscode.WebviewView
+		setPanel(mockTabPanel, "tab")
+		setPanel(mockSidebarView, "sidebar")
+
+		registerCommands({ context: mockContext, outputChannel: mockOutputChannel, provider: {} as any })
+		const cb = registeredCallbacks.get("operit-coder.plusButtonClickedTab")
+		expect(cb).toBeTruthy()
+		await cb?.()
+
+		expect(mockTabProvider.createTask).toHaveBeenCalledWith(undefined, undefined, undefined, { startTask: false })
+		expect(mockTabProvider.postMessageToWebview).toHaveBeenCalledWith({ type: "invoke", invoke: "newChat" })
+		expect(mockTabProvider.removeClineFromStack).not.toHaveBeenCalled()
+		expect(mockSidebarProvider.createTask).not.toHaveBeenCalled()
+	})
+
+	it("plusButtonClickedSidebar keeps legacy clear flow when concurrent tasks are disabled", async () => {
+		const mockSidebarProvider = {
+			getState: vi.fn().mockResolvedValue({
+				experiments: { ...experimentDefault, multipleConcurrentTasks: false },
+			}),
+			createTask: vi.fn().mockResolvedValue(undefined),
+			postStateToWebview: vi.fn().mockResolvedValue(undefined),
+			removeClineFromStack: vi.fn().mockResolvedValue(undefined),
+			refreshWorkspace: vi.fn().mockResolvedValue(undefined),
+			postMessageToWebview: vi.fn().mockResolvedValue(undefined),
+		} as any
+		const mockTabProvider = {
+			getState: vi.fn().mockResolvedValue({
+				experiments: { ...experimentDefault, multipleConcurrentTasks: false },
+			}),
+			createTask: vi.fn().mockResolvedValue(undefined),
+			postStateToWebview: vi.fn().mockResolvedValue(undefined),
 			removeClineFromStack: vi.fn().mockResolvedValue(undefined),
 			refreshWorkspace: vi.fn().mockResolvedValue(undefined),
 			postMessageToWebview: vi.fn().mockResolvedValue(undefined),
@@ -180,39 +287,8 @@ describe("title bar command routing", () => {
 		await cb?.()
 
 		expect(mockSidebarProvider.removeClineFromStack).toHaveBeenCalled()
+		expect(mockSidebarProvider.createTask).not.toHaveBeenCalled()
 		expect(mockTabProvider.removeClineFromStack).not.toHaveBeenCalled()
-	})
-
-	it("plusButtonClickedTab targets the tab provider", async () => {
-		const mockSidebarProvider = {
-			removeClineFromStack: vi.fn().mockResolvedValue(undefined),
-			refreshWorkspace: vi.fn().mockResolvedValue(undefined),
-			postMessageToWebview: vi.fn().mockResolvedValue(undefined),
-		} as any
-		const mockTabProvider = {
-			removeClineFromStack: vi.fn().mockResolvedValue(undefined),
-			refreshWorkspace: vi.fn().mockResolvedValue(undefined),
-			postMessageToWebview: vi.fn().mockResolvedValue(undefined),
-		} as any
-
-		;(ClineProvider.getVisibleInstance as Mock).mockReturnValue(mockSidebarProvider)
-		;(ClineProvider as any).getInstanceForView = (ClineProvider as any).getInstanceForView ?? vi.fn()
-		;((ClineProvider as any).getInstanceForView as Mock).mockImplementation((view: any) => {
-			return view?.active === true ? mockTabProvider : mockSidebarProvider
-		})
-
-		const mockTabPanel = { active: true } as unknown as vscode.WebviewPanel
-		const mockSidebarView = { visible: true } as unknown as vscode.WebviewView
-		setPanel(mockTabPanel, "tab")
-		setPanel(mockSidebarView, "sidebar")
-
-		registerCommands({ context: mockContext, outputChannel: mockOutputChannel, provider: {} as any })
-		const cb = registeredCallbacks.get("operit-coder.plusButtonClickedTab")
-		expect(cb).toBeTruthy()
-		await cb?.()
-
-		expect(mockTabProvider.removeClineFromStack).toHaveBeenCalled()
-		expect(mockSidebarProvider.removeClineFromStack).not.toHaveBeenCalled()
 	})
 
 	it("settingsButtonClickedSidebar targets the sidebar provider", async () => {

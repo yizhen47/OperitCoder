@@ -4208,9 +4208,12 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 			})
 		}
 
-		// Parallel tool calls are disabled - feature is on hold
-		// Previously resolved from experiments.isEnabled(..., EXPERIMENT_IDS.MULTIPLE_NATIVE_TOOL_CALLS)
-		const parallelToolCallsEnabled = false
+		// kilocode_change start
+		const parallelToolCallsEnabled = experiments.isEnabled(
+			state?.experiments ?? {},
+			EXPERIMENT_IDS.MULTIPLE_NATIVE_TOOL_CALLS,
+		)
+		// kilocode_change end
 
 		const metadata: ApiHandlerCreateMessageMetadata = {
 			mode: mode,

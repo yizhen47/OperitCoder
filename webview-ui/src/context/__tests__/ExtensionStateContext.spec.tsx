@@ -504,6 +504,7 @@ describe("mergeExtensionState", () => {
 				runSlashCommand: false,
 				nativeToolCalling: false,
 				multipleNativeToolCalls: false,
+				multipleConcurrentTasks: false, // kilocode_change
 			} as Record<ExperimentId, boolean>,
 			checkpointTimeout: DEFAULT_CHECKPOINT_TIMEOUT_SECONDS + 5,
 		}
@@ -526,6 +527,7 @@ describe("mergeExtensionState", () => {
 			runSlashCommand: false,
 			nativeToolCalling: false,
 			multipleNativeToolCalls: false,
+			multipleConcurrentTasks: false, // kilocode_change
 		})
 	})
 })

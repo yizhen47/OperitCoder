@@ -19,6 +19,7 @@ import { t } from "../i18n"
 import { getAppUrl } from "@roo-code/types" // kilocode_change
 import { generateTerminalCommand } from "../utils/terminalCommandGenerator" // kilocode_change
 import { AgentManagerProvider } from "../core/kilocode/agent-manager/AgentManagerProvider" // kilocode_change
+import { EXPERIMENT_IDS, experiments as experimentsRegistry } from "../shared/experiments" // kilocode_change
 
 /**
  * Helper to get the visible ClineProvider instance or log if not found.
@@ -55,6 +56,30 @@ function getTabProviderOrLog(outputChannel: vscode.OutputChannel): ClineProvider
 	}
 	return tabProvider
 }
+
+// kilocode_change start
+async function handlePlusButtonClicked(provider: ClineProvider): Promise<void> {
+	const state = await provider.getState()
+	const isMultipleConcurrentTasksEnabled = experimentsRegistry.isEnabled(
+		state.experiments ?? {},
+		EXPERIMENT_IDS.MULTIPLE_CONCURRENT_TASKS,
+	)
+
+	if (isMultipleConcurrentTasksEnabled) {
+		await provider.createTask(undefined, undefined, undefined, { startTask: false } as any)
+		await provider.postStateToWebview()
+		await provider.postMessageToWebview({ type: "invoke", invoke: "newChat" })
+		await provider.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
+		await provider.postMessageToWebview({ type: "action", action: "focusInput" })
+		return
+	}
+
+	await provider.removeClineFromStack()
+	await provider.refreshWorkspace()
+	await provider.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
+	await provider.postMessageToWebview({ type: "action", action: "focusInput" })
+}
+// kilocode_change end
 // kilocode_change end
 
 // Store panel references in both modes
@@ -147,13 +172,7 @@ const getCommandsMap = ({ context, outputChannel }: RegisterCommandOptions): Rec
 		}
 
 		TelemetryService.instance.captureTitleButtonClicked("plus")
-
-		await visibleProvider.removeClineFromStack()
-		await visibleProvider.refreshWorkspace()
-		await visibleProvider.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
-		// Send focusInput action immediately after chatButtonClicked
-		// This ensures the focus happens after the view has switched
-		await visibleProvider.postMessageToWebview({ type: "action", action: "focusInput" })
+		await handlePlusButtonClicked(visibleProvider)
 	},
 	// kilocode_change start
 	plusButtonClickedSidebar: async () => {
@@ -164,11 +183,7 @@ const getCommandsMap = ({ context, outputChannel }: RegisterCommandOptions): Rec
 		}
 
 		TelemetryService.instance.captureTitleButtonClicked("plus")
-
-		await sidebarProvider.removeClineFromStack()
-		await sidebarProvider.refreshWorkspace()
-		await sidebarProvider.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
-		await sidebarProvider.postMessageToWebview({ type: "action", action: "focusInput" })
+		await handlePlusButtonClicked(sidebarProvider)
 	},
 	// kilocode_change start
 	rulesButtonClickedSidebar: () => {
@@ -190,11 +205,7 @@ const getCommandsMap = ({ context, outputChannel }: RegisterCommandOptions): Rec
 		}
 
 		TelemetryService.instance.captureTitleButtonClicked("plus")
-
-		await tabProvider.removeClineFromStack()
-		await tabProvider.refreshWorkspace()
-		await tabProvider.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
-		await tabProvider.postMessageToWebview({ type: "action", action: "focusInput" })
+		await handlePlusButtonClicked(tabProvider)
 	},
 	// kilocode_change end
 	popoutButtonClicked: () => {

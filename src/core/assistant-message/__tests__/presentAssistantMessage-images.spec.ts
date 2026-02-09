@@ -54,6 +54,9 @@ describe("presentAssistantMessage - Image Handling in Native Tool Calls", () => 
 					getState: vi.fn().mockResolvedValue({
 						mode: "code",
 						customModes: [],
+						experiments: {
+							multipleNativeToolCalls: false,
+						},
 					}),
 				}),
 			},

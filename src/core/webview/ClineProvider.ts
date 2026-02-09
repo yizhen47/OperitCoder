@@ -31,6 +31,7 @@ import {
 	type CreateTaskOptions,
 	type TokenUsage,
 	type ToolUsage,
+	TaskStatus,
 	RooCodeEventName,
 	TelemetryEventName, // kilocode_change
 	requestyDefaultModelId,
@@ -46,12 +47,12 @@ import {
 import { TelemetryService } from "@roo-code/telemetry"
 
 import { Package } from "../../shared/package"
-import { findLast } from "../../shared/array"
+import { findLast, findLastIndex } from "../../shared/array"
 import { supportPrompt } from "../../shared/support-prompt"
 import { GlobalFileNames } from "../../shared/globalFileNames"
-import type { ExtensionMessage, ExtensionState, MarketplaceInstalledMetadata } from "../../shared/ExtensionMessage"
+import type { ActiveTaskTab, ExtensionMessage, ExtensionState, MarketplaceInstalledMetadata } from "../../shared/ExtensionMessage"
 import { Mode, defaultModeSlug, getGroupName, getModeBySlug } from "../../shared/modes"
-import { experimentDefault } from "../../shared/experiments"
+import { EXPERIMENT_IDS, experimentDefault, experiments as experimentsRegistry } from "../../shared/experiments" // kilocode_change
 import { formatLanguage } from "../../shared/language"
 // kilocode_change start
 import { scanExamplePackages } from "../tool-packages"
@@ -442,6 +443,26 @@ export class ClineProvider
 		}
 	}
 
+	// kilocode_change start
+	private async disposeTaskInstance(task: Task): Promise<void> {
+		try {
+			// Abort the running task and set isAbandoned to true so
+			// all running promises will exit as well.
+			await task.abortTask(true)
+		} catch (e) {
+			this.log(
+				`[ClineProvider#disposeTaskInstance] abortTask() failed ${task.taskId}.${task.instanceId}: ${e.message}`,
+			)
+		}
+
+		const cleanupFunctions = this.taskEventListeners.get(task)
+		if (cleanupFunctions) {
+			cleanupFunctions.forEach((cleanup) => cleanup())
+			this.taskEventListeners.delete(task)
+		}
+	}
+	// kilocode_change end
+
 	// Removes and destroys the top Cline instance (the current finished task),
 	// activating the previous one (resuming the parent task).
 	async removeClineFromStack() {
@@ -449,34 +470,13 @@ export class ClineProvider
 			return
 		}
 
-		// Pop the top Cline instance from the stack.
-		let task = this.clineStack.pop()
-
-		if (task) {
-			task.emit(RooCodeEventName.TaskUnfocused)
-
-			try {
-				// Abort the running task and set isAbandoned to true so
-				// all running promises will exit as well.
-				await task.abortTask(true)
-			} catch (e) {
-				this.log(
-					`[ClineProvider#removeClineFromStack] abortTask() failed ${task.taskId}.${task.instanceId}: ${e.message}`,
-				)
-			}
-
-			// Remove event listeners before clearing the reference.
-			const cleanupFunctions = this.taskEventListeners.get(task)
-
-			if (cleanupFunctions) {
-				cleanupFunctions.forEach((cleanup) => cleanup())
-				this.taskEventListeners.delete(task)
-			}
-
-			// Make sure no reference kept, once promises end it will be
-			// garbage collected.
-			task = undefined
+		const task = this.clineStack.pop()
+		if (!task) {
+			return
 		}
+
+		task.emit(RooCodeEventName.TaskUnfocused)
+		await this.disposeTaskInstance(task)
 	}
 
 	getTaskStackSize(): number {
@@ -486,6 +486,121 @@ export class ClineProvider
 	public getCurrentTaskStack(): string[] {
 		return this.clineStack.map((cline) => cline.taskId)
 	}
+
+	// kilocode_change start
+	private getConversationRootId(task: Task): string {
+		return task.rootTaskId || task.taskId
+	}
+
+	private getConversationRootTask(task: Task): Task {
+		const rootId = this.getConversationRootId(task)
+		return this.clineStack.find((candidate) => candidate.taskId === rootId) || task
+	}
+
+	private getActiveTaskTabs(taskHistory: HistoryItem[]): ActiveTaskTab[] {
+		if (this.clineStack.length === 0) {
+			return []
+		}
+
+		const currentTask = this.getCurrentTask()
+		const conversations = new Map<string, { rootTask: Task; activeTask: Task }>()
+
+		for (const task of this.clineStack) {
+			const conversationId = this.getConversationRootId(task)
+			const existing = conversations.get(conversationId)
+			if (!existing) {
+				conversations.set(conversationId, {
+					rootTask: this.getConversationRootTask(task),
+					activeTask: task,
+				})
+				continue
+			}
+			existing.activeTask = task
+		}
+
+		return Array.from(conversations.entries()).map(([conversationId, value], index) => {
+			const historyItem = taskHistory.find((item) => item.id === conversationId)
+			const title =
+				historyItem?.task?.trim() ||
+				value.rootTask.metadata.task?.trim() ||
+				`Task ${value.rootTask.taskNumber ?? index + 1}`
+			const status = value.activeTask.taskStatus ?? TaskStatus.Running
+			const latestAssistantMessage = findLast(
+				value.activeTask.clineMessages,
+				(message: ClineMessage) =>
+					message.type === "say" &&
+					(message.say === "text" || message.say === "reasoning" || message.say === "completion_result"),
+			)
+
+			return {
+				id: conversationId,
+				title,
+				status,
+				isCurrent: !!currentTask && this.getConversationRootId(currentTask) === conversationId,
+				isRunning:
+					value.activeTask.isStreaming === true && !!value.activeTask.currentRequestAbortController,
+				latestAssistantMessageTs: latestAssistantMessage?.ts,
+			}
+		})
+	}
+
+	public async switchActiveTask(taskId: string): Promise<void> {
+		const targetIndex = findLastIndex(this.clineStack, (task) => this.getConversationRootId(task) === taskId)
+		if (targetIndex === -1) {
+			await this.showTaskWithId(taskId)
+			return
+		}
+
+		if (targetIndex === this.clineStack.length - 1) {
+			await this.postStateToWebview()
+			return
+		}
+
+		const [targetTask] = this.clineStack.splice(targetIndex, 1)
+		if (!targetTask) {
+			return
+		}
+		this.clineStack.push(targetTask)
+
+		await this.postStateToWebview()
+		await this.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
+	}
+
+	public async closeActiveTask(taskId: string): Promise<void> {
+		const closeIndexes = this.clineStack
+			.map((task, index) => ({ index, rootId: this.getConversationRootId(task) }))
+			.filter((item) => item.rootId === taskId)
+			.map((item) => item.index)
+			.sort((a, b) => b - a)
+
+		if (closeIndexes.length === 0) {
+			return
+		}
+
+		const currentTask = this.getCurrentTask()
+		const isClosingCurrentConversation =
+			!!currentTask && this.getConversationRootId(currentTask) === taskId
+
+		for (const index of closeIndexes) {
+			const [task] = this.clineStack.splice(index, 1)
+			if (!task) {
+				continue
+			}
+			task.emit(RooCodeEventName.TaskUnfocused)
+			await this.disposeTaskInstance(task)
+		}
+
+		const nextCurrentTask = this.getCurrentTask()
+		if (isClosingCurrentConversation && nextCurrentTask) {
+			nextCurrentTask.emit(RooCodeEventName.TaskFocused)
+		}
+
+		await this.postStateToWebview()
+		if (isClosingCurrentConversation && nextCurrentTask) {
+			await this.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
+		}
+	}
+	// kilocode_change end
 
 	// Pending Edit Operations Management
 
@@ -920,13 +1035,13 @@ ${prompt}
 
 	public async createTaskWithHistoryItem(
 		historyItem: HistoryItem & { rootTask?: Task; parentTask?: Task },
-		options?: { startTask?: boolean },
+		options?: { startTask?: boolean; preserveExistingTasks?: boolean }, // kilocode_change
 	) {
 		// Check if we're rehydrating the current task to avoid flicker
 		const currentTask = this.getCurrentTask()
 		const isRehydratingCurrentTask = currentTask && currentTask.taskId === historyItem.id
 
-		if (!isRehydratingCurrentTask) {
+		if (!isRehydratingCurrentTask && !options?.preserveExistingTasks) {
 			await this.removeClineFromStack()
 		}
 
@@ -1791,12 +1906,35 @@ ${prompt}
 	}
 
 	async showTaskWithId(id: string) {
-		if (id !== this.getCurrentTask()?.taskId) {
-			// Non-current task.
-			const { historyItem } = await this.getTaskWithId(id)
-			await this.createTaskWithHistoryItem(historyItem) // Clears existing task.
+		if (id === this.getCurrentTask()?.taskId) {
+			await this.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
+			return
 		}
 
+		const existingTaskIndex = findLastIndex(this.clineStack, (task) => task.taskId === id)
+		if (existingTaskIndex !== -1) {
+			if (existingTaskIndex !== this.clineStack.length - 1) {
+				const [existingTask] = this.clineStack.splice(existingTaskIndex, 1)
+				if (existingTask) {
+					this.clineStack.push(existingTask)
+					await this.postStateToWebview() // kilocode_change
+				}
+			}
+
+			await this.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
+			return
+		}
+
+		const { historyItem } = await this.getTaskWithId(id)
+		const { experiments } = await this.getState()
+		const isMultipleConcurrentTasksEnabled = experimentsRegistry.isEnabled(
+			experiments ?? {},
+			EXPERIMENT_IDS.MULTIPLE_CONCURRENT_TASKS,
+		)
+		await this.createTaskWithHistoryItem(historyItem, {
+			preserveExistingTasks: isMultipleConcurrentTasksEnabled,
+		}) // kilocode_change
+		await this.postStateToWebview() // kilocode_change
 		await this.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
 	}
 
@@ -2177,6 +2315,7 @@ ${prompt}
 		// kilocode_change start wrapper information
 		const kiloCodeWrapperProperties = getKiloCodeWrapperProperties()
 		const taskHistory = this.getTaskHistory()
+		const activeTasks = this.clineStack.length > 0 ? this.getActiveTaskTabs(taskHistory) : undefined // kilocode_change
 		this.kiloCodeTaskHistorySizeForTelemetryOnly = taskHistory.length
 		// kilocode_change end
 
@@ -2213,6 +2352,7 @@ ${prompt}
 			currentTaskItem: this.getCurrentTask()?.taskId
 				? (taskHistory || []).find((item: HistoryItem) => item.id === this.getCurrentTask()?.taskId)
 				: undefined,
+			...(activeTasks ? { activeTasks } : {}), // kilocode_change
 			clineMessages: this.getCurrentTask()?.clineMessages || [],
 			currentTaskTodos: this.getCurrentTask()?.todoList || [],
 			messageQueue: this.getCurrentTask()?.messageQueueService?.messages,
@@ -2919,19 +3059,32 @@ ${prompt}
 			remoteControlEnabled,
 		} = await this.getState()
 
-		// Single-open-task invariant: always enforce for user-initiated top-level tasks
-		if (!parentTask) {
+		// kilocode_change start
+		const isMultipleConcurrentTasksEnabled = experimentsRegistry.isEnabled(
+			experiments ?? {},
+			EXPERIMENT_IDS.MULTIPLE_CONCURRENT_TASKS,
+		)
+
+		// Single-open-task invariant: enforce for top-level tasks unless concurrent-task experiment is enabled
+		if (!parentTask && !isMultipleConcurrentTasksEnabled) {
 			try {
 				await this.removeClineFromStack()
 			} catch {
 				// Non-fatal
 			}
 		}
+		// kilocode_change end
 
 		// kilocode_change: organization allow list check removed
 		// if (!ProfileValidator.isProfileAllowed(apiConfiguration, organizationAllowList)) {
 		// 	throw new OrganizationAllowListViolationError(t("common:errors.violated_organization_allowlist"))
 		// }
+
+		const parentRootTask = parentTask
+			? parentTask.rootTaskId
+				? this.clineStack.find((task) => task.taskId === parentTask.rootTaskId)
+				: parentTask
+			: undefined
 
 		const task = new Task({
 			provider: this,
@@ -2945,7 +3098,7 @@ ${prompt}
 			task: text,
 			images,
 			experiments,
-			rootTask: this.clineStack.length > 0 ? this.clineStack[0] : undefined,
+			rootTask: parentRootTask,
 			parentTask,
 			taskNumber: this.clineStack.length + 1,
 			onCreated: this.taskCreationCallback,

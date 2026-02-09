@@ -71,6 +71,8 @@ export interface WebviewMessage {
 		| "exportCurrentTask"
 		| "shareCurrentTask"
 		| "showTaskWithId"
+		| "switchActiveTask" // kilocode_change
+		| "closeActiveTask" // kilocode_change
 		| "deleteTaskWithId"
 		| "exportTaskWithId"
 		| "importSettings"

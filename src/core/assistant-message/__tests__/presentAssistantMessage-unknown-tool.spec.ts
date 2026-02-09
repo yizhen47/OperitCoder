@@ -53,6 +53,9 @@ describe("presentAssistantMessage - Unknown Tool Handling", () => {
 					getState: vi.fn().mockResolvedValue({
 						mode: "code",
 						customModes: [],
+						experiments: {
+							multipleNativeToolCalls: false,
+						},
 					}),
 				}),
 			},

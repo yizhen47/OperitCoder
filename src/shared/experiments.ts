@@ -9,6 +9,7 @@ export const EXPERIMENT_IDS = {
 	IMAGE_GENERATION: "imageGeneration",
 	RUN_SLASH_COMMAND: "runSlashCommand",
 	MULTIPLE_NATIVE_TOOL_CALLS: "multipleNativeToolCalls",
+	MULTIPLE_CONCURRENT_TASKS: "multipleConcurrentTasks", // kilocode_change
 } as const satisfies Record<string, ExperimentId>
 
 type _AssertExperimentIds = AssertEqual<Equals<ExperimentId, Values<typeof EXPERIMENT_IDS>>>
@@ -28,6 +29,7 @@ export const experimentConfigsMap: Record<ExperimentKey, ExperimentConfig> = {
 	IMAGE_GENERATION: { enabled: false },
 	RUN_SLASH_COMMAND: { enabled: false },
 	MULTIPLE_NATIVE_TOOL_CALLS: { enabled: false },
+	MULTIPLE_CONCURRENT_TASKS: { enabled: false }, // kilocode_change
 }
 
 export const experimentDefault = Object.fromEntries(

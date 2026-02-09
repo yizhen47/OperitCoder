@@ -9,6 +9,7 @@ import {
 	type ClineMessage,
 	openRouterDefaultModelId, // kilocode_change: openRouterDefaultModelId
 	ORGANIZATION_ALLOW_ALL,
+	TaskStatus,
 	DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
 } from "@roo-code/types"
 import { TelemetryService } from "@roo-code/telemetry"
@@ -375,6 +376,9 @@ describe("ClineProvider", () => {
 				setParentTask: vi.fn(),
 				setRootTask: vi.fn(),
 				taskId: options?.historyItem?.id || "test-task-id",
+				taskNumber: options?.taskNumber ?? 0,
+				isStreaming: false,
+				currentRequestAbortController: undefined,
 				emit: vi.fn(),
 			}
 
@@ -668,6 +672,295 @@ describe("ClineProvider", () => {
 		// check if the stack size was decreased
 		expect(stackSizeBeforeAbort - stackSizeAfterAbort).toBe(1)
 	})
+
+	test("newTask without input creates draft task", async () => {
+		await provider.resolveWebviewView(mockWebviewView)
+		const messageHandler = (mockWebviewView.webview.onDidReceiveMessage as any).mock.calls[0][0]
+
+		const createdTask = new Task(defaultTaskOptions)
+		const createTaskSpy = vi.spyOn(provider, "createTask").mockResolvedValue(createdTask)
+		const postStateSpy = vi.spyOn(provider, "postStateToWebview").mockResolvedValue(undefined)
+		const postMessageSpy = vi.spyOn(provider, "postMessageToWebview").mockResolvedValue(undefined)
+
+		await messageHandler({ type: "newTask" })
+
+		expect(createTaskSpy).toHaveBeenCalledWith(undefined, undefined, undefined, { startTask: false })
+		expect(postStateSpy).toHaveBeenCalledTimes(1)
+		expect(postMessageSpy).toHaveBeenCalledWith({ type: "invoke", invoke: "newChat" })
+		expect(postMessageSpy).toHaveBeenCalledWith({ type: "action", action: "chatButtonClicked" })
+	})
+
+	// kilocode_change start
+	test("createTask replaces current task when concurrent tasks experiment is disabled", async () => {
+		const mockCline = new Task(defaultTaskOptions)
+		await provider.addClineToStack(mockCline)
+
+		const removeSpy = vi.spyOn(provider, "removeClineFromStack").mockResolvedValue(undefined)
+		vi.spyOn(provider, "getState").mockResolvedValue({
+			mode: "code",
+			customModes: [],
+			apiConfiguration: {
+				apiProvider: "openrouter",
+			},
+			diffEnabled: false,
+			enableCheckpoints: false,
+			checkpointTimeout: DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
+			fuzzyMatchThreshold: 1,
+			experiments: {
+				...experimentDefault,
+				multipleConcurrentTasks: false,
+			},
+			remoteControlEnabled: false,
+		} as any)
+
+		await provider.createTask("hello")
+
+		expect(removeSpy).toHaveBeenCalled()
+	})
+
+	test("createTask keeps current task when concurrent tasks experiment is enabled", async () => {
+		const mockCline = new Task(defaultTaskOptions)
+		await provider.addClineToStack(mockCline)
+
+		const removeSpy = vi.spyOn(provider, "removeClineFromStack").mockResolvedValue(undefined)
+		vi.spyOn(provider, "getState").mockResolvedValue({
+			mode: "code",
+			customModes: [],
+			apiConfiguration: {
+				apiProvider: "openrouter",
+			},
+			diffEnabled: false,
+			enableCheckpoints: false,
+			checkpointTimeout: DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
+			fuzzyMatchThreshold: 1,
+			experiments: {
+				...experimentDefault,
+				multipleConcurrentTasks: true,
+			},
+			remoteControlEnabled: false,
+		} as any)
+
+		await provider.createTask("hello")
+
+		expect(removeSpy).not.toHaveBeenCalled()
+	})
+
+	test("getStateToPostToWebview includes active task tabs", async () => {
+		const taskOne = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
+		const taskTwo = new Task({ ...defaultTaskOptions, historyItem: { id: "task-2" } as any })
+
+		;(taskOne as any).clineMessages = [{ ts: 111, type: "say", say: "text", text: "hello" }]
+		;(taskTwo as any).clineMessages = [{ ts: 222, type: "say", say: "reasoning", text: "thinking" }]
+		;(taskTwo as any).isStreaming = true
+		;(taskTwo as any).currentRequestAbortController = new AbortController()
+
+		await provider.addClineToStack(taskOne)
+		await provider.addClineToStack(taskTwo)
+
+		vi.spyOn(provider as any, "getTaskHistory").mockReturnValue([
+			{ id: "task-1", task: "Task One" },
+			{ id: "task-2", task: "Task Two" },
+		])
+
+		const state = await (provider as any).getStateToPostToWebview()
+
+		expect(state.activeTasks).toEqual([
+			expect.objectContaining({
+				id: "task-1",
+				title: "Task One",
+				status: TaskStatus.Running,
+				isCurrent: false,
+				isRunning: false,
+				latestAssistantMessageTs: 111,
+			}),
+			expect.objectContaining({
+				id: "task-2",
+				title: "Task Two",
+				status: TaskStatus.Running,
+				isCurrent: true,
+				isRunning: true,
+				latestAssistantMessageTs: 222,
+			}),
+		])
+	})
+
+	test("getStateToPostToWebview groups delegated child tasks under conversation root", async () => {
+		const rootTask = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
+		const childTask = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1-child" } as any })
+		const secondTask = new Task({ ...defaultTaskOptions, historyItem: { id: "task-2" } as any })
+
+		;(childTask as any).rootTaskId = "task-1"
+		;(rootTask as any).clineMessages = [{ ts: 111, type: "say", say: "text", text: "root" }]
+		;(childTask as any).clineMessages = [{ ts: 333, type: "say", say: "text", text: "child" }]
+		;(secondTask as any).clineMessages = [{ ts: 222, type: "say", say: "text", text: "second" }]
+		;(childTask as any).isStreaming = true
+		;(childTask as any).currentRequestAbortController = new AbortController()
+
+		await provider.addClineToStack(rootTask)
+		await provider.addClineToStack(childTask)
+		await provider.addClineToStack(secondTask)
+
+		vi.spyOn(provider as any, "getTaskHistory").mockReturnValue([
+			{ id: "task-1", task: "Task One" },
+			{ id: "task-2", task: "Task Two" },
+		])
+
+		const state = await (provider as any).getStateToPostToWebview()
+
+		expect(state.activeTasks).toEqual([
+			expect.objectContaining({
+				id: "task-1",
+				title: "Task One",
+				isCurrent: false,
+				isRunning: true,
+				latestAssistantMessageTs: 333,
+			}),
+			expect.objectContaining({
+				id: "task-2",
+				title: "Task Two",
+				isCurrent: true,
+				isRunning: false,
+				latestAssistantMessageTs: 222,
+			}),
+		])
+	})
+
+	test("showTaskWithId appends history task in concurrent mode", async () => {
+		const taskOne = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
+		await provider.addClineToStack(taskOne)
+
+		vi.spyOn(provider, "getState").mockResolvedValue({
+			mode: "code",
+			customModes: [],
+			apiConfiguration: {
+				apiProvider: "openrouter",
+			},
+			diffEnabled: false,
+			enableCheckpoints: false,
+			checkpointTimeout: DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
+			fuzzyMatchThreshold: 1,
+			experiments: {
+				...experimentDefault,
+				multipleConcurrentTasks: true,
+			},
+			remoteControlEnabled: false,
+		} as any)
+
+		const getTaskWithIdSpy = vi.spyOn(provider, "getTaskWithId").mockResolvedValue({
+			historyItem: { id: "task-2", number: 2 } as any,
+			apiConversationHistory: [],
+			taskDirPath: "",
+		} as any)
+		const postStateSpy = vi.spyOn(provider, "postStateToWebview").mockResolvedValue(undefined)
+		const postMessageSpy = vi.spyOn(provider, "postMessageToWebview").mockResolvedValue(undefined)
+
+		await provider.showTaskWithId("task-2")
+
+		expect(getTaskWithIdSpy).toHaveBeenCalledWith("task-2")
+		expect(provider.getCurrentTaskStack()).toEqual(["task-1", "task-2"])
+		expect(postStateSpy).toHaveBeenCalledTimes(1)
+		expect(postMessageSpy).toHaveBeenCalledWith({ type: "action", action: "chatButtonClicked" })
+	})
+
+	test("showTaskWithId switches to already opened task", async () => {
+		const taskOne = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
+		const taskTwo = new Task({ ...defaultTaskOptions, historyItem: { id: "task-2" } as any })
+
+		await provider.addClineToStack(taskOne)
+		await provider.addClineToStack(taskTwo)
+
+		const getTaskWithIdSpy = vi.spyOn(provider, "getTaskWithId")
+		const postStateSpy = vi.spyOn(provider, "postStateToWebview").mockResolvedValue(undefined)
+		const postMessageSpy = vi.spyOn(provider, "postMessageToWebview").mockResolvedValue(undefined)
+
+		await provider.showTaskWithId("task-1")
+
+		expect(getTaskWithIdSpy).not.toHaveBeenCalled()
+		expect(provider.getCurrentTaskStack()).toEqual(["task-2", "task-1"])
+		expect(postStateSpy).toHaveBeenCalledTimes(1)
+		expect(postMessageSpy).toHaveBeenCalledWith({ type: "action", action: "chatButtonClicked" })
+	})
+
+	test("switchActiveTask reorders stack and notifies webview", async () => {
+		const taskOne = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
+		const taskTwo = new Task({ ...defaultTaskOptions, historyItem: { id: "task-2" } as any })
+		const taskThree = new Task({ ...defaultTaskOptions, historyItem: { id: "task-3" } as any })
+
+		await provider.addClineToStack(taskOne)
+		await provider.addClineToStack(taskTwo)
+		await provider.addClineToStack(taskThree)
+
+		const postStateSpy = vi.spyOn(provider, "postStateToWebview").mockResolvedValue(undefined)
+		const postMessageSpy = vi.spyOn(provider, "postMessageToWebview").mockResolvedValue(undefined)
+
+		await provider.switchActiveTask("task-1")
+
+		expect(provider.getCurrentTaskStack()).toEqual(["task-2", "task-3", "task-1"])
+		expect(postStateSpy).toHaveBeenCalledTimes(1)
+		expect(postMessageSpy).toHaveBeenCalledWith({ type: "action", action: "chatButtonClicked" })
+	})
+
+	test("closeActiveTask removes non-current tab without chat focus action", async () => {
+		const taskOne = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
+		const taskTwo = new Task({ ...defaultTaskOptions, historyItem: { id: "task-2" } as any })
+		const taskThree = new Task({ ...defaultTaskOptions, historyItem: { id: "task-3" } as any })
+
+		await provider.addClineToStack(taskOne)
+		await provider.addClineToStack(taskTwo)
+		await provider.addClineToStack(taskThree)
+
+		const postStateSpy = vi.spyOn(provider, "postStateToWebview").mockResolvedValue(undefined)
+		const postMessageSpy = vi.spyOn(provider, "postMessageToWebview").mockResolvedValue(undefined)
+
+		await provider.closeActiveTask("task-2")
+
+		expect(provider.getCurrentTaskStack()).toEqual(["task-1", "task-3"])
+		expect((taskTwo as any).abortTask).toHaveBeenCalledWith(true)
+		expect(postStateSpy).toHaveBeenCalledTimes(1)
+		expect(postMessageSpy).not.toHaveBeenCalledWith({ type: "action", action: "chatButtonClicked" })
+	})
+
+	test("closeActiveTask removes current tab and focuses previous tab", async () => {
+		const taskOne = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
+		const taskTwo = new Task({ ...defaultTaskOptions, historyItem: { id: "task-2" } as any })
+
+		await provider.addClineToStack(taskOne)
+		await provider.addClineToStack(taskTwo)
+
+		const postStateSpy = vi.spyOn(provider, "postStateToWebview").mockResolvedValue(undefined)
+		const postMessageSpy = vi.spyOn(provider, "postMessageToWebview").mockResolvedValue(undefined)
+
+		await provider.closeActiveTask("task-2")
+
+		expect(provider.getCurrentTaskStack()).toEqual(["task-1"])
+		expect((taskTwo as any).abortTask).toHaveBeenCalledWith(true)
+		expect(postStateSpy).toHaveBeenCalledTimes(1)
+		expect(postMessageSpy).toHaveBeenCalledWith({ type: "action", action: "chatButtonClicked" })
+	})
+
+	test("closeActiveTask removes all tasks in a delegated conversation", async () => {
+		const rootTask = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
+		const childTask = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1-child" } as any })
+		const secondTask = new Task({ ...defaultTaskOptions, historyItem: { id: "task-2" } as any })
+
+		;(childTask as any).rootTaskId = "task-1"
+
+		await provider.addClineToStack(rootTask)
+		await provider.addClineToStack(childTask)
+		await provider.addClineToStack(secondTask)
+
+		const postStateSpy = vi.spyOn(provider, "postStateToWebview").mockResolvedValue(undefined)
+		const postMessageSpy = vi.spyOn(provider, "postMessageToWebview").mockResolvedValue(undefined)
+
+		await provider.closeActiveTask("task-1")
+
+		expect(provider.getCurrentTaskStack()).toEqual(["task-2"])
+		expect((rootTask as any).abortTask).toHaveBeenCalledWith(true)
+		expect((childTask as any).abortTask).toHaveBeenCalledWith(true)
+		expect(postStateSpy).toHaveBeenCalledTimes(1)
+		expect(postMessageSpy).not.toHaveBeenCalledWith({ type: "action", action: "chatButtonClicked" })
+	})
+	// kilocode_change end
 
 	describe("clearTask message handler", () => {
 		beforeEach(async () => {

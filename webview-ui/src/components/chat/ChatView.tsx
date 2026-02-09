@@ -44,6 +44,7 @@ import BrowserSessionStatusRow from "./BrowserSessionStatusRow"
 import ChatRow from "./ChatRow"
 import { ChatRowErrorBoundary } from "./ChatRowErrorBoundary" // kilocode_change: 添加错误边界
 import { ChatTextArea } from "./ChatTextArea"
+import { TaskTabsBar } from "./TaskTabsBar" // kilocode_change
 // import TaskHeader from "./TaskHeader"// kilocode_change
 // import KiloTaskHeader from "../kilocode/KiloTaskHeader" // kilocode_change
 import AutoApproveMenu from "./AutoApproveMenu"
@@ -93,9 +94,11 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		clineMessages: messages,
 		currentTaskItem,
 		currentTaskTodos,
+		activeTasks,
 		taskHistoryFullLength, // kilocode_change
 		taskHistoryVersion, // kilocode_change
 		apiConfiguration,
+		experiments,
 		// kilocode_change: organizationAllowList removed
 		mode,
 		setMode,
@@ -957,7 +960,13 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				// - Task is busy (sendingDisabled)
 				// - API request in progress (isStreaming)
 				// - Queue has items (preserve message order during drain)
-				if (allowQueue && (sendingDisabled || isStreaming || messageQueue.length > 0)) {
+				// kilocode_change start - allow first message in a brand-new draft conversation to send directly
+				const isDraftFirstMessage =
+					messagesRef.current.length === 0 &&
+					clineAskRef.current === undefined &&
+					!isStreaming &&
+					messageQueue.length === 0
+				if (allowQueue && !isDraftFirstMessage && (sendingDisabled || isStreaming || messageQueue.length > 0)) {
 					try {
 						console.log("queueMessage", text, images)
 						vscode.postMessage({ type: "queueMessage", text, images })
@@ -971,6 +980,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 
 					return
 				}
+				// kilocode_change end
 
 				// Mark that user has responded - this prevents any pending auto-approvals.
 				userRespondedRef.current = true
@@ -1029,7 +1039,11 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		[inputValue, selectedImages],
 	)
 
-	const startNewTask = useCallback(() => vscode.postMessage({ type: "clearTask" }), [])
+	// kilocode_change start
+	const startNewTask = useCallback(() => {
+		vscode.postMessage({ type: "newTask" })
+	}, [])
+	// kilocode_change end
 
 	// This logic depends on the useEffect[messages] above to set clineAsk,
 	// after which buttons are shown and we then send an askResponse to the
@@ -1908,6 +1922,9 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 					: "fixed top-0 left-0 right-0 bottom-0 flex flex-col overflow-hidden text-sm"
 			}>
 			{(showAnnouncement || showAnnouncementModal) && <Announcement hideAnnouncement={hideAnnouncement} />}
+			{experiments?.multipleConcurrentTasks && activeTasks && activeTasks.length > 0 && (
+				<TaskTabsBar tasks={activeTasks} />
+			)} {/* kilocode_change */}
 			{task ? (
 				<>
 					{/* kilocode_change start */}

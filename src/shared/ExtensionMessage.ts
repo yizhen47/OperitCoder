@@ -14,6 +14,7 @@ import type {
 	CloudOrganizationMembership,
 	OrganizationAllowList,
 	ShareVisibility,
+	TaskStatus,
 	QueuedMessage,
 } from "@roo-code/types"
 
@@ -71,6 +72,17 @@ export interface IndexingStatusUpdateMessage {
 	type: "indexingStatusUpdate"
 	values: IndexingStatus
 }
+
+// kilocode_change start
+export interface ActiveTaskTab {
+	id: string
+	title: string
+	status: TaskStatus
+	isCurrent: boolean
+	isRunning: boolean
+	latestAssistantMessageTs?: number
+}
+// kilocode_change end
 
 export interface LanguageModelChatSelector {
 	vendor?: string
@@ -471,6 +483,7 @@ export type ExtensionState = Pick<
 	version: string
 	clineMessages: ClineMessage[]
 	currentTaskItem?: HistoryItem
+	activeTasks?: ActiveTaskTab[] // kilocode_change
 	currentTaskTodos?: TodoItem[] // Initial todos for the current task
 	apiConfiguration: ProviderSettings
 	uriScheme?: string

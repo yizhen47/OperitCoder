@@ -1498,6 +1498,64 @@ describe.skip("ChatView - Message Queueing Tests", () => {
 	})
 })
 
+// kilocode_change start
+// Regression: clicking tab-bar "+" creates a draft task and triggers invoke:newChat.
+// The first user message in that empty draft should send directly, not be queued.
+describe("ChatView - Draft Task First Message", () => {
+	beforeEach(() => {
+		vi.clearAllMocks()
+		vi.mocked(vscode.postMessage).mockClear()
+	})
+
+	it("sends first message directly after newChat reset", async () => {
+		const { getByTestId } = renderChatView()
+
+		mockPostMessage({
+			clineMessages: [],
+		})
+
+		await waitFor(() => {
+			expect(getByTestId("chat-textarea")).toBeInTheDocument()
+		})
+
+		vi.mocked(vscode.postMessage).mockClear()
+
+		await act(async () => {
+			const event = new MessageEvent("message", {
+				data: {
+					type: "invoke",
+					invoke: "newChat",
+				},
+			})
+			window.dispatchEvent(event)
+		})
+
+		const chatTextArea = getByTestId("chat-textarea")
+		const input = chatTextArea.querySelector("input")! as HTMLInputElement
+
+		await act(async () => {
+			fireEvent.change(input, { target: { value: "first message in draft task" } })
+			fireEvent.keyDown(input, { key: "Enter", code: "Enter" })
+		})
+
+		await waitFor(() => {
+			expect(vscode.postMessage).toHaveBeenCalledWith({
+				type: "askResponse",
+				askResponse: "messageResponse",
+				text: "first message in draft task",
+				images: [],
+			})
+		})
+
+		expect(vscode.postMessage).not.toHaveBeenCalledWith(
+			expect.objectContaining({
+				type: "queueMessage",
+			}),
+		)
+	})
+})
+// kilocode_change end
+
 describe("ChatView - Context Condensing Indicator Tests", () => {
 	beforeEach(() => {
 		vi.clearAllMocks()

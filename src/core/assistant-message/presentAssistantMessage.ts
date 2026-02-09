@@ -68,6 +68,67 @@ type NormalizedToolResponse = {
   imageBlocks: Anthropic.ImageBlockParam[]
 }
 
+const approvalQueueByTask = new WeakMap<Task, Promise<void>>()
+const pendingConcurrentToolCallsByTask = new WeakMap<Task, Set<Promise<void>>>()
+
+const enqueueTaskApproval = <T>(task: Task, operation: () => Promise<T>): Promise<T> => {
+	const previous = approvalQueueByTask.get(task) ?? Promise.resolve()
+	const next = previous.catch(() => undefined).then(operation)
+	approvalQueueByTask.set(task, next.then(() => undefined, () => undefined))
+	return next
+}
+
+const hasPendingConcurrentToolCalls = (task: Task): boolean => {
+	const pending = pendingConcurrentToolCallsByTask.get(task)
+	return (pending?.size ?? 0) > 0
+}
+
+const CONCURRENT_NATIVE_TOOL_ALLOWLIST = new Set<ToolName>([
+	"read_file",
+	"fetch_instructions",
+	"list_files",
+	"codebase_search",
+	"search_files",
+	"access_mcp_resource",
+	"use_mcp_tool",
+])
+
+const canRunToolUseConcurrently = async (cline: Task, toolBlock: ToolUse): Promise<boolean> => {
+	if (toolBlock.partial || !toolBlock.id || cline.didRejectTool || cline.didAlreadyUseTool) {
+		return false
+	}
+
+	if (!CONCURRENT_NATIVE_TOOL_ALLOWLIST.has(toolBlock.name as ToolName)) {
+		return false
+	}
+
+	const state = await cline.providerRef.deref()?.getState()
+	return experiments.isEnabled(state?.experiments ?? {}, EXPERIMENT_IDS.MULTIPLE_NATIVE_TOOL_CALLS)
+}
+
+const trackConcurrentToolCall = (task: Task, operation: () => Promise<void>): void => {
+	const pending = pendingConcurrentToolCallsByTask.get(task) ?? new Set<Promise<void>>()
+	pendingConcurrentToolCallsByTask.set(task, pending)
+
+	let trackedPromise: Promise<void>
+	trackedPromise = operation()
+		.catch((error) => {
+			console.error("[presentAssistantMessage] Concurrent tool execution failed:", error)
+		})
+		.finally(() => {
+			pending.delete(trackedPromise)
+			if (
+				pending.size === 0 &&
+				task.didCompleteReadingStream &&
+				task.currentStreamingContentIndex >= task.assistantMessageContent.length
+			) {
+				task.userMessageContentReady = true
+			}
+		})
+
+	pending.add(trackedPromise)
+}
+
 const normalizeToolResponse = (
   content: ToolResponse,
   formatText: (text: string) => string = (text) => text || "(tool did not return anything)",
@@ -242,57 +303,65 @@ const createAskApprovalHandler = (options: {
 		progressStatus?: ToolProgressStatus,
 		isProtected?: boolean,
 	) => {
-		// kilocode_change start: YOLO mode with AI gatekeeper
-		const state = await cline.providerRef.deref()?.getState()
-		if (state?.yoloMode) {
-			const approved = await evaluateGatekeeperApproval(cline, gatekeeperToolName, gatekeeperParams)
-			if (!approved) {
-				pushToolResult(
-					yoloDeniedUsesProtocol ? formatResponse.toolDenied(toolProtocol) : formatResponse.toolDenied(),
-				)
+		return await enqueueTaskApproval(cline, async () => {
+			if (cline.didRejectTool) {
+				pushToolResult(formatResponse.toolDenied(toolProtocol))
+				captureAskApproval(telemetryToolName, false)
+				return false
+			}
+
+			// kilocode_change start: YOLO mode with AI gatekeeper
+			const state = await cline.providerRef.deref()?.getState()
+			if (state?.yoloMode) {
+				const approved = await evaluateGatekeeperApproval(cline, gatekeeperToolName, gatekeeperParams)
+				if (!approved) {
+					pushToolResult(
+						yoloDeniedUsesProtocol ? formatResponse.toolDenied(toolProtocol) : formatResponse.toolDenied(),
+					)
+					cline.didRejectTool = true
+					captureAskApproval(telemetryToolName, false)
+					return false
+				}
+				captureAskApproval(telemetryToolName, true)
+				return true
+			}
+			// kilocode_change end
+
+			const { response, text, images } = await cline.ask(
+				type,
+				partialMessage,
+				false,
+				progressStatus,
+				isProtected || false,
+			)
+
+			if (response !== "yesButtonClicked") {
+				if (text) {
+					await cline.say("user_feedback", text, images)
+					pushToolResult(
+						formatResponse.toolResult(
+							formatResponse.toolDeniedWithFeedback(text, toolProtocol),
+							images,
+						),
+					)
+				} else {
+					pushToolResult(formatResponse.toolDenied(toolProtocol))
+				}
 				cline.didRejectTool = true
 				captureAskApproval(telemetryToolName, false)
 				return false
 			}
-			captureAskApproval(telemetryToolName, true)
-			return true
-		}
-		// kilocode_change end
 
-		const { response, text, images } = await cline.ask(
-			type,
-			partialMessage,
-			false,
-			progressStatus,
-			isProtected || false,
-		)
-
-		if (response !== "yesButtonClicked") {
 			if (text) {
 				await cline.say("user_feedback", text, images)
 				pushToolResult(
-					formatResponse.toolResult(
-						formatResponse.toolDeniedWithFeedback(text, toolProtocol),
-						images,
-					),
+					formatResponse.toolResult(formatResponse.toolApprovedWithFeedback(text, toolProtocol), images),
 				)
-			} else {
-				pushToolResult(formatResponse.toolDenied(toolProtocol))
 			}
-			cline.didRejectTool = true
-			captureAskApproval(telemetryToolName, false)
-			return false
-		}
 
-		if (text) {
-			await cline.say("user_feedback", text, images)
-			pushToolResult(
-				formatResponse.toolResult(formatResponse.toolApprovedWithFeedback(text, toolProtocol), images),
-			)
-		}
-
-		captureAskApproval(telemetryToolName, true)
-		return true
+			captureAskApproval(telemetryToolName, true)
+			return true
+		})
 	}
 }
 // kilocode_change end
@@ -308,10 +377,18 @@ async function handleMcpToolUse(cline: Task, mcpBlock: McpToolUse): Promise<void
 	}
 
 	if (cline.didAlreadyUseTool) {
-		const toolCallId = mcpBlock.id
-		const errorMessage = `MCP tool [${mcpBlock.name}] was not executed because a tool has already been used in this message. Only one tool may be used per message.`
-		pushNativeToolSkipResult(cline, toolCallId, errorMessage)
-		return
+		const state = await cline.providerRef.deref()?.getState()
+		const isMultipleNativeToolCallsEnabled = experiments.isEnabled(
+			state?.experiments ?? {},
+			EXPERIMENT_IDS.MULTIPLE_NATIVE_TOOL_CALLS,
+		)
+		if (!isMultipleNativeToolCallsEnabled) {
+			const toolCallId = mcpBlock.id
+			const errorMessage = `MCP tool [${mcpBlock.name}] was not executed because a tool has already been used in this message. Only one tool may be used per message.`
+			pushNativeToolSkipResult(cline, toolCallId, errorMessage)
+			return
+		}
+		cline.didAlreadyUseTool = false
 	}
 
 	const toolCallId = mcpBlock.id
@@ -320,7 +397,7 @@ async function handleMcpToolUse(cline: Task, mcpBlock: McpToolUse): Promise<void
 		cline,
 		toolCallId,
 		warnLabel: "mcp_tool_use",
-		markToolUsed: true,
+		markToolUsed: false,
 	})
 
 	const handleError = createHandleError({ cline, toolProtocol, pushToolResult })
@@ -472,25 +549,33 @@ async function handlePkgToolUse(cline: Task, pkgBlock: ExampleToolUse): Promise<
 	}
 
 	if (cline.didAlreadyUseTool) {
-		const errorMessage = `Package tool [${pkgBlock.name}] was not executed because a tool has already been used in this message. Only one tool may be used per message.`
-		const formatted = errorMessage
-		pushToolSkipResult(cline, toolProtocol, toolCallId, formatted)
-		await cline.say(
-			"tool" as any,
-			JSON.stringify({
-				tool: "sandboxPackageTool",
-				packageName: pkgBlock.packageName,
-				toolName: pkgBlock.toolName,
-				content: formatted,
-				isError: true,
-			}),
-			undefined,
-			false,
-			undefined,
-			undefined,
-			{ isNonInteractive: true },
+		const state = await cline.providerRef.deref()?.getState()
+		const isMultipleNativeToolCallsEnabled = experiments.isEnabled(
+			state?.experiments ?? {},
+			EXPERIMENT_IDS.MULTIPLE_NATIVE_TOOL_CALLS,
 		)
-		return
+		if (!isMultipleNativeToolCallsEnabled) {
+			const errorMessage = `Package tool [${pkgBlock.name}] was not executed because a tool has already been used in this message. Only one tool may be used per message.`
+			const formatted = errorMessage
+			pushToolSkipResult(cline, toolProtocol, toolCallId, formatted)
+			await cline.say(
+				"tool" as any,
+				JSON.stringify({
+					tool: "sandboxPackageTool",
+					packageName: pkgBlock.packageName,
+					toolName: pkgBlock.toolName,
+					content: formatted,
+					isError: true,
+				}),
+				undefined,
+				false,
+				undefined,
+				undefined,
+				{ isNonInteractive: true },
+			)
+			return
+		}
+		cline.didAlreadyUseTool = false
 	}
 
 	const toolDescription = () => `[sandbox_package_tool for '${pkgBlock.packageName}.${pkgBlock.toolName}']`
@@ -534,7 +619,7 @@ async function handlePkgToolUse(cline: Task, pkgBlock: ExampleToolUse): Promise<
 		formatText: formatPkgToolResultContent,
 		computeIsError: isPkgToolErrorResult,
 		includeIsErrorField: true,
-		markToolUsed: true,
+		markToolUsed: false,
 		onDidPush: (text, isError) => {
 			void sayPkgToolResult(text, isError)
 		},
@@ -563,7 +648,9 @@ async function handlePkgToolUse(cline: Task, pkgBlock: ExampleToolUse): Promise<
 				void sayPkgToolResult(formatted, isPkgToolErrorResult(formatted))
 			}
 		}
-		cline.didAlreadyUseTool = true
+		if (toolProtocol === TOOL_PROTOCOL.XML) {
+			cline.didAlreadyUseTool = true
+		}
 	}
 
 	const handleError = async (action: string, error: Error) => {
@@ -576,35 +663,42 @@ async function handlePkgToolUse(cline: Task, pkgBlock: ExampleToolUse): Promise<
 		progressStatus?: ToolProgressStatus,
 		isProtected?: boolean,
 	) => {
-		const { response, text, images } = await cline.ask(
-			type,
-			partialMessage,
-			false,
-			progressStatus,
-			isProtected || false,
-		)
+		return await enqueueTaskApproval(cline, async () => {
+			if (cline.didRejectTool) {
+				pushToolResult(formatResponse.toolDenied(toolProtocol))
+				return false
+			}
 
-		if (response !== "yesButtonClicked") {
+			const { response, text, images } = await cline.ask(
+				type,
+				partialMessage,
+				false,
+				progressStatus,
+				isProtected || false,
+			)
+
+			if (response !== "yesButtonClicked") {
+				if (text) {
+					await cline.say("user_feedback", text, images)
+					pushToolResult(
+						formatResponse.toolResult(formatResponse.toolDeniedWithFeedback(text, toolProtocol), images),
+					)
+				} else {
+					pushToolResult(formatResponse.toolDenied(toolProtocol))
+				}
+				cline.didRejectTool = true
+				return false
+			}
+
 			if (text) {
 				await cline.say("user_feedback", text, images)
 				pushToolResult(
-					formatResponse.toolResult(formatResponse.toolDeniedWithFeedback(text, toolProtocol), images),
+					formatResponse.toolResult(formatResponse.toolApprovedWithFeedback(text, toolProtocol), images),
 				)
-			} else {
-				pushToolResult(formatResponse.toolDenied(toolProtocol))
 			}
-			cline.didRejectTool = true
-			return false
-		}
 
-		if (text) {
-			await cline.say("user_feedback", text, images)
-			pushToolResult(
-				formatResponse.toolResult(formatResponse.toolApprovedWithFeedback(text, toolProtocol), images),
-			)
-		}
-
-		return true
+			return true
+		})
 	}
 
 	// Only execute when the tool call is complete.
@@ -903,6 +997,10 @@ async function handleToolUse(cline: Task, toolBlock: ToolUse): Promise<void> {
 	// XML protocol tool calls NEVER have an ID (parsed from XML text).
 	const toolCallId = (toolBlock as any).id
 	const toolProtocol = toolCallId ? TOOL_PROTOCOL.NATIVE : TOOL_PROTOCOL.XML
+	const isMultipleNativeToolCallsEnabled = experiments.isEnabled(
+		stateExperiments ?? {},
+		EXPERIMENT_IDS.MULTIPLE_NATIVE_TOOL_CALLS,
+	)
 
 	if (cline.didRejectTool) {
 		const errorMessage = !toolBlock.partial
@@ -913,17 +1011,13 @@ async function handleToolUse(cline: Task, toolBlock: ToolUse): Promise<void> {
 	}
 
 	if (cline.didAlreadyUseTool) {
-		const errorMessage = `Tool [${toolBlock.name}] was not executed because a tool has already been used in this message. Only one tool may be used per message. You must assess the first tool's result before proceeding to use the next tool.`
-		pushToolSkipResult(cline, toolProtocol, toolCallId, errorMessage)
-		return
+		if (!isMultipleNativeToolCallsEnabled || toolProtocol === TOOL_PROTOCOL.XML) {
+			const errorMessage = `Tool [${toolBlock.name}] was not executed because a tool has already been used in this message. Only one tool may be used per message. You must assess the first tool's result before proceeding to use the next tool.`
+			pushToolSkipResult(cline, toolProtocol, toolCallId, errorMessage)
+			return
+		}
+		cline.didAlreadyUseTool = false
 	}
-
-	// Track if we've already pushed a tool result for this tool call (native protocol only)
-	let hasToolResult = false
-
-	// Multiple native tool calls feature is on hold - always disabled
-	// Previously resolved from experiments.isEnabled(..., EXPERIMENT_IDS.MULTIPLE_NATIVE_TOOL_CALLS)
-	const isMultipleNativeToolCallsEnabled = false
 
 	const { pushToolResult: pushNativeToolResult } = createNativeToolResultPusher({
 		cline,
@@ -934,7 +1028,6 @@ async function handleToolUse(cline: Task, toolBlock: ToolUse): Promise<void> {
 	const pushToolResult = (content: ToolResponse) => {
 		if (toolProtocol === TOOL_PROTOCOL.NATIVE) {
 			pushNativeToolResult(content)
-			hasToolResult = true
 		} else {
 			// For XML protocol, add as text blocks (legacy behavior)
 			cline.userMessageContent.push({ type: "text", text: `${toolDescription()} Result:` })
@@ -960,6 +1053,9 @@ async function handleToolUse(cline: Task, toolBlock: ToolUse): Promise<void> {
 		} else if (toolProtocol === TOOL_PROTOCOL.NATIVE && !isMultipleNativeToolCallsEnabled) {
 			// For native protocol with experimental flag disabled, enforce single tool per message
 			cline.didAlreadyUseTool = true
+		} else if (toolProtocol === TOOL_PROTOCOL.NATIVE && isMultipleNativeToolCallsEnabled) {
+			// When multiple native tool calls are enabled, keep accepting subsequent tool blocks.
+			cline.didAlreadyUseTool = false
 		}
 		// If toolProtocol is NATIVE and isMultipleNativeToolCallsEnabled is true,
 		// allow multiple tool calls in sequence (don't set didAlreadyUseTool)
@@ -1438,7 +1534,16 @@ export async function presentAssistantMessage(cline: Task) {
 			break
 		}
 		case "tool_use": {
-			await handleToolUse(cline, block as ToolUse)
+			// kilocode_change start
+			if (await canRunToolUseConcurrently(cline, block as ToolUse)) {
+				const concurrentBlock = block as ToolUse
+				trackConcurrentToolCall(cline, async () => {
+					await handleToolUse(cline, concurrentBlock)
+				})
+			} else {
+				await handleToolUse(cline, block as ToolUse)
+			}
+			// kilocode_change end
 			break
 		}
 	}
@@ -1469,7 +1574,11 @@ export async function presentAssistantMessage(cline: Task) {
 			// true when out of bounds. This gracefully allows the stream to
 			// continue on and all potential content blocks be presented.
 			// Last block is complete and it is finished executing
-			cline.userMessageContentReady = true // Will allow `pWaitFor` to continue.
+			// kilocode_change start
+			if (!hasPendingConcurrentToolCalls(cline)) {
+				cline.userMessageContentReady = true // Will allow `pWaitFor` to continue.
+			}
+			// kilocode_change end
 		}
 
 		// Call next block if it exists (if not then read stream will call it
@@ -1489,9 +1598,11 @@ export async function presentAssistantMessage(cline: Task) {
 		} else {
 			// CRITICAL FIX: If we're out of bounds and the stream is complete, set userMessageContentReady
 			// This handles the case where assistantMessageContent is empty or becomes empty after processing
-			if (cline.didCompleteReadingStream) {
+			// kilocode_change start
+			if (cline.didCompleteReadingStream && !hasPendingConcurrentToolCalls(cline)) {
 				cline.userMessageContentReady = true
 			}
+			// kilocode_change end
 		}
 	}
 

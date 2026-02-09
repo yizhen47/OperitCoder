@@ -1038,6 +1038,10 @@
 		"MULTIPLE_NATIVE_TOOL_CALLS": {
 			"name": "Parallel tool calls",
 			"description": "When enabled, the native protocol can execute multiple tools in a single assistant message turn."
+		},
+		"MULTIPLE_CONCURRENT_TASKS": {
+			"name": "Multiple concurrent tasks",
+			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
 		}
 	},
 	"promptCaching": {
