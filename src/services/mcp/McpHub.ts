@@ -81,6 +81,13 @@ const mixedFieldsErrorMessage =
 const missingFieldsErrorMessage =
 	"Server configuration must include either 'command' (for stdio) or 'url' (for sse/streamable-http) and a corresponding 'type' if 'url' is used."
 
+const BUILTIN_MCP_SERVERS: Record<string, z.input<typeof ServerConfigSchema>> = {
+	playwright: {
+		command: "npx",
+		args: ["@playwright/mcp@latest"],
+	},
+}
+
 // Helper function to create a refined schema with better error messages
 const createServerTypeSchema = () => {
 	return z.union([
@@ -255,6 +262,27 @@ export class McpHub {
 				)
 			}
 			throw validationError
+		}
+	}
+
+	private getBuiltinMcpServers(): Record<string, z.input<typeof ServerConfigSchema>> {
+		return BUILTIN_MCP_SERVERS
+	}
+
+	private getBuiltinServerConfig(serverName: string): z.input<typeof ServerConfigSchema> | undefined {
+		return this.getBuiltinMcpServers()[serverName]
+	}
+
+	private mergeBuiltinServers(
+		servers: Record<string, any>,
+		source: "global" | "project",
+	): Record<string, any> {
+		if (source !== "global") {
+			return servers
+		}
+		return {
+			...this.getBuiltinMcpServers(),
+			...servers,
 		}
 	}
 
@@ -1145,13 +1173,14 @@ export class McpHub {
 		if (manageConnectingState) {
 			this.isConnecting = true
 		}
+		const resolvedServers = this.mergeBuiltinServers(newServers, source)
 		this.removeAllFileWatchers()
 		// Filter connections by source
 		const currentConnections = this.connections.filter(
 			(conn) => conn.server.source === source || (!conn.server.source && source === "global"),
 		)
 		const currentNames = new Set(currentConnections.map((conn) => conn.server.name))
-		const newNames = new Set(Object.keys(newServers))
+		const newNames = new Set(Object.keys(resolvedServers))
 
 		// Delete removed servers
 		for (const name of currentNames) {
@@ -1161,7 +1190,7 @@ export class McpHub {
 		}
 
 		// Update or add servers
-		for (const [name, config] of Object.entries(newServers)) {
+		for (const [name, config] of Object.entries(resolvedServers)) {
 			// Only consider connections that match the current source
 			const currentConnection = this.findConnection(name, source)
 
@@ -1607,7 +1636,8 @@ export class McpHub {
 		}
 
 		if (!config.mcpServers[serverName]) {
-			config.mcpServers[serverName] = {}
+			const builtinConfig = this.getBuiltinServerConfig(serverName)
+			config.mcpServers[serverName] = builtinConfig ? { ...builtinConfig } : {}
 		}
 
 		// Create a new server config object to ensure clean structure
@@ -1844,11 +1874,14 @@ export class McpHub {
 		}
 
 		if (!config.mcpServers[serverName]) {
-			config.mcpServers[serverName] = {
-				type: "stdio",
-				command: "node",
-				args: [], // Default to an empty array; can be set later if needed
-			}
+			const builtinConfig = this.getBuiltinServerConfig(serverName)
+			config.mcpServers[serverName] = builtinConfig
+				? { ...builtinConfig }
+				: {
+						type: "stdio",
+						command: "node",
+						args: [], // Default to an empty array; can be set later if needed
+					}
 		}
 
 		if (!config.mcpServers[serverName][listName]) {

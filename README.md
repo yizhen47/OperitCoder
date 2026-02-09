@@ -33,6 +33,7 @@
 - **任务自动化**：自动执行重复性编码流程（含终端、浏览器等）
 - **多模式协作**：规划（Architect）/编码（Coder）/调试（Debugger）+ 自定义模式
 - **MCP 扩展**：通过 MCP 服务器扩展代理能力
+- **内置 Playwright MCP**：基于 https://github.com/microsoft/playwright-mcp
 - **自带安全边界**：关键操作需要明确授权（可配置允许/拒绝规则）
 
 ## Practical changes in this fork

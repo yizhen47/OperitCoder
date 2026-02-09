@@ -23,6 +23,7 @@
 - **Task automation**: automate repetitive coding workflows (terminal, browser, etc.)
 - **Multi-mode collaboration**: planning (Architect) / coding (Coder) / debugging (Debugger) plus custom modes
 - **MCP extensibility**: extend agent capabilities via MCP servers
+- **Built-in Playwright MCP**: based on https://github.com/microsoft/playwright-mcp
 - **Safety boundaries**: high-impact operations require explicit approval (configurable allow/deny rules)
 
 ## Practical changes in this fork

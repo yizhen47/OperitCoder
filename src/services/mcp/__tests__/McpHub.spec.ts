@@ -353,6 +353,45 @@ describe("McpHub", () => {
 		})
 	})
 
+	describe("Built-in MCP servers", () => {
+		it("should include Playwright MCP in global connections", async () => {
+			// Mock StdioClientTransport
+			const stdioModule = await import("@modelcontextprotocol/sdk/client/stdio.js")
+			const StdioClientTransport = stdioModule.StdioClientTransport as ReturnType<typeof vi.fn>
+
+			const mockTransport = {
+				start: vi.fn().mockResolvedValue(undefined),
+				close: vi.fn().mockResolvedValue(undefined),
+				stderr: {
+					on: vi.fn(),
+				},
+				onerror: null,
+				onclose: null,
+			}
+
+			StdioClientTransport.mockImplementation(() => mockTransport)
+
+			// Mock Client
+			const clientModule = await import("@modelcontextprotocol/sdk/client/index.js")
+			const Client = clientModule.Client as ReturnType<typeof vi.fn>
+
+			const mockClient = {
+				connect: vi.fn().mockResolvedValue(undefined),
+				close: vi.fn().mockResolvedValue(undefined),
+				getInstructions: vi.fn().mockReturnValue("test instructions"),
+				request: vi.fn().mockResolvedValue({ tools: [], resources: [], resourceTemplates: [] }),
+				getServerCapabilities: vi.fn().mockResolvedValue({ tools: {} }),
+			}
+
+			Client.mockImplementation(() => mockClient)
+
+			await mcpHub.updateServerConnections({}, "global")
+
+			const connection = mcpHub.connections.find((conn) => conn.server.name === "playwright")
+			expect(connection).toBeDefined()
+		})
+	})
+
 	describe("File watcher cleanup", () => {
 		it("should clean up file watchers when server is disabled", async () => {
 			// Get the mocked chokidar
@@ -779,6 +818,40 @@ describe("McpHub", () => {
 	})
 
 	describe("toggleToolAlwaysAllow", () => {
+		it("should seed built-in Playwright config when missing", async () => {
+			const mockConfig = {
+				mcpServers: {},
+			}
+
+			// Mock reading initial config
+			vi.mocked(fs.readFile).mockResolvedValueOnce(JSON.stringify(mockConfig))
+
+			// Set up mock connection
+			const mockConnection: ConnectedMcpConnection = {
+				type: "connected",
+				server: {
+					name: "playwright",
+					source: "global",
+					config: JSON.stringify({
+						command: "npx",
+						args: ["@playwright/mcp@latest"],
+					}),
+				} as any,
+				client: {} as any,
+				transport: {} as any,
+			}
+			mcpHub.connections = [mockConnection]
+
+			await mcpHub.toggleToolAlwaysAllow("playwright", "global", "new-tool", true)
+
+			const writeCalls = vi.mocked(fs.writeFile).mock.calls
+			const callToUse = writeCalls[writeCalls.length - 1]
+			const writtenConfig = JSON.parse(callToUse[1] as string)
+			expect(writtenConfig.mcpServers.playwright.command).toBe("npx")
+			expect(writtenConfig.mcpServers.playwright.args).toEqual(["@playwright/mcp@latest"])
+			expect(writtenConfig.mcpServers.playwright.alwaysAllow).toContain("new-tool")
+		})
+
 		it("should add tool to always allow list when enabling", async () => {
 			const mockConfig = {
 				mcpServers: {
