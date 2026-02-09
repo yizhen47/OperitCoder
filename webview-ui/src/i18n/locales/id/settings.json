@@ -967,6 +967,10 @@
 			"name": "Panggilan tool paralel",
 			"description": "Ketika diaktifkan, protokol native dapat mengeksekusi beberapa tool dalam satu giliran pesan asisten."
 		},
+		"MULTIPLE_CONCURRENT_TASKS": {
+			"name": "Multiple concurrent tasks",
+			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
+		},
 		"SPEECH_TO_TEXT": {
 			"name": "Ucapan-ke-Teks (STT)",
 			"description": "Ketika diaktifkan, Operit Coder dapat mengubah suara Anda menjadi teks menggunakan model Whisper dari OpenAI. Klik tombol mikrofon di chat untuk mulai merekam. Memerlukan FFmpeg yang terinstal dan penyedia API OpenAI yang dikonfigurasi."

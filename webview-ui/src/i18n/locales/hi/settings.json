@@ -946,6 +946,10 @@
 			"name": "समानांतर टूल कॉल",
 			"description": "सक्षम होने पर, नेटिव प्रोटोकॉल एकल सहायक संदेश टर्न में एकाधिक टूल निष्पादित कर सकता है।"
 		},
+		"MULTIPLE_CONCURRENT_TASKS": {
+			"name": "Multiple concurrent tasks",
+			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
+		},
 		"SPEECH_TO_TEXT": {
 			"name": "वाक्-से-पाठ (STT)",
 			"description": "जब सक्षम किया जाता है, तो Operit Coder OpenAI के Whisper मॉडल का उपयोग करके आपकी आवाज़ को टेक्स्ट में बदल सकता है। रिकॉर्डिंग शुरू करने के लिए चैट में माइक्रोफ़ोन बटन पर क्लिक करें। इसके लिए FFmpeg इंस्टॉल होना और एक कॉन्फ़िगर किया गया OpenAI API प्रोवाइडर होना आवश्यक है।"

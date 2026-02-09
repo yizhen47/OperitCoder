@@ -28,8 +28,8 @@ export const experimentConfigsMap: Record<ExperimentKey, ExperimentConfig> = {
 	PREVENT_FOCUS_DISRUPTION: { enabled: false },
 	IMAGE_GENERATION: { enabled: false },
 	RUN_SLASH_COMMAND: { enabled: false },
-	MULTIPLE_NATIVE_TOOL_CALLS: { enabled: false },
-	MULTIPLE_CONCURRENT_TASKS: { enabled: false }, // kilocode_change
+	MULTIPLE_NATIVE_TOOL_CALLS: { enabled: true },
+	MULTIPLE_CONCURRENT_TASKS: { enabled: true }, // kilocode_change
 }
 
 export const experimentDefault = Object.fromEntries(

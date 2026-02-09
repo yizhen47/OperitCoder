@@ -946,6 +946,10 @@
 			"name": "Równoległe wywołania narzędzi",
 			"description": "Po włączeniu protokół natywny może wykonywać wiele narzędzi w jednej turze wiadomości asystenta."
 		},
+		"MULTIPLE_CONCURRENT_TASKS": {
+			"name": "Multiple concurrent tasks",
+			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
+		},
 		"SPEECH_TO_TEXT": {
 			"name": "Zamiana mowy na tekst (STT)",
 			"description": "Gdy włączone, Operit Coder może transkrybować Twój głos na tekst używając modelu Whisper od OpenAI. Kliknij przycisk mikrofonu w czacie, aby rozpocząć nagrywanie. Wymaga zainstalowania FFmpeg i skonfigurowanego dostawcy API OpenAI."

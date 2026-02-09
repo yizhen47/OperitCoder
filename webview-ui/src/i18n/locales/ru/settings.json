@@ -946,6 +946,10 @@
 			"name": "Параллельные вызовы инструментов",
 			"description": "При включении нативный протокол может выполнять несколько инструментов в одном ходе сообщения ассистента."
 		},
+		"MULTIPLE_CONCURRENT_TASKS": {
+			"name": "Multiple concurrent tasks",
+			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
+		},
 		"SPEECH_TO_TEXT": {
 			"name": "Речь-в-текст (STT)",
 			"description": "При включении Operit Coder может преобразовывать вашу речь в текст с помощью модели Whisper от OpenAI. Нажмите кнопку микрофона в чате, чтобы начать запись. Требуется установленный FFmpeg и настроенный API-провайдер OpenAI."

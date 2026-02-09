@@ -945,6 +945,10 @@
 			"name": "Llamadas paralelas a herramientas",
 			"description": "Cuando está habilitado, el protocolo nativo puede ejecutar múltiples herramientas en un solo turno de mensaje del asistente."
 		},
+		"MULTIPLE_CONCURRENT_TASKS": {
+			"name": "Multiple concurrent tasks",
+			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
+		},
 		"SPEECH_TO_TEXT": {
 			"name": "Voz a Texto (STT)",
 			"description": "Cuando esté habilitado, Operit Coder puede transcribir tu voz a texto usando el modelo Whisper de OpenAI. Haz clic en el botón del micrófono en el chat para comenzar a grabar. Requiere que FFmpeg esté instalado y un proveedor de API de OpenAI configurado."

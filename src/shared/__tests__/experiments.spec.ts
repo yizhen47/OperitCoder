@@ -37,7 +37,7 @@ describe("experiments", () => {
 		it("is configured correctly", () => {
 			expect(EXPERIMENT_IDS.MULTIPLE_CONCURRENT_TASKS).toBe("multipleConcurrentTasks")
 			expect(experimentConfigsMap.MULTIPLE_CONCURRENT_TASKS).toMatchObject({
-				enabled: false,
+				enabled: true,
 			})
 		})
 	})

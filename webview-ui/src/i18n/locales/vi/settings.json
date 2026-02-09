@@ -946,6 +946,10 @@
 			"name": "Lệnh gọi công cụ song song",
 			"description": "Khi được bật, giao thức native có thể thực thi nhiều công cụ trong một lượt tin nhắn của trợ lý."
 		},
+		"MULTIPLE_CONCURRENT_TASKS": {
+			"name": "Multiple concurrent tasks",
+			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
+		},
 		"SPEECH_TO_TEXT": {
 			"name": "Chuyển Giọng nói thành Văn bản (STT)",
 			"description": "Khi được bật, Operit Coder có thể chuyển đổi giọng nói của bạn thành văn bản bằng mô hình Whisper của OpenAI. Nhấp vào nút microphone trong chat để bắt đầu ghi âm. Yêu cầu cài đặt FFmpeg và cấu hình nhà cung cấp API OpenAI."

@@ -1050,6 +1050,10 @@
 			"name": "Паралельні виклики інструментів",
 			"description": "Коли увімкнено, нативний протокол може виконувати кілька інструментів у одному повідомленні асистента."
 		},
+		"MULTIPLE_CONCURRENT_TASKS": {
+			"name": "Multiple concurrent tasks",
+			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
+		},
 		"experimentalParallelToolCalls": "Експериментальні паралельні виклики інструментів",
 		"experimentalParallelToolCallsDesc": "Дозволяє моделі викликати кілька інструментів одночасно для покращення ефективності",
 		"experimentalParallelToolCallsInfo": "Ця функція може покращити швидкість виконання завдань, але може бути нестабільною з деякими моделями",

@@ -946,6 +946,10 @@
 			"name": "Parallelle tool-aanroepen",
 			"description": "Wanneer ingeschakeld, kan het native protocol meerdere tools uitvoeren in één enkele assistent-berichtbeurt."
 		},
+		"MULTIPLE_CONCURRENT_TASKS": {
+			"name": "Multiple concurrent tasks",
+			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
+		},
 		"SPEECH_TO_TEXT": {
 			"name": "Spraak-naar-Tekst (STT)",
 			"description": "Wanneer ingeschakeld kan Operit Coder je stem naar tekst transcriberen met behulp van OpenAI's Whisper model. Klik op de microfoonknop in de chat om op te nemen. Vereist dat FFmpeg geïnstalleerd is en een geconfigureerde OpenAI API provider."

@@ -947,6 +947,10 @@
 			"name": "並列ツール呼び出し",
 			"description": "有効にすると、ネイティブプロトコルは単一のアシスタントメッセージターンで複数のツールを実行できます。"
 		},
+		"MULTIPLE_CONCURRENT_TASKS": {
+			"name": "Multiple concurrent tasks",
+			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
+		},
 		"SPEECH_TO_TEXT": {
 			"name": "音声認識 (STT)",
 			"description": "有効にすると、Operit CoderはOpenAIのWhisperモデルを使用して音声をテキストに変換できます。録音を開始するには、チャット内のマイクボタンをクリックしてください。FFmpegのインストールと、設定済みのOpenAI APIプロバイダーが必要です。"

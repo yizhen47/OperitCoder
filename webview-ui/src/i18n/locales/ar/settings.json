@@ -1045,6 +1045,10 @@
 			"name": "استدعاءات أدوات متوازية",
 			"description": "عند التفعيل، يمكن للبروتوكول الأصلي تنفيذ عدة أدوات في دور رسالة واحدة."
 		},
+		"MULTIPLE_CONCURRENT_TASKS": {
+			"name": "Multiple concurrent tasks",
+			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
+		},
 		"experimentalParallelToolCalls": "استدعاءات أدوات متوازية تجريبية",
 		"experimentalParallelToolCallsDesc": "يسمح بتنفيذ عدة أدوات في نفس الوقت",
 		"experimentalParallelToolCallsInfo": "هذه الميزة تجريبية وقد تسبب سلوكًا غير متوقع",

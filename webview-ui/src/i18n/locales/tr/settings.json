@@ -947,6 +947,10 @@
 			"name": "Paralel araç çağrıları",
 			"description": "Etkinleştirildiğinde, yerel protokol tek bir asistan mesaj turunda birden fazla araç yürütebilir."
 		},
+		"MULTIPLE_CONCURRENT_TASKS": {
+			"name": "Multiple concurrent tasks",
+			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
+		},
 		"SPEECH_TO_TEXT": {
 			"description": "Etkinleştirildiğinde, Operit Coder sesinizi OpenAI'nin Whisper modeli kullanarak metne dönüştürebilir. Kayda başlamak için sohbetteki mikrofon düğmesine tıklayın. FFmpeg'in yüklü olması ve yapılandırılmış bir OpenAI API sağlayıcısı gereklidir.",
 			"name": "Konuşmadan Metne (STT)"
