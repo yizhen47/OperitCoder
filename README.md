@@ -1,8 +1,4 @@
 <p align="center">
-  <strong>中文</strong> | <a href="./README.en.md">English</a>
-</p>
-
-<p align="center">
   <a href="https://github.com/yizhen47/OperitCoder"><img src="https://img.shields.io/badge/GitHub-Repo-181717?style=flat&logo=github&logoColor=white" alt="GitHub Repo"></a>
   <a href="https://github.com/yizhen47/OperitCoder/issues"><img src="https://img.shields.io/badge/GitHub-Issues-1F6FEB?style=flat&logo=github&logoColor=white" alt="GitHub Issues"></a>
   <a href="https://marketplace.visualstudio.com/items?itemName=kilocode.Operit-Coder"><img src="https://img.shields.io/badge/VS_Code_Marketplace-007ACC?style=flat&logo=visualstudiocode&logoColor=white" alt="VS Code Marketplace"></a>
@@ -11,11 +7,25 @@
 
 # 🚀 Operit Coder
 
+> This is a personal-maintained fork of a VS Code AI coding assistant (based on [KiloCode](https://github.com/Kilo-Org/kilocode) / Roo Code).
+>
+> In this fork, I removed a large amount of cloud-related dependencies and logic to make it more standalone and minimal. I focus on improving the UI and day-to-day workflow. Some interaction patterns are inspired by closed-source AI editors, aiming to provide an open-source tool that feels smooth to use.
+>
+> It also supports custom AI APIs, so you can use your own models and API keys.
+
 > 这是我个人维护的 VS Code AI 编码助手分支（基于 [KiloCode](https://github.com/Kilo-Org/kilocode) / Roo Code 体系）。
-> 
+>
 > 我在这个分支里删除了大量云端相关依赖与逻辑，使其更独立、更极简，并专注把 UI 与日常使用体验打磨得更顺手；制作过程中也参考了一些闭源 AI 代码编辑器的交互设计，希望让大家用上开源且顺手的工具。
-> 
+>
 > 同时支持自定义 AI API，让你用自己的模型与 Key。
+
+## What you can do here
+
+- **Write code with natural language**: describe your needs and it generates/modifies project files
+- **Task automation**: automate repetitive coding workflows (terminal, browser, etc.)
+- **Multi-mode collaboration**: planning (Architect) / coding (Coder) / debugging (Debugger) plus custom modes
+- **MCP extensibility**: extend agent capabilities via MCP servers
+- **Safety boundaries**: high-impact operations require explicit approval (configurable allow/deny rules)
 
 ## 你可以在这里做什么
 
@@ -24,6 +34,47 @@
 - **多模式协作**：规划（Architect）/编码（Coder）/调试（Debugger）+ 自定义模式
 - **MCP 扩展**：通过 MCP 服务器扩展代理能力
 - **自带安全边界**：关键操作需要明确授权（可配置允许/拒绝规则）
+
+## Practical changes in this fork
+
+The focus is not on adding random features, but on making the core path smoother, more stable, and less disruptive:
+
+- Reduce unnecessary dependencies and complexity (especially cloud-related parts)
+- Make the UI denser so you can see more useful content in one screen
+- Improve high-frequency interactions (checkpoints, resend, waiting states, etc.)
+
+Some changes already implemented (more details can be found in the repo code and changesets):
+
+- **Less cloud coupling / more standalone**
+  - Removed many cloud-related dependencies and logic to reduce install/build/runtime overhead
+  - More independent from the original Kilo direction, focused on minimalism and UX
+  - Supports custom AI APIs (bring your own models and keys)
+- **UI layout rework**
+  - Removed the top task bar and checkpoint jump to reclaim space for chat and content
+  - Improved layout density to reduce scrolling and context switching
+- **Checkpoint behavior redesign**
+  - Checkpoints behave more like “undo/rollback” (Cursor-style) to match “go back to that step” intuition
+  - Fewer clicks for common actions
+- **Message resend experience**
+  - Avoids resending duplicate content when retrying a message; reduces accidental spam
+- **Rendering and placeholder fixes**
+  - Fixed ghost placeholders caused by layout index changes upstream
+  - Switched to straightforward Markdown-only rendering to avoid “invisible but taking space” UI issues
+- **Thinking/chat UI improvements**
+  - Cleaner display for thinking content and chat layout; easier to scan
+- **Thinking timer persistence fixes**
+  - Fixed issues where thinking seconds wouldn’t stop, wouldn’t persist, or would disappear after refresh
+- **Interaction polish**
+  - Improved cancel button behavior and visual feedback, and added waiting animations
+  - i18n tweaks: expanded language support and experimental defaults enabled
+- **Concurrency & tabs**
+  - Multi-chat and multi-task concurrency
+  - Tab highlight styling and close logic fixes
+- **Models & configuration**
+  - OpenAI Compatible (Responses) provider support
+  - Model list handling improvements
+- **Stability & rendering**
+  - Fixes for duplicate messages, diff rendering, and DOM reconciliation
 
 ## 我在这个分支做了哪些“实用向”改动
 
@@ -56,8 +107,32 @@
   - 修复思考秒数不停止、不会储存，以及一刷新就没的 bug，让状态展示更可信
 - **交互细节**：
   - 优化取消按键的体验与视觉反馈，并制作等待动画，让“正在做事”更明确
+  - i18n 多语言支持增强，新增实验性设置默认开启
+- **并发与标签体验**：
+  - 支持对话并发与任务并发
+  - 标签页高亮与关闭逻辑优化
+- **模型与配置能力**：
+  - OpenAI Compatible（Responses）供应商支持
+  - 模型列表请求与相关逻辑优化
+- **稳定性与渲染修复**：
+  - 修复重复消息、diff 渲染与 React DOM 协调问题
+
+If you like VS Code, or you used closed-source AI code editors before and now have your own API, you are welcome to try Operit Coder.
 
 如果你觉得 VS Code 顺手，抑或你曾是闭源 AI 代码编辑器的用户，并且现在已经拥有了自己的 API，欢迎来使用 Operit Coder。
+
+## Roadmap (near-term)
+
+- **Move two MCP buttons into settings**: keep frequent entry points while reducing UI clutter
+- **Reorganize settings**: clearer groups and naming
+- **Rearrange the top bar**: prioritize commonly-used actions
+- **Ensure the “expand” button in the top bar is not collapsed**: avoid losing key actions in narrow widths
+- **Link chat history with model configuration**: keep the model/params used for each session
+- **Support multi-model selection**: easier switching and comparison
+- **Chat history import**
+- **Custom themes (background / chat bubbles / AI & user avatars)**
+- **Smoother UI**: better animations and interaction consistency
+- **Will follow Operit project memory sync in the future**: https://github.com/AAswordman/Operit
 
 ## Roadmap（近期计划）
 
@@ -72,7 +147,50 @@
 - **更流畅的界面**：更好的动效与交互一致性
 - **未来将跟随 Operit 项目记忆同步，请期待！**：https://github.com/AAswordman/Operit
 
+## Changelog (English)
+
+### 0.0.1 - 0.1.0 Summary
+
+- **Concurrency & tabs**: multi-chat/task support, tab highlight polish, tab close fixes.
+- **Core UI & interaction**: denser layout, clearer loading/waiting animations, spacing improvements.
+- **Checkpoints & resend**: checkpoint logic redesign; resend avoids duplication.
+- **Providers & models**: OpenAI Compatible (Responses) provider and model list handling improvements.
+- **Stability & rendering**: fixes for duplicate messages, diff rendering, and DOM reconciliation.
+- **i18n**: expanded language support and experimental defaults enabled.
+
+### 0.1.0
+
+- **Concurrent chats/tasks**: support for multi-chat and multi-task concurrency.
+- **Tab UX polish**: improved tab highlight styling and interaction details.
+- **Tab close fix**: fixed issues when closing tabs.
+- **Removed browser tools**: removed browser-related tools to reduce overhead.
+- **i18n defaults**: two new experimental settings are enabled by default.
+
+[Jump to Chinese changelog](#更新日志)
+
 ## 更新日志
+
+[Jump to English changelog](#changelog-english)
+
+### 0.0.1 - 0.1.0 更新摘要
+
+- **并发与标签体验**：支持对话/任务并发，标签页高亮与关闭逻辑优化。
+- **核心 UI / 交互打磨**：布局更紧凑，加载/等待动画优化，思考区与消息间距更清晰。
+- **检查点与重发体验**：检查点逻辑重做，重发避免重复与误触。
+- **模型与配置能力**：新增/优化 OpenAI Compatible（Responses）供应商与模型列表请求逻辑。
+- **稳定性与渲染修复**：修复重复消息、Diff 渲染与 React DOM 协调问题。
+- **i18n 扩展**：增加多语言支持与实验性设置默认开启。
+
+### 0.1.0
+
+- **对话/任务并发**：支持多对话并发与任务并发。
+- **标签页体验优化**：高亮样式美化、交互细节优化。
+- **标签页关闭逻辑修复**：修复关闭标签页时的异常行为。
+- **删除浏览器工具**：移除浏览器相关工具，减少冗余与依赖。
+- **i18n 默认配置调整**：两个新的实验性设置默认开启。
+
+<details>
+<summary>历史版本更新日志（0.0.8 及更早）</summary>
 
 ### 0.0.8
 
@@ -138,6 +256,7 @@
 ### 0.0.1
 
 - 初始版本
+</details>
 
 ## 安装
 

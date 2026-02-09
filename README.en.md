@@ -27,7 +27,7 @@
 
 ## Practical changes in this fork
 
-My goal is not to add random features, but to make the core path smoother, more stable, and less disruptive:
+The focus is not on adding random features, but on making the core path smoother, more stable, and less disruptive:
 
 - Reduce unnecessary dependencies and complexity (especially cloud-related parts)
 - Make the UI denser so you can see more useful content in one screen
@@ -73,6 +73,30 @@ If you like VS Code, or you used closed-source AI code editors before and now ha
 - **Will follow Operit project memory sync in the future**: https://github.com/AAswordman/Operit
 
 ## Changelog
+
+### 0.0.1 - 0.1.0 Summary
+
+- **Concurrency & tabs**: multi-chat/task support, tab highlight polish, tab close fixes.
+- **Core UI & interaction**: denser layout, clearer loading/waiting animations, spacing improvements.
+- **Checkpoints & resend**: checkpoint logic redesign; resend avoids duplication.
+- **Providers & models**: OpenAI Compatible (Responses) provider and model list handling improvements.
+- **Stability & rendering**: fixes for duplicate messages, diff rendering, and DOM reconciliation.
+- **i18n**: expanded language support and experimental defaults enabled.
+
+### 0.1.0
+
+- **Concurrent chats/tasks**: support for multi-chat and multi-task concurrency.
+- **Tab UX polish**: improved tab highlight styling and interaction details.
+- **Tab close fix**: fixed issues when closing tabs.
+- **Removed browser tools**: removed browser-related tools to reduce overhead.
+- **i18n defaults**: two new experimental settings are enabled by default.
+
+<details>
+<summary>Earlier releases (0.0.8 and below)</summary>
+
+### 0.0.8
+
+- **Metallic loading animation**: upgraded the loading animation with a metallic gradient style for improved visual quality.
 
 ### 0.0.7
 
@@ -127,6 +151,7 @@ If you like VS Code, or you used closed-source AI code editors before and now ha
 ### 0.0.1
 
 - Initial release
+</details>
 
 ## Installation
 
