@@ -838,6 +838,40 @@ describe("ClineProvider", () => {
 		expect(nextState.activeTasks?.[1].isCurrent).toBe(false)
 	})
 
+	test("closeActiveTask discards empty draft tasks", async () => {
+		const taskOne = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any }) as any
+		taskOne.isInitialized = false
+		taskOne.clineMessages = []
+
+		await provider.addClineToStack(taskOne)
+
+		const deleteTaskFromStateSpy = vi
+			.spyOn(provider as any, "deleteTaskFromState")
+			.mockResolvedValue(undefined)
+
+		await provider.closeActiveTask("task-1")
+
+		expect(deleteTaskFromStateSpy).toHaveBeenCalledWith("task-1")
+	})
+
+	test("reorderActiveTaskTabs updates active task order", async () => {
+		const taskOne = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
+		const taskTwo = new Task({ ...defaultTaskOptions, historyItem: { id: "task-2" } as any })
+
+		await provider.addClineToStack(taskOne)
+		await provider.addClineToStack(taskTwo)
+
+		vi.spyOn(provider as any, "getTaskHistory").mockReturnValue([
+			{ id: "task-1", task: "Task One" },
+			{ id: "task-2", task: "Task Two" },
+		])
+
+		await provider.reorderActiveTaskTabs(["task-2", "task-1"])
+
+		const nextState = await (provider as any).getStateToPostToWebview()
+		expect(nextState.activeTasks?.map((task) => task.id)).toEqual(["task-2", "task-1"])
+	})
+
 	test("getStateToPostToWebview groups delegated child tasks under conversation root", async () => {
 		const rootTask = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
 		const childTask = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1-child" } as any })

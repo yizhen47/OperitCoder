@@ -73,6 +73,7 @@ export interface WebviewMessage {
 		| "showTaskWithId"
 		| "switchActiveTask" // kilocode_change
 		| "closeActiveTask" // kilocode_change
+		| "reorderActiveTasks" // kilocode_change
 		| "deleteTaskWithId"
 		| "exportTaskWithId"
 		| "importSettings"

@@ -466,7 +466,7 @@ export class ClineProvider
 
 	// Removes and destroys the top Cline instance (the current finished task),
 	// activating the previous one (resuming the parent task).
-	async removeClineFromStack() {
+	async removeClineFromStack(): Promise<Task | undefined> {
 		if (this.clineStack.length === 0) {
 			return
 		}
@@ -478,6 +478,7 @@ export class ClineProvider
 
 		task.emit(RooCodeEventName.TaskUnfocused)
 		await this.disposeTaskInstance(task)
+		return task
 	}
 
 	getTaskStackSize(): number {
@@ -576,7 +577,7 @@ export class ClineProvider
 		if (this.isCurrentTaskEmptyDraft()) {
 			const currentTask = this.getCurrentTask()
 			if (currentTask && this.getConversationRootId(currentTask) !== taskId) {
-				await this.removeClineFromStack()
+				await this.pruneCurrentEmptyDraftTask()
 			}
 		}
 
@@ -623,6 +624,9 @@ export class ClineProvider
 			}
 			task.emit(RooCodeEventName.TaskUnfocused)
 			await this.disposeTaskInstance(task)
+			if (this.isEmptyDraftTask(task)) {
+				await this.discardEmptyDraftTask(task)
+			}
 		}
 
 		const nextCurrentTask = this.getCurrentTask()
@@ -636,27 +640,69 @@ export class ClineProvider
 		}
 	}
 
+	public async reorderActiveTaskTabs(order: string[]): Promise<void> {
+		if (!order.length || this.clineStack.length === 0) {
+			return
+		}
+
+		const conversationIdsInStack: string[] = []
+		for (const task of this.clineStack) {
+			const conversationId = this.getConversationRootId(task)
+			if (!conversationIdsInStack.includes(conversationId)) {
+				conversationIdsInStack.push(conversationId)
+			}
+		}
+
+		const activeConversationIds = new Set(conversationIdsInStack)
+		const nextOrder = order.filter((conversationId) => activeConversationIds.has(conversationId))
+
+		for (const conversationId of conversationIdsInStack) {
+			if (!nextOrder.includes(conversationId)) {
+				nextOrder.push(conversationId)
+			}
+		}
+
+		this.activeTaskTabOrder = nextOrder
+		await this.postStateToWebview()
+	}
+
 	// kilocode_change start
-	private isCurrentTaskEmptyDraft(): boolean {
-		const currentTask = this.getCurrentTask()
-		if (!currentTask) {
+	private isEmptyDraftTask(task?: Task): boolean {
+		if (!task) {
 			return false
 		}
 
-		return (
-			currentTask.clineMessages.length === 0 &&
-			currentTask.isInitialized === false &&
-			!currentTask.parentTaskId &&
-			!currentTask.rootTaskId
-		)
+		return task.clineMessages.length === 0 && task.isInitialized === false && !task.parentTaskId && !task.rootTaskId
 	}
 
-	private async pruneCurrentEmptyDraftTask(): Promise<void> {
+	private isCurrentTaskEmptyDraft(): boolean {
+		return this.isEmptyDraftTask(this.getCurrentTask())
+	}
+
+	public async pruneCurrentEmptyDraftTask(): Promise<void> {
 		if (!this.isCurrentTaskEmptyDraft()) {
 			return
 		}
 
-		await this.removeClineFromStack()
+		const removedTask = await this.removeClineFromStack()
+		if (!removedTask) {
+			return
+		}
+
+		await this.discardEmptyDraftTask(removedTask)
+	}
+
+	private async discardEmptyDraftTask(task: Task): Promise<void> {
+		await this.deleteTaskFromState(task.taskId)
+
+		try {
+			const { getTaskDirectoryPath } = await import("../../utils/storage")
+			const globalStoragePath = this.contextProxy.globalStorageUri.fsPath
+			const taskDirPath = await getTaskDirectoryPath(globalStoragePath, task.taskId)
+			await fs.rm(taskDirPath, { recursive: true, force: true })
+		} catch {
+			// Non-fatal cleanup for empty drafts.
+		}
 	}
 	// kilocode_change end
 
@@ -1968,7 +2014,7 @@ ${prompt}
 		if (this.isCurrentTaskEmptyDraft()) {
 			const currentTask = this.getCurrentTask()
 			if (currentTask && currentTask.taskId !== id) {
-				await this.removeClineFromStack()
+				await this.pruneCurrentEmptyDraftTask()
 			}
 		}
 

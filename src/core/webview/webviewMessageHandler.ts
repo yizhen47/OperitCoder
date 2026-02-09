@@ -613,7 +613,7 @@ export const webviewMessageHandler = async (
 			if (message.askResponse === "messageResponse" && (!currentTask || isDraftTask)) {
 				try {
 					if (isDraftTask) {
-						await provider.removeClineFromStack()
+						await provider.pruneCurrentEmptyDraftTask()
 					}
 					await provider.createTask(message.text, message.images)
 					await provider.postStateToWebview() // kilocode_change: refresh active task tabs immediately
@@ -773,6 +773,9 @@ export const webviewMessageHandler = async (
 			break
 		case "closeActiveTask": // kilocode_change
 			await provider.closeActiveTask(message.text!)
+			break
+		case "reorderActiveTasks": // kilocode_change
+			await provider.reorderActiveTaskTabs(message.ids ?? [])
 			break
 		case "condenseTaskContextRequest":
 			provider.condenseTaskContext(message.text!)
