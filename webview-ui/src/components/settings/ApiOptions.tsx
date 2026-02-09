@@ -1010,6 +1010,34 @@ const ApiOptions = ({
 								</div>
 							</div>
 						)}
+						<div>
+							<label className="block font-medium mb-1">
+								{t("settings:playwrightMcp.defaultChannel.label")}
+							</label>
+							<Select
+								value={apiConfiguration.playwrightMcpDefaultChannel || "auto"}
+								onValueChange={(value) =>
+									setApiConfigurationField(
+										"playwrightMcpDefaultChannel",
+										value === "auto" ? undefined : (value as ProviderSettings["playwrightMcpDefaultChannel"]),
+									)
+								}>
+								<SelectTrigger className="w-full">
+									<SelectValue placeholder={t("settings:common.select")} />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="auto">{t("settings:playwrightMcp.defaultChannel.auto")}</SelectItem>
+									<SelectItem value="edge">{t("settings:playwrightMcp.defaultChannel.edge")}</SelectItem>
+									<SelectItem value="chromium">
+										{t("settings:playwrightMcp.defaultChannel.chromium")}
+									</SelectItem>
+									<SelectItem value="chrome">{t("settings:playwrightMcp.defaultChannel.chrome")}</SelectItem>
+								</SelectContent>
+							</Select>
+							<div className="text-sm text-vscode-descriptionForeground mt-1">
+								{t("settings:playwrightMcp.defaultChannel.description")}
+							</div>
+						</div>
 					</CollapsibleContent>
 				</Collapsible>
 			)}

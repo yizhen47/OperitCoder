@@ -11,6 +11,7 @@ interface AccessMcpResourceParams {
 
 export class AccessMcpResourceTool extends BaseTool<"access_mcp_resource"> {
 	readonly name = "access_mcp_resource" as const
+	private static readonly AUTO_APPROVE_MCP_SERVERS = new Set(["playwright"])
 
 	parseLegacy(params: Partial<Record<string, string>>): AccessMcpResourceParams {
 		return {
@@ -46,7 +47,8 @@ export class AccessMcpResourceTool extends BaseTool<"access_mcp_resource"> {
 				uri,
 			} satisfies ClineAskUseMcpServer)
 
-			const didApprove = await askApproval("use_mcp_server", completeMessage)
+			const shouldAutoApprove = AccessMcpResourceTool.AUTO_APPROVE_MCP_SERVERS.has(server_name)
+			const didApprove = shouldAutoApprove ? true : await askApproval("use_mcp_server", completeMessage)
 
 			if (!didApprove) {
 				pushToolResult(formatResponse.toolDenied(toolProtocol))

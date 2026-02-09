@@ -23,6 +23,7 @@ type ValidationResult =
 
 export class UseMcpToolTool extends BaseTool<"use_mcp_tool"> {
 	readonly name = "use_mcp_tool" as const
+	private static readonly AUTO_APPROVE_MCP_SERVERS = new Set(["playwright"])
 
 	parseLegacy(params: Partial<Record<string, string>>): UseMcpToolParams {
 		// For legacy params, arguments come as a JSON string that needs parsing
@@ -64,7 +65,8 @@ export class UseMcpToolTool extends BaseTool<"use_mcp_tool"> {
 			} satisfies ClineAskUseMcpServer)
 
 			const executionId = task.lastMessageTs?.toString() ?? Date.now().toString()
-			const didApprove = await askApproval("use_mcp_server", completeMessage)
+			const shouldAutoApprove = UseMcpToolTool.AUTO_APPROVE_MCP_SERVERS.has(serverName)
+			const didApprove = shouldAutoApprove ? true : await askApproval("use_mcp_server", completeMessage)
 
 			if (!didApprove) {
 				return
@@ -306,7 +308,67 @@ export class UseMcpToolTool extends BaseTool<"use_mcp_tool"> {
 			toolName,
 		})
 
-		const toolResult = await task.providerRef.deref()?.getMcpHub()?.callTool(serverName, toolName, parsedArguments)
+		let toolResult: any
+
+		const provider = task.providerRef.deref()
+		const contextProxy = provider?.contextProxy
+		const preferredChannel = contextProxy?.getProviderSettings().playwrightMcpDefaultChannel
+		const parsedChannel =
+			parsedArguments && typeof parsedArguments === "object"
+				? (parsedArguments as { channel?: string }).channel
+				: undefined
+		const hasExplicitChannel = typeof parsedChannel === "string"
+		const shouldPersistDefault =
+			!hasExplicitChannel && (!preferredChannel || preferredChannel === "auto") && contextProxy
+
+		const shouldUseFallbacks =
+			serverName === "playwright" && (!parsedArguments || typeof parsedArguments === "object")
+		if (!shouldUseFallbacks) {
+			toolResult = await provider?.getMcpHub()?.callTool(serverName, toolName, parsedArguments)
+		} else {
+			const fallbackOrder = ["edge", "chromium"]
+			const attempts: string[] = []
+
+			if (hasExplicitChannel) {
+				attempts.push(parsedChannel as string)
+			} else if (preferredChannel && preferredChannel !== "auto") {
+				attempts.push(preferredChannel)
+			}
+
+			for (const channel of fallbackOrder) {
+				if (!attempts.includes(channel)) {
+					attempts.push(channel)
+				}
+			}
+
+			const baseArgs =
+				parsedArguments && typeof parsedArguments === "object" ? (parsedArguments as Record<string, unknown>) : {}
+			let lastError: unknown
+
+			const resolvePlaywrightChannel = (channel: string) => (channel === "edge" ? "msedge" : channel)
+
+			for (const channel of attempts) {
+				try {
+					const attemptArgs = { ...baseArgs, channel: resolvePlaywrightChannel(channel) }
+					toolResult = await provider?.getMcpHub()?.callTool(serverName, toolName, attemptArgs)
+					if (shouldPersistDefault) {
+						await contextProxy?.setValue("playwrightMcpDefaultChannel", channel)
+					}
+					lastError = undefined
+					break
+				} catch (error) {
+					lastError = error
+					const errorText = `${error}`
+					if (!errorText.includes("Chromium distribution")) {
+						throw error
+					}
+				}
+			}
+
+			if (!toolResult && lastError) {
+				throw lastError
+			}
+		}
 
 		let toolResultPretty = "(No response)"
 
