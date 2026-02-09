@@ -600,6 +600,29 @@ export class ClineProvider
 			await this.postMessageToWebview({ type: "action", action: "chatButtonClicked" })
 		}
 	}
+
+	// kilocode_change start
+	private isCurrentTaskEmptyDraft(): boolean {
+		const currentTask = this.getCurrentTask()
+		if (!currentTask) {
+			return false
+		}
+
+		return (
+			currentTask.clineMessages.length === 0 &&
+			currentTask.isInitialized === false &&
+			!currentTask.parentTaskId &&
+			!currentTask.rootTaskId
+		)
+	}
+
+	private async pruneCurrentEmptyDraftTask(): Promise<void> {
+		if (!this.isCurrentTaskEmptyDraft()) {
+			return
+		}
+
+		await this.removeClineFromStack()
+	}
 	// kilocode_change end
 
 	// Pending Edit Operations Management
@@ -3064,6 +3087,24 @@ ${prompt}
 			experiments ?? {},
 			EXPERIMENT_IDS.MULTIPLE_CONCURRENT_TASKS,
 		)
+
+		// kilocode_change start
+		const isDraftTopLevelTaskCreation =
+			isMultipleConcurrentTasksEnabled &&
+			options.startTask === false &&
+			!parentTask &&
+			!text &&
+			(!images || images.length === 0)
+		if (isDraftTopLevelTaskCreation) {
+			try {
+				await this.pruneCurrentEmptyDraftTask()
+			} catch (error) {
+				this.log(
+					`[createTask] pruneCurrentEmptyDraftTask failed: ${error instanceof Error ? error.message : String(error)}`,
+				)
+			}
+		}
+		// kilocode_change end
 
 		// Single-open-task invariant: enforce for top-level tasks unless concurrent-task experiment is enabled
 		if (!parentTask && !isMultipleConcurrentTasksEnabled) {

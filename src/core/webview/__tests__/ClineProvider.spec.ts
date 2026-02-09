@@ -745,6 +745,70 @@ describe("ClineProvider", () => {
 		expect(removeSpy).not.toHaveBeenCalled()
 	})
 
+	// kilocode_change start
+	test("createTask prunes current empty draft task before creating a new draft", async () => {
+		const emptyDraftTask = new Task(defaultTaskOptions)
+		;(emptyDraftTask as any).taskId = "draft-1"
+		;(emptyDraftTask as any).clineMessages = []
+		;(emptyDraftTask as any).isInitialized = false
+		await provider.addClineToStack(emptyDraftTask)
+
+		vi.spyOn(provider, "getState").mockResolvedValue({
+			mode: "code",
+			customModes: [],
+			apiConfiguration: {
+				apiProvider: "openrouter",
+			},
+			diffEnabled: false,
+			enableCheckpoints: false,
+			checkpointTimeout: DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
+			fuzzyMatchThreshold: 1,
+			experiments: {
+				...experimentDefault,
+				multipleConcurrentTasks: true,
+			},
+			remoteControlEnabled: false,
+		} as any)
+
+		await provider.createTask(undefined, undefined, undefined, { startTask: false } as any)
+
+		expect((emptyDraftTask as any).abortTask).toHaveBeenCalledWith(true)
+		expect(provider.getTaskStackSize()).toBe(1)
+		expect(provider.getCurrentTask()).not.toBe(emptyDraftTask)
+	})
+
+	test("createTask keeps current task if draft already has messages", async () => {
+		const nonEmptyDraftTask = new Task(defaultTaskOptions)
+		;(nonEmptyDraftTask as any).taskId = "draft-has-message"
+		;(nonEmptyDraftTask as any).clineMessages = [{ ts: 1, type: "ask", ask: "followup" }]
+		;(nonEmptyDraftTask as any).isInitialized = false
+		await provider.addClineToStack(nonEmptyDraftTask)
+
+		vi.spyOn(provider, "getState").mockResolvedValue({
+			mode: "code",
+			customModes: [],
+			apiConfiguration: {
+				apiProvider: "openrouter",
+			},
+			diffEnabled: false,
+			enableCheckpoints: false,
+			checkpointTimeout: DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
+			fuzzyMatchThreshold: 1,
+			experiments: {
+				...experimentDefault,
+				multipleConcurrentTasks: true,
+			},
+			remoteControlEnabled: false,
+		} as any)
+
+		await provider.createTask(undefined, undefined, undefined, { startTask: false } as any)
+
+		expect((nonEmptyDraftTask as any).abortTask).not.toHaveBeenCalled()
+		expect(provider.getTaskStackSize()).toBe(2)
+		expect(provider.getCurrentTask()).not.toBe(nonEmptyDraftTask)
+	})
+	// kilocode_change end
+
 	test("getStateToPostToWebview includes active task tabs", async () => {
 		const taskOne = new Task({ ...defaultTaskOptions, historyItem: { id: "task-1" } as any })
 		const taskTwo = new Task({ ...defaultTaskOptions, historyItem: { id: "task-2" } as any })
