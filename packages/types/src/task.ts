@@ -89,6 +89,7 @@ export type TaskProviderEvents = {
  */
 
 export interface CreateTaskOptions {
+	startTask?: boolean
 	enableDiff?: boolean
 	enableCheckpoints?: boolean
 	fuzzyMatchThreshold?: number

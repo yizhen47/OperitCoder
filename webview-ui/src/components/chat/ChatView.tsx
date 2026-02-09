@@ -2117,7 +2117,6 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				setMode={setMode}
 				modeShortcutText={modeShortcutText}
 				sendMessageOnEnter={sendMessageOnEnter} // kilocode_change
-				showBrowserDockToggle={showBrowserDockToggle}
 				contextTokens={apiMetrics.contextTokens} // kilocode_change: pass context tokens to ChatTextArea
 			/>
 			{/* kilocode_change: added settings toggle the profile and model selection */}
