@@ -1,12 +1,5 @@
 import React, { useState } from "react"
-import { Trans } from "react-i18next"
-import {
-	VSCodeCheckbox,
-	VSCodeLink,
-	VSCodePanels,
-	VSCodePanelTab,
-	VSCodePanelView,
-} from "@vscode/webview-ui-toolkit/react"
+import { VSCodeCheckbox, VSCodePanels, VSCodePanelTab, VSCodePanelView } from "@vscode/webview-ui-toolkit/react"
 
 import { McpServer } from "@roo/mcp"
 
@@ -22,9 +15,8 @@ import {
 	DialogDescription,
 	DialogFooter,
 	ToggleSwitch,
-	// StandardTooltip, // kilocode_change: not used
+	StandardTooltip,
 } from "@src/components/ui"
-import { buildDocLink } from "@src/utils/docLinks"
 import { Section } from "@src/components/settings/Section"
 
 import { Tab, TabHeader } from "../common/Tab" // kilocode_change
@@ -43,7 +35,6 @@ const McpView = ({ onDone, hideHeader = false }: McpViewProps) => {
 	const {
 		mcpServers: servers,
 		alwaysAllowMcp,
-		mcpEnabled,
 		enableMcpServerCreation,
 		setEnableMcpServerCreation,
 	} = useExtensionState()
@@ -59,150 +50,86 @@ const McpView = ({ onDone, hideHeader = false }: McpViewProps) => {
 				<Button onClick={onDone}>{t("mcp:done")}</Button>
 			</TabHeader>
 
-			<Section>
-				<div
-					style={{
-						color: "var(--vscode-foreground)",
-						fontSize: "13px",
-						marginBottom: "10px",
-						marginTop: "5px",
-					}}>
-					<Trans i18nKey="mcp:description">
-						<VSCodeLink
-							href={buildDocLink("features/mcp/using-mcp-in-operit-coder", "mcp_settings")}
-							style={{ display: "inline" }}>
-							Learn More
-						</VSCodeLink>
-					</Trans>
-				</div>
+			<Section className={hideHeader ? "px-0" : undefined}>
+				{/* Description removed per UX request */}
 
 				{/* <McpEnabledToggle /> kilocode_change: we always enable MCP */}
 
-				{mcpEnabled && (
-					<>
-						{/* kilocode_change: display: none; we always allow mcp server creation */}
-						<div style={{ display: "none", marginBottom: 15 }}>
-							<VSCodeCheckbox
-								checked={enableMcpServerCreation}
-								onChange={(e: any) => {
-									setEnableMcpServerCreation(e.target.checked)
-									vscode.postMessage({ type: "enableMcpServerCreation", bool: e.target.checked })
-								}}>
-								<span style={{ fontWeight: "500" }}>{t("mcp:enableServerCreation.title")}</span>
-							</VSCodeCheckbox>
-							<div
-								style={{
-									fontSize: "12px",
-									marginTop: "5px",
-									color: "var(--vscode-descriptionForeground)",
-								}}>
-								<Trans i18nKey="mcp:enableServerCreation.description">
-									<VSCodeLink
-										href={buildDocLink(
-											"features/mcp/using-mcp-in-operit-coder#how-to-use-operit-coder-to-create-an-mcp-server",
-											"mcp_server_creation",
-										)}
-										style={{ display: "inline" }}>
-										Learn about server creation
-									</VSCodeLink>
-									<strong>new</strong>
-								</Trans>
-								<p style={{ marginTop: "8px" }}>{t("mcp:enableServerCreation.hint")}</p>
-							</div>
-						</div>
-
-						{/* Server List */}
-						{servers.length > 0 && (
-							<div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-								{servers.map((server) => (
-									<ServerRow
-										key={`${server.name}-${server.source || "global"}`}
-										server={server}
-										alwaysAllowMcp={alwaysAllowMcp}
-									/>
-								))}
-							</div>
-						)}
-
-						{/* Edit Settings Buttons */}
+				<>
+					{/* kilocode_change: display: none; we always allow mcp server creation */}
+					<div style={{ display: "none", marginBottom: 15 }}>
+						<VSCodeCheckbox
+							checked={enableMcpServerCreation}
+							onChange={(e: any) => {
+								setEnableMcpServerCreation(e.target.checked)
+								vscode.postMessage({ type: "enableMcpServerCreation", bool: e.target.checked })
+							}}>
+							<span style={{ fontWeight: "500" }}>{t("mcp:enableServerCreation.title")}</span>
+						</VSCodeCheckbox>
 						<div
 							style={{
-								marginTop: "10px",
-								width: "100%",
-								display: "grid",
-								gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-								gap: "10px",
+								fontSize: "12px",
+								marginTop: "5px",
+								color: "var(--vscode-descriptionForeground)",
 							}}>
+							{t("mcp:enableServerCreation.description")}
+							<p style={{ marginTop: "8px" }}>{t("mcp:enableServerCreation.hint")}</p>
+						</div>
+					</div>
+
+					{/* Server List */}
+					{servers.length > 0 && (
+						<div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+							{servers.map((server) => (
+								<ServerRow
+									key={`${server.name}-${server.source || "global"}`}
+									server={server}
+									alwaysAllowMcp={alwaysAllowMcp}
+								/>
+							))}
+						</div>
+					)}
+					{servers.length === 0 && (
+						<div className="text-xs text-vscode-descriptionForeground mt-2">暂无 MCP 服务器</div>
+					)}
+
+					{/* Edit Settings Buttons */}
+					<div className="mt-2 flex items-center gap-2">
+						<StandardTooltip content={t("mcp:editGlobalMCP")}>
 							<Button
-								variant="secondary"
-								style={{ width: "100%" }}
+								variant="ghost"
+								size="icon"
+								aria-label={t("mcp:editGlobalMCP")}
 								onClick={() => {
 									vscode.postMessage({ type: "openMcpSettings" })
 								}}>
-								<span className="codicon codicon-edit" style={{ marginRight: "6px" }}></span>
-								{t("mcp:editGlobalMCP")}
+								<span className="codicon codicon-edit" style={{ fontSize: "14px" }}></span>
 							</Button>
+						</StandardTooltip>
+						<StandardTooltip content={t("mcp:editProjectMCP")}>
 							<Button
-								variant="secondary"
-								style={{ width: "100%" }}
+								variant="ghost"
+								size="icon"
+								aria-label={t("mcp:editProjectMCP")}
 								onClick={() => {
 									vscode.postMessage({ type: "openProjectMcpSettings" })
 								}}>
-								<span className="codicon codicon-edit" style={{ marginRight: "6px" }}></span>
-								{t("mcp:editProjectMCP")}
+								<span className="codicon codicon-edit" style={{ fontSize: "14px" }}></span>
 							</Button>
+						</StandardTooltip>
+						<StandardTooltip content={t("mcp:refreshMCP")}>
 							<Button
-								variant="secondary"
-								style={{ width: "100%" }}
+								variant="ghost"
+								size="icon"
+								aria-label={t("mcp:refreshMCP")}
 								onClick={() => {
 									vscode.postMessage({ type: "refreshAllMcpServers" })
 								}}>
-								<span className="codicon codicon-refresh" style={{ marginRight: "6px" }}></span>
-								{t("mcp:refreshMCP")}
+								<span className="codicon codicon-refresh" style={{ fontSize: "14px" }}></span>
 							</Button>
-							{/* kilocode_change
-							<StandardTooltip content={t("mcp:marketplace")}>
-								<Button
-									variant="secondary"
-									style={{ width: "100%" }}
-									onClick={() => {
-										window.postMessage(
-											{
-												type: "action",
-												action: "marketplaceButtonClicked",
-												values: { marketplaceTab: "mcp" },
-											},
-											"*",
-										)
-									}}>
-									<span className="codicon codicon-extensions" style={{ marginRight: "6px" }}></span>
-									{t("mcp:marketplace")}
-								</Button>
-							</StandardTooltip>
-							*/}
-						</div>
-						{/* kilocode_change start */}
-						<div className="mt-5">
-							You can find the MCP Marketplace under Settings &gt; MCP Servers &gt; Marketplace
-						</div>
-						{/* kilocode_change end */}
-						<div
-							style={{
-								marginTop: "15px",
-								fontSize: "12px",
-								color: "var(--vscode-descriptionForeground)",
-							}}>
-							<VSCodeLink
-								href={buildDocLink(
-									"features/mcp/using-mcp-in-operit-coder#editing-mcp-settings-files",
-									"mcp_edit_settings",
-								)}
-								style={{ display: "inline" }}>
-								{t("mcp:learnMoreEditingSettings")}
-							</VSCodeLink>
-						</div>
-					</>
-				)}
+						</StandardTooltip>
+					</div>
+				</>
 			</Section>
 		</Tab>
 	)
@@ -283,11 +210,12 @@ const ServerRow = ({ server, alwaysAllowMcp }: { server: McpServer; alwaysAllowM
 	}
 
 	return (
-		<div style={{ marginBottom: "10px" }}>
+		<div style={{ marginBottom: "10px", width: "100%" }}>
 			<div
 				style={{
 					display: "flex",
 					alignItems: "center",
+					width: "100%",
 					padding: "8px",
 					background: "var(--vscode-textCodeBlock-background)",
 					cursor: isExpandable ? "pointer" : "default",
@@ -301,51 +229,39 @@ const ServerRow = ({ server, alwaysAllowMcp }: { server: McpServer; alwaysAllowM
 						style={{ marginRight: "8px" }}
 					/>
 				)}
-				<span style={{ flex: 1 }}>
-					{server.name}
+				<div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1, minWidth: 0 }}>
+					<span className="truncate">{server.name}</span>
 					{server.source && (
 						<span
 							style={{
-								marginLeft: "8px",
 								padding: "1px 6px",
 								fontSize: "11px",
 								borderRadius: "4px",
 								background: "var(--vscode-badge-background)",
 								color: "var(--vscode-badge-foreground)",
+								flexShrink: 0,
 							}}>
 							{server.source}
 						</span>
 					)}
-				</span>
-				<div
-					style={{ display: "flex", alignItems: "center", marginRight: "8px" }}
-					onClick={(e) => e.stopPropagation()}>
-					<Button
-						variant="ghost"
-						size="icon"
-						onClick={() => setShowDeleteConfirm(true)}
-						style={{ marginRight: "8px" }}>
-						<span className="codicon codicon-trash" style={{ fontSize: "14px" }}></span>
-					</Button>
-					<Button
-						variant="ghost"
-						size="icon"
-						onClick={handleRestart}
-						disabled={server.status === "connecting"}
-						style={{ marginRight: "8px" }}>
-						<span className="codicon codicon-refresh" style={{ fontSize: "14px" }}></span>
-					</Button>
 				</div>
 				<div
-					style={{
-						width: "8px",
-						height: "8px",
-						borderRadius: "50%",
-						background: getStatusColor(),
-						marginLeft: "8px",
-					}}
-				/>
-				<div style={{ marginLeft: "8px" }}>
+					style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}
+					onClick={(e) => e.stopPropagation()}>
+					<Button variant="ghost" size="icon" onClick={() => setShowDeleteConfirm(true)}>
+						<span className="codicon codicon-trash" style={{ fontSize: "14px" }}></span>
+					</Button>
+					<Button variant="ghost" size="icon" onClick={handleRestart} disabled={server.status === "connecting"}>
+						<span className="codicon codicon-refresh" style={{ fontSize: "14px" }}></span>
+					</Button>
+					<span
+						style={{
+							width: "8px",
+							height: "8px",
+							borderRadius: "50%",
+							background: getStatusColor(),
+						}}
+					/>
 					<ToggleSwitch
 						checked={!server.disabled}
 						onChange={() => {

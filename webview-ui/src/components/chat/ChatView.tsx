@@ -1998,10 +1998,12 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							</ChatRowErrorBoundary>
 						</div>
 					</div>
-					<div className={`flex-initial min-h-0 ${!areButtonsVisible ? "mb-1" : ""}`}>
-						{/* kilocode_change: added settings toggle for this */}
-						{showAutoApproveMenu && <AutoApproveMenu />}
-					</div>
+					{/* kilocode_change: added settings toggle for this */}
+					{showAutoApproveMenu && (
+						<div className={`flex-initial min-h-0 ${!areButtonsVisible ? "mb-1" : ""}`}>
+							<AutoApproveMenu />
+						</div>
+					)}
 					{/* kilocode_change: Floating scroll-to-bottom button - overlay style */}
 					{showScrollToBottom && (
 						<StandardTooltip content={t("chat:scrollToBottom")}>
@@ -2019,14 +2021,14 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							</button>
 						</StandardTooltip>
 					)}
-					{areButtonsVisible && !showScrollToBottom && (
+					{!showScrollToBottom && !isStreaming && (primaryButtonText || secondaryButtonText) && (
 						<div
 							className={`flex h-9 items-center mb-1 px-[15px] ${
 								enableButtons || (isStreaming && !didClickCancel)
 									? "opacity-100"
 									: "opacity-50"
 							}`}>
-							{primaryButtonText && !isStreaming && (
+							{primaryButtonText && (
 								<StandardTooltip
 									content={
 										primaryButtonText === t("chat:retry.title")
@@ -2055,7 +2057,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 									</Button>
 								</StandardTooltip>
 							)}
-							{secondaryButtonText && !isStreaming && (
+							{secondaryButtonText && (
 								<StandardTooltip
 									content={
 										secondaryButtonText === t("chat:startNewTask.title")

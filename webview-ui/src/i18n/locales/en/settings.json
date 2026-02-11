@@ -89,16 +89,6 @@
 			"description": "When enabled, you must press {{primaryMod}}+Enter to send messages instead of just Enter"
 		}
 	},
-	"playwrightMcp": {
-		"defaultChannel": {
-			"label": "Playwright default browser channel",
-			"description": "When Playwright MCP is used without a channel, try Edge first and fall back to Chromium. The first working channel becomes the default unless you override it here.",
-			"auto": "Auto (edge -> chromium)",
-			"edge": "Edge",
-			"chromium": "Chromium",
-			"chrome": "Chrome"
-		}
-	},
 	"prompts": {
 		"description": "Configure support prompts that are used for quick actions like enhancing prompts, explaining code, and fixing issues. These prompts help Operit Coder provide better assistance for common development tasks."
 	},

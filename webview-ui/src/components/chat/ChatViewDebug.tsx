@@ -24,7 +24,7 @@ export const ChatViewDebug: React.FC = () => {
 					message.includes("findDOMNode") ||
 					message.includes("was not found in the DOM")
 				) {
-					console.error("[React DOM Error Detected]:", ...args)
+					originalError("[React DOM Error Detected]:", ...args)
 				}
 			}
 			originalError(...args)

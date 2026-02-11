@@ -196,7 +196,6 @@ const baseProviderSettingsSchema = z.object({
 	includeMaxTokens: z.boolean().optional(),
 	diffEnabled: z.boolean().optional(),
 	todoListEnabled: z.boolean().optional(),
-	playwrightMcpDefaultChannel: z.enum(["auto", "edge", "chromium", "chrome"]).optional(),
 	fuzzyMatchThreshold: z.number().optional(),
 	modelTemperature: z.number().nullish(),
 	rateLimitSeconds: z.number().optional(),

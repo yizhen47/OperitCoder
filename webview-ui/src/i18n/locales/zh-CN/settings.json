@@ -82,16 +82,6 @@
 	"prompts": {
 		"description": "配置用于快速操作的支持提示词，如增强提示词、解释代码和修复问题。这些提示词帮助 Operit Coder 为常见开发任务提供更好的支持。"
 	},
-	"playwrightMcp": {
-		"defaultChannel": {
-			"label": "Playwright 默认浏览器通道",
-			"description": "当 Playwright MCP 未指定通道时，先尝试 Edge，再回退到 Chromium。首次成功的通道会成为默认值，除非在这里手动覆盖。",
-			"auto": "自动（Edge → Chromium）",
-			"edge": "Edge",
-			"chromium": "Chromium",
-			"chrome": "Chrome"
-		}
-	},
 	"codeIndex": {
 		"title": "代码库索引",
 		"description": "配置代码库索引设置以启用项目的语义搜索。<0>了解更多</0>",

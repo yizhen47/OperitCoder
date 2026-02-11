@@ -12,7 +12,6 @@ import { COMMAND_OUTPUT_STRING } from "@roo/combineCommandSequences"
 import { safeJsonParse } from "@roo/safeJsonParse"
 
 import { useExtensionState } from "@src/context/ExtensionStateContext"
-import { findMatchingResourceOrTemplate } from "@src/utils/mcp"
 import { vscode } from "@src/utils/vscode"
 import { formatPathTooltip } from "@src/utils/formatPathTooltip"
 
@@ -25,9 +24,6 @@ import { ReasoningBlock } from "./ReasoningBlock"
 import Thumbnails from "../common/Thumbnails"
 import ImageBlock from "../common/ImageBlock"
 import ErrorRow from "./ErrorRow"
-
-import McpResourceRow from "../mcp/McpResourceRow"
-
 import { Mention } from "./Mention"
 import { FollowUpSuggest } from "./FollowUpSuggest"
 import { BatchFilePermission } from "./BatchFilePermission"
@@ -44,7 +40,6 @@ import { AutoApprovedRequestLimitWarning } from "./AutoApprovedRequestLimitWarni
 import { InProgressRow, CondensationResultRow, CondensationErrorRow, TruncationResultRow } from "./context-management"
 import CodebaseSearchResultsDisplay from "./CodebaseSearchResultsDisplay"
 import { appendImages } from "@src/utils/imageUtils"
-import { McpExecution } from "./McpExecution"
 import { ChatTextArea } from "./ChatTextArea"
 import { MAX_IMAGES_PER_MESSAGE } from "./ChatView"
 import { useSelectedModel } from "../ui/hooks/useSelectedModel"
@@ -575,8 +570,7 @@ export const ChatRowContent = ({
 	const { t, i18n } = useTranslation()
 
 	// kilocode_change: add showTimestamps
-	const { mcpServers, alwaysAllowMcp, currentCheckpoint, mode, apiConfiguration, clineMessages, showTimestamps } =
-		useExtensionState()
+		const { currentCheckpoint, mode, apiConfiguration, clineMessages, showTimestamps } = useExtensionState()
 
 	// kilocode_change: 添加组件挂载/卸载日志追踪
 	const isMountedRef = useRef(true)
@@ -1839,40 +1833,38 @@ export const ChatRowContent = ({
 						return null
 					}
 
-					const server = mcpServers.find((server) => server.name === useMcpServer.serverName)
-
 					return (
 						<>
-							<div className="w-full bg-vscode-editor-background border border-vscode-border rounded-xs p-2 mt-2">
-								{useMcpServer.type === "access_mcp_resource" && (
-									<McpResourceRow
-										item={{
-											// Use the matched resource/template details, with fallbacks
-											...(findMatchingResourceOrTemplate(
-												useMcpServer.uri || "",
-												server?.resources,
-												server?.resourceTemplates,
-											) || {
-												name: "",
-												mimeType: "",
-												description: "",
-											}),
-											// Always use the actual URI from the request
-											uri: useMcpServer.uri || "",
-										}}
-									/>
-								)}
-								{useMcpServer.type === "use_mcp_tool" && (
-									<McpExecution
-										executionId={message.ts.toString()}
-										text={useMcpServer.arguments !== "{}" ? useMcpServer.arguments : undefined}
-										serverName={useMcpServer.serverName}
-										toolName={useMcpServer.toolName}
-										isArguments={true}
-										server={server}
-										useMcpServer={useMcpServer}
-										alwaysAllowMcp={alwaysAllowMcp}
-									/>
+							<div className="pl-0">
+								<CompactToolDisplay
+									toolName={
+										useMcpServer.type === "use_mcp_tool"
+											? useMcpServer.toolName || "mcp_tool"
+											: "mcp_resource"
+									}
+									params={
+										useMcpServer.type === "use_mcp_tool"
+											? `server: ${useMcpServer.serverName}`
+											: `server: ${useMcpServer.serverName}${useMcpServer.uri ? ` | uri: ${useMcpServer.uri}` : ""}`
+									}
+									expandedContent={
+										useMcpServer.type === "use_mcp_tool" &&
+										useMcpServer.arguments &&
+										useMcpServer.arguments !== "{}" ? (
+											<div className="text-xs text-vscode-descriptionForeground whitespace-pre-wrap break-words">
+												{useMcpServer.arguments}
+											</div>
+										) : undefined
+									}
+								/>
+								{useMcpServer.response && (
+									<div className="pl-0">
+										<ToolResultDisplay
+											resultText={useMcpServer.response}
+											isError={useMcpServer.response.trim().startsWith("Error:")}
+											isRunning={message.partial === true}
+										/>
+									</div>
 								)}
 							</div>
 						</>
