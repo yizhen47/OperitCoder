@@ -33,7 +33,7 @@
 - **任务自动化**：自动执行重复性编码流程（含终端、浏览器等）
 - **多模式协作**：规划（Architect）/编码（Coder）/调试（Debugger）+ 自定义模式
 - **MCP 扩展**：通过 MCP 服务器扩展代理能力
-- **内置 Playwright MCP**：基于 https://github.com/microsoft/playwright-mcp
+- **内置 Playwright MCP**：基于 https://github.com/microsoft/playwright-mcp，可打开 Chrome/Edge，AI 可指定浏览器；权限需在 设置 > MCP 中开启
 - **自带安全边界**：关键操作需要明确授权（可配置允许/拒绝规则）
 
 ## Practical changes in this fork
@@ -166,6 +166,10 @@ If you like VS Code, or you used closed-source AI code editors before and now ha
 - **Tab close fix**: fixed issues when closing tabs.
 - **Removed browser tools**: removed browser-related tools to reduce overhead.
 - **i18n defaults**: two new experimental settings are enabled by default.
+- **Built-in Playwright MCP**: supports Chrome/Edge; the AI can specify the browser. Enable permissions in Settings > MCP.
+- **Compact MCP tool rows**: MCP tool/resource calls render as compact tool rows with cleaner results display.
+- **Simplified MCP handling**: removed Playwright-specific auto-approve/channel defaults; errors are reported back in chat.
+- **MCP settings polish**: compact icon controls and empty-state messaging for MCP server lists.
 
 [Jump to Chinese changelog](#更新日志)
 
@@ -189,6 +193,10 @@ If you like VS Code, or you used closed-source AI code editors before and now ha
 - **标签页关闭逻辑修复**：修复关闭标签页时的异常行为。
 - **删除浏览器工具**：移除浏览器相关工具，减少冗余与依赖。
 - **i18n 默认配置调整**：两个新的实验性设置默认开启。
+- **内置 Playwright MCP**：支持打开 Chrome/Edge，AI 可指定浏览器；使用前需在 设置 > MCP 中开启权限。
+- **MCP 工具行更紧凑**：MCP 工具/资源调用以紧凑工具行展示，结果显示更清晰。
+- **MCP 处理简化**：移除 Playwright 专属自动授权与默认通道设定，错误会回传到对话中。
+- **MCP 设置细节优化**：MCP 服务器列表支持空状态提示，操作按钮更紧凑。
 
 <details>
 <summary>历史版本更新日志（0.0.8 及更早）</summary>

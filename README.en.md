@@ -23,7 +23,7 @@
 - **Task automation**: automate repetitive coding workflows (terminal, browser, etc.)
 - **Multi-mode collaboration**: planning (Architect) / coding (Coder) / debugging (Debugger) plus custom modes
 - **MCP extensibility**: extend agent capabilities via MCP servers
-- **Built-in Playwright MCP**: based on https://github.com/microsoft/playwright-mcp
+- **Built-in Playwright MCP**: based on https://github.com/microsoft/playwright-mcp; opens Chrome/Edge, the AI can specify the browser, and permissions must be enabled in Settings > MCP
 - **Safety boundaries**: high-impact operations require explicit approval (configurable allow/deny rules)
 
 ## Practical changes in this fork
@@ -91,6 +91,10 @@ If you like VS Code, or you used closed-source AI code editors before and now ha
 - **Tab close fix**: fixed issues when closing tabs.
 - **Removed browser tools**: removed browser-related tools to reduce overhead.
 - **i18n defaults**: two new experimental settings are enabled by default.
+- **Built-in Playwright MCP**: supports Chrome/Edge; the AI can specify the browser. Enable permissions in Settings > MCP.
+- **Compact MCP tool rows**: MCP tool/resource calls render as compact tool rows with cleaner results display.
+- **Simplified MCP handling**: removed Playwright-specific auto-approve/channel defaults; errors are reported back in chat.
+- **MCP settings polish**: compact icon controls and empty-state messaging for MCP server lists.
 
 <details>
 <summary>Earlier releases (0.0.8 and below)</summary>
