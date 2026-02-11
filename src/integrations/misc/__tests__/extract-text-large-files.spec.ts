@@ -2,13 +2,24 @@
 
 import * as fs from "fs/promises"
 
-import { extractTextFromFile } from "../extract-text"
+import { extractTextFromFile, DEFAULT_MAX_READ_FILE_BYTES } from "../extract-text"
 import { countFileLines } from "../line-counter"
 import { readLines } from "../read-lines"
 import { isBinaryFile } from "isbinaryfile"
 
 // Mock all dependencies
-vi.mock("fs/promises")
+vi.mock("fs/promises", () => {
+	const fsMock = {
+		access: vi.fn(),
+		readFile: vi.fn(),
+		stat: vi.fn(),
+		open: vi.fn(),
+	}
+	return {
+		...fsMock,
+		default: fsMock,
+	}
+})
 vi.mock("../line-counter")
 vi.mock("../read-lines")
 vi.mock("isbinaryfile")
@@ -24,6 +35,12 @@ describe("extractTextFromFile - Large File Handling", () => {
 		vi.clearAllMocks()
 		// Set default mock behavior
 		mockedFs.access.mockResolvedValue(undefined)
+		mockedFs.stat.mockResolvedValue({ size: 100 } as any)
+		mockedFs.open.mockResolvedValue({
+			stat: vi.fn().mockResolvedValue({ size: 100 }),
+			read: vi.fn().mockResolvedValue({ bytesRead: 0 }),
+			close: vi.fn().mockResolvedValue(undefined),
+		} as any)
 		mockedIsBinaryFile.mockResolvedValue(false)
 	})
 
@@ -108,6 +125,26 @@ describe("extractTextFromFile - Large File Handling", () => {
 
 		// Should not include truncation message
 		expect(result).not.toContain("[File truncated:")
+	})
+
+	it("should truncate by byte limit before applying line limits", async () => {
+		const totalBytes = DEFAULT_MAX_READ_FILE_BYTES + 20
+		mockedFs.stat.mockResolvedValue({ size: totalBytes } as any)
+		mockedFs.open.mockResolvedValue({
+			stat: vi.fn().mockResolvedValue({ size: totalBytes }),
+			read: vi.fn().mockImplementation(async (buffer: Buffer, _offset: number, length: number) => {
+				buffer.fill("A", 0, length)
+				return { bytesRead: length }
+			}),
+			close: vi.fn().mockResolvedValue(undefined),
+		} as any)
+
+		const result = await extractTextFromFile("/test/huge-line.txt", 100)
+
+		expect(result).toContain("1 | A")
+		expect(result).toContain("[File truncated: showing first")
+		expect(mockedCountFileLines).not.toHaveBeenCalled()
+		expect(mockedReadLines).not.toHaveBeenCalled()
 	})
 
 	it("should handle empty files", async () => {

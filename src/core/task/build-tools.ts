@@ -8,6 +8,7 @@ import {
 } from "../prompts/tools/native-tools" // kilocode_change
 import { filterNativeToolsForMode, filterMcpToolsForMode, filterExampleToolsForMode } from "../prompts/tools/filter-tools-for-mode" // kilocode_change
 import type { ClineProviderState } from "../webview/ClineProvider" // kilocode_change
+import { normalizeMaxReadFileLine } from "../../utils/maxReadFileLine"
 
 interface BuildToolsOptions {
 	provider: ClineProvider
@@ -59,8 +60,8 @@ export async function buildNativeToolsArray(options: BuildToolsOptions): Promise
 		diffEnabled,
 	}
 
-	// Determine if partial reads are enabled based on maxReadFileLine setting
-	const partialReadsEnabled = maxReadFileLine !== -1
+	// Full file reads are disabled; always allow partial reads/line ranges.
+	const partialReadsEnabled = normalizeMaxReadFileLine(maxReadFileLine) >= 0
 
 	// Build native tools with dynamic read_file tool based on partialReadsEnabled
 	const nativeTools = getNativeTools(partialReadsEnabled)

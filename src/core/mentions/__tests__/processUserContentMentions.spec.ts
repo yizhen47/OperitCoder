@@ -57,7 +57,7 @@ describe("processUserContentMentions", () => {
 			)
 		})
 
-		it("should pass undefined maxReadFileLine when not provided", async () => {
+		it("should use default maxReadFileLine when not provided", async () => {
 			const userContent = [
 				{
 					type: "text" as const,
@@ -82,11 +82,11 @@ describe("processUserContentMentions", () => {
 				false,
 				true, // includeDiagnosticMessages
 				50, // maxDiagnosticMessages
-				undefined,
+				500,
 			)
 		})
 
-		it("should handle UNLIMITED_LINES constant correctly", async () => {
+		it("should normalize negative maxReadFileLine to default", async () => {
 			const userContent = [
 				{
 					type: "text" as const,
@@ -112,7 +112,7 @@ describe("processUserContentMentions", () => {
 				false,
 				true, // includeDiagnosticMessages
 				50, // maxDiagnosticMessages
-				-1,
+				500,
 			)
 		})
 	})
@@ -316,7 +316,7 @@ describe("processUserContentMentions", () => {
 				false, // showRooIgnoredFiles should default to false
 				true, // includeDiagnosticMessages
 				50, // maxDiagnosticMessages
-				undefined,
+				500,
 			)
 		})
 
@@ -345,7 +345,7 @@ describe("processUserContentMentions", () => {
 				false,
 				true, // includeDiagnosticMessages
 				50, // maxDiagnosticMessages
-				undefined,
+				500,
 			)
 		})
 	})

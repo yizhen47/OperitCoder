@@ -1,4 +1,5 @@
 import path from "path"
+import fs from "fs/promises"
 import { isBinaryFile } from "isbinaryfile"
 import type { FileEntry, LineRange } from "@roo-code/types"
 import { isNativeProtocol, ANTHROPIC_DEFAULT_MAX_TOKENS } from "@roo-code/types"
@@ -13,10 +14,17 @@ import { isPathOutsideWorkspace } from "../../utils/pathUtils"
 import { getReadablePath } from "../../utils/path"
 import { countFileLines } from "../../integrations/misc/line-counter"
 import { readLines } from "../../integrations/misc/read-lines"
-import { extractTextFromFile, addLineNumbers, getSupportedBinaryFormats } from "../../integrations/misc/extract-text"
+import {
+	DEFAULT_MAX_READ_FILE_BYTES,
+	extractTextFromFile,
+	addLineNumbers,
+	getSupportedBinaryFormats,
+	readTextFileWithByteLimit,
+} from "../../integrations/misc/extract-text"
 import { parseSourceCodeDefinitionsForFile } from "../../services/tree-sitter"
 import { parseXml } from "../../utils/xml"
 import { resolveToolProtocol } from "../../utils/resolveToolProtocol"
+import { normalizeMaxReadFileLine } from "../../utils/maxReadFileLine"
 import {
 	DEFAULT_MAX_IMAGE_FILE_SIZE_MB,
 	DEFAULT_MAX_TOTAL_IMAGE_SIZE_MB,
@@ -195,6 +203,7 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 
 			if (filesToApprove.length > 1) {
 				const { maxReadFileLine = -1 } = (await task.providerRef.deref()?.getState()) ?? {}
+				const effectiveMaxReadFileLine = normalizeMaxReadFileLine(maxReadFileLine)
 
 				const batchFiles = filesToApprove.map((fileResult) => {
 					const relPath = fileResult.path
@@ -207,10 +216,10 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 							t("tools:readFile.linesRange", { start: range.start, end: range.end }),
 						)
 						lineSnippet = ranges.join(", ")
-					} else if (maxReadFileLine === 0) {
+					} else if (effectiveMaxReadFileLine === 0) {
 						lineSnippet = t("tools:readFile.definitionsOnly")
-					} else if (maxReadFileLine > 0) {
-						lineSnippet = t("tools:readFile.maxLines", { max: maxReadFileLine })
+					} else if (effectiveMaxReadFileLine > 0) {
+						lineSnippet = t("tools:readFile.maxLines", { max: effectiveMaxReadFileLine })
 					}
 
 					const readablePath = getReadablePath(task.cwd, relPath)
@@ -283,6 +292,7 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 				const fullPath = path.resolve(task.cwd, relPath)
 				const isOutsideWorkspace = isPathOutsideWorkspace(fullPath)
 				const { maxReadFileLine = -1 } = (await task.providerRef.deref()?.getState()) ?? {}
+				const effectiveMaxReadFileLine = normalizeMaxReadFileLine(maxReadFileLine)
 
 				let lineSnippet = ""
 				if (fileResult.lineRanges && fileResult.lineRanges.length > 0) {
@@ -290,10 +300,10 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 						t("tools:readFile.linesRange", { start: range.start, end: range.end }),
 					)
 					lineSnippet = ranges.join(", ")
-				} else if (maxReadFileLine === 0) {
+				} else if (effectiveMaxReadFileLine === 0) {
 					lineSnippet = t("tools:readFile.definitionsOnly")
-				} else if (maxReadFileLine > 0) {
-					lineSnippet = t("tools:readFile.maxLines", { max: maxReadFileLine })
+				} else if (effectiveMaxReadFileLine > 0) {
+					lineSnippet = t("tools:readFile.maxLines", { max: effectiveMaxReadFileLine })
 				}
 
 				const completeMessage = JSON.stringify({
@@ -329,6 +339,7 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 				maxImageFileSize = DEFAULT_MAX_IMAGE_FILE_SIZE_MB,
 				maxTotalImageSize = DEFAULT_MAX_TOTAL_IMAGE_SIZE_MB,
 			} = state ?? {}
+			const effectiveMaxReadFileLine = normalizeMaxReadFileLine(maxReadFileLine)
 
 			for (const fileResult of fileResults) {
 				if (fileResult.status !== "approved") continue
@@ -337,7 +348,29 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 				const fullPath = path.resolve(task.cwd, relPath)
 
 				try {
-					const [totalLines, isBinary] = await Promise.all([countFileLines(fullPath), isBinaryFile(fullPath)])
+					const [stats, isBinary] = await Promise.all([fs.stat(fullPath), isBinaryFile(fullPath)])
+
+					if (!isBinary && stats.size > DEFAULT_MAX_READ_FILE_BYTES) {
+						const { content, totalBytes, bytesRead } = await readTextFileWithByteLimit(
+							fullPath,
+							DEFAULT_MAX_READ_FILE_BYTES,
+						)
+						const numberedContent = addLineNumbers(content)
+						const noticeSuffix = fileResult.lineRanges?.length
+							? " Line ranges were ignored due to byte limit."
+							: ""
+						const notice = `File truncated by byte limit: showing first ${bytesRead} of ${totalBytes} bytes.${noticeSuffix}`
+
+						await task.fileContextTracker.trackFileContext(relPath, "read_tool" as RecordSource)
+
+						updateFileResult(relPath, {
+							xmlContent: `<file><path>${relPath}</path>\n<content>\n${numberedContent}</content>\n<notice>${notice}</notice>\n</file>`,
+							nativeContent: `File: ${relPath}\n${numberedContent ? `Content:\n${numberedContent}\n` : ""}Note: ${notice}`,
+						})
+						continue
+					}
+
+					const totalLines = await countFileLines(fullPath)
 
 					if (isBinary) {
 						const fileExtension = path.extname(relPath).toLowerCase()
@@ -419,14 +452,14 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 						continue
 					}
 
-					if (maxReadFileLine === 0) {
+					if (effectiveMaxReadFileLine === 0) {
 						try {
 							const defResult = await parseSourceCodeDefinitionsForFile(
 								fullPath,
 								task.rooIgnoreController,
 							)
 							if (defResult) {
-								const notice = `Showing only ${maxReadFileLine} of ${totalLines} total lines. Use line_range if you need to read more lines`
+								const notice = `Showing only ${effectiveMaxReadFileLine} of ${totalLines} total lines. Use line_range if you need to read more lines`
 								updateFileResult(relPath, {
 									xmlContent: `<file><path>${relPath}</path>\n<list_code_definition_names>${defResult}</list_code_definition_names>\n<notice>${notice}</notice>\n</file>`,
 									nativeContent: `File: ${relPath}\nCode Definitions:\n${defResult}\n\nNote: ${notice}`,
@@ -444,11 +477,11 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 						continue
 					}
 
-					if (maxReadFileLine > 0 && totalLines > maxReadFileLine) {
-						const content = addLineNumbers(await readLines(fullPath, maxReadFileLine - 1, 0))
-						const lineRangeAttr = ` lines="1-${maxReadFileLine}"`
+					if (effectiveMaxReadFileLine > 0 && totalLines > effectiveMaxReadFileLine) {
+						const content = addLineNumbers(await readLines(fullPath, effectiveMaxReadFileLine - 1, 0))
+						const lineRangeAttr = ` lines="1-${effectiveMaxReadFileLine}"`
 						let xmlInfo = `<content${lineRangeAttr}>\n${content}</content>\n`
-						let nativeInfo = `Lines 1-${maxReadFileLine}:\n${content}\n`
+						let nativeInfo = `Lines 1-${effectiveMaxReadFileLine}:\n${content}\n`
 
 						try {
 							const defResult = await parseSourceCodeDefinitionsForFile(
@@ -456,12 +489,12 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 								task.rooIgnoreController,
 							)
 							if (defResult) {
-								const truncatedDefs = truncateDefinitionsToLineLimit(defResult, maxReadFileLine)
+								const truncatedDefs = truncateDefinitionsToLineLimit(defResult, effectiveMaxReadFileLine)
 								xmlInfo += `<list_code_definition_names>${truncatedDefs}</list_code_definition_names>\n`
 								nativeInfo += `\nCode Definitions:\n${truncatedDefs}\n`
 							}
 
-							const notice = `Showing only ${maxReadFileLine} of ${totalLines} total lines. Use line_range if you need to read more lines`
+							const notice = `Showing only ${effectiveMaxReadFileLine} of ${totalLines} total lines. Use line_range if you need to read more lines`
 							xmlInfo += `<notice>${notice}</notice>\n`
 							nativeInfo += `\nNote: ${notice}`
 

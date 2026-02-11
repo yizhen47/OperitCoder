@@ -2,6 +2,7 @@ import { Anthropic } from "@anthropic-ai/sdk"
 import { parseMentions } from "./index"
 import { UrlContentFetcher } from "../../services/browser/UrlContentFetcher"
 import { FileContextTracker } from "../context-tracking/FileContextTracker"
+import { normalizeMaxReadFileLine } from "../../utils/maxReadFileLine"
 
 import { GlobalFileNames } from "../../shared/globalFileNames"
 import { ensureLocalKilorulesDirExists } from "../context/instructions/kilo-rules"
@@ -37,6 +38,7 @@ export async function processKiloUserContentMentions({
 }): Promise<[Anthropic.Messages.ContentBlockParam[], boolean]> {
 	// Track if we need to check kilorules file
 	let needsRulesFileCheck = false
+	const effectiveMaxReadFileLine = normalizeMaxReadFileLine(maxReadFileLine)
 
 	// kilocode_change
 	const mentionTagRegex = /<(?:task|feedback|answer|user_message)>/
@@ -72,7 +74,7 @@ export async function processKiloUserContentMentions({
 							showRooIgnoredFiles,
 							includeDiagnosticMessages,
 							maxDiagnosticMessages,
-							maxReadFileLine,
+							effectiveMaxReadFileLine,
 						)
 
 						// when parsing slash commands, we still want to allow the user to provide their desired context
@@ -108,7 +110,7 @@ export async function processKiloUserContentMentions({
 									showRooIgnoredFiles,
 									includeDiagnosticMessages,
 									maxDiagnosticMessages,
-									maxReadFileLine,
+									effectiveMaxReadFileLine,
 								),
 							}
 						}

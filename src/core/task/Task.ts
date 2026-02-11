@@ -52,6 +52,7 @@ import {
 } from "@roo-code/types"
 import { TelemetryService } from "@roo-code/telemetry"
 import { resolveToolProtocol } from "../../utils/resolveToolProtocol"
+import { normalizeMaxReadFileLine } from "../../utils/maxReadFileLine"
 
 // api
 import { ApiHandler, ApiHandlerCreateMessageMetadata, buildApiHandler } from "../../api"
@@ -2433,6 +2434,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 				maxDiagnosticMessages = 50,
 				maxReadFileLine = -1,
 			} = (await this.providerRef.deref()?.getState()) ?? {}
+			const effectiveMaxReadFileLine = normalizeMaxReadFileLine(maxReadFileLine)
 
 			// kilocode_change start
 			const [parsedUserContent, needsRulesFileCheck] = await processKiloUserContentMentions({
@@ -2445,7 +2447,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 				showRooIgnoredFiles,
 				includeDiagnosticMessages,
 				maxDiagnosticMessages,
-				maxReadFileLine,
+				maxReadFileLine: effectiveMaxReadFileLine,
 			})
 
 			if (needsRulesFileCheck) {
@@ -3734,6 +3736,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 			maxReadFileLine,
 			apiConfiguration,
 		} = state ?? {}
+		const effectiveMaxReadFileLine = normalizeMaxReadFileLine(maxReadFileLine)
 
 		return await (async () => {
 			const provider = this.providerRef.deref()
@@ -3764,7 +3767,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 				enableMcpServerCreation,
 				language,
 				rooIgnoreInstructions,
-				maxReadFileLine !== -1,
+				effectiveMaxReadFileLine >= 0,
 				{
 					maxConcurrentFileReads: maxConcurrentFileReads ?? 5,
 					todoListEnabled: apiConfiguration?.todoListEnabled ?? true,
@@ -4141,7 +4144,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 				customModes: state?.customModes,
 				experiments: state?.experiments,
 				apiConfiguration,
-				maxReadFileLine: state?.maxReadFileLine ?? -1,
+				maxReadFileLine: normalizeMaxReadFileLine(state?.maxReadFileLine),
 				// kilocode_change: browser_tool_enabled removed
 				// kilocode_change start
 				state,

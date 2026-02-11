@@ -1,4 +1,5 @@
 import path from "path"
+import fs from "fs/promises"
 import { isBinaryFile } from "isbinaryfile"
 
 import { Task } from "../task/Task"
@@ -11,7 +12,13 @@ import { isPathOutsideWorkspace } from "../../utils/pathUtils"
 import { getReadablePath } from "../../utils/path"
 import { countFileLines } from "../../integrations/misc/line-counter"
 import { readLines } from "../../integrations/misc/read-lines"
-import { extractTextFromFile, addLineNumbers, getSupportedBinaryFormats } from "../../integrations/misc/extract-text"
+import {
+	DEFAULT_MAX_READ_FILE_BYTES,
+	extractTextFromFile,
+	addLineNumbers,
+	getSupportedBinaryFormats,
+	readTextFileWithByteLimit,
+} from "../../integrations/misc/extract-text"
 import { parseSourceCodeDefinitionsForFile } from "../../services/tree-sitter"
 import { ToolProtocol, isNativeProtocol } from "@roo-code/types"
 import {
@@ -21,6 +28,7 @@ import {
 	validateImageForProcessing,
 	processImageFile,
 } from "./helpers/imageHelpers"
+import { normalizeMaxReadFileLine } from "../../utils/maxReadFileLine"
 
 /**
  * Simplified read file tool for models that only support single file reads
@@ -87,14 +95,15 @@ export async function simpleReadFileTool(
 
 		// Get max read file line setting
 		const { maxReadFileLine = -1 } = (await cline.providerRef.deref()?.getState()) ?? {}
+		const effectiveMaxReadFileLine = normalizeMaxReadFileLine(maxReadFileLine)
 
 		// Create approval message
 		const isOutsideWorkspace = isPathOutsideWorkspace(fullPath)
 		let lineSnippet = ""
-		if (maxReadFileLine === 0) {
+		if (effectiveMaxReadFileLine === 0) {
 			lineSnippet = t("tools:readFile.definitionsOnly")
-		} else if (maxReadFileLine > 0) {
-			lineSnippet = t("tools:readFile.maxLines", { max: maxReadFileLine })
+		} else if (effectiveMaxReadFileLine > 0) {
+			lineSnippet = t("tools:readFile.maxLines", { max: effectiveMaxReadFileLine })
 		}
 
 		const completeMessage = JSON.stringify({
@@ -126,7 +135,24 @@ export async function simpleReadFileTool(
 		}
 
 		// Process the file
-		const [totalLines, isBinary] = await Promise.all([countFileLines(fullPath), isBinaryFile(fullPath)])
+		const [stats, isBinary] = await Promise.all([fs.stat(fullPath), isBinaryFile(fullPath)])
+
+		if (!isBinary && stats.size > DEFAULT_MAX_READ_FILE_BYTES) {
+			const { content, totalBytes, bytesRead } = await readTextFileWithByteLimit(
+				fullPath,
+				DEFAULT_MAX_READ_FILE_BYTES,
+			)
+			const numberedContent = addLineNumbers(content)
+			const notice = `File truncated by byte limit: showing first ${bytesRead} of ${totalBytes} bytes.`
+
+			await cline.fileContextTracker.trackFileContext(relPath, "read_tool" as RecordSource)
+			pushToolResult(
+				`<file><path>${relPath}</path>\n<content>\n${numberedContent}</content>\n<notice>${notice}</notice>\n</file>`,
+			)
+			return
+		}
+
+		const totalLines = await countFileLines(fullPath)
 
 		// Handle binary files
 		if (isBinary) {
@@ -202,7 +228,7 @@ export async function simpleReadFileTool(
 		}
 
 		// Handle definitions-only mode
-		if (maxReadFileLine === 0) {
+		if (effectiveMaxReadFileLine === 0) {
 			try {
 				const defResult = await parseSourceCodeDefinitionsForFile(fullPath, cline.rooIgnoreController)
 				if (defResult) {
@@ -224,9 +250,9 @@ export async function simpleReadFileTool(
 		}
 
 		// Handle files exceeding line threshold
-		if (maxReadFileLine > 0 && totalLines > maxReadFileLine) {
-			const content = addLineNumbers(await readLines(fullPath, maxReadFileLine - 1, 0))
-			const lineRangeAttr = ` lines="1-${maxReadFileLine}"`
+		if (effectiveMaxReadFileLine > 0 && totalLines > effectiveMaxReadFileLine) {
+			const content = addLineNumbers(await readLines(fullPath, effectiveMaxReadFileLine - 1, 0))
+			const lineRangeAttr = ` lines="1-${effectiveMaxReadFileLine}"`
 			let xmlInfo = `<content${lineRangeAttr}>\n${content}</content>\n`
 
 			try {
@@ -234,7 +260,7 @@ export async function simpleReadFileTool(
 				if (defResult) {
 					xmlInfo += `<list_code_definition_names>${defResult}</list_code_definition_names>\n`
 				}
-				xmlInfo += `<notice>Showing only ${maxReadFileLine} of ${totalLines} total lines. File is too large for complete display</notice>\n`
+				xmlInfo += `<notice>Showing only ${effectiveMaxReadFileLine} of ${totalLines} total lines. File is too large for complete display</notice>\n`
 				pushToolResult(`<file><path>${relPath}</path>\n${xmlInfo}</file>`)
 			} catch (error) {
 				if (error instanceof Error && error.message.startsWith("Unsupported language:")) {

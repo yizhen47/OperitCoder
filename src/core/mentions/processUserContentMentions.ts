@@ -2,6 +2,7 @@ import { Anthropic } from "@anthropic-ai/sdk"
 import { parseMentions } from "./index"
 import { UrlContentFetcher } from "../../services/browser/UrlContentFetcher"
 import { FileContextTracker } from "../context-tracking/FileContextTracker"
+import { normalizeMaxReadFileLine } from "../../utils/maxReadFileLine"
 
 /**
  * Process mentions in user content, specifically within task and feedback tags
@@ -37,6 +38,8 @@ export async function processUserContentMentions({
 	// (see askFollowupQuestion), we place all user generated content in
 	// these tags so they can effectively be used as markers for when we
 	// should parse mentions).
+	const effectiveMaxReadFileLine = normalizeMaxReadFileLine(maxReadFileLine)
+
 	return Promise.all(
 		userContent.map(async (block) => {
 			const shouldProcessMentions = (text: string) =>
@@ -58,7 +61,7 @@ export async function processUserContentMentions({
 							showRooIgnoredFiles,
 							includeDiagnosticMessages,
 							maxDiagnosticMessages,
-							maxReadFileLine,
+							effectiveMaxReadFileLine,
 						),
 					}
 				}
@@ -78,7 +81,7 @@ export async function processUserContentMentions({
 								showRooIgnoredFiles,
 								includeDiagnosticMessages,
 								maxDiagnosticMessages,
-								maxReadFileLine,
+								effectiveMaxReadFileLine,
 							),
 						}
 					}
@@ -99,10 +102,10 @@ export async function processUserContentMentions({
 										showRooIgnoredFiles,
 										includeDiagnosticMessages,
 										maxDiagnosticMessages,
-										maxReadFileLine,
-									),
-								}
+									effectiveMaxReadFileLine,
+								),
 							}
+						}
 
 							return contentBlock
 						}),

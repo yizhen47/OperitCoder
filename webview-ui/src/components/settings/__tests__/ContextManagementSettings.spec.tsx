@@ -93,7 +93,7 @@ describe("ContextManagementSettings", () => {
 		maxOpenTabsContext: 20,
 		maxWorkspaceFiles: 200,
 		showRooIgnoredFiles: false,
-		maxReadFileLine: -1,
+		maxReadFileLine: 500,
 		maxConcurrentFileReads: 5,
 		profileThresholds: {},
 		includeDiagnosticMessages: true,
@@ -330,11 +330,6 @@ describe("ContextManagementSettings", () => {
 		const maxReadFileInput = screen.getByTestId("max-read-file-line-input")
 		expect(maxReadFileInput).toBeInTheDocument()
 		expect(maxReadFileInput).toHaveValue(500)
-
-		// Always full read checkbox
-		const alwaysFullReadCheckbox = screen.getByTestId("max-read-file-always-full-checkbox")
-		expect(alwaysFullReadCheckbox).toBeInTheDocument()
-		expect(alwaysFullReadCheckbox).not.toBeChecked()
 	})
 
 	it("updates max read file line setting", () => {
@@ -348,19 +343,6 @@ describe("ContextManagementSettings", () => {
 		fireEvent.change(input, { target: { value: "1000" } })
 
 		expect(defaultProps.setCachedStateField).toHaveBeenCalledWith("maxReadFileLine", 1000)
-	})
-
-	it("toggles always full read setting", () => {
-		const propsWithMaxReadFileLine = {
-			...defaultProps,
-			maxReadFileLine: 500,
-		}
-		render(<ContextManagementSettings {...propsWithMaxReadFileLine} />)
-
-		const checkbox = screen.getByTestId("max-read-file-always-full-checkbox")
-		fireEvent.click(checkbox)
-
-		expect(defaultProps.setCachedStateField).toHaveBeenCalledWith("maxReadFileLine", -1)
 	})
 
 	it("renders with autoCondenseContext enabled", () => {
@@ -439,18 +421,6 @@ describe("ContextManagementSettings", () => {
 		})
 	})
 
-	it("renders max read file line controls with -1 value", () => {
-		const propsWithMaxReadFileLine = {
-			...defaultProps,
-			maxReadFileLine: -1,
-		}
-		render(<ContextManagementSettings {...propsWithMaxReadFileLine} />)
-
-		const checkbox = screen.getByTestId("max-read-file-always-full-checkbox")
-		const input = checkbox.querySelector('input[type="checkbox"]')
-		expect(input).toBeChecked()
-	})
-
 	it("handles boundary values for sliders", () => {
 		const mockSetCachedStateField = vitest.fn()
 		const props = {
@@ -501,23 +471,19 @@ describe("ContextManagementSettings", () => {
 			expect(screen.queryByTestId("condense-threshold-slider")).not.toBeInTheDocument()
 		})
 
-		it("renders max read file controls with default value when maxReadFileLine is undefined", () => {
-			const propsWithoutMaxReadFile = {
-				...defaultProps,
-				maxReadFileLine: undefined,
-			}
-			render(<ContextManagementSettings {...propsWithoutMaxReadFile} />)
+	it("renders max read file controls with default value when maxReadFileLine is undefined", () => {
+		const propsWithoutMaxReadFile = {
+			...defaultProps,
+			maxReadFileLine: undefined,
+		}
+		render(<ContextManagementSettings {...propsWithoutMaxReadFile} />)
 
-			// Controls should still be rendered with default value of -1
-			const input = screen.getByTestId("max-read-file-line-input")
-			const checkbox = screen.getByTestId("max-read-file-always-full-checkbox")
+		// Controls should still be rendered with default value
+		const input = screen.getByTestId("max-read-file-line-input")
 
-			expect(input).toBeInTheDocument()
-			expect(input).toHaveValue(-1)
-			expect(input).not.toBeDisabled() // Input is not disabled when maxReadFileLine is undefined (only when explicitly set to -1)
-			expect(checkbox).toBeInTheDocument()
-			expect(checkbox).not.toBeChecked() // Checkbox is not checked when maxReadFileLine is undefined (only when explicitly set to -1)
-		})
+		expect(input).toBeInTheDocument()
+		expect(input).toHaveValue(500)
+	})
 	})
 
 	describe("Accessibility", () => {
@@ -546,7 +512,6 @@ describe("ContextManagementSettings", () => {
 			expect(screen.getByTestId("workspace-files-limit-slider")).toBeInTheDocument()
 			expect(screen.getByTestId("show-rooignored-files-checkbox")).toBeInTheDocument()
 			expect(screen.getByTestId("max-read-file-line-input")).toBeInTheDocument()
-			expect(screen.getByTestId("max-read-file-always-full-checkbox")).toBeInTheDocument()
 		})
 	})
 

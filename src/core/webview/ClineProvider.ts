@@ -116,6 +116,7 @@ import { getKilocodeDefaultModel } from "../../api/providers/kilocode/getKilocod
 import { getKiloCodeWrapperProperties } from "../../core/kilocode/wrapper"
 import { getKilocodeConfig, KilocodeConfig } from "../../utils/kilo-config-file"
 import { resolveToolProtocol } from "../../utils/resolveToolProtocol"
+import { normalizeMaxReadFileLine } from "../../utils/maxReadFileLine"
 import { kilo_execIfExtension } from "../../shared/kilocode/cli-sessions/extension/session-manager-utils"
 import { DeviceAuthHandler } from "../kilocode/webview/deviceAuthHandler"
 
@@ -2516,7 +2517,7 @@ ${prompt}
 			hideCostBelowThreshold, // kilocode_change
 			language, // kilocode_change
 			renderContext: this.renderContext,
-			maxReadFileLine: maxReadFileLine ?? -1,
+			maxReadFileLine: normalizeMaxReadFileLine(maxReadFileLine),
 			maxImageFileSize: maxImageFileSize ?? 5,
 			maxTotalImageSize: maxTotalImageSize ?? 20,
 			maxConcurrentFileReads: maxConcurrentFileReads ?? 5,
@@ -2777,7 +2778,7 @@ ${prompt}
 			sendMessageOnEnter: stateValues.sendMessageOnEnter ?? true, // kilocode_change
 			showTimestamps: stateValues.showTimestamps ?? true, // kilocode_change
 			hideCostBelowThreshold: stateValues.hideCostBelowThreshold ?? 0, // kilocode_change
-			maxReadFileLine: stateValues.maxReadFileLine ?? -1,
+			maxReadFileLine: normalizeMaxReadFileLine(stateValues.maxReadFileLine),
 			maxImageFileSize: stateValues.maxImageFileSize ?? 5,
 			maxTotalImageSize: stateValues.maxTotalImageSize ?? 20,
 			maxConcurrentFileReads: stateValues.maxConcurrentFileReads ?? 5,

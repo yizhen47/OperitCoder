@@ -21,6 +21,9 @@ vi.mock("@src/context/ExtensionStateContext", () => ({
 vi.mock("@src/i18n/TranslationContext", () => ({
 	useAppTranslation: () => ({
 		t: (key: string) => key,
+		i18n: {
+			changeLanguage: vi.fn(),
+		},
 	}),
 	useTranslation: () => ({
 		t: (key: string) => key,
@@ -170,7 +173,7 @@ describe("SettingsView - Unsaved Changes Detection", () => {
 		terminalZdotdir: false,
 		writeDelayMs: 0,
 		showRooIgnoredFiles: false,
-		maxReadFileLine: -1,
+		maxReadFileLine: 500,
 		maxImageFileSize: 5,
 		maxTotalImageSize: 20,
 		terminalCompressProgressBar: false,

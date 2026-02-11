@@ -24,7 +24,6 @@ export const generateSystemPrompt = async (provider: ClineProvider, message: Web
 		experiments,
 		enableMcpServerCreation,
 		language,
-		maxReadFileLine,
 		maxConcurrentFileReads,
 	} = state // kilocode_change
 
@@ -78,7 +77,7 @@ export const generateSystemPrompt = async (provider: ClineProvider, message: Web
 		enableMcpServerCreation,
 		language,
 		rooIgnoreInstructions,
-		maxReadFileLine !== -1,
+		true,
 		{
 			maxConcurrentFileReads: maxConcurrentFileReads ?? 5,
 			todoListEnabled: apiConfiguration?.todoListEnabled ?? true,

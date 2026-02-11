@@ -357,21 +357,19 @@ describe("read_file tool with maxReadFileLine setting", () => {
 			expect(result).toContain(`<content lines="1-5">`)
 		})
 
-		it("should not show line snippet in approval message when maxReadFileLine is -1", async () => {
+		it("should fall back to default max line snippet in approval message when maxReadFileLine is -1", async () => {
 			// This test verifies the line snippet behavior for the approval message
-			// Setup - use default mockInputContent
 			mockInputContent = fileContent
 
 			// Execute - we'll reuse executeReadFileTool to run the tool
 			await executeReadFileTool({}, { maxReadFileLine: -1 })
 
-			// Verify the empty line snippet for full read was passed to the approval message
 			// Look at the parameters passed to the 'ask' method in the approval message
 			const askCall = mockCline.ask.mock.calls[0]
 			const completeMessage = JSON.parse(askCall[1])
 
-			// Verify the reason (lineSnippet) is empty or undefined for full read
-			expect(completeMessage.reason).toBeFalsy()
+			// Verify the reason (lineSnippet) uses default max line limit
+			expect(completeMessage.reason).toContain("max 500 lines")
 		})
 	})
 
@@ -600,7 +598,7 @@ describe("read_file tool XML output structure", () => {
 		mockInputContent = fileContent
 
 		// Setup mock provider with default maxReadFileLine
-		mockProvider.getState.mockResolvedValue({ maxReadFileLine: -1, maxImageFileSize: 20, maxTotalImageSize: 20 }) // Default to full file read
+		mockProvider.getState.mockResolvedValue({ maxReadFileLine: 500, maxImageFileSize: 20, maxTotalImageSize: 20 }) // Default to line-limited read
 
 		// Add additional properties needed for XML tests
 		mockCline.sayAndCreateMissingParamError = vi.fn().mockResolvedValue("Missing required parameter")
@@ -664,7 +662,7 @@ describe("read_file tool XML output structure", () => {
 				return Promise.resolve(numberedContent)
 			})
 			mockProvider.getState.mockResolvedValue({
-				maxReadFileLine: -1,
+				maxReadFileLine: 500,
 				maxImageFileSize: 20,
 				maxTotalImageSize: 20,
 			}) // Allow up to 20MB per image and total size
@@ -682,7 +680,7 @@ describe("read_file tool XML output structure", () => {
 			// Setup
 			mockInputContent = fileContent
 			// Execute
-			const result = await executeReadFileTool({}, { maxReadFileLine: -1 })
+			const result = await executeReadFileTool({}, { maxReadFileLine: 500 })
 
 			// Verify using regex to check structure
 			const xmlStructureRegex = new RegExp(
@@ -697,7 +695,7 @@ describe("read_file tool XML output structure", () => {
 			mockedCountFileLines.mockResolvedValue(0)
 			mockedExtractTextFromFile.mockResolvedValue("")
 			mockProvider.getState.mockResolvedValue({
-				maxReadFileLine: -1,
+				maxReadFileLine: 500,
 				maxImageFileSize: 20,
 				maxTotalImageSize: 20,
 			}) // Allow up to 20MB per image and total size
@@ -777,7 +775,7 @@ describe("read_file tool XML output structure", () => {
 
 				// Setup mockProvider
 				mockProvider.getState.mockResolvedValue({
-					maxReadFileLine: -1,
+					maxReadFileLine: 500,
 					maxImageFileSize: 20,
 					maxTotalImageSize: 20,
 				}) // Allow up to 20MB per image and total size
@@ -850,7 +848,7 @@ describe("read_file tool XML output structure", () => {
 
 				// Setup mockProvider
 				mockProvider.getState.mockResolvedValue({
-					maxReadFileLine: -1,
+					maxReadFileLine: 500,
 					maxImageFileSize: 15,
 					maxTotalImageSize: 20,
 				}) // Allow up to 15MB per image and 20MB total size
@@ -936,7 +934,7 @@ describe("read_file tool XML output structure", () => {
 
 				// Setup mockProvider
 				mockProvider.getState.mockResolvedValue({
-					maxReadFileLine: -1,
+					maxReadFileLine: 500,
 					maxImageFileSize: 15,
 					maxTotalImageSize: 20,
 				}) // Allow up to 15MB per image and 20MB total size
@@ -1009,7 +1007,7 @@ describe("read_file tool XML output structure", () => {
 
 				// Setup mockProvider
 				mockProvider.getState.mockResolvedValue({
-					maxReadFileLine: -1,
+					maxReadFileLine: 500,
 					maxImageFileSize: 20,
 					maxTotalImageSize: 20,
 				}) // Allow up to 20MB per image and total size
@@ -1051,7 +1049,7 @@ describe("read_file tool XML output structure", () => {
 
 				// Mock provider state with 5MB individual limit
 				mockProvider.getState.mockResolvedValue({
-					maxReadFileLine: -1,
+					maxReadFileLine: 500,
 					maxImageFileSize: 5,
 					maxTotalImageSize: 20,
 				})
@@ -1087,7 +1085,7 @@ describe("read_file tool XML output structure", () => {
 				]
 
 				mockProvider.getState.mockResolvedValue({
-					maxReadFileLine: -1,
+					maxReadFileLine: 500,
 					maxImageFileSize: 10, // 10MB per image
 					maxTotalImageSize: 20, // 20MB total
 				})
@@ -1134,7 +1132,7 @@ describe("read_file tool XML output structure", () => {
 
 				// Setup mockProvider
 				mockProvider.getState.mockResolvedValue({
-					maxReadFileLine: -1,
+					maxReadFileLine: 500,
 					maxImageFileSize: 20,
 					maxTotalImageSize: 20,
 				})
@@ -1178,7 +1176,7 @@ describe("read_file tool XML output structure", () => {
 					),
 				)
 				mockProvider.getState.mockResolvedValue({
-					maxReadFileLine: -1,
+					maxReadFileLine: 500,
 					maxImageFileSize: 20,
 					maxTotalImageSize: 20,
 				})
@@ -1255,7 +1253,7 @@ describe("read_file tool XML output structure", () => {
 
 				// Setup provider with 5MB individual limit and 20MB total limit
 				mockProvider.getState.mockResolvedValue({
-					maxReadFileLine: -1,
+					maxReadFileLine: 500,
 					maxImageFileSize: 5,
 					maxTotalImageSize: 20,
 				})
@@ -1303,7 +1301,7 @@ describe("read_file tool XML output structure", () => {
 
 				// Setup provider
 				mockProvider.getState.mockResolvedValue({
-					maxReadFileLine: -1,
+					maxReadFileLine: 500,
 					maxImageFileSize: 20,
 					maxTotalImageSize: 20,
 				})
@@ -1437,7 +1435,7 @@ describe("read_file tool with image support", () => {
 		mockedFsReadFile.mockResolvedValue(imageBuffer)
 
 		// Setup mock provider with default maxReadFileLine
-		localMockProvider.getState.mockResolvedValue({ maxReadFileLine: -1 })
+		localMockProvider.getState.mockResolvedValue({ maxReadFileLine: 500 })
 
 		toolResult = undefined
 	})

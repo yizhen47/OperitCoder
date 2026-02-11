@@ -3,6 +3,8 @@ import * as path from "path"
 import pdf from "pdf-parse/lib/pdf-parse"
 import mammoth from "mammoth"
 import fs from "fs/promises"
+
+export const DEFAULT_MAX_READ_FILE_BYTES = 256 * 1024
 import { isBinaryFile } from "isbinaryfile"
 import { extractTextFromXLSX } from "./extract-text-from-xlsx"
 import { countFileLines } from "./line-counter"
@@ -89,6 +91,19 @@ export async function extractTextFromFile(filePath: string, maxReadFileLine?: nu
 	const isBinary = await isBinaryFile(filePath).catch(() => false)
 
 	if (!isBinary) {
+		const stats = await fs.stat(filePath)
+		if (stats.size > DEFAULT_MAX_READ_FILE_BYTES) {
+			const { content, totalBytes, bytesRead } = await readTextFileWithByteLimit(
+				filePath,
+				DEFAULT_MAX_READ_FILE_BYTES,
+			)
+			const numberedContent = addLineNumbers(content)
+			return (
+				numberedContent +
+				`\n\n[File truncated: showing first ${bytesRead} of ${totalBytes} bytes due to byte limit.]`
+			)
+		}
+
 		// Check if we need to apply line limit
 		if (maxReadFileLine !== undefined && maxReadFileLine !== -1) {
 			const totalLines = await countFileLines(filePath)
@@ -106,6 +121,24 @@ export async function extractTextFromFile(filePath: string, maxReadFileLine?: nu
 		return addLineNumbers(await fs.readFile(filePath, "utf8"))
 	} else {
 		throw new Error(`Cannot read text for file type: ${fileExtension}`)
+	}
+}
+
+export async function readTextFileWithByteLimit(
+	filePath: string,
+	maxBytes: number,
+): Promise<{ content: string; totalBytes: number; bytesRead: number }> {
+	const fileHandle = await fs.open(filePath, "r")
+	try {
+		const stats = await fileHandle.stat()
+		const totalBytes = stats.size
+		const bytesToRead = Math.min(totalBytes, maxBytes)
+		const buffer = Buffer.alloc(bytesToRead)
+		const { bytesRead } = await fileHandle.read(buffer, 0, bytesToRead, 0)
+		const content = buffer.slice(0, bytesRead).toString("utf8")
+		return { content, totalBytes, bytesRead }
+	} finally {
+		await fileHandle.close()
 	}
 }
 
