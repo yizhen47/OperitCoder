@@ -42,6 +42,7 @@ import Announcement from "./Announcement"
 // kilocode_change: browser rows removed
 import ChatRow from "./ChatRow"
 import { ChatRowErrorBoundary } from "./ChatRowErrorBoundary" // kilocode_change: 添加错误边界
+import { ToolCallsGroupRow } from "./ToolCallsGroupRow"
 import { ChatTextArea } from "./ChatTextArea"
 import { TaskTabsBar } from "./TaskTabsBar" // kilocode_change
 // import TaskHeader from "./TaskHeader"// kilocode_change
@@ -56,6 +57,7 @@ import { KilocodeNotifications } from "../kilocode/KilocodeNotifications" // kil
 import { QueuedMessages } from "./QueuedMessages"
 import { ChatViewDebug } from "./ChatViewDebug" // kilocode_change: 添加调试组件
 import { buildDocLink } from "@/utils/docLinks"
+import { groupToolCalls } from "./utils/groupToolCalls"
 // import DismissibleUpsell from "../common/DismissibleUpsell" // kilocode_change: unused
 // import { useCloudUpsell } from "@src/hooks/useCloudUpsell" // kilocode_change: unused
 // import { Cloud } from "lucide-react" // kilocode_change: unused
@@ -1474,6 +1476,9 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				} as any,
 			]
 		}
+
+		// Collapse heavy tool-call runs into a single toggle row (like "reasoning").
+		result = groupToolCalls(result, 3)
 		return result
 	}, [
 		isCondensing,
@@ -1706,6 +1711,37 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							{t("chat:task.seeMore")} ({hiddenCount})
 						</button>
 					</div>
+				)
+			}
+
+			if (messageOrGroup.type === "say" && (messageOrGroup as any).say === "tool_calls_group") {
+				const toolMessages = ((messageOrGroup as any).toolMessages ?? []) as ClineMessage[]
+				const toolCallCount = Number((messageOrGroup as any).toolCallCount ?? 0)
+
+				return (
+					<ToolCallsGroupRow
+						toolMessages={toolMessages}
+						toolCallCount={toolCallCount}
+						renderToolMessage={(msg) => (
+							<ChatRow
+								key={msg.ts}
+								message={msg}
+								isExpanded={expandedRows[msg.ts] || false}
+								onToggleExpand={toggleRowExpansion}
+								lastModifiedMessage={modifiedMessages.at(-1)}
+								isLast={false}
+								onHeightChange={handleRowHeightChange}
+								isStreaming={isStreaming}
+								onSuggestionClick={handleSuggestionClickInRow}
+								onBatchFileResponse={handleBatchFileResponse}
+								highlighted={false}
+								enableCheckpoints={enableCheckpoints}
+								isFollowUpAnswered={false}
+								isFollowUpAutoApprovalPaused={isFollowUpAutoApprovalPaused}
+								hasCheckpoint={hasCheckpoint}
+							/>
+						)}
+					/>
 				)
 			}
 
