@@ -30,25 +30,27 @@ describe("mode-validator", () => {
 
 		describe("architect mode", () => {
 			it("allows configured tools", () => {
-				// Architect mode has read, browser, and mcp groups
-				const architectTools = [
-					...TOOL_GROUPS.read.tools,
-					...TOOL_GROUPS.browser.tools,
-					...TOOL_GROUPS.mcp.tools,
-				]
-				architectTools.forEach((tool) => {
-					expect(isToolAllowedForMode(tool, architectMode, [])).toBe(true)
+				const architectModeConfig = modes.find((m) => m.slug === architectMode)
+				expect(architectModeConfig).toBeTruthy()
+				const tools = new Set<string>()
+				architectModeConfig?.groups.forEach((groupEntry) => {
+					const groupName = typeof groupEntry === "string" ? groupEntry : groupEntry[0]
+					TOOL_GROUPS[groupName].tools.forEach((tool) => tools.add(tool))
 				})
+				tools.forEach((tool) => expect(isToolAllowedForMode(tool, architectMode, [])).toBe(true))
 			})
 		})
 
 		describe("ask mode", () => {
 			it("allows configured tools", () => {
-				// Ask mode has read, browser, and mcp groups
-				const askTools = [...TOOL_GROUPS.read.tools, ...TOOL_GROUPS.browser.tools, ...TOOL_GROUPS.mcp.tools]
-				askTools.forEach((tool) => {
-					expect(isToolAllowedForMode(tool, askMode, [])).toBe(true)
+				const askModeConfig = modes.find((m) => m.slug === askMode)
+				expect(askModeConfig).toBeTruthy()
+				const tools = new Set<string>()
+				askModeConfig?.groups.forEach((groupEntry) => {
+					const groupName = typeof groupEntry === "string" ? groupEntry : groupEntry[0]
+					TOOL_GROUPS[groupName].tools.forEach((tool) => tools.add(tool))
 				})
+				tools.forEach((tool) => expect(isToolAllowedForMode(tool, askMode, [])).toBe(true))
 			})
 		})
 

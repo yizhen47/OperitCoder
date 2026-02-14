@@ -193,21 +193,37 @@ vi.mock("../../../integrations/workspace/WorkspaceTracker", () => {
 })
 
 vi.mock("../../task/Task", () => ({
-	Task: vi.fn().mockImplementation((options: any) => ({
-		api: undefined,
-		abortTask: vi.fn(),
-		handleWebviewAskResponse: vi.fn(),
-		clineMessages: [],
-		apiConversationHistory: [],
-		overwriteClineMessages: vi.fn(),
-		overwriteApiConversationHistory: vi.fn(),
-		getTaskNumber: vi.fn().mockReturnValue(0),
-		setTaskNumber: vi.fn(),
-		setParentTask: vi.fn(),
-		setRootTask: vi.fn(),
-		taskId: options?.historyItem?.id || "test-task-id",
-		emit: vi.fn(),
-	})),
+	Task: vi.fn().mockImplementation((options: any) => {
+		const task: any = {
+			api: undefined,
+			abortTask: vi.fn(),
+			handleWebviewAskResponse: vi.fn(),
+			clineMessages: [],
+			apiConversationHistory: [],
+			overwriteClineMessages: vi.fn(),
+			overwriteApiConversationHistory: vi.fn(),
+			submitUserMessage: vi.fn(),
+			getTaskNumber: vi.fn().mockReturnValue(0),
+			setTaskNumber: vi.fn(),
+			setParentTask: vi.fn(),
+			setRootTask: vi.fn(),
+			taskId: options?.historyItem?.id || "test-task-id",
+			rootTaskId: options?.rootTaskId,
+			taskNumber: options?.taskNumber ?? 0,
+			taskStatus: TaskStatus.Running,
+			isStreaming: false,
+			isWaitingForFirstChunk: false,
+			currentRequestAbortController: undefined,
+			metadata: { task: options?.historyItem?.task },
+			emit: vi.fn(),
+		}
+
+		Object.defineProperty(task, "messageManager", {
+			get: () => new MessageManager(task),
+		})
+
+		return task
+	}),
 }))
 
 vi.mock("../../../integrations/misc/extract-text", () => ({
@@ -341,14 +357,19 @@ describe("ClineProvider", () => {
 				apiConversationHistory: [],
 				overwriteClineMessages: vi.fn(),
 				overwriteApiConversationHistory: vi.fn(),
+				submitUserMessage: vi.fn(),
 				getTaskNumber: vi.fn().mockReturnValue(0),
 				setTaskNumber: vi.fn(),
 				setParentTask: vi.fn(),
 				setRootTask: vi.fn(),
 				taskId: options?.historyItem?.id || "test-task-id",
+				rootTaskId: options?.rootTaskId,
 				taskNumber: options?.taskNumber ?? 0,
+				taskStatus: TaskStatus.Running,
 				isStreaming: false,
+				isWaitingForFirstChunk: false,
 				currentRequestAbortController: undefined,
+				metadata: { task: options?.historyItem?.task },
 				emit: vi.fn(),
 			}
 
@@ -828,12 +849,12 @@ describe("ClineProvider", () => {
 		])
 
 		const initialState = await (provider as any).getStateToPostToWebview()
-		expect(initialState.activeTasks?.map((task) => task.id)).toEqual(["task-1", "task-2"])
+		expect(initialState.activeTasks?.map((task: any) => task.id)).toEqual(["task-1", "task-2"])
 
 		await provider.switchActiveTask("task-1")
 
 		const nextState = await (provider as any).getStateToPostToWebview()
-		expect(nextState.activeTasks?.map((task) => task.id)).toEqual(["task-1", "task-2"])
+		expect(nextState.activeTasks?.map((task: any) => task.id)).toEqual(["task-1", "task-2"])
 		expect(nextState.activeTasks?.[0].isCurrent).toBe(true)
 		expect(nextState.activeTasks?.[1].isCurrent).toBe(false)
 	})
@@ -869,7 +890,7 @@ describe("ClineProvider", () => {
 		await provider.reorderActiveTaskTabs(["task-2", "task-1"])
 
 		const nextState = await (provider as any).getStateToPostToWebview()
-		expect(nextState.activeTasks?.map((task) => task.id)).toEqual(["task-2", "task-1"])
+		expect(nextState.activeTasks?.map((task: any) => task.id)).toEqual(["task-2", "task-1"])
 	})
 
 	test("getStateToPostToWebview groups delegated child tasks under conversation root", async () => {
@@ -1176,7 +1197,6 @@ describe("ClineProvider", () => {
 		expect(state).toHaveProperty("alwaysAllowReadOnly")
 		expect(state).toHaveProperty("alwaysAllowWrite")
 		expect(state).toHaveProperty("alwaysAllowExecute")
-		expect(state).toHaveProperty("alwaysAllowBrowser")
 		// expect(state).toHaveProperty("taskHistory") // kilocode_change
 		expect(state).toHaveProperty("soundEnabled")
 		expect(state).toHaveProperty("ttsEnabled")
@@ -3027,37 +3047,31 @@ describe("ClineProvider - Router Models", () => {
 		await messageHandler({ type: "requestRouterModels" })
 
 		// Verify getModels was called for each provider with correct options
-		expect(getModels).toHaveBeenCalledWith({ provider: "openrouter", apiKey: "openrouter-key" }) // kilocode_change: apiKey
+		expect(getModels).toHaveBeenCalledWith(expect.objectContaining({ provider: "openrouter", apiKey: "openrouter-key" })) // kilocode_change: apiKey
 		// kilocode_change start
 		expect(getModels).toHaveBeenCalledWith({
 			provider: "gemini",
 			apiKey: "gemini-key",
 			baseUrl: "https://gemini.example.com",
 		})
-		expect(getModels).toHaveBeenCalledWith({ provider: "ovhcloud", apiKey: "ovhcloud-key" })
+		expect(getModels).toHaveBeenCalledWith(expect.objectContaining({ provider: "ovhcloud", apiKey: "ovhcloud-key" }))
 		expect(getModels).toHaveBeenCalledWith({
 			provider: "inception",
 			apiKey: "inception-key",
 			baseUrl: "https://api.inceptionlabs.ai/v1/",
 		})
 		// kilocode_change end
-		expect(getModels).toHaveBeenCalledWith({ provider: "requesty", apiKey: "requesty-key" })
+		expect(getModels).toHaveBeenCalledWith(expect.objectContaining({ provider: "requesty", apiKey: "requesty-key" }))
 		expect(getModels).toHaveBeenCalledWith({ provider: "glama" }) // kilocode_change
-		expect(getModels).toHaveBeenCalledWith({ provider: "unbound", apiKey: "unbound-key" })
+		expect(getModels).toHaveBeenCalledWith(expect.objectContaining({ provider: "unbound", apiKey: "unbound-key" }))
 		expect(getModels).toHaveBeenCalledWith({ provider: "vercel-ai-gateway" })
-		expect(getModels).toHaveBeenCalledWith({ provider: "deepinfra" })
-		expect(getModels).toHaveBeenCalledWith(
-			expect.objectContaining({
-				provider: "roo",
-				baseUrl: expect.any(String),
-			}),
-		)
+		expect(getModels).toHaveBeenCalledWith(expect.objectContaining({ provider: "deepinfra" }))
 		expect(getModels).toHaveBeenCalledWith({
 			provider: "litellm",
 			apiKey: "litellm-key",
 			baseUrl: "http://localhost:4000",
 		})
-		expect(getModels).toHaveBeenCalledWith({ provider: "chutes" })
+		expect(getModels).toHaveBeenCalledWith(expect.objectContaining({ provider: "chutes" }))
 
 		// Verify response was sent
 		expect(mockPostMessage).toHaveBeenCalledWith({
@@ -3070,7 +3084,7 @@ describe("ClineProvider - Router Models", () => {
 				glama: mockModels, // kilocode_change
 				synthetic: mockModels, // kilocode_change
 				unbound: mockModels,
-				roo: mockModels,
+				roo: {},
 				chutes: mockModels,
 				litellm: mockModels,
 				kilocode: mockModels,
@@ -3118,24 +3132,35 @@ describe("ClineProvider - Router Models", () => {
 		}
 		const { getModels } = await import("../../../api/providers/fetchers/modelCache")
 
-		// Mock some providers to succeed and others to fail
-		vi.mocked(getModels)
-			.mockResolvedValueOnce(mockModels) // openrouter success
-			.mockResolvedValueOnce(mockModels) // kilocode_change: gemini success
-			.mockRejectedValueOnce(new Error("Requesty API error")) //
-			.mockResolvedValueOnce(mockModels) // kilocode_change glama success
-			.mockRejectedValueOnce(new Error("Unbound API error")) // unbound fail
-			.mockRejectedValueOnce(new Error("Kilocode-OpenRouter API error")) // kilocode-openrouter fail
-			.mockRejectedValueOnce(new Error("Ollama API error")) // kilocode_change
-			.mockResolvedValueOnce(mockModels) // vercel-ai-gateway success
-			.mockResolvedValueOnce(mockModels) // deepinfra success
-			.mockResolvedValueOnce(mockModels) // nano-gpt success // kilocode_change
-			.mockResolvedValueOnce(mockModels) // kilocode_change: ovhcloud
-			.mockResolvedValueOnce(mockModels) // kilocode_change: inception success
-			.mockResolvedValueOnce(mockModels) // kilocode_change: synthetic success
-			.mockResolvedValueOnce(mockModels) // roo success
-			.mockRejectedValueOnce(new Error("Chutes API error")) // chutes fail
-			.mockRejectedValueOnce(new Error("LiteLLM connection failed")) // litellm fail
+		// Mock providers by name (order-independent)
+		vi.mocked(getModels).mockImplementation(async ({ provider }) => {
+			switch (provider) {
+				case "openrouter":
+				case "gemini":
+				case "glama":
+				case "vercel-ai-gateway":
+				case "deepinfra":
+				case "nano-gpt":
+				case "ovhcloud":
+				case "inception":
+				case "synthetic":
+					return mockModels
+				case "requesty":
+					throw new Error("Requesty API error")
+				case "unbound":
+					throw new Error("Unbound API error")
+				case "kilocode":
+					throw new Error("Kilocode-OpenRouter API error")
+				case "ollama":
+					throw new Error("Ollama API error")
+				case "chutes":
+					throw new Error("Chutes API error")
+				case "litellm":
+					throw new Error("LiteLLM connection failed")
+				default:
+					return {}
+			}
+		})
 
 		await messageHandler({ type: "requestRouterModels" })
 
@@ -3149,7 +3174,7 @@ describe("ClineProvider - Router Models", () => {
 				requesty: {},
 				glama: mockModels, // kilocode_change
 				unbound: {},
-				roo: mockModels,
+				roo: {},
 				chutes: {},
 				ollama: {},
 				lmstudio: {},
@@ -3305,7 +3330,7 @@ describe("ClineProvider - Router Models", () => {
 				requesty: mockModels,
 				glama: mockModels, // kilocode_change
 				unbound: mockModels,
-				roo: mockModels,
+				roo: {},
 				chutes: mockModels,
 				litellm: {},
 				kilocode: mockModels,

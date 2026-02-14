@@ -686,7 +686,6 @@ describe("SYSTEM_PROMPT", () => {
 			false,
 			undefined,
 			undefined,
-			undefined,
 			defaultModeSlug,
 			undefined,
 			undefined,

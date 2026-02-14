@@ -339,6 +339,24 @@ Example: Requesting to execute ls in a specific directory if directed
 <cwd>/home/user/projects</cwd>
 </execute_command>
 
+## activate_sandbox_package
+
+Activate a sandbox (example) package for the current session.
+
+Sandbox packages are listed by name and description, but their specific tools (pkg--<package>--<tool>) are NOT exposed until you activate the package.
+
+After activation succeeds, the tool result will include the package's tool names, descriptions, and parameter schemas. Subsequent requests will allow calling those pkg-- tools.
+
+**Parameters:**
+- package_name (required): Name of the sandbox package to activate
+
+**Usage:**
+```xml
+<activate_sandbox_package>
+<package_name>12306_ticket</package_name>
+</activate_sandbox_package>
+```
+
 ## ask_followup_question
 Description: Ask the user a question to gather additional information needed to complete the task. Use when you need clarification or more details to proceed effectively.
 

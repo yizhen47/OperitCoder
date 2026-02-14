@@ -26,7 +26,7 @@ describe("CustomModeSchema", () => {
 				slug: "test",
 				name: "Test Mode",
 				roleDefinition: "Test role definition",
-				groups: ["read", "edit", "browser"] as const,
+				groups: ["read", "edit", "command"] as const,
 			} satisfies ModeConfig
 
 			expect(() => validateCustomMode(validMode)).not.toThrow()
@@ -121,7 +121,7 @@ describe("CustomModeSchema", () => {
 				slug: "markdown-editor",
 				name: "Markdown Editor",
 				roleDefinition: "Markdown editing mode",
-				groups: ["read", ["edit", { fileRegex: "\\.md$" }], "browser"],
+				groups: ["read", ["edit", { fileRegex: "\\.md$" }], "command"],
 			}
 
 			const modeWithDescription = {
@@ -131,7 +131,7 @@ describe("CustomModeSchema", () => {
 				groups: [
 					"read",
 					["edit", { fileRegex: "\\.(md|txt)$", description: "Documentation files only" }],
-					"browser",
+					"command",
 				],
 			}
 
@@ -195,7 +195,7 @@ describe("CustomModeSchema", () => {
 		test("accepts multiple groups", () => {
 			const mode = {
 				...validBaseMode,
-				groups: ["read", "edit", "browser"] as const,
+				groups: ["read", "edit", "command"] as const,
 			} satisfies ModeConfig
 
 			expect(() => modeConfigSchema.parse(mode)).not.toThrow()
@@ -204,7 +204,7 @@ describe("CustomModeSchema", () => {
 		test("accepts all available groups", () => {
 			const mode = {
 				...validBaseMode,
-				groups: ["read", "edit", "browser", "command", "mcp"] as const,
+				groups: ["read", "edit", "command", "mcp", "modes"] as const,
 			} satisfies ModeConfig
 
 			expect(() => modeConfigSchema.parse(mode)).not.toThrow()
