@@ -325,3 +325,4 @@ const isEmptyTextContent = (block: AssistantMessageContent) =>
 		})
 	})
 })
+})
