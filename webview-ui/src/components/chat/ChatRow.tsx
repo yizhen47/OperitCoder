@@ -21,7 +21,6 @@ import { TodoChangeDisplay } from "./TodoChangeDisplay"
 import CodeAccordian from "../common/CodeAccordian"
 import MarkdownBlock from "../common/MarkdownBlock"
 import { ReasoningBlock } from "./ReasoningBlock"
-import Thumbnails from "../common/Thumbnails"
 import ImageBlock from "../common/ImageBlock"
 import ErrorRow from "./ErrorRow"
 import { Mention } from "./Mention"
@@ -76,6 +75,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import { Textarea } from "../ui/textarea"
 import { Button } from "../ui/button"
 import { useClipboard } from "../ui/hooks"
+
+const renderImageStrip = (images: string[]) => (
+	<div className="mt-2 flex gap-2 overflow-x-auto py-1">
+		{images.map((image, index) => (
+			<div key={`${image}-${index}`} className="shrink-0 w-[45%] min-w-[33%] max-w-[50%]">
+				<ImageBlock imageData={image} />
+			</div>
+		))}
+	</div>
+)
 
 // Helper function to get previous todos before a specific message
 function getPreviousTodos(messages: ClineMessage[], currentMessageTs: number): any[] {
@@ -169,13 +178,13 @@ const ChatRow = memo(
 		const { showTaskTimeline, clineMessages } = useExtensionState() // kilocode_change: Used by KiloChatRowGutterBar
 		const { isLast, onHeightChange, message } = props
 		const { copy } = useClipboard()
-		const { t } = useTranslation()
+	const { t } = useTranslation()
 		const [rawMenuPos, setRawMenuPos] = useState<{ x: number; y: number } | null>(null)
 		const [rawDialogOpen, setRawDialogOpen] = useState(false)
 		const [rawDialogView, setRawDialogView] = useState<"raw" | "parsed">("raw")
 		const [rawDialogMessageSource, setRawDialogMessageSource] = useState<"source" | "rendered">("source")
 		const [rawDialogSourceIndex, setRawDialogSourceIndex] = useState(0)
-		const [rawDialogPanel, setRawDialogPanel] = useState<"message" | "context">("message")
+	const [rawDialogPanel, setRawDialogPanel] = useState<"message" | "context">("message")
 		const [rawDialogSourceTsOverride, setRawDialogSourceTsOverride] = useState<number | null>(null)
 
 		const sourceMessages = useMemo(() => {
@@ -229,12 +238,13 @@ const ChatRow = memo(
 			setRawDialogSourceTsOverride(null)
 		}, [rawDialogOpen])
 
-		const selectedSourceMessage = useMemo(() => {
+	const selectedSourceMessage = useMemo(() => {
 			if (rawDialogSourceTsOverride !== null) {
 				return clineMessages.find((m) => m.ts === rawDialogSourceTsOverride) ?? message
 			}
 			return sourceMessages[Math.min(rawDialogSourceIndex, sourceMessages.length - 1)]
-		}, [clineMessages, message, rawDialogSourceIndex, rawDialogSourceTsOverride, sourceMessages])
+	}, [clineMessages, message, rawDialogSourceIndex, rawDialogSourceTsOverride, sourceMessages])
+
 
 		const displayedMessage = rawDialogMessageSource === "source" ? selectedSourceMessage : message
 		const displayedText = useMemo(() => displayedMessage.text ?? "", [displayedMessage.text])
@@ -1560,14 +1570,36 @@ export const ChatRowContent = ({
 						<div className="pl-0">
 							<Markdown markdown={message.text} partial={message.partial} />
 							{message.images && message.images.length > 0 && (
-								<div style={{ marginTop: "10px" }}>
-									{message.images.map((image, index) => (
-										<ImageBlock key={index} imageData={image} />
-									))}
-								</div>
+								renderImageStrip(message.images)
 							)}
 						</div>
 					)
+				case "image": {
+					const payload = safeJsonParse<{ imageUri?: string; imagePath?: string; imageData?: string }>(
+						message.text,
+					)
+					const imageUri = payload?.imageUri
+					const imagePath = payload?.imagePath
+					const imageData = payload?.imageData
+
+					if (imageUri || imageData) {
+						return (
+							<div className="pl-0">
+								<div className="mt-2 flex gap-2 overflow-x-auto py-1">
+									<div className="shrink-0 w-[45%] min-w-[33%] max-w-[50%]">
+										<ImageBlock imageUri={imageUri} imagePath={imagePath} imageData={imageData} />
+									</div>
+								</div>
+							</div>
+						)
+					}
+
+					if (message.images && message.images.length > 0) {
+						return <div className="pl-0">{renderImageStrip(message.images)}</div>
+					}
+
+					return null
+				}
 				case "user_feedback":
 					return (
 						<div className="group">
@@ -1634,9 +1666,7 @@ export const ChatRowContent = ({
 										</div>
 									</div>
 								)}
-								{!isEditing && message.images && message.images.length > 0 && (
-									<Thumbnails images={message.images} style={{ marginTop: "8px" }} />
-								)}
+								{!isEditing && message.images && message.images.length > 0 && renderImageStrip(message.images)}
 							</div>
 						</div>
 					)

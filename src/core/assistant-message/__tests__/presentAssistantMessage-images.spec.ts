@@ -206,6 +206,36 @@ describe("presentAssistantMessage - Image Handling in Native Tool Calls", () => 
 		expect(toolResult.content).toBeTruthy()
 	})
 
+	it("should emit image messages for image urls in assistant text", async () => {
+		mockTask.assistantMessageContent = [
+			{
+				type: "text",
+				content:
+					"Here is one ![alt](https://example.com/a.png) and another https://example.com/b.jpg plus data:image/png;base64,AAAA",
+				partial: false,
+			},
+		]
+
+		await presentAssistantMessage(mockTask)
+
+		const sayCalls = mockTask.say.mock.calls
+		expect(sayCalls[0][0]).toBe("text")
+		expect(sayCalls[0][1]).toContain("Here is one")
+
+		const imageCalls = sayCalls.filter((call: any[]) => call[0] === "image")
+		expect(imageCalls.length).toBe(3)
+		const imageUris = imageCalls
+			.map((call: any[]) => JSON.parse(call[1]).imageUri)
+			.sort()
+		expect(imageUris).toEqual(
+			[
+				"data:image/png;base64,AAAA",
+				"https://example.com/a.png",
+				"https://example.com/b.jpg",
+			].sort(),
+		)
+	})
+
 	describe("Multiple tool calls handling", () => {
 		it("should send tool_result with is_error for skipped tools in native protocol when didRejectTool is true", async () => {
 			// Simulate multiple tool calls with native protocol (all have IDs)

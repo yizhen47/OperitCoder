@@ -68,6 +68,41 @@ type NormalizedToolResponse = {
   imageBlocks: Anthropic.ImageBlockParam[]
 }
 
+const extractImageUrisFromText = (text: string): string[] => {
+	if (!text) {
+		return []
+	}
+
+	const urls = new Set<string>()
+	const add = (value: string | undefined) => {
+		const trimmed = (value ?? "").trim()
+		if (trimmed) {
+			urls.add(trimmed)
+		}
+	}
+
+	const dataUriRegex = /data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+/g
+	const markdownImageRegex = /!\[[^\]]*\]\(([^)]+)\)/g
+	const imageUrlRegex = /https?:\/\/[^\s)]+?\.(?:png|jpe?g|gif|webp|svg)(?:\?[^\s)]*)?/gi
+
+	let match: RegExpExecArray | null
+	while ((match = dataUriRegex.exec(text)) !== null) {
+		add(match[0])
+	}
+
+	while ((match = markdownImageRegex.exec(text)) !== null) {
+		const raw = match[1]?.trim()
+		const url = raw ? raw.split(/\s+/)[0] : undefined
+		add(url)
+	}
+
+	while ((match = imageUrlRegex.exec(text)) !== null) {
+		add(match[0])
+	}
+
+	return Array.from(urls)
+}
+
 const approvalQueueByTask = new WeakMap<Task, Promise<void>>()
 const pendingConcurrentToolCallsByTask = new WeakMap<Task, Set<Promise<void>>>()
 
@@ -1494,6 +1529,12 @@ export async function presentAssistantMessage(cline: Task) {
 			}
 
 			await cline.say("text", content, undefined, block.partial)
+			if (!block.partial && content) {
+				const imageUris = extractImageUrisFromText(content)
+				for (const imageUri of imageUris) {
+					await cline.say("image", JSON.stringify({ imageUri }))
+				}
+			}
 			break
 		}
 		case "tool_use": {

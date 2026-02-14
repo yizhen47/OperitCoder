@@ -4,6 +4,7 @@ import { useMemo, useState, type MouseEvent } from "react"
 import { Check, Copy, CornerDownRight, LoaderCircle, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import ImageBlock from "../common/ImageBlock"
 
 interface ToolResultDisplayProps {
 	resultText: string
@@ -19,6 +20,20 @@ const parseBooleanResult = (raw: string): boolean | undefined => {
 	if (normalized === "true") return true
 	if (normalized === "false") return false
 	return undefined
+}
+
+const extractMarkdownImageUris = (text: string): string[] => {
+	const imageUrls = new Set<string>()
+	const regex = /!\[[^\]]*\]\(([^)]+)\)/g
+	let match: RegExpExecArray | null
+	while ((match = regex.exec(text)) !== null) {
+		const raw = match[1]?.trim()
+		const url = raw ? raw.split(/\s+/)[0] : undefined
+		if (url) {
+			imageUrls.add(url)
+		}
+	}
+	return Array.from(imageUrls)
 }
 
 export const ToolResultDisplay = ({
@@ -40,6 +55,7 @@ export const ToolResultDisplay = ({
 		if (isBoolTrue) return "text-vscode-charts-green"
 		return "text-vscode-descriptionForeground"
 	}, [isError, isBoolTrue])
+	const imageUris = useMemo(() => extractMarkdownImageUris(normalized), [normalized])
 
 	const handleToggle = () => setIsExpanded((v) => !v)
 	const hasContent = normalized.trim().length > 0
@@ -102,6 +118,15 @@ export const ToolResultDisplay = ({
 						"px-2 py-1",
 					)}>
 					<div className={cn("text-xs whitespace-pre-wrap break-words", statusColorClass)}>{normalized}</div>
+				</div>
+			)}
+			{imageUris.length > 0 && (
+				<div className="mt-1 ml-6 mr-4 flex gap-2 overflow-x-auto py-1">
+					{imageUris.map((uri) => (
+						<div key={uri} className="shrink-0 w-40">
+							<ImageBlock imageData={uri} />
+						</div>
+					))}
 				</div>
 			)}
 		</div>

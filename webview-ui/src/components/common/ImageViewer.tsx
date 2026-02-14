@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import { useCopyToClipboard } from "@src/utils/clipboard"
 import { useAppTranslation } from "@src/i18n/TranslationContext"
 import { vscode } from "@src/utils/vscode"
@@ -18,6 +18,7 @@ export interface ImageViewerProps {
 	alt?: string
 	showControls?: boolean
 	className?: string
+	maxHeight?: number
 }
 
 export function ImageViewer({
@@ -26,6 +27,7 @@ export function ImageViewer({
 	alt = "Generated image",
 	showControls = true,
 	className = "",
+	maxHeight = 140,
 }: ImageViewerProps) {
 	const [showModal, setShowModal] = useState(false)
 	const [zoomLevel, setZoomLevel] = useState(1)
@@ -34,8 +36,13 @@ export function ImageViewer({
 	const [isDragging, setIsDragging] = useState(false)
 	const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 })
 	const [imageError, setImageError] = useState<string | null>(null)
+	const [shouldLoad, setShouldLoad] = useState(
+		() => imageUri.startsWith("data:") || typeof IntersectionObserver === "undefined",
+	)
+	const [isLoaded, setIsLoaded] = useState(false)
 	const { copyWithFeedback } = useCopyToClipboard()
 	const { t } = useAppTranslation()
+	const containerRef = useRef<HTMLDivElement>(null)
 
 	/**
 	 * Opens a modal with the image for zooming
@@ -144,11 +151,37 @@ export function ImageViewer({
 
 	const handleImageError = useCallback(() => {
 		setImageError("Failed to load image")
+		setIsLoaded(false)
 	}, [])
 
 	const handleImageLoad = useCallback(() => {
 		setImageError(null)
+		setIsLoaded(true)
 	}, [])
+
+	useEffect(() => {
+		if (shouldLoad || imageUri.startsWith("data:")) {
+			setShouldLoad(true)
+			return
+		}
+		if (typeof IntersectionObserver === "undefined" || !containerRef.current) {
+			setShouldLoad(true)
+			return
+		}
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries.some((entry) => entry.isIntersecting)) {
+					setShouldLoad(true)
+					observer.disconnect()
+				}
+			},
+			{ root: null, rootMargin: "200px 0px", threshold: 0.01 },
+		)
+
+		observer.observe(containerRef.current)
+		return () => observer.disconnect()
+	}, [imageUri, shouldLoad])
 
 	/**
 	 * Format the display path for the image
@@ -188,6 +221,7 @@ export function ImageViewer({
 	return (
 		<>
 			<div
+				ref={containerRef}
 				className={`relative w-full ${className}`}
 				onMouseEnter={handleMouseEnter}
 				onMouseLeave={handleMouseLeave}>
@@ -205,19 +239,32 @@ export function ImageViewer({
 						<span style={{ color: "var(--vscode-errorForeground)" }}>⚠️ {imageError}</span>
 					</div>
 				) : (
-					<img
-						src={imageUri}
-						alt={alt}
-						className="w-full h-auto rounded cursor-pointer"
-						onClick={handleOpenInEditor}
-						onError={handleImageError}
-						onLoad={handleImageLoad}
-						style={{
-							maxHeight: "400px",
-							objectFit: "contain",
-							backgroundColor: "var(--vscode-editor-background)",
-						}}
-					/>
+					<>
+						{(!shouldLoad || !isLoaded) && (
+							<div
+								className="w-full rounded animate-pulse"
+								style={{
+									height: "120px",
+									backgroundColor: "var(--vscode-editor-background)",
+								}}
+							/>
+						)}
+						<img
+							src={shouldLoad ? imageUri : undefined}
+							alt={alt}
+							loading="lazy"
+							decoding="async"
+							className={`w-full h-auto rounded cursor-pointer transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+							onClick={handleOpenInEditor}
+							onError={handleImageError}
+							onLoad={handleImageLoad}
+							style={{
+								maxHeight: `${maxHeight}px`,
+								objectFit: "contain",
+								backgroundColor: "var(--vscode-editor-background)",
+							}}
+						/>
+					</>
 				)}
 				{imagePath && (
 					<div className="mt-1 text-xs text-vscode-descriptionForeground">{formatDisplayPath(imagePath)}</div>
