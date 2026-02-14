@@ -1,7 +1,8 @@
 {
 	"greeting": "Operit Coder 能为您做什么？",
 	"toolCalls": {
-		"label": "工具调用"
+		"label": "工具调用",
+		"withReasoningLabel": "思考 + 工具调用"
 	},
 	"task": {
 		"title": "任务",

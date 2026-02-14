@@ -1714,14 +1714,18 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				)
 			}
 
-			if (messageOrGroup.type === "say" && (messageOrGroup as any).say === "tool_calls_group") {
-				const toolMessages = ((messageOrGroup as any).toolMessages ?? []) as ClineMessage[]
+			if (messageOrGroup.type === "say" && (messageOrGroup as any).say === "tool_run_group") {
+				const groupMessages = ((messageOrGroup as any).groupMessages ?? []) as ClineMessage[]
 				const toolCallCount = Number((messageOrGroup as any).toolCallCount ?? 0)
+				const hasReasoning = Boolean((messageOrGroup as any).hasReasoning)
+				const isComplete = Boolean((messageOrGroup as any).isComplete)
 
 				return (
 					<ToolCallsGroupRow
-						toolMessages={toolMessages}
+						groupMessages={groupMessages}
 						toolCallCount={toolCallCount}
+						hasReasoning={hasReasoning}
+						isComplete={isComplete}
 						renderToolMessage={(msg) => (
 							<ChatRow
 								key={msg.ts}

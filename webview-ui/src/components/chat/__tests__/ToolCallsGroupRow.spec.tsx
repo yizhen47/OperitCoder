@@ -14,11 +14,13 @@ function toolResultMsg(ts: number, partial?: boolean): ClineMessage {
 }
 
 describe("ToolCallsGroupRow", () => {
-	it("defaults to expanded while active, then auto-collapses when done", () => {
+	it("stays expanded while incomplete and auto-collapses when complete", () => {
 		const { queryByTestId, rerender } = render(
 			<ToolCallsGroupRow
-				toolMessages={[toolMsg(1, false)]}
-				toolCallCount={4}
+				groupMessages={[toolMsg(1, false)]}
+				toolCallCount={3}
+				hasReasoning={false}
+				isComplete={false}
 				renderToolMessage={() => <div data-testid="tool-row" />}
 			/>,
 		)
@@ -27,8 +29,10 @@ describe("ToolCallsGroupRow", () => {
 
 		rerender(
 			<ToolCallsGroupRow
-				toolMessages={[toolMsg(1, false), toolResultMsg(2, false)]}
-				toolCallCount={4}
+				groupMessages={[toolMsg(1, false), toolResultMsg(2, false)]}
+				toolCallCount={3}
+				hasReasoning={false}
+				isComplete={true}
 				renderToolMessage={() => <div data-testid="tool-row" />}
 			/>,
 		)
@@ -36,21 +40,31 @@ describe("ToolCallsGroupRow", () => {
 		expect(queryByTestId("tool-calls-group-expanded")).not.toBeInTheDocument()
 	})
 
-	it("treats a pending ask:tool as active (expanded by default)", () => {
-		const { queryByTestId } = render(
-			<ToolCallsGroupRow toolMessages={[toolMsg(1, false)]} toolCallCount={4} renderToolMessage={() => <div />} />,
+	it("click enters user override and prevents later auto-collapse", () => {
+		const { getByTestId, queryByTestId, rerender } = render(
+			<ToolCallsGroupRow
+				groupMessages={[toolResultMsg(1, false)]}
+				toolCallCount={3}
+				hasReasoning={false}
+				isComplete={false}
+				renderToolMessage={() => <div data-testid="tool-row" />}
+			/>,
 		)
 
 		expect(queryByTestId("tool-calls-group-expanded")).toBeInTheDocument()
-	})
+		fireEvent.click(getByTestId("tool-calls-group-toggle"))
+		expect(queryByTestId("tool-calls-group-expanded")).not.toBeInTheDocument()
 
-	it("toggles expansion on click", () => {
-		const { getByTestId, queryByTestId } = render(
-			<ToolCallsGroupRow toolMessages={[toolResultMsg(1, false)]} toolCallCount={4} renderToolMessage={() => <div />} />,
+		rerender(
+			<ToolCallsGroupRow
+				groupMessages={[toolResultMsg(1, false)]}
+				toolCallCount={3}
+				hasReasoning={false}
+				isComplete={true}
+				renderToolMessage={() => <div data-testid="tool-row" />}
+			/>,
 		)
 
 		expect(queryByTestId("tool-calls-group-expanded")).not.toBeInTheDocument()
-		fireEvent.click(getByTestId("tool-calls-group-toggle"))
-		expect(queryByTestId("tool-calls-group-expanded")).toBeInTheDocument()
 	})
 })

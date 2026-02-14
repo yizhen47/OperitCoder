@@ -1,7 +1,8 @@
 {
 	"greeting": "What can Operit Coder do for you?",
 	"toolCalls": {
-		"label": "Tool calls"
+		"label": "Tool calls",
+		"withReasoningLabel": "Thought + tool calls"
 	},
 	"task": {
 		"title": "Task",
