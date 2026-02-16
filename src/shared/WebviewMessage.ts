@@ -123,6 +123,8 @@ export interface WebviewMessage {
 		| "toggleMcpServer"
 		// kilocode_change start
 		| "toggleExamplePackage"
+		| "setSandboxEnvVar"
+		| "deleteSandboxEnvVar"
 		// kilocode_change end
 		| "updateMcpTimeout"
 		| "fuzzyMatchThreshold" // kilocode_change
@@ -296,6 +298,8 @@ export interface WebviewMessage {
 	text?: string
 	// kilocode_change start
 	packageName?: string
+	envName?: string
+	envValue?: string
 	// kilocode_change end
 	suggestionLength?: number // kilocode_change: Length of accepted suggestion for telemetry
 	completionRequestId?: string // kilocode_change

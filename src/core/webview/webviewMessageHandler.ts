@@ -94,6 +94,7 @@ import {
 import { GhostServiceManager } from "../../services/ghost/GhostServiceManager"
 import { handleChatCompletionRequest } from "../../services/ghost/chat-autocomplete/handleChatCompletionRequest"
 import { handleChatCompletionAccepted } from "../../services/ghost/chat-autocomplete/handleChatCompletionAccepted"
+import { getSandboxEnvSecretKey } from "../tool-packages/env-secrets"
 // kilocode_change end
 
 const ALLOWED_VSCODE_SETTINGS = new Set(["terminal.integrated.inheritEnv"])
@@ -848,6 +849,32 @@ export const webviewMessageHandler = async (
 
 			await updateGlobalState("disabledExamplePackages", nextDisabled)
 			await updateGlobalState("enabledExamplePackages", nextEnabled)
+			await provider.postStateToWebview()
+			break
+		}
+
+		case "setSandboxEnvVar": {
+			const name = String(message.envName ?? "").trim()
+			if (!name) {
+				break
+			}
+			const value = String(message.envValue ?? "")
+			const key = getSandboxEnvSecretKey(name)
+			if (!value) {
+				await provider.context.secrets.delete(key)
+			} else {
+				await provider.context.secrets.store(key, value)
+			}
+			await provider.postStateToWebview()
+			break
+		}
+
+		case "deleteSandboxEnvVar": {
+			const name = String(message.envName ?? "").trim()
+			if (!name) {
+				break
+			}
+			await provider.context.secrets.delete(getSandboxEnvSecretKey(name))
 			await provider.postStateToWebview()
 			break
 		}

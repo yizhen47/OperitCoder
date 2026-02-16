@@ -549,6 +549,11 @@ export type ExtensionState = Pick<
 	 * This is UI-only state; the persisted toggle list is `disabledExamplePackages`.
 	 */
 	// kilocode_change: Localized text payloads used by sandbox packages metadata.
+	/**
+	 * Sandbox package environment variables stored in VS Code SecretStorage.
+	 * Values are never sent to the webview; only existence is reported.
+	 */
+	sandboxEnvStatus?: Record<string, boolean>
 	examplePackages?: Array<{
 		/**
 		 * Package identifier used for toggles. This is sanitized to be safe for tool/function naming.
@@ -576,6 +581,12 @@ export type ExtensionState = Pick<
 				required?: boolean
 				description?: string | Record<string, string>
 			}>
+		}>
+		env?: Array<{
+			name: string
+			description?: string | Record<string, string>
+			required?: boolean
+			defaultValue?: string | null
 		}>
 	}>
 	// kilocode_change end

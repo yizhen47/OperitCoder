@@ -7,6 +7,7 @@ import { BaseTool, ToolCallbacks } from "./BaseTool"
 import { scanExamplePackages } from "../tool-packages"
 import { buildExampleToolName } from "../../utils/example-tool-name"
 import { sanitizeMcpName } from "../../utils/mcp-name"
+import { getMissingRequiredSandboxEnvVars } from "../tool-packages/env-secrets"
 
 interface ActivateSandboxPackageParams {
 	package_name: string
@@ -84,6 +85,28 @@ export class ActivateSandboxPackageTool extends BaseTool<"activate_sandbox_packa
 						.map((p) => p.name)
 						.slice(0, 50)
 						.join(", ")}`,
+				)
+				return
+			}
+
+			const missingEnv = await getMissingRequiredSandboxEnvVars(provider.context.secrets, pkg.env)
+			if (missingEnv.length > 0) {
+				const message = `Missing required environment variables for package '${pkg.name}': ${missingEnv.join(
+					", ",
+				)}. Configure them in Settings → Sandbox Packages.`
+				pushToolResult(message)
+				await task.say(
+					"tool",
+					JSON.stringify({
+						tool: "sandboxPackageTool",
+						packageName,
+						toolName: "__activate__",
+						arguments: JSON.stringify({ package_name: packageName }),
+						content: message,
+						isError: true,
+					}),
+					undefined,
+					false,
 				)
 				return
 			}

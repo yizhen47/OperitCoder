@@ -16,6 +16,7 @@ import * as path from "path"
 import { scanExamplePackages } from "../tool-packages"
 import { sanitizeMcpName } from "../../utils/mcp-name"
 import { executeSandboxedTool } from "../tool-packages/runtime/sandbox"
+import { getMissingRequiredSandboxEnvVars, getSandboxEnvValues } from "../tool-packages/env-secrets"
 // kilocode_change end
 
 import { fetchInstructionsTool } from "../tools/FetchInstructionsTool"
@@ -884,11 +885,39 @@ async function handlePkgToolUse(cline: Task, pkgBlock: ExampleToolUse): Promise<
 			throw new Error(`Tool not found in package '${pkg.name}': ${pkgBlock.toolName}`)
 		}
 
+		const missingEnv = await getMissingRequiredSandboxEnvVars(provider.context.secrets, pkg.env)
+		if (missingEnv.length > 0) {
+			const message = `Missing required environment variables for package '${pkg.name}': ${missingEnv.join(
+				", ",
+			)}. Configure them in Settings → Sandbox Packages.`
+			pushToolSkipResult(cline, toolProtocol, toolCallId, message)
+			await cline.say(
+				"tool" as any,
+				JSON.stringify({
+					tool: "sandboxPackageTool",
+					packageName: pkgBlock.packageName,
+					toolName: pkgBlock.toolName,
+					content: message,
+					isError: true,
+				}),
+				undefined,
+				false,
+				undefined,
+				undefined,
+				{ isNonInteractive: true },
+			)
+			cline.didAlreadyUseTool = true
+			return
+		}
+
+		const env = await getSandboxEnvValues(provider.context.secrets, pkg.env)
+
 		const result = await executeSandboxedTool({
 			script: tool.script,
 			toolExportName: tool.name,
 			args: (pkgBlock.arguments ?? {}) as Record<string, unknown>,
 			cwd: cline.cwd,
+			env,
 			toolCall: toolCallForSandbox,
 			filename: pkg.sourcePath ?? `examples/${pkg.name}.js`,
 			logger: console,

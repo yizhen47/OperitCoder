@@ -57,6 +57,7 @@ import { formatLanguage } from "../../shared/language"
 // kilocode_change start
 import { scanExamplePackages } from "../tool-packages"
 import { sanitizeMcpName } from "../../utils/mcp-name"
+import { getSandboxEnvStatus } from "../tool-packages/env-secrets"
 // kilocode_change end
 import { WebviewMessage } from "../../shared/WebviewMessage"
 import { EMBEDDING_MODEL_PROFILES } from "../../shared/embeddingModels"
@@ -183,6 +184,12 @@ export class ClineProvider
 				required?: boolean
 				description?: string | Record<string, string>
 			}>
+		}>
+		env?: Array<{
+			name: string
+			description?: string | Record<string, string>
+			required?: boolean
+			defaultValue?: string | null
 		}>
 	}> // kilocode_change - Cache for example packages
 
@@ -2707,39 +2714,54 @@ ${prompt}
 			enabledExamplePackages: stateValues.enabledExamplePackages ?? [],
 			disabledExamplePackages: stateValues.disabledExamplePackages ?? [],
 			examplePackages: await (async () => {
-				if (this.examplePackagesCache) {
-					return this.examplePackagesCache
-				}
-				try {
-					const primaryExamplesDir = path.join(this.context.extensionPath, "dist", "examples")
-					const isDevExtensionLayout = path.basename(this.context.extensionPath).toLowerCase() === "src"
-					const fallbackExamplesDir = isDevExtensionLayout
-						? path.join(this.context.extensionPath, "examples")
-						: path.join(this.context.extensionPath, "src", "examples")
-					let packages = await scanExamplePackages({ examplesDir: primaryExamplesDir })
-					if (packages.length === 0) {
-						packages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })
-					}
-					this.examplePackagesCache = packages.map((p) => ({
-						name: sanitizeMcpName(p.name),
-						displayName: p.name,
-						enabledByDefault: p.enabledByDefault ?? false,
-						toolCount: p.tools.length,
-						description: p.description,
-						tools: p.tools.map((t) => ({
-							name: t.name,
-							description: t.description,
-							parameters: (t.parameters ?? []).map((param) => ({
-								name: param.name,
-								type: param.type,
-								required: param.required,
-								description: param.description,
+				if (!this.examplePackagesCache) {
+					try {
+						const primaryExamplesDir = path.join(this.context.extensionPath, "dist", "examples")
+						const isDevExtensionLayout = path.basename(this.context.extensionPath).toLowerCase() === "src"
+						const fallbackExamplesDir = isDevExtensionLayout
+							? path.join(this.context.extensionPath, "examples")
+							: path.join(this.context.extensionPath, "src", "examples")
+						let packages = await scanExamplePackages({ examplesDir: primaryExamplesDir })
+						if (packages.length === 0) {
+							packages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })
+						}
+						this.examplePackagesCache = packages.map((p) => ({
+							name: sanitizeMcpName(p.name),
+							displayName: p.name,
+							enabledByDefault: p.enabledByDefault ?? false,
+							toolCount: p.tools.length,
+							description: p.description,
+							tools: p.tools.map((t) => ({
+								name: t.name,
+								description: t.description,
+								parameters: (t.parameters ?? []).map((param) => ({
+									name: param.name,
+									type: param.type,
+									required: param.required,
+									description: param.description,
+								})),
 							})),
-						})),
-					}))
-					return this.examplePackagesCache
-				} catch (error) {
-					return []
+							env: (p.env ?? []).map((e) => ({
+								name: e.name,
+								description: e.description,
+								required: e.required,
+								defaultValue: e.defaultValue ?? null,
+							})),
+						}))
+					} catch (error) {
+						this.examplePackagesCache = []
+					}
+				}
+
+				return this.examplePackagesCache
+			})(),
+			sandboxEnvStatus: await (async () => {
+				try {
+					const envNames = (this.examplePackagesCache ?? []).flatMap((p) => p.env ?? []).map((e) => e.name)
+						.filter(Boolean)
+					return await getSandboxEnvStatus(this.context.secrets, envNames)
+				} catch {
+					return {}
 				}
 			})(),
 			// kilocode_change end

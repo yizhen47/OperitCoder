@@ -140,6 +140,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 	const [isDiscardDialogShow, setDiscardDialogShow] = useState(false)
 	const [isChangeDetected, setChangeDetected] = useState(false)
 	const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
+	const [sandboxEnvInputs, setSandboxEnvInputs] = useState<Record<string, string>>({})
 	const [activeTab, setActiveTab] = useState<SectionName>(
 		targetSection && sectionNames.includes(targetSection as SectionName)
 			? (targetSection as SectionName)
@@ -1104,6 +1105,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 											const enabled = isEnabledOverride || (enabledByDefault && !isDisabled)
 											const displayName = pkg.displayName || pkg.name
 											const desc = getLocalizedText(pkg.description)
+											const envVars = pkg.env ?? []
 
 											return (
 												<Collapsible key={pkg.name}>
@@ -1145,6 +1147,88 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 
 														<CollapsibleContent>
 															<div className="border-t border-vscode-panel-border px-3 py-2">
+																{envVars.length > 0 ? (
+																	<div className="mb-3" data-testid={`sandbox-package-env-${pkg.name}`}>
+																		<div className="text-vscode-descriptionForeground text-xs">
+																			{t("settings:examplePackages.envLabel")}
+																		</div>
+																		<div className="mt-2 flex flex-col gap-2">
+																			{envVars.map((env) => {
+																				const envName = env.name
+																				const envDesc = getLocalizedText(env.description)
+																				const isRequired = env.required !== false
+																				const isConfigured = Boolean(extensionState.sandboxEnvStatus?.[envName])
+																				const inputKey = `${pkg.name}::${envName}`
+																				const inputValue = sandboxEnvInputs[inputKey] ?? ""
+
+																				return (
+																					<div
+																						key={envName}
+																						className="rounded border border-vscode-panel-border px-2 py-2">
+																						<div className="flex items-start justify-between gap-2">
+																							<div className="min-w-0 flex-1">
+																								<div className="text-vscode-foreground text-sm font-mono truncate">
+																									{envName}
+																								</div>
+																								<div className="text-vscode-descriptionForeground text-xs">
+																									{envDesc ? envDesc : isRequired ? t("settings:examplePackages.envRequired") : t("settings:examplePackages.envOptional")}
+																								</div>
+																							</div>
+																							<div
+																								className={cn(
+																									"shrink-0 text-xs px-2 py-0.5 rounded border",
+																									isConfigured
+																										? "border-[var(--vscode-testing-iconPassed)] bg-[var(--vscode-testing-iconPassed)] text-vscode-editor-background"
+																										: "border-[var(--vscode-testing-iconFailed)] bg-[var(--vscode-testing-iconFailed)] text-vscode-editor-background",
+																								)}>
+																								{isConfigured
+																									? t("settings:examplePackages.envConfigured")
+																									: t("settings:examplePackages.envMissing")}
+																							</div>
+																						</div>
+
+																						<div className="mt-2 flex items-center gap-2">
+																							<input
+																								type="password"
+																								value={inputValue}
+																								placeholder={t("settings:examplePackages.envPlaceholder")}
+																								className="flex-1 min-w-0 rounded border border-vscode-input-border bg-vscode-input-background px-2 py-1 text-vscode-input-foreground text-sm"
+																								onChange={(e) => {
+																									const next = e.currentTarget.value
+																									setSandboxEnvInputs((prev) => ({ ...prev, [inputKey]: next }))
+																								}}
+																							/>
+																							<Button
+																								variant="secondary"
+																								disabled={!inputValue}
+																								onClick={() => {
+																									vscode.postMessage({
+																										type: "setSandboxEnvVar",
+																										envName: envName,
+																										envValue: inputValue,
+																									})
+																									setSandboxEnvInputs((prev) => ({ ...prev, [inputKey]: "" }))
+																								}}>
+																								{t("settings:examplePackages.envSave")}
+																							</Button>
+																							<Button
+																								variant="secondary"
+																								onClick={() => {
+																									vscode.postMessage({
+																										type: "deleteSandboxEnvVar",
+																										envName: envName,
+																									})
+																									setSandboxEnvInputs((prev) => ({ ...prev, [inputKey]: "" }))
+																								}}>
+																								{t("settings:examplePackages.envClear")}
+																							</Button>
+																						</div>
+																					</div>
+																				)
+																			})}
+																		</div>
+																	</div>
+																) : null}
 																{(pkg.tools ?? []).length === 0 ? (
 																	<div className="text-vscode-descriptionForeground text-sm">{t("settings:examplePackages.noToolsMetadata")}</div>
 																) : (

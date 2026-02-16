@@ -1,6 +1,7 @@
 // pnpm --filter @roo-code/vscode-webview test src/components/settings/__tests__/SettingsView.spec.tsx
 
-import { render, screen, fireEvent } from "@/utils/test-utils"
+import React, { createContext, useContext, useState } from "react"
+import { render, screen, fireEvent, within } from "@/utils/test-utils"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 import { vscode } from "@/utils/vscode"
@@ -135,8 +136,13 @@ vi.mock("../../../components/common/Tab", () => ({
 	},
 }))
 
-vi.mock("@/components/ui", () => ({
-	...vi.importActual("@/components/ui"),
+vi.mock("@src/components/ui", async (importOriginal) => {
+	const actual = await importOriginal<any>()
+
+	const CollapsibleContext = createContext<{ open: boolean; setOpen: (open: boolean) => void } | null>(null)
+
+	return {
+		...actual,
 	Popover: ({ children }: any) => <div data-testid="popover">{children}</div>,
 	PopoverTrigger: ({ children }: any) => <div data-testid="popover-trigger">{children}</div>,
 	PopoverContent: ({ children }: any) => <div data-testid="popover-content">{children}</div>,
@@ -169,11 +175,20 @@ vi.mock("@/components/ui", () => ({
 			{children}
 		</div>
 	),
-	// kilocode_change end
-	Button: ({ children, onClick, variant, className, "data-testid": dataTestId }: any) => (
-		<button onClick={onClick} data-variant={variant} className={className} data-testid={dataTestId}>
-			{children}
-		</button>
+		// kilocode_change end
+		ToggleSwitch: ({ checked, onChange, "data-testid": dataTestId, ...rest }: any) => (
+			<input
+				type="checkbox"
+				checked={checked}
+				onChange={() => onChange?.()}
+				data-testid={dataTestId}
+				{...rest}
+			/>
+		),
+		Button: ({ children, onClick, variant, className, "data-testid": dataTestId }: any) => (
+			<button onClick={onClick} data-variant={variant} className={className} data-testid={dataTestId}>
+				{children}
+			</button>
 	),
 	StandardTooltip: ({ children, content }: any) => <div title={content}>{children}</div>,
 	Input: ({ value, onChange, placeholder, "data-testid": dataTestId }: any) => (
@@ -220,26 +235,49 @@ vi.mock("@/components/ui", () => ({
 			{children}
 		</button>
 	),
-	AlertDialogCancel: ({ children, onClick }: any) => (
-		<button data-testid="alert-dialog-cancel" onClick={onClick}>
-			{children}
-		</button>
-	),
-	// Add Collapsible components
-	Collapsible: ({ children, open }: any) => (
-		<div className="collapsible-mock" data-open={open}>
-			{children}
-		</div>
-	),
-	CollapsibleTrigger: ({ children, className, onClick }: any) => (
-		<div className={`collapsible-trigger-mock ${className || ""}`} onClick={onClick}>
-			{children}
-		</div>
-	),
-	CollapsibleContent: ({ children, className }: any) => (
-		<div className={`collapsible-content-mock ${className || ""}`}>{children}</div>
-	),
-}))
+		AlertDialogCancel: ({ children, onClick }: any) => (
+			<button data-testid="alert-dialog-cancel" onClick={onClick}>
+				{children}
+			</button>
+		),
+		// Add Collapsible components
+		Collapsible: ({ children, defaultOpen }: any) => {
+			const [open, setOpen] = useState(Boolean(defaultOpen))
+			return (
+				<CollapsibleContext.Provider value={{ open, setOpen }}>
+					<div className="collapsible-mock" data-open={open}>
+						{children}
+					</div>
+				</CollapsibleContext.Provider>
+			)
+		},
+		CollapsibleTrigger: ({ children, asChild }: any) => {
+			const ctx = useContext(CollapsibleContext)
+			const toggle = () => ctx?.setOpen(!ctx.open)
+
+			if (asChild && React.isValidElement(children)) {
+				const existingOnClick = (children as any).props?.onClick
+				return React.cloneElement(children as any, {
+					onClick: (...args: any[]) => {
+						existingOnClick?.(...args)
+						toggle()
+					},
+				})
+			}
+
+			return (
+				<button type="button" onClick={toggle}>
+					{children}
+				</button>
+			)
+		},
+		CollapsibleContent: ({ children, className }: any) => {
+			const ctx = useContext(CollapsibleContext)
+			if (!ctx?.open) return null
+			return <div className={`collapsible-content-mock ${className || ""}`}>{children}</div>
+		},
+	}
+})
 
 // Mock window.postMessage to trigger state hydration
 const mockPostMessage = (state: any) => {
@@ -301,7 +339,7 @@ describe("SettingsView - Sound Settings", () => {
 		vi.clearAllMocks()
 	})
 
-	it("toggles sandbox package and sends message to VSCode", () => {
+	it("toggles sandbox package and sends message to VSCode", async () => {
 		const { activateTab } = renderSettingsView({
 			examplePackages: [{ name: "alpha", enabledByDefault: true, toolCount: 1 }],
 			enabledExamplePackages: [],
@@ -310,7 +348,7 @@ describe("SettingsView - Sound Settings", () => {
 
 		activateTab("examplePackages")
 
-		const toggle = screen.getByTestId("sandbox-package-toggle-alpha")
+		const toggle = await screen.findByTestId("sandbox-package-toggle-alpha")
 		fireEvent.click(toggle)
 
 		expect(vscode.postMessage).toHaveBeenCalledWith(
@@ -358,9 +396,49 @@ describe("SettingsView - Sound Settings", () => {
 		expect(screen.getByText("do_thing")).toBeInTheDocument()
 		expect(screen.getByText("Does a thing")).toBeInTheDocument()
 		expect(screen.getByText("Query")).toBeInTheDocument()
-		expect(screen.getByText("q")).toBeInTheDocument()
+		expect(screen.getByText(/\(\s*q\s*,/)).toBeInTheDocument()
 		expect(screen.getByText(/string/)).toBeInTheDocument()
-		expect(screen.getByText(/required/)).toBeInTheDocument()
+		expect(screen.getByText(/settings:examplePackages\.parameter\.required/)).toBeInTheDocument()
+	})
+
+	it("renders sandbox package env vars and sends setSandboxEnvVar message", async () => {
+		const { activateTab } = renderSettingsView({
+			language: "en",
+			examplePackages: [
+				{
+					name: "alpha",
+					displayName: "Alpha Package",
+					enabledByDefault: true,
+					toolCount: 1,
+					env: [{ name: "MY_API_KEY", required: true, description: { en: "API key" } }],
+					tools: [{ name: "do_thing" }],
+				},
+			],
+			sandboxEnvStatus: { MY_API_KEY: false },
+			enabledExamplePackages: [],
+			disabledExamplePackages: [],
+		})
+
+		activateTab("examplePackages")
+
+		fireEvent.click(await screen.findByTestId("sandbox-package-card-alpha"))
+
+		const envSection = await screen.findByTestId("sandbox-package-env-alpha")
+		expect(within(envSection).getByText("settings:examplePackages.envLabel")).toBeInTheDocument()
+
+		const input = within(envSection).getByPlaceholderText("settings:examplePackages.envPlaceholder")
+		fireEvent.change(input, { target: { value: "secret" } })
+
+		const saveButton = within(envSection).getByRole("button", { name: "settings:examplePackages.envSave" })
+		fireEvent.click(saveButton)
+
+		expect(vscode.postMessage).toHaveBeenCalledWith(
+			expect.objectContaining({
+				type: "setSandboxEnvVar",
+				envName: "MY_API_KEY",
+				envValue: "secret",
+			}),
+		)
 	})
 
 	it("initializes with tts disabled by default", () => {
@@ -675,7 +753,7 @@ describe("SettingsView - Allowed Commands", () => {
 			render(
 				<ExtensionStateContextProvider>
 					<QueryClientProvider client={new QueryClient()}>
-						<SettingsView onDone={vi.fn()} targetSection="browser" />
+						<SettingsView onDone={vi.fn()} targetSection="notifications" />
 					</QueryClientProvider>
 				</ExtensionStateContextProvider>,
 			)
@@ -683,7 +761,7 @@ describe("SettingsView - Allowed Commands", () => {
 			// Hydrate initial state
 			mockPostMessage({})
 
-			// Verify browser-related content is visible and API config is not
+			// Verify non-providers content is visible and API config is not
 			expect(screen.queryByTestId("api-config-management")).not.toBeInTheDocument()
 		})
 	})
