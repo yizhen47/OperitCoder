@@ -5,7 +5,7 @@ import * as path from "path"
 import { UrlContentFetcher } from "../UrlContentFetcher"
 
 const hoisted = vi.hoisted(() => ({
-	fileExistsAtPath: vi.fn<Parameters<typeof import("../../../utils/fs").fileExistsAtPath>, any>(),
+	fileExistsAtPath: vi.fn<(filePath: string) => Promise<boolean>>(),
 	puppeteerLaunch: vi.fn(),
 }))
 
