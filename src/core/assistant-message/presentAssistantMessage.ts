@@ -13,7 +13,7 @@ import { AskIgnoredError } from "../task/AskIgnoredError"
 
 // kilocode_change start
 import * as path from "path"
-import { scanExamplePackages } from "../tool-packages"
+import { buildDefaultSandboxCapabilities, resolveToolPackageToolsForCapabilities, scanExamplePackages } from "../tool-packages"
 import { sanitizeMcpName } from "../../utils/mcp-name"
 import { executeSandboxedTool } from "../tool-packages/runtime/sandbox"
 import { getMissingRequiredSandboxEnvVars, getSandboxEnvValues } from "../tool-packages/env-secrets"
@@ -785,6 +785,23 @@ async function handlePkgToolUse(cline: Task, pkgBlock: ExampleToolUse): Promise<
 	})
 
 	const toolCallForSandbox = async (toolName: string, params?: Record<string, unknown>): Promise<unknown> => {
+		if (toolName === "visit_web") {
+			const url = String((params as any)?.url ?? "").trim()
+			if (!url) {
+				throw new Error("visit_web requires url")
+			}
+			try {
+				const providerState = await cline.providerRef.deref()?.getState().catch(() => undefined as any)
+				await cline.urlContentFetcher.launchBrowser({
+					browserType: providerState?.visitWebBrowserType,
+					executablePath: providerState?.visitWebBrowserExecutablePath,
+				})
+				return await cline.urlContentFetcher.urlToMarkdown(url)
+			} finally {
+				await cline.urlContentFetcher.closeBrowser().catch(() => undefined)
+			}
+		}
+
 		// Execute nested native tools through existing tool handlers and return a string result to sandbox.
 		const name = toolName as ToolName
 		const paramObj = (params ?? {}) as Record<string, any>
@@ -880,7 +897,11 @@ async function handlePkgToolUse(cline: Task, pkgBlock: ExampleToolUse): Promise<
 			throw new Error(`Example package not found: ${pkgBlock.packageName}`)
 		}
 
-		const tool = pkg.tools.find((t) => sanitizeMcpName(t.name) === pkgBlock.toolName)
+		const modelInfo = cline.api.getModel().info
+		const capabilities = buildDefaultSandboxCapabilities({ supportsComputerUse: (modelInfo as any)?.supportsImages === true })
+		const { activeStateId, tools: effectiveTools } = resolveToolPackageToolsForCapabilities(pkg, capabilities)
+
+		const tool = effectiveTools.find((t) => sanitizeMcpName(t.name) === pkgBlock.toolName)
 		if (!tool) {
 			throw new Error(`Tool not found in package '${pkg.name}': ${pkgBlock.toolName}`)
 		}
@@ -911,6 +932,8 @@ async function handlePkgToolUse(cline: Task, pkgBlock: ExampleToolUse): Promise<
 		}
 
 		const env = await getSandboxEnvValues(provider.context.secrets, pkg.env)
+		const providerState = await provider.getState().catch(() => undefined as any)
+		const lang = String(providerState?.language ?? "en")
 
 		const result = await executeSandboxedTool({
 			script: tool.script,
@@ -918,6 +941,8 @@ async function handlePkgToolUse(cline: Task, pkgBlock: ExampleToolUse): Promise<
 			args: (pkgBlock.arguments ?? {}) as Record<string, unknown>,
 			cwd: cline.cwd,
 			env,
+			lang,
+			state: activeStateId,
 			toolCall: toolCallForSandbox,
 			filename: pkg.sourcePath ?? `examples/${pkg.name}.js`,
 			logger: console,

@@ -461,6 +461,8 @@ export type ExtensionState = Pick<
 	// kilocode_change start
 	| "enabledExamplePackages"
 	| "disabledExamplePackages"
+	| "visitWebBrowserType"
+	| "visitWebBrowserExecutablePath"
 	// kilocode_change end
 	| "includeTaskHistoryInEnhance"
 	| "reasoningBlockCollapsed"

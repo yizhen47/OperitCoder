@@ -21,6 +21,7 @@ export interface ExecuteSandboxedToolOptions {
 	cwd?: string
 	env?: Record<string, string | undefined>
 	state?: string
+	lang?: string
 	onIntermediateResult?: (result: unknown) => void
 	toolCall: ToolCallHandler
 	logger?: SandboxLogger
@@ -107,8 +108,33 @@ export async function executeSandboxedTool(options: ExecuteSandboxedToolOptions)
 		}
 	}
 
-	const getEnv = (key: string) => options.env?.[key]
-	const getState = () => options.state
+	const getEnv = (key: string) => {
+		try {
+			const value = options.env?.[String(key)]
+			if (value === null || value === undefined || value === "") {
+				return undefined
+			}
+			return String(value)
+		} catch {
+			return undefined
+		}
+	}
+	const getState = () => {
+		try {
+			const v = String(options.state ?? "").trim()
+			return v || undefined
+		} catch {
+			return undefined
+		}
+	}
+	const getLang = () => {
+		try {
+			const v = String(options.lang ?? "").trim()
+			return v || "en"
+		} catch {
+			return "en"
+		}
+	}
 
 	const sandboxToolCall = createToolCall(options.toolCall)
 	const okHttp = createOkHttpWithFetch(options.fetch ?? fetch)
@@ -207,6 +233,7 @@ export async function executeSandboxedTool(options: ExecuteSandboxedToolOptions)
 		sendIntermediateResult,
 		getEnv,
 		getState,
+		getLang,
 		toolCall: sandboxToolCall,
 		Tools,
 		OkHttp,

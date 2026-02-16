@@ -6,7 +6,11 @@ import * as path from "path"
 import { buildExampleToolName } from "../../../../utils/example-tool-name"
 import { sanitizeMcpName } from "../../../../utils/mcp-name" // kilocode_change
 import type { LocalizedText, ToolPackage } from "../../../tool-packages"
-import { scanExamplePackages } from "../../../tool-packages"
+import {
+	buildDefaultSandboxCapabilities,
+	resolveToolPackageToolsForCapabilities,
+	scanExamplePackages,
+} from "../../../tool-packages"
 
 function describeLocalizedText(description: LocalizedText | undefined): string {
 	if (!description) {
@@ -108,7 +112,12 @@ export async function getExamplePackageToolsWithDisabledList(
 
 export async function getExamplePackageToolsWithToggleLists(
 	extensionPath: string,
-	options?: { enabledExamplePackages?: string[]; disabledExamplePackages?: string[]; activatedExamplePackages?: string[] },
+	options?: {
+		enabledExamplePackages?: string[]
+		disabledExamplePackages?: string[]
+		activatedExamplePackages?: string[]
+		capabilities?: Record<string, unknown>
+	},
 ): Promise<OpenAI.Chat.ChatCompletionTool[]> {
 	const primaryExamplesDir = path.join(extensionPath, "dist", "examples")
 	const isDevExtensionLayout = path.basename(extensionPath).toLowerCase() === "src" // kilocode_change
@@ -119,7 +128,11 @@ export async function getExamplePackageToolsWithToggleLists(
 	const enabledKey = (options?.enabledExamplePackages ?? []).slice().sort().join(",")
 	const disabledKey = (options?.disabledExamplePackages ?? []).slice().sort().join(",")
 	const activatedKey = (options?.activatedExamplePackages ?? []).slice().sort().join(",")
-	const cacheKey = `${primaryExamplesDir}|${fallbackExamplesDir}|${disabledKey}`
+	const capKey = JSON.stringify({
+		// Keep cache key stable and minimal; only include capability flags that impact state selection.
+		ui_virtual_display: Boolean((options?.capabilities as any)?.ui?.virtual_display),
+	})
+	const cacheKey = `${primaryExamplesDir}|${fallbackExamplesDir}|${disabledKey}|${capKey}`
 	const fullCacheKey = `${cacheKey}|${enabledKey}|${activatedKey}`
 
 	if (cachedTools && cachedKey === fullCacheKey) {
@@ -148,8 +161,12 @@ export async function getExamplePackageToolsWithToggleLists(
 
 		// Require explicit activation before exposing any pkg-- tools to the model.
 		// If no activated packages, return empty tool list.
+		const capabilities = (options?.capabilities ?? buildDefaultSandboxCapabilities()) as any
 		const activatedEnabled = enabled.filter((p) => activated.has(sanitizeMcpName(p.name)))
-		const tools = activatedEnabled.flatMap(convertToolPackageToOpenAITools)
+		const tools = activatedEnabled.flatMap((pkg) => {
+			const { tools: effectiveTools } = resolveToolPackageToolsForCapabilities(pkg, capabilities)
+			return convertToolPackageToOpenAITools({ ...pkg, tools: effectiveTools })
+		})
 
 		cachedTools = tools
 		cachedKey = fullCacheKey

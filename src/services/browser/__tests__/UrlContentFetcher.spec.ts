@@ -4,12 +4,23 @@ import * as path from "path"
 
 import { UrlContentFetcher } from "../UrlContentFetcher"
 
+const hoisted = vi.hoisted(() => ({
+	fileExistsAtPath: vi.fn<Parameters<typeof import("../../../utils/fs").fileExistsAtPath>, any>(),
+	puppeteerLaunch: vi.fn(),
+}))
+
 // Mock dependencies
 vi.mock("vscode", () => ({
 	ExtensionContext: vi.fn(),
 	Uri: {
 		file: vi.fn((path) => ({ fsPath: path })),
 	},
+}))
+
+vi.mock("puppeteer-core", () => ({
+	launch: hoisted.puppeteerLaunch,
+	Browser: vi.fn(),
+	Page: vi.fn(),
 }))
 
 // Mock fs/promises
@@ -22,7 +33,7 @@ vi.mock("fs/promises", () => ({
 
 // Mock utils/fs
 vi.mock("../../../utils/fs", () => ({
-	fileExistsAtPath: vi.fn().mockResolvedValue(true),
+	fileExistsAtPath: hoisted.fileExistsAtPath,
 }))
 
 // Mock cheerio
@@ -105,6 +116,13 @@ describe("UrlContentFetcher", () => {
 			newPage: vi.fn().mockResolvedValue(mockPage),
 			close: vi.fn().mockResolvedValue(undefined),
 		}
+
+		hoisted.puppeteerLaunch.mockResolvedValue(mockBrowser)
+		hoisted.fileExistsAtPath.mockImplementation(async (p: string) => {
+			// Default: only report the puppeteer storage dir as existing. Everything else (system browser paths)
+			// should be treated as missing unless a test overrides this behavior.
+			return p === path.join("/test/storage", "puppeteer")
+		})
 
 		// Reset PCR mock
 		// @ts-ignore
@@ -193,6 +211,62 @@ describe("UrlContentFetcher", () => {
 					value: originalPlatform,
 				})
 			}
+		})
+
+		it("should use a custom executable path when provided and avoid bundled download", async () => {
+			hoisted.fileExistsAtPath.mockImplementation(async (p: string) => {
+				if (p === path.join("/test/storage", "puppeteer")) return true
+				return p === "/custom/chrome"
+			})
+
+			await urlContentFetcher.launchBrowser({
+				browserType: "custom",
+				executablePath: "/custom/chrome",
+			})
+
+			expect(vi.mocked(PCR)).not.toHaveBeenCalled()
+			expect(hoisted.puppeteerLaunch).toHaveBeenCalledWith({
+				args: expect.any(Array),
+				executablePath: "/custom/chrome",
+			})
+		})
+
+		it("auto-detects a system browser before falling back to bundled Chromium", async () => {
+			const originalPlatform = process.platform
+			const originalProgramFiles = process.env["PROGRAMFILES"]
+
+			Object.defineProperty(process, "platform", {
+				value: "win32",
+			})
+			process.env["PROGRAMFILES"] = "C:\\PF"
+
+			const edgePath = "C:\\PF\\Microsoft\\Edge\\Application\\msedge.exe"
+			hoisted.fileExistsAtPath.mockImplementation(async (p: string) => {
+				if (p === path.join("/test/storage", "puppeteer")) return true
+				return p === edgePath
+			})
+
+			try {
+				await urlContentFetcher.launchBrowser({ browserType: "auto" })
+
+				expect(vi.mocked(PCR)).not.toHaveBeenCalled()
+				expect(hoisted.puppeteerLaunch).toHaveBeenCalledWith({
+					args: expect.any(Array),
+					executablePath: edgePath,
+				})
+			} finally {
+				Object.defineProperty(process, "platform", {
+					value: originalPlatform,
+				})
+				process.env["PROGRAMFILES"] = originalProgramFiles
+			}
+		})
+
+		it("throws when a preferred system browser is requested but not found", async () => {
+			await expect(urlContentFetcher.launchBrowser({ browserType: "edge" })).rejects.toThrow(
+				"Could not find a system-installed browser for 'edge'",
+			)
+			expect(vi.mocked(PCR)).not.toHaveBeenCalled()
 		})
 
 		it("should set viewport and headers after launching", async () => {

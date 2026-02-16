@@ -181,6 +181,8 @@ declare global {
 
     function getState(): string | undefined;
 
+    function getLang(): string;
+
     // Utility objects
     const _: {
         isEmpty(value: any): boolean;

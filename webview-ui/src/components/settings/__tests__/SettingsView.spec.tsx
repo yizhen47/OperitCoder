@@ -441,6 +441,79 @@ describe("SettingsView - Sound Settings", () => {
 		)
 	})
 
+	it("renders global sandbox env section and sends setSandboxEnvVar message", async () => {
+		const { activateTab } = renderSettingsView({
+			language: "en",
+			examplePackages: [
+				{
+					name: "alpha",
+					displayName: "Alpha Package",
+					enabledByDefault: true,
+					toolCount: 1,
+					env: [{ name: "MY_API_KEY", required: true, description: { en: "API key" } }],
+					tools: [{ name: "do_thing" }],
+				},
+			],
+			sandboxEnvStatus: { MY_API_KEY: false },
+			enabledExamplePackages: [],
+			disabledExamplePackages: [],
+		})
+
+		activateTab("examplePackages")
+
+		fireEvent.click(await screen.findByTestId("sandbox-env-global-trigger"))
+		const envSection = await screen.findByTestId("sandbox-env-global")
+		const input = within(envSection).getByPlaceholderText("settings:examplePackages.envPlaceholder")
+		fireEvent.change(input, { target: { value: "secret" } })
+
+		const saveButton = within(envSection).getByRole("button", { name: "settings:examplePackages.envSave" })
+		fireEvent.click(saveButton)
+
+		expect(vscode.postMessage).toHaveBeenCalledWith(
+			expect.objectContaining({
+				type: "setSandboxEnvVar",
+				envName: "MY_API_KEY",
+				envValue: "secret",
+			}),
+		)
+	})
+
+	it("configures sandbox visit_web browser settings and persists on save", async () => {
+		const { activateTab } = renderSettingsView({
+			language: "en",
+			experiments: {},
+			visitWebBrowserType: "auto",
+			visitWebBrowserExecutablePath: "",
+		})
+
+		activateTab("experimental")
+
+		const trigger = await screen.findByTestId("visit-web-browser-trigger")
+		expect(screen.queryByTestId("visit-web-browser-content")).not.toBeInTheDocument()
+
+		fireEvent.click(trigger)
+		const content = await screen.findByTestId("visit-web-browser-content")
+
+		const dropdown = within(content).getByTestId("visit-web-browser-type")
+		fireEvent.change(dropdown, { target: { value: "custom" } })
+
+		const pathInput = within(content).getByTestId("visit-web-browser-executable-path")
+		fireEvent.change(pathInput, { target: { value: "C:\\\\Browser\\\\chrome.exe" } })
+
+		const saveButtons = screen.getAllByTestId("save-button")
+		fireEvent.click(saveButtons[0])
+
+		expect(vscode.postMessage).toHaveBeenCalledWith(
+			expect.objectContaining({
+				type: "updateSettings",
+				updatedSettings: expect.objectContaining({
+					visitWebBrowserType: "custom",
+					visitWebBrowserExecutablePath: "C:\\\\Browser\\\\chrome.exe",
+				}),
+			}),
+		)
+	})
+
 	it("initializes with tts disabled by default", () => {
 		// Render once and get the activateTab helper
 		const { activateTab } = renderSettingsView()

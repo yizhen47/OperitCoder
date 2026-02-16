@@ -114,6 +114,56 @@ exports.main = async function () {
 		expect(seen).toEqual([{ name: "write_to_file", params: { path: "a.txt", content: "x" } }])
 	})
 
+	it("getLang returns provided language or defaults to en", async () => {
+		const script = `
+exports.main = async function () {
+  return { lang: getLang() };
+}
+`
+
+		const defaultResult = await executeSandboxedTool({
+			script,
+			toolExportName: "main",
+			args: {},
+			toolCall: async () => {
+				throw new Error("toolCall should not be called")
+			},
+		})
+		expect(defaultResult).toEqual({ lang: "en" })
+
+		const zhResult = await executeSandboxedTool({
+			script,
+			toolExportName: "main",
+			args: {},
+			lang: "zh",
+			toolCall: async () => {
+				throw new Error("toolCall should not be called")
+			},
+		})
+		expect(zhResult).toEqual({ lang: "zh" })
+	})
+
+	it("getEnv/getState return undefined for empty values", async () => {
+		const script = `
+exports.main = async function () {
+  return { env: getEnv('X'), state: getState() };
+}
+`
+
+		const result = await executeSandboxedTool({
+			script,
+			toolExportName: "main",
+			args: {},
+			env: { X: "" },
+			state: "",
+			toolCall: async () => {
+				throw new Error("toolCall should not be called")
+			},
+		})
+
+		expect(result).toEqual({ env: undefined, state: undefined })
+	})
+
 	it("Tools.Files supports basic read/write/list/exists within sandbox root", async () => {
 		const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "operit-coder-sandbox-"))
 		const script = `

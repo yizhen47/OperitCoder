@@ -4,7 +4,7 @@ import * as path from "path"
 
 import { Task } from "../task/Task"
 import { BaseTool, ToolCallbacks } from "./BaseTool"
-import { scanExamplePackages } from "../tool-packages"
+import { buildDefaultSandboxCapabilities, resolveToolPackageToolsForCapabilities, scanExamplePackages } from "../tool-packages"
 import { buildExampleToolName } from "../../utils/example-tool-name"
 import { sanitizeMcpName } from "../../utils/mcp-name"
 import { getMissingRequiredSandboxEnvVars } from "../tool-packages/env-secrets"
@@ -114,9 +114,16 @@ export class ActivateSandboxPackageTool extends BaseTool<"activate_sandbox_packa
 			// Mark as activated for this task/session.
 			task.activateExamplePackage(pkg.name)
 
+			const modelInfo = task.api.getModel().info
+			const capabilities = buildDefaultSandboxCapabilities({ supportsComputerUse: (modelInfo as any)?.supportsImages === true })
+			const { activeStateId, tools: effectiveTools } = resolveToolPackageToolsForCapabilities(pkg, capabilities)
+
 			// Return tool descriptions (including tool names) so the model can call them next.
 			const lines: string[] = []
 			lines.push(`Activated sandbox package: ${pkg.name}`)
+			if (activeStateId) {
+				lines.push(`Active state: ${activeStateId}`)
+			}
 			if (pkg.description) {
 				const desc =
 					typeof pkg.description === "string" ? pkg.description : pkg.description["zh"] ?? pkg.description["en"]
@@ -140,7 +147,7 @@ export class ActivateSandboxPackageTool extends BaseTool<"activate_sandbox_packa
 			lines.push("")
 			lines.push("Tools now available (function names):")
 
-			for (const tool of pkg.tools) {
+			for (const tool of effectiveTools) {
 				const toolFullName = buildExampleToolName(pkg.name, tool.name)
 				lines.push("")
 				lines.push(`- ${toolFullName}`)

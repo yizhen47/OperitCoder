@@ -1013,6 +1013,21 @@
 		"MULTIPLE_CONCURRENT_TASKS": {
 			"name": "Multiple concurrent tasks",
 			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
+		},
+		"visitWebBrowser": {
+			"label": "Sandbox visit_web browser",
+			"description": "Controls which local browser is used for sandbox packages calling visit_web. Auto tries a system-installed browser first to avoid downloading bundled Chromium.",
+			"typeLabel": "Browser",
+			"pathLabel": "Executable path (optional)",
+			"pathPlaceholder": "Leave blank to auto-detect",
+			"types": {
+				"auto": "Auto (Recommended)",
+				"edge": "Microsoft Edge",
+				"chrome": "Google Chrome",
+				"brave": "Brave",
+				"bundled": "Bundled Chromium (download if needed)",
+				"custom": "Custom (use executable path)"
+			}
 		}
 	},
 	"promptCaching": {

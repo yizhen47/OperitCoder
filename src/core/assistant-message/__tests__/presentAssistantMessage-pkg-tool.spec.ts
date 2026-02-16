@@ -16,9 +16,13 @@ vi.mock("@roo-code/telemetry", () => ({
 	},
 }))
 
-vi.mock("../../tool-packages", () => ({
-	scanExamplePackages: vi.fn(),
-}))
+vi.mock("../../tool-packages", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("../../tool-packages")>()
+	return {
+		...actual,
+		scanExamplePackages: vi.fn(),
+	}
+})
 
 vi.mock("../../tool-packages/runtime/sandbox", () => ({
 	executeSandboxedTool: vi.fn(),
@@ -43,6 +47,9 @@ describe("presentAssistantMessage - pkg_tool_use", () => {
 			didAlreadyUseTool: false,
 			diffEnabled: false,
 			consecutiveMistakeCount: 0,
+			api: {
+				getModel: () => ({ info: { supportsImages: false } }),
+			},
 			providerRef: {
 				deref: () => ({
 					getState: vi.fn().mockResolvedValue({
@@ -56,6 +63,7 @@ describe("presentAssistantMessage - pkg_tool_use", () => {
 			ask: vi.fn().mockResolvedValue({ response: "yesButtonClicked" }),
 			checkpointSave: vi.fn().mockResolvedValue(undefined),
 			currentStreamingDidCheckpoint: false,
+			isExamplePackageActivated: vi.fn().mockReturnValue(true),
 		}
 	})
 

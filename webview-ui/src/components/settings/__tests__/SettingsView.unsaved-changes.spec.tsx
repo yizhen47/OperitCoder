@@ -344,6 +344,65 @@ describe("SettingsView - Unsaved Changes Detection", () => {
 		expect(onDone).not.toHaveBeenCalled()
 	})
 
+	it("should allow closing after discarding when parent re-checks unsaved changes", async () => {
+		const finalOnDone = vi.fn()
+		const settingsRef = React.createRef<{ checkUnsaveChanges: (then: () => void) => void }>()
+		const onDone = () => {
+			settingsRef.current?.checkUnsaveChanges(finalOnDone)
+		}
+
+		vi.mocked(ApiOptions).mockImplementation(({ setApiConfigurationField, apiConfiguration }: any) => (
+			<div data-testid="api-options">
+				<div>apiModelId: {String(apiConfiguration?.apiModelId)}</div>
+				<button onClick={() => setApiConfigurationField("apiModelId", "changed", true)}>Change</button>
+			</div>
+		))
+
+		render(
+			<QueryClientProvider client={queryClient}>
+				<SettingsView ref={settingsRef as any} onDone={onDone} editingProfile="Config 1" />
+			</QueryClientProvider>,
+		)
+
+		await waitFor(() => {
+			expect(screen.getByTestId("api-options")).toBeInTheDocument()
+		})
+		// Allow effects to run and the message listener to re-bind after editingProfile sets editingApiConfigName.
+		await new Promise((resolve) => setTimeout(resolve, 0))
+
+		window.dispatchEvent(
+			new MessageEvent("message", {
+				data: {
+					type: "profileConfigurationForEditing",
+					text: "Config 1",
+					apiConfiguration: {
+						apiProvider: "openai",
+						apiModelId: "editing",
+					},
+				},
+			}),
+		)
+
+		await waitFor(() => {
+			expect(screen.getByText("apiModelId: editing")).toBeInTheDocument()
+		})
+
+		fireEvent.click(screen.getByText("Change"))
+		await waitFor(() => {
+			expect(screen.getByText("apiModelId: changed")).toBeInTheDocument()
+		})
+
+		fireEvent.click(screen.getByText("settings:common.done"))
+		fireEvent.click(screen.getByText("settings:unsavedChangesDialog.discardButton"))
+
+		await waitFor(() => {
+			expect(finalOnDone).toHaveBeenCalledTimes(1)
+		})
+		await waitFor(() => {
+			expect(screen.getByText("apiModelId: editing")).toBeInTheDocument()
+		})
+	})
+
 	// TODO: Fix underlying issue - see above
 	it.skip("should handle initialization from undefined to value without triggering unsaved changes", async () => {
 		const onDone = vi.fn()

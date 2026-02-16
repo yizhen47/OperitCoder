@@ -969,6 +969,21 @@
 			"name": "Multiple concurrent tasks",
 			"description": "When enabled, starting a new top-level task no longer auto-cancels the current one, allowing multiple tasks to run concurrently."
 		},
+		"visitWebBrowser": {
+			"label": "沙盒 visit_web 瀏覽器",
+			"description": "控制沙盒包呼叫 visit_web 時使用的本機瀏覽器。自動會優先使用系統已安裝的瀏覽器，避免下載內建 Chromium。",
+			"typeLabel": "瀏覽器",
+			"pathLabel": "可執行檔路徑（選填）",
+			"pathPlaceholder": "留空將自動偵測",
+			"types": {
+				"auto": "自動（推薦）",
+				"edge": "Microsoft Edge",
+				"chrome": "Google Chrome",
+				"brave": "Brave",
+				"bundled": "內建 Chromium（需要時下載）",
+				"custom": "自訂（使用路徑）"
+			}
+		},
 		"SPEECH_TO_TEXT": {
 			"name": "语音转文本 (STT)",
 			"description": "启用后，Operit Coder 可以使用 OpenAI 的 Whisper 模型将您的语音转录为文本。点击聊天中的麦克风按钮开始录音。需要安装 FFmpeg 并配置 OpenAI API 提供商。"

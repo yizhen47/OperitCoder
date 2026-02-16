@@ -91,6 +91,7 @@ export async function buildNativeToolsArray(options: BuildToolsOptions): Promise
 		enabledExamplePackages: options.state?.enabledExamplePackages,
 		disabledExamplePackages: options.state?.disabledExamplePackages,
 		activatedExamplePackages: options.activatedExamplePackages,
+		capabilities: { ui: { virtual_display: (modelInfo as any)?.supportsImages === true } },
 	})
 	const filteredExampleTools = filterExampleToolsForMode(toggledExampleTools, mode, customModes, experiments)
 	// kilocode_change end

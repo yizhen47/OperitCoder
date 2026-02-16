@@ -13,6 +13,13 @@ import { serializeError } from "serialize-error"
 const URL_FETCH_TIMEOUT = 30_000 // 30 seconds
 const URL_FETCH_FALLBACK_TIMEOUT = 20_000 // 20 seconds for fallback
 
+type VisitWebBrowserType = "auto" | "bundled" | "edge" | "chrome" | "brave" | "custom"
+
+export interface VisitWebBrowserLaunchOptions {
+	browserType?: VisitWebBrowserType
+	executablePath?: string
+}
+
 interface PCRStats {
 	puppeteer: { launch: typeof launch }
 	executablePath: string
@@ -45,11 +52,112 @@ export class UrlContentFetcher {
 		return stats
 	}
 
-	async launchBrowser(): Promise<void> {
+	private async detectSystemBrowserExecutablePath(
+		browserType: Exclude<VisitWebBrowserType, "auto" | "bundled" | "custom">,
+	): Promise<string | undefined> {
+		const candidates: string[] = []
+
+		if (process.platform === "win32") {
+			const programFiles = process.env["PROGRAMFILES"]
+			const programFilesX86 = process.env["PROGRAMFILES(X86)"]
+			const localAppData = process.env["LOCALAPPDATA"]
+
+			const roots = [programFiles, programFilesX86, localAppData].filter(Boolean) as string[]
+
+			for (const root of roots) {
+				if (browserType === "edge") {
+					candidates.push(
+						path.join(root, "Microsoft", "Edge", "Application", "msedge.exe"),
+						path.join(root, "Microsoft", "Edge SxS", "Application", "msedge.exe"),
+					)
+				} else if (browserType === "chrome") {
+					candidates.push(path.join(root, "Google", "Chrome", "Application", "chrome.exe"))
+				} else if (browserType === "brave") {
+					candidates.push(path.join(root, "BraveSoftware", "Brave-Browser", "Application", "brave.exe"))
+				}
+			}
+		} else if (process.platform === "darwin") {
+			if (browserType === "edge") {
+				candidates.push(
+					"/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+					"/Applications/Microsoft Edge Canary.app/Contents/MacOS/Microsoft Edge Canary",
+				)
+			} else if (browserType === "chrome") {
+				candidates.push(
+					"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+					"/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
+				)
+			} else if (browserType === "brave") {
+				candidates.push("/Applications/Brave Browser.app/Contents/MacOS/Brave Browser")
+			}
+		} else {
+			// linux and others
+			if (browserType === "edge") {
+				candidates.push("/usr/bin/microsoft-edge", "/usr/bin/microsoft-edge-stable")
+			} else if (browserType === "chrome") {
+				candidates.push("/usr/bin/google-chrome", "/usr/bin/google-chrome-stable")
+			} else if (browserType === "brave") {
+				candidates.push("/usr/bin/brave-browser", "/usr/bin/brave")
+			}
+		}
+
+		for (const candidate of candidates) {
+			if (await fileExistsAtPath(candidate)) {
+				return candidate
+			}
+		}
+		return undefined
+	}
+
+	private async resolveExecutablePath(
+		options?: VisitWebBrowserLaunchOptions,
+	): Promise<{ executablePath: string; launchFn: typeof launch }> {
+		const browserType = (options?.browserType ?? "auto") as VisitWebBrowserType
+		const configuredPath = String(options?.executablePath ?? "").trim()
+
+		if (configuredPath) {
+			if (!(await fileExistsAtPath(configuredPath))) {
+				throw new Error(`Browser executable not found at path: ${configuredPath}`)
+			}
+			return { executablePath: configuredPath, launchFn: launch }
+		}
+
+		if (browserType === "custom") {
+			throw new Error("Custom browser requires visitWebBrowserExecutablePath to be set")
+		}
+
+		if (browserType === "bundled") {
+			const stats = await this.ensureChromiumExists()
+			return { executablePath: stats.executablePath, launchFn: stats.puppeteer.launch }
+		}
+
+		const preferred: Array<Exclude<VisitWebBrowserType, "auto" | "bundled" | "custom">> =
+			browserType === "auto" ? ["edge", "chrome", "brave"] : [browserType]
+
+		for (const candidateType of preferred) {
+			const candidatePath = await this.detectSystemBrowserExecutablePath(candidateType)
+			if (candidatePath) {
+				return { executablePath: candidatePath, launchFn: launch }
+			}
+		}
+
+		// Fallback: auto can download bundled Chromium when no system browser is found.
+		if (browserType === "auto") {
+			const stats = await this.ensureChromiumExists()
+			return { executablePath: stats.executablePath, launchFn: stats.puppeteer.launch }
+		}
+
+		throw new Error(
+			`Could not find a system-installed browser for '${browserType}'. Set visitWebBrowserExecutablePath or switch to 'bundled'.`,
+		)
+	}
+
+	async launchBrowser(options?: VisitWebBrowserLaunchOptions): Promise<void> {
 		if (this.browser) {
 			return
 		}
-		const stats = await this.ensureChromiumExists()
+
+		const { executablePath, launchFn } = await this.resolveExecutablePath(options)
 		const args = [
 			"--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
 			"--disable-dev-shm-usage",
@@ -62,9 +170,9 @@ export class UrlContentFetcher {
 			// Fixes network errors on Linux hosts (see https://github.com/puppeteer/puppeteer/issues/8246)
 			args.push("--no-sandbox")
 		}
-		this.browser = await stats.puppeteer.launch({
+		this.browser = await launchFn({
 			args,
-			executablePath: stats.executablePath,
+			executablePath,
 		})
 		// (latest version of puppeteer does not add headless to user agent)
 		this.page = await this.browser?.newPage()

@@ -34,7 +34,7 @@ describe("sandbox package toggles", () => {
 
 	it("getExamplePackageToolsWithToggleLists honors enabledByDefault and enabled/disabled overrides", async () => {
 		const mocked = vi.mocked(scanExamplePackages)
-		mocked.mockResolvedValueOnce([
+		mocked.mockResolvedValue([
 			pkg("alpha", true, ["t1"]),
 			pkg("beta", false, ["t2"]),
 			pkg("gamma", true, ["t3"]),

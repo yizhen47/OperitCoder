@@ -138,7 +138,12 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 	const { currentApiConfigName, listApiConfigMeta, uriScheme, settingsImportedAt } = extensionState
 
 	const [isDiscardDialogShow, setDiscardDialogShow] = useState(false)
-	const [isChangeDetected, setChangeDetected] = useState(false)
+	const [isChangeDetected, setChangeDetectedState] = useState(false)
+	const isChangeDetectedRef = useRef(false)
+	const setChangeDetected = useCallback((next: boolean) => {
+		isChangeDetectedRef.current = next
+		setChangeDetectedState(next)
+	}, [])
 	const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
 	const [sandboxEnvInputs, setSandboxEnvInputs] = useState<Record<string, string>>({})
 	const [activeTab, setActiveTab] = useState<SectionName>(
@@ -158,6 +163,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 	const confirmDialogHandler = useRef<() => void>()
 
 	const [cachedState, setCachedState] = useState(() => extensionState)
+	const cachedStateBaselineRef = useRef<ExtensionStateContextType>(extensionState)
 
 	// kilocode_change begin
 	useEffect(() => {
@@ -254,6 +260,8 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		includeCurrentTime,
 		includeCurrentCost,
 		maxGitStatusFiles,
+		visitWebBrowserType,
+		visitWebBrowserExecutablePath,
 	} = cachedState
 
 	const apiConfiguration = useMemo(() => cachedState.apiConfiguration ?? {}, [cachedState.apiConfiguration])
@@ -300,7 +308,11 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			return
 		}
 
-		setCachedState((prevCachedState) => ({ ...prevCachedState, ...extensionState }))
+		setCachedState((prevCachedState) => {
+			const nextState = { ...prevCachedState, ...extensionState }
+			cachedStateBaselineRef.current = nextState
+			return nextState
+		})
 		prevApiConfigName.current = currentApiConfigName
 		setChangeDetected(false)
 		// kilocode_change start - Don't reset editingApiConfigName if we have an editingProfile prop (from auth return)
@@ -332,10 +344,14 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			const message = event.data
 			if (message.type === "profileConfigurationForEditing" && message.text === editingApiConfigName) {
 				// Update cached state with the editing profile's configuration
-				setCachedState((prevState) => ({
-					...prevState,
-					apiConfiguration: message.apiConfiguration,
-				}))
+				setCachedState((prevState) => {
+					const nextState = {
+						...prevState,
+						apiConfiguration: message.apiConfiguration,
+					}
+					cachedStateBaselineRef.current = nextState
+					return nextState
+				})
 				setChangeDetected(false)
 				isLoadingProfileForEditing.current = false
 			}
@@ -360,6 +376,15 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 				requestyApiKey,
 			},
 		}))
+		cachedStateBaselineRef.current = {
+			...cachedStateBaselineRef.current,
+			apiConfiguration: {
+				...(cachedStateBaselineRef.current.apiConfiguration ?? {}),
+				openRouterApiKey,
+				glamaApiKey,
+				requestyApiKey,
+			},
+		}
 	}, [openRouterApiKey, glamaApiKey, requestyApiKey])
 
 	useEffect(() => {
@@ -373,13 +398,21 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			if (editingApiConfigName !== currentApiConfigName) {
 				// Sync everything except apiConfiguration
 				const { apiConfiguration: _, ...restOfExtensionState } = extensionState
-				setCachedState((prevState) => ({
-					...prevState,
-					...restOfExtensionState,
-				}))
+				setCachedState((prevState) => {
+					const nextState = {
+						...prevState,
+						...restOfExtensionState,
+					}
+					cachedStateBaselineRef.current = nextState
+					return nextState
+				})
 			} else {
 				// When editing the active profile, sync everything including apiConfiguration
-				setCachedState((prevState) => ({ ...prevState, ...extensionState }))
+				setCachedState((prevState) => {
+					const nextState = { ...prevState, ...extensionState }
+					cachedStateBaselineRef.current = nextState
+					return nextState
+				})
 			}
 		}
 	}, [extensionState, isChangeDetected, editingApiConfigName, currentApiConfigName])
@@ -388,7 +421,11 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 	// Bust the cache when settings are imported.
 	useEffect(() => {
 		if (settingsImportedAt) {
-			setCachedState((prevCachedState) => ({ ...prevCachedState, ...extensionState }))
+			setCachedState((prevCachedState) => {
+				const nextState = { ...prevCachedState, ...extensionState }
+				cachedStateBaselineRef.current = nextState
+				return nextState
+			})
 			setChangeDetected(false)
 		}
 	}, [settingsImportedAt, extensionState])
@@ -589,6 +626,8 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 					imageGenerationProvider,
 					openRouterImageApiKey,
 					openRouterImageGenerationSelectedModel,
+					visitWebBrowserType: visitWebBrowserType ?? "auto",
+					visitWebBrowserExecutablePath: visitWebBrowserExecutablePath ?? "",
 					experiments,
 					customSupportPrompts,
 				},
@@ -636,13 +675,21 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			if (editingApiConfigName !== currentApiConfigName) {
 				// Only sync non-apiConfiguration fields from extensionState
 				const { apiConfiguration: _, ...restOfExtensionState } = extensionState
-				setCachedState((prevState) => ({
-					...prevState,
-					...restOfExtensionState,
-				}))
+				setCachedState((prevState) => {
+					const nextState = {
+						...prevState,
+						...restOfExtensionState,
+					}
+					cachedStateBaselineRef.current = nextState
+					return nextState
+				})
 			} else {
 				// When editing the active profile, sync everything including apiConfiguration
-				setCachedState((prevState) => ({ ...prevState, ...extensionState }))
+				setCachedState((prevState) => {
+					const nextState = { ...prevState, ...extensionState }
+					cachedStateBaselineRef.current = nextState
+					return nextState
+				})
 			}
 			// kilocode_change end
 			setChangeDetected(false)
@@ -651,14 +698,14 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 
 	const checkUnsaveChanges = useCallback(
 		(then: () => void) => {
-			if (isChangeDetected) {
+			if (isChangeDetectedRef.current) {
 				confirmDialogHandler.current = then
 				setDiscardDialogShow(true)
 			} else {
 				then()
 			}
 		},
-		[isChangeDetected],
+		[],
 	)
 
 	useImperativeHandle(ref, () => ({ checkUnsaveChanges }), [checkUnsaveChanges])
@@ -666,15 +713,18 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 	// kilocode_change start
 	const onConfirmDialogResult = useCallback(
 		(confirm: boolean) => {
+			setDiscardDialogShow(false)
 			if (confirm) {
 				// Discard changes: Reset state and flag
-				setCachedState(extensionState) // Revert to original state
+				setCachedState(cachedStateBaselineRef.current) // Revert to last known clean state (including editing profile)
 				setChangeDetected(false) // Reset change flag
-				confirmDialogHandler.current?.() // Execute the pending action (e.g., tab switch)
+				const handler = confirmDialogHandler.current
+				confirmDialogHandler.current = undefined
+				queueMicrotask(() => handler?.()) // Execute the pending action (e.g., tab switch)
 			}
 			// If confirm is false (Cancel), do nothing, dialog closes automatically
 		},
-		[setCachedState, setChangeDetected, extensionState], // Depend on extensionState to get the latest original state
+		[setCachedState, setChangeDetected],
 	)
 
 	// From time to time there's a bug that triggers unsaved changes upon rendering the SettingsView
@@ -1097,7 +1147,154 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 								{(extensionState.examplePackages ?? []).length === 0 ? (
 									<div className="text-vscode-descriptionForeground">{t("settings:examplePackages.empty")}</div>
 								) : (
-									<div className="flex flex-col gap-2">
+									<div className="flex flex-col gap-3">
+										{(() => {
+											const packages = extensionState.examplePackages ?? []
+											const isPackageEnabled = (pkg: any) => {
+												const enabledByDefault = Boolean(pkg?.enabledByDefault)
+												const name = String(pkg?.name ?? "")
+												const isEnabledOverride = (extensionState.enabledExamplePackages ?? []).includes(name)
+												const isDisabled = (extensionState.disabledExamplePackages ?? []).includes(name)
+												return isEnabledOverride || (enabledByDefault && !isDisabled)
+											}
+
+											const enabledPackages = packages.filter(isPackageEnabled)
+											const envByName = new Map<string, { name: string; description: any; required: boolean }>()
+
+											for (const pkg of enabledPackages) {
+												for (const env of pkg.env ?? []) {
+													const name = String(env?.name ?? "").trim()
+													if (!name) continue
+
+													const existing = envByName.get(name)
+													const isRequired = env.required !== false
+													if (!existing) {
+														envByName.set(name, { name, description: env.description, required: isRequired })
+														continue
+													}
+
+													const existingDesc = getLocalizedText(existing.description)
+													const nextDesc = getLocalizedText(env.description)
+													envByName.set(name, {
+														name,
+														description: existingDesc ? existing.description : env.description,
+														required: existing.required || isRequired,
+													})
+													// If we didn't have a description but this env does, take it.
+													if (!existingDesc && nextDesc) {
+														envByName.set(name, {
+															name,
+															description: env.description,
+															required: existing.required || isRequired,
+														})
+													}
+												}
+											}
+
+											const globalEnvVars = Array.from(envByName.values()).sort((a, b) => a.name.localeCompare(b.name))
+											if (globalEnvVars.length === 0) {
+												return null
+											}
+
+											return (
+												<Collapsible defaultOpen={false}>
+													<div className="rounded border border-vscode-panel-border bg-vscode-editor-background">
+														<div className="flex items-center justify-between gap-3 px-3 py-2">
+															<CollapsibleTrigger asChild>
+																<button
+																	type="button"
+																	data-testid="sandbox-env-global-trigger"
+																	className="text-vscode-foreground text-sm text-left w-full">
+																	{t("settings:examplePackages.envLabel")}
+																</button>
+															</CollapsibleTrigger>
+														</div>
+
+														<CollapsibleContent>
+															<div className="border-t border-vscode-panel-border px-3 py-2" data-testid="sandbox-env-global">
+																<div className="flex flex-col gap-2">
+																	{globalEnvVars.map((env) => {
+																		const envName = env.name
+																		const envDesc = getLocalizedText(env.description)
+																		const isRequired = env.required !== false
+																		const isConfigured = Boolean(extensionState.sandboxEnvStatus?.[envName])
+																		const inputKey = `__global__::${envName}`
+																		const inputValue = sandboxEnvInputs[inputKey] ?? ""
+
+																		return (
+																			<div
+																				key={envName}
+																				className="rounded border border-vscode-panel-border px-2 py-2">
+																				<div className="flex items-start justify-between gap-2">
+																					<div className="min-w-0 flex-1">
+																						<div className="text-vscode-foreground text-sm font-mono truncate">{envName}</div>
+																						<div className="text-vscode-descriptionForeground text-xs">
+																							{envDesc
+																								? envDesc
+																								: isRequired
+																									? t("settings:examplePackages.envRequired")
+																									: t("settings:examplePackages.envOptional")}
+																						</div>
+																					</div>
+																					<div
+																						className={cn(
+																							"shrink-0 text-xs px-2 py-0.5 rounded border",
+																							isConfigured
+																								? "border-[var(--vscode-testing-iconPassed)] bg-[var(--vscode-testing-iconPassed)] text-vscode-editor-background"
+																								: "border-[var(--vscode-testing-iconFailed)] bg-[var(--vscode-testing-iconFailed)] text-vscode-editor-background",
+																						)}>
+																						{isConfigured
+																							? t("settings:examplePackages.envConfigured")
+																							: t("settings:examplePackages.envMissing")}
+																					</div>
+																				</div>
+
+																				<div className="mt-2 flex items-center gap-2">
+																					<input
+																						type="password"
+																						value={inputValue}
+																						placeholder={t("settings:examplePackages.envPlaceholder")}
+																						className="flex-1 min-w-0 rounded border border-vscode-input-border bg-vscode-input-background px-2 py-1 text-vscode-input-foreground text-sm"
+																						onChange={(e) => {
+																							const next = e.currentTarget.value
+																							setSandboxEnvInputs((prev) => ({ ...prev, [inputKey]: next }))
+																						}}
+																					/>
+																					<Button
+																						variant="secondary"
+																						disabled={!inputValue}
+																						onClick={() => {
+																							vscode.postMessage({
+																								type: "setSandboxEnvVar",
+																								envName: envName,
+																								envValue: inputValue,
+																							})
+																							setSandboxEnvInputs((prev) => ({ ...prev, [inputKey]: "" }))
+																						}}>
+																						{t("settings:examplePackages.envSave")}
+																					</Button>
+																					<Button
+																						variant="secondary"
+																						onClick={() => {
+																							vscode.postMessage({
+																								type: "deleteSandboxEnvVar",
+																								envName: envName,
+																							})
+																							setSandboxEnvInputs((prev) => ({ ...prev, [inputKey]: "" }))
+																						}}>
+																						{t("settings:examplePackages.envClear")}
+																					</Button>
+																				</div>
+																			</div>
+																		)
+																	})}
+																</div>
+															</div>
+														</CollapsibleContent>
+													</div>
+												</Collapsible>
+											)
+										})()}
 										{(extensionState.examplePackages ?? []).map((pkg) => {
 											const enabledByDefault = Boolean(pkg.enabledByDefault)
 											const isEnabledOverride = (extensionState.enabledExamplePackages ?? []).includes(pkg.name)
@@ -1105,7 +1302,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 											const enabled = isEnabledOverride || (enabledByDefault && !isDisabled)
 											const displayName = pkg.displayName || pkg.name
 											const desc = getLocalizedText(pkg.description)
-											const envVars = pkg.env ?? []
+											const envVars = enabled ? (pkg.env ?? []) : []
 
 											return (
 												<Collapsible key={pkg.name}>
@@ -1381,6 +1578,8 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 							morphApiKey={morphApiKey}
 							fastApplyModel={fastApplyModel}
 							fastApplyApiProvider={fastApplyApiProvider}
+							visitWebBrowserType={visitWebBrowserType}
+							visitWebBrowserExecutablePath={visitWebBrowserExecutablePath}
 							// kilocode_change end
 							apiConfiguration={apiConfiguration}
 							setApiConfigurationField={setApiConfigurationField}

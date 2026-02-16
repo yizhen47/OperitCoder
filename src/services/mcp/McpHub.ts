@@ -81,12 +81,7 @@ const mixedFieldsErrorMessage =
 const missingFieldsErrorMessage =
 	"Server configuration must include either 'command' (for stdio) or 'url' (for sse/streamable-http) and a corresponding 'type' if 'url' is used."
 
-const BUILTIN_MCP_SERVERS: Record<string, z.input<typeof ServerConfigSchema>> = {
-	playwright: {
-		command: "npx",
-		args: ["@playwright/mcp@latest"],
-	},
-}
+const BUILTIN_MCP_SERVERS: Record<string, z.input<typeof ServerConfigSchema>> = {}
 
 // Helper function to create a refined schema with better error messages
 const createServerTypeSchema = () => {

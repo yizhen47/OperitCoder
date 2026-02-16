@@ -211,6 +211,18 @@ export const globalSettingsSchema = z.object({
 	// Example package (sandbox) tool packs
 	enabledExamplePackages: z.array(z.string()).optional(),
 	disabledExamplePackages: z.array(z.string()).optional(),
+	/**
+	 * Browser selection for sandbox `visit_web` tool.
+	 * - "auto": try to use a system-installed browser first (Edge/Chrome/etc), fallback to bundled Chromium.
+	 * - "bundled": always use bundled Chromium (may download on first use).
+	 * - "edge"/"chrome"/"brave": prefer that browser; errors if not found unless `visitWebBrowserExecutablePath` is set.
+	 * - "custom": requires `visitWebBrowserExecutablePath`.
+	 */
+	visitWebBrowserType: z.enum(["auto", "bundled", "edge", "chrome", "brave", "custom"]).optional(),
+	/**
+	 * Optional executable path for sandbox `visit_web` browser (overrides auto-detect).
+	 */
+	visitWebBrowserExecutablePath: z.string().optional(),
 	// kilocode_change end
 
 	mode: z.string().optional(),

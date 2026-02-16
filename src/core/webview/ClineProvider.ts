@@ -55,7 +55,7 @@ import { Mode, defaultModeSlug, getGroupName, getModeBySlug } from "../../shared
 import { EXPERIMENT_IDS, experimentDefault, experiments as experimentsRegistry } from "../../shared/experiments" // kilocode_change
 import { formatLanguage } from "../../shared/language"
 // kilocode_change start
-import { scanExamplePackages } from "../tool-packages"
+import { buildDefaultSandboxCapabilities, resolveToolPackageToolsForCapabilities, scanExamplePackages } from "../tool-packages"
 import { sanitizeMcpName } from "../../utils/mcp-name"
 import { getSandboxEnvStatus } from "../tool-packages/env-secrets"
 // kilocode_change end
@@ -2713,9 +2713,20 @@ ${prompt}
 			// kilocode_change start
 			enabledExamplePackages: stateValues.enabledExamplePackages ?? [],
 			disabledExamplePackages: stateValues.disabledExamplePackages ?? [],
+			visitWebBrowserType: stateValues.visitWebBrowserType ?? "auto",
+			visitWebBrowserExecutablePath: stateValues.visitWebBrowserExecutablePath,
 			examplePackages: await (async () => {
 				if (!this.examplePackagesCache) {
 					try {
+						const supportsComputerUse = (() => {
+							const currentTask = this.getCurrentTask()
+							if (currentTask) {
+								return (currentTask.api.getModel().info as any)?.supportsImages === true
+							}
+							return false
+						})()
+						const capabilities = buildDefaultSandboxCapabilities({ supportsComputerUse })
+
 						const primaryExamplesDir = path.join(this.context.extensionPath, "dist", "examples")
 						const isDevExtensionLayout = path.basename(this.context.extensionPath).toLowerCase() === "src"
 						const fallbackExamplesDir = isDevExtensionLayout
@@ -2725,13 +2736,15 @@ ${prompt}
 						if (packages.length === 0) {
 							packages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })
 						}
-						this.examplePackagesCache = packages.map((p) => ({
-							name: sanitizeMcpName(p.name),
-							displayName: p.name,
-							enabledByDefault: p.enabledByDefault ?? false,
-							toolCount: p.tools.length,
-							description: p.description,
-							tools: p.tools.map((t) => ({
+						this.examplePackagesCache = packages.map((p) => {
+							const { tools: effectiveTools } = resolveToolPackageToolsForCapabilities(p, capabilities)
+							return ({
+								name: sanitizeMcpName(p.name),
+								displayName: p.name,
+								enabledByDefault: p.enabledByDefault ?? false,
+								toolCount: effectiveTools.length,
+								description: p.description,
+								tools: effectiveTools.map((t) => ({
 								name: t.name,
 								description: t.description,
 								parameters: (t.parameters ?? []).map((param) => ({
@@ -2740,14 +2753,15 @@ ${prompt}
 									required: param.required,
 									description: param.description,
 								})),
-							})),
-							env: (p.env ?? []).map((e) => ({
+								})),
+								env: (p.env ?? []).map((e) => ({
 								name: e.name,
 								description: e.description,
 								required: e.required,
 								defaultValue: e.defaultValue ?? null,
-							})),
-						}))
+								})),
+							})
+						})
 					} catch (error) {
 						this.examplePackagesCache = []
 					}
