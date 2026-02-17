@@ -33,7 +33,6 @@
 - **任务自动化**：自动执行重复性编码流程（含终端、浏览器等）
 - **多模式协作**：规划（Architect）/编码（Coder）/调试（Debugger）+ 自定义模式
 - **MCP 扩展**：通过 MCP 服务器扩展代理能力
-- **内置 Playwright MCP**：基于 https://github.com/microsoft/playwright-mcp，可打开 Chrome/Edge，AI 可指定浏览器；权限需在 设置 > MCP 中开启
 - **自带安全边界**：关键操作需要明确授权（可配置允许/拒绝规则）
 
 ## Practical changes in this fork
@@ -150,6 +149,15 @@ If you like VS Code, or you used closed-source AI code editors before and now ha
 
 ## Changelog (English)
 
+### 0.1.1
+
+- **Sandbox packages: states**: support `states/condition` in package METADATA to dynamically select/merge tools by state, and pass the active state into the sandbox runtime (`getState()`).
+- **Sandbox runtime helpers**: expose `getEnv(name)` / `getLang()` for scripts (aligned with Operit-style helpers).
+- **Sandbox env UX**: add a unified, collapsible env configuration section in Settings → Sandbox Packages; only show env fields for enabled packages.
+- **Sandbox visit_web uses a real browser**: allow sandbox packages to call `visit_web` and fetch page content via local browser automation.
+- **Configurable visit_web browser**: in Settings → Experimental, choose browser type and/or executable path (auto-detect to avoid downloading bundled Chromium).
+- **MCP preset cleanup**: remove the built-in Playwright MCP preset (now fully opt-in via MCP settings/marketplace).
+
 ### 0.0.1 - 0.1.0 Summary
 
 - **Concurrency & tabs**: multi-chat/task support, tab highlight polish, tab close fixes.
@@ -176,6 +184,15 @@ If you like VS Code, or you used closed-source AI code editors before and now ha
 ## 更新日志
 
 [Jump to English changelog](#changelog-english)
+
+### 0.1.1
+
+- **沙盒包状态（states）**：支持在包的 METADATA 里通过 `states/condition` 按 state 动态选择/合并工具，并将当前 state 注入运行时（`getState()`）。
+- **沙盒运行时辅助函数**：为脚本暴露 `getEnv(name)` / `getLang()` 等函数（与 Operit 风格对齐）。
+- **沙盒环境变量配置体验**：在 设置 → Sandbox Packages 提供统一的、默认折叠的 env 配置区；并且仅对已启用的包展示对应的 env 输入框。
+- **沙盒 visit_web 真实浏览器**：沙盒包可调用 `visit_web`，通过本机浏览器自动化抓取网页内容。
+- **visit_web 浏览器可配置**：在 设置 → 实验性 中指定浏览器类型与/或可执行路径（支持自动检测，避免下载内置 Chromium）。
+- **MCP 预置清理**：移除内置 Playwright MCP 预置（改为完全按需启用/安装）。
 
 ### 0.0.1 - 0.1.0 更新摘要
 
