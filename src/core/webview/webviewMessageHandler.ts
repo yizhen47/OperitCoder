@@ -878,6 +878,32 @@ export const webviewMessageHandler = async (
 			await provider.postStateToWebview()
 			break
 		}
+
+		case "openToolPkgUiModule": {
+			const toolPkgId = String(message.toolPkgId ?? "").trim()
+			const uiModuleId = String(message.uiModuleId ?? "").trim()
+			if (!toolPkgId || !uiModuleId) {
+				break
+			}
+			await provider.openToolPkgUiModule(toolPkgId, uiModuleId)
+			break
+		}
+
+		case "toolPkgUiInvokeAction": {
+			const sessionId = String(message.sessionId ?? "").trim()
+			const actionId = String(message.actionId ?? "").trim()
+			if (!sessionId || !actionId) {
+				break
+			}
+			await provider.invokeToolPkgUiAction(sessionId, actionId, message.toolPkgPayload)
+			break
+		}
+
+		case "closeToolPkgUiModule": {
+			const sessionId = String(message.sessionId ?? "").trim()
+			await provider.closeToolPkgUiModule(sessionId || undefined)
+			break
+		}
 		// kilocode_change end
 		case "exportTaskWithId":
 			provider.exportTaskWithId(message.text!)

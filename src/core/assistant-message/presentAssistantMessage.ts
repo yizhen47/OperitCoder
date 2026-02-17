@@ -886,7 +886,10 @@ async function handlePkgToolUse(cline: Task, pkgBlock: ExampleToolUse): Promise<
 		}
 
 		const primaryExamplesDir = path.join(extensionPath, "dist", "examples")
-		const fallbackExamplesDir = path.join(extensionPath, "src", "examples")
+		const isDevExtensionLayout = path.basename(extensionPath).toLowerCase() === "src"
+		const fallbackExamplesDir = isDevExtensionLayout
+			? path.join(extensionPath, "examples")
+			: path.join(extensionPath, "src", "examples")
 		let packages = await scanExamplePackages({ examplesDir: primaryExamplesDir })
 		if (packages.length === 0) {
 			packages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })

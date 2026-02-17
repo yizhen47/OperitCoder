@@ -78,6 +78,7 @@ import { ContextManagementSettings } from "./ContextManagementSettings"
 import { TerminalSettings } from "./TerminalSettings"
 import { ExperimentalSettings } from "./ExperimentalSettings"
 import { LanguageSettings } from "./LanguageSettings"
+import { ComposeDslRenderer, type ComposeDslNode } from "@src/components/toolpkg/ComposeDslRenderer"
 import { About } from "./About"
 import { Section } from "./Section"
 import PromptsSettings from "./PromptsSettings"
@@ -1144,6 +1145,53 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 							</SectionHeader>
 
 							<Section>
+								{(extensionState.toolPkgUiModules ?? []).length > 0 ? (
+									<Collapsible defaultOpen={false}>
+										<div className="rounded border border-vscode-panel-border bg-vscode-editor-background">
+											<div className="flex items-center justify-between gap-3 px-3 py-2">
+												<CollapsibleTrigger asChild>
+													<button type="button" className="text-vscode-foreground text-sm text-left w-full">
+														ToolPkg UI
+													</button>
+												</CollapsibleTrigger>
+											</div>
+
+											<CollapsibleContent>
+												<div className="border-t border-vscode-panel-border px-3 py-2 flex flex-col gap-2">
+													{(extensionState.toolPkgUiModules ?? []).map((m) => {
+														const title = getLocalizedText(m.title) ?? `${m.toolPkgId}:${m.uiModuleId}`
+														const desc = getLocalizedText(m.description)
+														return (
+															<div key={`${m.toolPkgId}:${m.uiModuleId}`} className="rounded border border-vscode-panel-border px-2 py-2">
+																<div className="flex items-center justify-between gap-2">
+																	<div className="flex flex-col gap-0.5">
+																		<div className="text-vscode-foreground text-sm">{title}</div>
+																		<div className="text-vscode-descriptionForeground font-mono text-xs">
+																			{m.toolPkgId}:{m.uiModuleId}
+																		</div>
+																	</div>
+																	<Button
+																		variant="secondary"
+																		onClick={() => {
+																			vscode.postMessage({
+																				type: "openToolPkgUiModule",
+																				toolPkgId: m.toolPkgId,
+																				uiModuleId: m.uiModuleId,
+																			})
+																		}}>
+																		Open
+																	</Button>
+																</div>
+																{desc ? <div className="mt-2 text-vscode-descriptionForeground text-sm">{desc}</div> : null}
+															</div>
+														)
+													})}
+												</div>
+											</CollapsibleContent>
+										</div>
+									</Collapsible>
+								) : null}
+
 								{(extensionState.examplePackages ?? []).length === 0 ? (
 									<div className="text-vscode-descriptionForeground">{t("settings:examplePackages.empty")}</div>
 								) : (
@@ -1480,6 +1528,50 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 									</div>
 								)}
 							</Section>
+
+							{extensionState.toolPkgUiSession ? (
+								<div className="fixed inset-0 z-50 bg-vscode-editor-background/80 backdrop-blur-sm">
+									<div className="absolute inset-0 p-4 overflow-auto">
+										<div className="mx-auto max-w-3xl rounded border border-vscode-panel-border bg-vscode-editor-background">
+											<div className="flex items-center justify-between gap-2 border-b border-vscode-panel-border px-3 py-2">
+												<div className="text-vscode-foreground text-sm">{extensionState.toolPkgUiSession.title}</div>
+												<div className="flex items-center gap-2">
+													<Button
+														variant="secondary"
+														onClick={() => {
+															vscode.postMessage({
+																type: "closeToolPkgUiModule",
+																sessionId: extensionState.toolPkgUiSession?.sessionId,
+															})
+														}}>
+														Close
+													</Button>
+												</div>
+											</div>
+
+											<div className="p-4">
+												{extensionState.toolPkgUiSession.error ? (
+													<div className="text-vscode-errorForeground text-sm">{extensionState.toolPkgUiSession.error}</div>
+												) : extensionState.toolPkgUiSession.tree ? (
+													<ComposeDslRenderer
+														tree={extensionState.toolPkgUiSession.tree as ComposeDslNode}
+														onAction={(actionId, payload) => {
+															vscode.postMessage({
+																type: "toolPkgUiInvokeAction",
+																sessionId: extensionState.toolPkgUiSession?.sessionId,
+																actionId,
+																toolPkgPayload: payload,
+															})
+														}}
+													/>
+												) : (
+													<div className="text-vscode-descriptionForeground text-sm">Loading...</div>
+												)}
+											</div>
+										</div>
+									</div>
+								</div>
+							) : null}
 						</div>
 					)}
 					{/* kilocode_change end display section */}

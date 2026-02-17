@@ -5,6 +5,7 @@ import * as path from "path"
 
 import type { ToolPackage } from "./types"
 import { parseJsToolPackageFromContent } from "./metadata"
+import { scanToolPkgs } from "./toolpkg/scanner"
 
 export interface ScanExamplePackagesOptions {
 	examplesDir: string
@@ -72,6 +73,25 @@ export async function scanExamplePackages(options: ScanExamplePackagesOptions): 
 		}
 
 		packages.push(toolPackage)
+	}
+
+	// ToolPkg archives (.toolpkg)
+	// By convention we scan a sibling `toolpkgs/` directory next to `examples/`.
+	const derivedToolPkgsDir = path.join(path.dirname(options.examplesDir), "toolpkgs")
+	// If examplesDir is ".../dist/examples", also try ".../toolpkgs" for dev layouts.
+	const rootToolPkgsDir = path.join(path.dirname(path.dirname(options.examplesDir)), "toolpkgs")
+	const toolPkgsDirCandidates = [derivedToolPkgsDir, rootToolPkgsDir, options.examplesDir]
+	const seenToolPkg = new Set<string>()
+	for (const toolPkgsDir of toolPkgsDirCandidates) {
+		const { subpackages } = await scanToolPkgs({ toolPkgsDir, isBuiltIn: true })
+		for (const pkg of subpackages) {
+			const key = `${pkg.toolPkgId ?? ""}::${pkg.name}`
+			if (seenToolPkg.has(key)) {
+				continue
+			}
+			seenToolPkg.add(key)
+			packages.push(pkg)
+		}
 	}
 
 	return packages

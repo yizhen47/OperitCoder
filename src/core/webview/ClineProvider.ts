@@ -120,6 +120,8 @@ import { resolveToolProtocol } from "../../utils/resolveToolProtocol"
 import { normalizeMaxReadFileLine } from "../../utils/maxReadFileLine"
 import { kilo_execIfExtension } from "../../shared/kilocode/cli-sessions/extension/session-manager-utils"
 import { DeviceAuthHandler } from "../kilocode/webview/deviceAuthHandler"
+import { ToolPkgRegistry } from "../tool-packages/toolpkg/registry"
+import { ToolPkgComposeDslSession } from "../tool-packages/toolpkg/compose-dsl"
 
 export type ClineProviderState = Awaited<ReturnType<ClineProvider["getState"]>>
 // kilocode_change end
@@ -192,6 +194,18 @@ export class ClineProvider
 			defaultValue?: string | null
 		}>
 	}> // kilocode_change - Cache for example packages
+	private toolPkgRegistry?: ToolPkgRegistry
+	private toolPkgUiSessions = new Map<string, ToolPkgComposeDslSession>()
+	private toolPkgUiSessionState?:
+		| {
+				sessionId: string
+				toolPkgId: string
+				uiModuleId: string
+				title: string
+				tree: any
+				error?: string
+		  }
+		| undefined
 
 	private recentTasksCache?: string[]
 	private pendingOperations: Map<string, PendingEditOperation> = new Map()
@@ -487,6 +501,165 @@ export class ClineProvider
 		task.emit(RooCodeEventName.TaskUnfocused)
 		await this.disposeTaskInstance(task)
 		return task
+	}
+
+	private async getToolPkgRegistry(): Promise<ToolPkgRegistry> {
+		const primary = path.join(this.context.extensionPath, "dist", "toolpkgs")
+		const isDevExtensionLayout = path.basename(this.context.extensionPath).toLowerCase() === "src"
+		const fallback = isDevExtensionLayout
+			? path.join(this.context.extensionPath, "toolpkgs")
+			: path.join(this.context.extensionPath, "src", "toolpkgs")
+
+		if (!this.toolPkgRegistry) {
+			this.toolPkgRegistry = new ToolPkgRegistry({ toolPkgsDirs: [primary, fallback], isBuiltIn: true })
+		}
+		// Always refresh; toolpkgs are few and this keeps dev iteration predictable.
+		await this.toolPkgRegistry.refresh()
+		return this.toolPkgRegistry
+	}
+
+	public async openToolPkgUiModule(toolPkgId: string, uiModuleId: string): Promise<void> {
+		const registry = await this.getToolPkgRegistry()
+		const container = registry.getContainer(toolPkgId)
+		if (!container) {
+			this.toolPkgUiSessionState = {
+				sessionId: "error",
+				toolPkgId,
+				uiModuleId,
+				title: uiModuleId,
+				tree: null,
+				error: `ToolPkg not found: ${toolPkgId}`,
+			}
+			await this.postStateToWebview()
+			return
+		}
+
+		const ui = container.uiModules.find((m) => m.id === uiModuleId)
+		if (!ui) {
+			this.toolPkgUiSessionState = {
+				sessionId: "error",
+				toolPkgId,
+				uiModuleId,
+				title: uiModuleId,
+				tree: null,
+				error: `UI module not found: ${toolPkgId}/${uiModuleId}`,
+			}
+			await this.postStateToWebview()
+			return
+		}
+
+		// Load env values for all known sandbox env vars (best effort).
+		const envValues: Record<string, string> = {}
+		try {
+			const envNames = (this.examplePackagesCache ?? []).flatMap((p) => p.env ?? []).map((e) => e.name).filter(Boolean)
+			for (const name of new Set(envNames)) {
+				const key = `sandbox-env:${encodeURIComponent(name)}`
+				const value = await this.context.secrets.get(key)
+				if (value !== undefined) {
+					envValues[name] = value
+				}
+			}
+		} catch {
+			// ignore
+		}
+
+		const session = new ToolPkgComposeDslSession({
+			context: this.context,
+			registry,
+			container,
+			uiModuleId,
+			uiEntryPath: ui.entry,
+			extensionPath: this.context.extensionPath,
+			initialEnvValues: envValues,
+			packageOps: {
+				isPackageEnabled: (name) => {
+					const disabled = (this.getGlobalState("disabledExamplePackages") ?? []) as string[]
+					return !disabled.includes(name)
+				},
+				enablePackage: async (name) => {
+					const currentDisabled = (this.getGlobalState("disabledExamplePackages") ?? []) as string[]
+					const currentEnabled = (this.getGlobalState("enabledExamplePackages") ?? []) as string[]
+					const nextDisabled = currentDisabled.filter((x) => x !== name)
+					const nextEnabled = Array.from(new Set([...currentEnabled, name]))
+					await this.updateGlobalState("disabledExamplePackages", nextDisabled)
+					await this.updateGlobalState("enabledExamplePackages", nextEnabled)
+					await this.postStateToWebview()
+				},
+			},
+		})
+
+		this.toolPkgUiSessions.set(session.id, session)
+		try {
+			const render = await session.render()
+			this.toolPkgUiSessionState = {
+				sessionId: session.id,
+				toolPkgId,
+				uiModuleId,
+				title: session.title,
+				tree: render.tree,
+			}
+		} catch (e) {
+			this.toolPkgUiSessionState = {
+				sessionId: session.id,
+				toolPkgId,
+				uiModuleId,
+				title: session.title,
+				tree: null,
+				error: (e as Error).message,
+			}
+		}
+
+		await this.postStateToWebview()
+	}
+
+	public async invokeToolPkgUiAction(sessionId: string, actionId: string, payload?: any): Promise<void> {
+		const session = this.toolPkgUiSessions.get(sessionId)
+		if (!session) {
+			return
+		}
+
+		try {
+			await session.invokeAction({ actionId, payload })
+			const render = await session.render()
+			this.toolPkgUiSessionState = {
+				...(this.toolPkgUiSessionState ?? {
+					sessionId,
+					toolPkgId: "",
+					uiModuleId: "",
+					title: session.title,
+					tree: null,
+				}),
+				sessionId,
+				title: session.title,
+				tree: render.tree,
+				error: undefined,
+			}
+		} catch (e) {
+			this.toolPkgUiSessionState = {
+				...(this.toolPkgUiSessionState ?? {
+					sessionId,
+					toolPkgId: "",
+					uiModuleId: "",
+					title: session.title,
+					tree: null,
+				}),
+				sessionId,
+				title: session.title,
+				error: (e as Error).message,
+			}
+		}
+
+		await this.postStateToWebview()
+	}
+
+	public async closeToolPkgUiModule(sessionId?: string): Promise<void> {
+		if (sessionId) {
+			this.toolPkgUiSessions.delete(sessionId)
+		} else if (this.toolPkgUiSessionState?.sessionId) {
+			this.toolPkgUiSessions.delete(this.toolPkgUiSessionState.sessionId)
+		}
+		this.toolPkgUiSessionState = undefined
+		await this.postStateToWebview()
 	}
 
 	getTaskStackSize(): number {
@@ -2740,7 +2913,10 @@ ${prompt}
 							const { tools: effectiveTools } = resolveToolPackageToolsForCapabilities(p, capabilities)
 							return ({
 								name: sanitizeMcpName(p.name),
-								displayName: p.name,
+								displayName:
+									typeof (p as any).displayName === "string"
+										? (p as any).displayName
+										: (p as any).displayName?.["zh"] ?? (p as any).displayName?.["en"] ?? p.name,
 								enabledByDefault: p.enabledByDefault ?? false,
 								toolCount: effectiveTools.length,
 								description: p.description,
@@ -2778,6 +2954,32 @@ ${prompt}
 					return {}
 				}
 			})(),
+			toolPkgUiModules: await (async () => {
+				if (!this.toolPkgUiModulesCache) {
+					try {
+						const registry = await this.getToolPkgRegistry()
+						const modules = registry
+							.getContainers()
+							.flatMap((c) => {
+								const containerDesc = c.description
+								return c.uiModules
+									.filter((m) => m.showInPackageManager && m.runtime.toLowerCase() === "compose_dsl")
+									.map((m) => ({
+										toolPkgId: c.toolPkgId,
+										uiModuleId: m.id,
+										runtime: m.runtime,
+										title: m.title,
+										description: containerDesc,
+									}))
+							})
+						this.toolPkgUiModulesCache = modules
+					} catch {
+						this.toolPkgUiModulesCache = []
+					}
+				}
+				return this.toolPkgUiModulesCache
+			})(),
+			toolPkgUiSession: this.toolPkgUiSessionState,
 			// kilocode_change end
 			alwaysApproveResubmit: stateValues.alwaysApproveResubmit ?? false,
 			requestDelaySeconds: Math.max(5, stateValues.requestDelaySeconds ?? 10),

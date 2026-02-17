@@ -70,7 +70,10 @@ export class ActivateSandboxPackageTool extends BaseTool<"activate_sandbox_packa
 			}
 
 			const primaryExamplesDir = path.join(extensionPath, "dist", "examples")
-			const fallbackExamplesDir = path.join(extensionPath, "src", "examples")
+			const isDevExtensionLayout = path.basename(extensionPath).toLowerCase() === "src"
+			const fallbackExamplesDir = isDevExtensionLayout
+				? path.join(extensionPath, "examples")
+				: path.join(extensionPath, "src", "examples")
 
 			let packages = await scanExamplePackages({ examplesDir: primaryExamplesDir })
 			if (packages.length === 0) {

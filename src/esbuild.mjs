@@ -111,6 +111,27 @@ async function main() {
 						console.error(`[${name}] Failed to copy examples:`, error.message)
 					}
 
+					// Copy toolpkg archives to dist directory
+					try {
+						const toolPkgsSrc = path.join(srcDir, "toolpkgs")
+						const toolPkgsDest = path.join(distDir, "toolpkgs")
+						if (fs.existsSync(toolPkgsSrc)) {
+							if (fs.existsSync(toolPkgsDest)) {
+								fs.rmSync(toolPkgsDest, { recursive: true, force: true })
+							}
+							fs.mkdirSync(toolPkgsDest, { recursive: true })
+							for (const entry of fs.readdirSync(toolPkgsSrc, { withFileTypes: true })) {
+								if (!entry.isFile()) continue
+								if (!entry.name.toLowerCase().endsWith(".toolpkg")) continue
+								const srcFile = path.join(toolPkgsSrc, entry.name)
+								const destFile = path.join(toolPkgsDest, entry.name)
+								fs.copyFileSync(srcFile, destFile)
+							}
+						}
+					} catch (error) {
+						console.error(`[${name}] Failed to copy toolpkgs:`, error.message)
+					}
+
 					// Copy tree-sitter files to dist directory
 					copyPaths([["services/continuedev/tree-sitter", "tree-sitter"]], srcDir, distDir)
 

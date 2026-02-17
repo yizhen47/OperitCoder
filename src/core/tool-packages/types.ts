@@ -33,12 +33,24 @@ export interface ToolPackageState {
 
 export interface ToolPackage {
 	name: string
+	/**
+	 * Optional user-facing display name. When omitted, clients should fall back to `name`.
+	 */
+	displayName?: LocalizedText
 	description: LocalizedText
 	tools: PackageTool[]
 	states?: ToolPackageState[]
 	env?: EnvVar[]
 	isBuiltIn?: boolean
 	enabledByDefault?: boolean
+	/**
+	 * Optional toolpkg container identifier if this package was loaded from a `.toolpkg` archive.
+	 */
+	toolPkgId?: string
+	/**
+	 * Optional toolpkg subpackage identifier if this package was loaded from a `.toolpkg` archive.
+	 */
+	toolPkgSubpackageId?: string
 
 	/** Absolute path to the source file if known. */
 	sourcePath?: string

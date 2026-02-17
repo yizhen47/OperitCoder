@@ -728,6 +728,7 @@
 		"isbinaryfile": "^5.0.2",
 		"js-tiktoken": "^1.0.8",
 		"jsdom": "^26.0.0",
+		"jszip": "^3.10.1",
 		"json5": "^2.2.3",
 		"hjson": "^3.2.2",
 		"jwt-decode": "^4.0.0",

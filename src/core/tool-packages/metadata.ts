@@ -181,6 +181,13 @@ export function parseJsToolPackageFromContent(
 		return null
 	}
 
+	const displayName =
+		record.displayName !== undefined
+			? asLocalizedText(record.displayName)
+			: record.display_name !== undefined
+				? asLocalizedText(record.display_name)
+				: undefined
+
 	const rawTools = Array.isArray(record.tools) ? record.tools : []
 	const tools = rawTools.map((t) => asPackageTool(t, jsContent)).filter(Boolean) as PackageTool[]
 	if (tools.length === 0) {
@@ -207,6 +214,7 @@ export function parseJsToolPackageFromContent(
 
 	return {
 		name,
+		displayName,
 		description: asLocalizedText(record.description),
 		tools,
 		states,

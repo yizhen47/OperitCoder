@@ -125,6 +125,9 @@ export interface WebviewMessage {
 		| "toggleExamplePackage"
 		| "setSandboxEnvVar"
 		| "deleteSandboxEnvVar"
+		| "openToolPkgUiModule"
+		| "toolPkgUiInvokeAction"
+		| "closeToolPkgUiModule"
 		// kilocode_change end
 		| "updateMcpTimeout"
 		| "fuzzyMatchThreshold" // kilocode_change
@@ -300,6 +303,10 @@ export interface WebviewMessage {
 	packageName?: string
 	envName?: string
 	envValue?: string
+	toolPkgId?: string
+	uiModuleId?: string
+	actionId?: string
+	toolPkgPayload?: any
 	// kilocode_change end
 	suggestionLength?: number // kilocode_change: Length of accepted suggestion for telemetry
 	completionRequestId?: string // kilocode_change
