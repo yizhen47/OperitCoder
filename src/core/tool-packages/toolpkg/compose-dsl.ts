@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import * as fs from "fs/promises"
+import os from "os"
 import * as path from "path"
 import * as vm from "vm"
 
@@ -422,8 +424,29 @@ export class ToolPkgComposeDslSession {
 				if (!filePath) {
 					throw new Error("share_file requires { path }")
 				}
-				await vscode.commands.executeCommand("revealFileInOS", vscode.Uri.file(filePath))
-				return { success: true, path: filePath }
+
+				const filename = path.basename(filePath)
+				let defaultDir = os.homedir()
+				const downloads = path.join(defaultDir, "Downloads")
+				try {
+					await fs.access(downloads)
+					defaultDir = downloads
+				} catch {
+					// ignore
+				}
+
+				const saveLabel = typeof params?.title === "string" && params.title.trim() ? params.title.trim() : "Export"
+				const dest = await vscode.window.showSaveDialog({
+					saveLabel,
+					defaultUri: vscode.Uri.file(path.join(defaultDir, filename)),
+				})
+				if (!dest) {
+					return { success: false, canceled: true }
+				}
+
+				await fs.copyFile(filePath, dest.fsPath)
+				await vscode.commands.executeCommand("revealFileInOS", dest)
+				return { success: true, path: dest.fsPath }
 			}
 
 			// Package tool call: "<package>:<tool>"
@@ -446,10 +469,17 @@ export class ToolPkgComposeDslSession {
 		const isDevExtensionLayout = path.basename(extensionPath).toLowerCase() === "src"
 		const fallbackExamplesDir = isDevExtensionLayout ? path.join(extensionPath, "examples") : path.join(extensionPath, "src", "examples")
 
-		let packages = await scanExamplePackages({ examplesDir: primaryExamplesDir })
-		if (packages.length === 0) {
-			packages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })
+		const primaryPackages = await scanExamplePackages({ examplesDir: primaryExamplesDir })
+		const fallbackPackages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })
+
+		const packagesByName = new Map<string, ToolPackage>()
+		for (const pkg of primaryPackages) packagesByName.set(pkg.name, pkg)
+		for (const pkg of fallbackPackages) {
+			if (!packagesByName.has(pkg.name)) {
+				packagesByName.set(pkg.name, pkg)
+			}
 		}
+		const packages = Array.from(packagesByName.values())
 
 		const requested = sanitizeMcpName(packageName)
 		const pkg = packages.find((p) => sanitizeMcpName(p.name) === requested)
@@ -480,6 +510,18 @@ export class ToolPkgComposeDslSession {
 			logger: console,
 		})
 
+		// Normalize common network/timeout errors into actionable messages.
+		if (result && typeof result === "object") {
+			const errorText = typeof (result as any).error === "string" ? String((result as any).error) : ""
+			if (errorText && /this operation was aborted/i.test(errorText)) {
+				;(result as any).error =
+					`${errorText}（通常表示连接/读取超时或请求被中断：请确认 Agent 正在运行、地址可达、端口未被防火墙拦截；必要时增大超时再重试）`
+			} else if (errorText && /timed out/i.test(errorText)) {
+				;(result as any).error =
+					`${errorText}（通常表示网络超时：请确认 Agent 地址可达、端口未被防火墙拦截；必要时增大超时再重试）`
+			}
+		}
+
 		return result
 	}
 
@@ -497,8 +539,13 @@ export class ToolPkgComposeDslSession {
 	}
 
 	async invokeAction(invocation: ActionInvocation): Promise<void> {
+		const { promise } = this.invokeActionNonBlocking(invocation)
+		await promise
+	}
+
+	invokeActionNonBlocking(invocation: ActionInvocation): { promise: Promise<void>; startedAsync: boolean } {
 		const actionId = String(invocation.actionId ?? "").trim()
-		if (!actionId) return
+		if (!actionId) return { promise: Promise.resolve(), startedAsync: false }
 		const fn = this.actionRegistry.get(actionId)
 		if (!fn) {
 			throw new Error(`Unknown action: ${actionId}`)
@@ -506,8 +553,9 @@ export class ToolPkgComposeDslSession {
 		const payload = invocation.payload
 		const result = fn.length >= 1 ? fn(payload) : fn()
 		if (result && typeof result.then === "function") {
-			await result
+			return { promise: result as Promise<void>, startedAsync: true }
 		}
+		return { promise: Promise.resolve(), startedAsync: false }
 	}
 
 	extractActionIdFromValue(value: any): string | null {

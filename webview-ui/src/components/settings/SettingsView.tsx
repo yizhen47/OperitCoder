@@ -89,6 +89,7 @@ import { SlashCommandsSettings } from "./SlashCommandsSettings"
 import { UISettings } from "./UISettings"
 import ModesView from "../modes/ModesView"
 // import McpView from "../mcp/McpView" // kilocode_change: own view
+import { useEscapeKey } from "@src/hooks/useEscapeKey"
 
 export const settingsTabsContainer = "flex flex-1 overflow-hidden [&.narrow_.tab-label]:hidden"
 export const settingsTabList =
@@ -138,6 +139,12 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 	const extensionState = useExtensionState()
 	const { currentApiConfigName, listApiConfigMeta, uriScheme, settingsImportedAt } = extensionState
 
+	const toolPkgUiSessionId = extensionState.toolPkgUiSession?.sessionId
+	const closeToolPkgUi = useCallback(() => {
+		vscode.postMessage({ type: "closeToolPkgUiModule", sessionId: toolPkgUiSessionId })
+	}, [toolPkgUiSessionId])
+	useEscapeKey(Boolean(toolPkgUiSessionId), closeToolPkgUi, { preventDefault: true, stopPropagation: true })
+
 	const [isDiscardDialogShow, setDiscardDialogShow] = useState(false)
 	const [isChangeDetected, setChangeDetectedState] = useState(false)
 	const isChangeDetectedRef = useRef(false)
@@ -171,6 +178,12 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		ensureBodyPointerEventsRestored()
 	}, [isDiscardDialogShow])
 	// kilocode_change end
+
+	useEffect(() => {
+		if (extensionState.toolPkgUiSession) {
+			ensureBodyPointerEventsRestored()
+		}
+	}, [extensionState.toolPkgUiSession])
 
 	const {
 		alwaysAllowReadOnly,
@@ -1145,33 +1158,71 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 							</SectionHeader>
 
 							<Section>
-								{(extensionState.toolPkgUiModules ?? []).length > 0 ? (
-									<Collapsible defaultOpen={false}>
-										<div className="rounded border border-vscode-panel-border bg-vscode-editor-background">
-											<div className="flex items-center justify-between gap-3 px-3 py-2">
-												<CollapsibleTrigger asChild>
-													<button type="button" className="text-vscode-foreground text-sm text-left w-full">
-														ToolPkg UI
-													</button>
-												</CollapsibleTrigger>
-											</div>
+								<Collapsible defaultOpen={false}>
+									<div className="rounded border border-vscode-panel-border bg-vscode-editor-background">
+										<div className="flex items-center justify-between gap-3 px-3 py-2">
+											<CollapsibleTrigger asChild>
+												<button type="button" className="text-vscode-foreground text-sm text-left w-full">
+													ToolPkg UI
+													<span className="ml-2 text-vscode-descriptionForeground text-xs">
+														({(extensionState.toolPkgUiModules ?? []).length})
+													</span>
+												</button>
+											</CollapsibleTrigger>
+										</div>
 
-											<CollapsibleContent>
-												<div className="border-t border-vscode-panel-border px-3 py-2 flex flex-col gap-2">
-													{(extensionState.toolPkgUiModules ?? []).map((m) => {
+										<CollapsibleContent>
+											<div className="border-t border-vscode-panel-border px-3 py-2 flex flex-col gap-2">
+												{(extensionState.toolPkgUiModules ?? []).length === 0 ? (
+													<div className="text-vscode-descriptionForeground text-sm">
+														No ToolPkg UI modules detected.
+														{"toolPkgDebug" in extensionState && extensionState.toolPkgDebug ? (
+															<div className="mt-2 flex flex-col gap-1">
+																<div>
+																	Scanned dirs:{" "}
+																	<span className="font-mono">
+																		{(extensionState.toolPkgDebug.toolPkgsDirs ?? []).join(" | ")}
+																	</span>
+																</div>
+																<div>
+																	Found `.toolpkg`:{" "}
+																	<span className="font-mono">
+																		{Object.values(extensionState.toolPkgDebug.toolPkgFilesByDir ?? {}).flat().length}
+																	</span>
+																	{" · "}Containers:{" "}
+																	<span className="font-mono">{extensionState.toolPkgDebug.containerCount ?? 0}</span>
+																</div>
+																{extensionState.toolPkgDebug.error ? (
+																	<div>
+																		Error: <span className="font-mono">{extensionState.toolPkgDebug.error}</span>
+																	</div>
+																) : null}
+															</div>
+														) : (
+															<div className="mt-2">
+																If you just added/updated `.toolpkg` files, rebuild the extension and reload VS Code.
+															</div>
+														)}
+													</div>
+												) : (
+													(extensionState.toolPkgUiModules ?? []).map((m) => {
 														const title = getLocalizedText(m.title) ?? `${m.toolPkgId}:${m.uiModuleId}`
 														const desc = getLocalizedText(m.description)
 														return (
-															<div key={`${m.toolPkgId}:${m.uiModuleId}`} className="rounded border border-vscode-panel-border px-2 py-2">
-																<div className="flex items-center justify-between gap-2">
-																	<div className="flex flex-col gap-0.5">
-																		<div className="text-vscode-foreground text-sm">{title}</div>
-																		<div className="text-vscode-descriptionForeground font-mono text-xs">
+															<div
+																key={`${m.toolPkgId}:${m.uiModuleId}`}
+																className="rounded border border-vscode-panel-border px-2 py-2 w-full"
+															>
+																<div className="flex items-start justify-between gap-3 w-full">
+																	<div className="flex flex-col gap-0.5 min-w-0 flex-1">
+																		<div className="text-vscode-foreground text-sm truncate">{title}</div>
+																		<div className="text-vscode-descriptionForeground font-mono text-xs truncate">
 																			{m.toolPkgId}:{m.uiModuleId}
 																		</div>
 																	</div>
 																	<Button
 																		variant="secondary"
+																		className="shrink-0"
 																		onClick={() => {
 																			vscode.postMessage({
 																				type: "openToolPkgUiModule",
@@ -1185,12 +1236,12 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 																{desc ? <div className="mt-2 text-vscode-descriptionForeground text-sm">{desc}</div> : null}
 															</div>
 														)
-													})}
-												</div>
-											</CollapsibleContent>
-										</div>
-									</Collapsible>
-								) : null}
+													})
+												)}
+											</div>
+										</CollapsibleContent>
+									</div>
+								</Collapsible>
 
 								{(extensionState.examplePackages ?? []).length === 0 ? (
 									<div className="text-vscode-descriptionForeground">{t("settings:examplePackages.empty")}</div>
@@ -1530,19 +1581,46 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 							</Section>
 
 							{extensionState.toolPkgUiSession ? (
-								<div className="fixed inset-0 z-50 bg-vscode-editor-background/80 backdrop-blur-sm">
-									<div className="absolute inset-0 p-4 overflow-auto">
-										<div className="mx-auto max-w-3xl rounded border border-vscode-panel-border bg-vscode-editor-background">
-											<div className="flex items-center justify-between gap-2 border-b border-vscode-panel-border px-3 py-2">
+								<div
+									className="fixed inset-0 z-50 bg-vscode-editor-background/80 backdrop-blur-sm overflow-auto p-4"
+									onMouseDown={(e) => {
+										if (e.target === e.currentTarget) closeToolPkgUi()
+									}}
+								>
+									<div className="fixed top-6 right-6 z-[9999] pointer-events-auto">
+										<button
+											type="button"
+											className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 cursor-pointer active:opacity-80 h-7 px-3 bg-secondary text-secondary-foreground hover:bg-secondary/70"
+											onPointerDown={(e) => {
+												e.preventDefault()
+												e.stopPropagation()
+												closeToolPkgUi()
+											}}
+											onClick={(e) => {
+												e.preventDefault()
+												e.stopPropagation()
+												closeToolPkgUi()
+											}}
+										>
+											Close
+										</button>
+									</div>
+									<div
+										className="mx-auto max-w-3xl rounded border border-vscode-panel-border bg-vscode-editor-background"
+										onMouseDown={(e) => e.stopPropagation()}
+									>
+										<div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-vscode-panel-border px-3 py-2 bg-vscode-editor-background">
 												<div className="text-vscode-foreground text-sm">{extensionState.toolPkgUiSession.title}</div>
 												<div className="flex items-center gap-2">
 													<Button
 														variant="secondary"
+														onPointerDown={(e) => {
+															e.preventDefault()
+															e.stopPropagation()
+															closeToolPkgUi()
+														}}
 														onClick={() => {
-															vscode.postMessage({
-																type: "closeToolPkgUiModule",
-																sessionId: extensionState.toolPkgUiSession?.sessionId,
-															})
+															closeToolPkgUi()
 														}}>
 														Close
 													</Button>
@@ -1568,7 +1646,6 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 													<div className="text-vscode-descriptionForeground text-sm">Loading...</div>
 												)}
 											</div>
-										</div>
 									</div>
 								</div>
 							) : null}

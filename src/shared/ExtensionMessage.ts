@@ -480,6 +480,39 @@ export type ExtensionState = Pick<
 	uriScheme?: string
 	uiKind?: string // kilocode_change
 
+	/**
+	 * ToolPkg UI modules (compose_dsl) discovered from built-in `.toolpkg` archives.
+	 */
+	toolPkgUiModules?: Array<{
+		toolPkgId: string
+		uiModuleId: string
+		runtime: string
+		title?: string | Record<string, string>
+		description?: string | Record<string, string>
+	}>
+
+	/**
+	 * Active ToolPkg UI session state (render tree + action ids).
+	 */
+	toolPkgUiSession?: {
+		sessionId: string
+		toolPkgId: string
+		uiModuleId: string
+		title: string
+		tree: any
+		error?: string
+	}
+
+	/**
+	 * Debug info for ToolPkg discovery (helps diagnose missing `.toolpkg` files in packaged builds).
+	 */
+	toolPkgDebug?: {
+		toolPkgsDirs: string[]
+		toolPkgFilesByDir: Record<string, string[]>
+		containerCount: number
+		error?: string
+	}
+
 	kiloCodeWrapperProperties?: KiloCodeWrapperProperties // kilocode_change: Wrapper information
 
 	kilocodeDefaultModel: string
@@ -593,28 +626,6 @@ export type ExtensionState = Pick<
 	}>
 	// kilocode_change end
 
-	/**
-	 * ToolPkg UI modules (compose_dsl) discovered from built-in `.toolpkg` archives.
-	 */
-	toolPkgUiModules?: Array<{
-		toolPkgId: string
-		uiModuleId: string
-		runtime: string
-		title?: string | Record<string, string>
-		description?: string | Record<string, string>
-	}>
-
-	/**
-	 * Active ToolPkg UI session state (render tree + action ids).
-	 */
-	toolPkgUiSession?: {
-		sessionId: string
-		toolPkgId: string
-		uiModuleId: string
-		title: string
-		tree: any
-		error?: string
-	}
 }
 
 export interface ClineSayTool {

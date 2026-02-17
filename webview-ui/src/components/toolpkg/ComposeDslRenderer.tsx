@@ -43,6 +43,7 @@ export function ComposeDslRenderer(props: {
 	onAction: (actionId: string, payload?: any) => void
 }) {
 	const seenOnLoadRef = React.useRef<Set<string>>(new Set())
+	const pendingTextValuesRef = React.useRef<Map<string, string>>(new Map())
 
 	React.useEffect(() => {
 		const walk = (n: ComposeDslNode) => {
@@ -57,6 +58,22 @@ export function ComposeDslRenderer(props: {
 		}
 		walk(props.tree)
 	}, [props.tree, props.onAction])
+
+	const getTextValue = React.useCallback((actionId: string | null, remoteValue: string) => {
+		if (!actionId) return remoteValue
+		const pending = pendingTextValuesRef.current.get(actionId)
+		if (pending === undefined) return remoteValue
+		if (pending === remoteValue) {
+			pendingTextValuesRef.current.delete(actionId)
+			return remoteValue
+		}
+		return pending
+	}, [])
+
+	const setPendingTextValue = React.useCallback((actionId: string | null, value: string) => {
+		if (!actionId) return
+		pendingTextValuesRef.current.set(actionId, value)
+	}, [])
 
 	const renderNode = (node: ComposeDslNode, index: number): React.ReactNode => {
 		const type = String(node.type ?? "")
@@ -143,9 +160,10 @@ export function ComposeDslRenderer(props: {
 			case "TextField": {
 				const label = typeof p.label === "string" ? p.label : ""
 				const placeholder = typeof p.placeholder === "string" ? p.placeholder : ""
-				const value = typeof p.value === "string" ? p.value : String(p.value ?? "")
+				const remoteValue = typeof p.value === "string" ? p.value : String(p.value ?? "")
 				const onChangeId = extractActionId(p.onValueChange)
 				const rows = Number(p.minLines ?? 1)
+				const value = getTextValue(onChangeId, remoteValue)
 				return (
 					<div key={index} className={cls("flex flex-col gap-1", p.fillMaxWidth ? "w-full" : null)}>
 						{label ? <div className="text-xs text-vscode-descriptionForeground">{label}</div> : null}
@@ -158,6 +176,7 @@ export function ComposeDslRenderer(props: {
 							rows={Number.isFinite(rows) && rows > 0 ? rows : 1}
 							onChange={(e) => {
 								if (!onChangeId) return
+								setPendingTextValue(onChangeId, e.target.value)
 								props.onAction(onChangeId, e.target.value)
 							}}
 						/>

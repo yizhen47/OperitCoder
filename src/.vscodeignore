@@ -11,7 +11,10 @@
 !package.nls.*
 
 # Include the built extension
-!dist
+!dist/**
+
+# Include built-in toolpkg archives
+!dist/toolpkgs/**
 
 # Include the built webview
 !**/*.map

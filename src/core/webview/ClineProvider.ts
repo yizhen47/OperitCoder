@@ -55,7 +55,7 @@ import { Mode, defaultModeSlug, getGroupName, getModeBySlug } from "../../shared
 import { EXPERIMENT_IDS, experimentDefault, experiments as experimentsRegistry } from "../../shared/experiments" // kilocode_change
 import { formatLanguage } from "../../shared/language"
 // kilocode_change start
-import { buildDefaultSandboxCapabilities, resolveToolPackageToolsForCapabilities, scanExamplePackages } from "../tool-packages"
+import { buildDefaultSandboxCapabilities, resolveToolPackageToolsForCapabilities, scanExamplePackages, type ToolPackage } from "../tool-packages"
 import { sanitizeMcpName } from "../../utils/mcp-name"
 import { getSandboxEnvStatus } from "../tool-packages/env-secrets"
 // kilocode_change end
@@ -504,14 +504,27 @@ export class ClineProvider
 	}
 
 	private async getToolPkgRegistry(): Promise<ToolPkgRegistry> {
-		const primary = path.join(this.context.extensionPath, "dist", "toolpkgs")
-		const isDevExtensionLayout = path.basename(this.context.extensionPath).toLowerCase() === "src"
-		const fallback = isDevExtensionLayout
-			? path.join(this.context.extensionPath, "toolpkgs")
-			: path.join(this.context.extensionPath, "src", "toolpkgs")
+		const toolPkgsDirs = (() => {
+			const extensionPath = this.context.extensionPath
+			const candidates = [
+				path.join(extensionPath, "dist", "toolpkgs"),
+				path.join(extensionPath, "toolpkgs"),
+				path.join(extensionPath, "src", "toolpkgs"),
+				path.join(extensionPath, "..", "toolpkgs"),
+				path.join(extensionPath, "..", "src", "toolpkgs"),
+				path.join(extensionPath, "..", "dist", "toolpkgs"),
+				path.join(extensionPath, "..", "src", "dist", "toolpkgs"),
+			]
+
+			const uniq = new Set<string>()
+			for (const c of candidates) {
+				uniq.add(path.resolve(c))
+			}
+			return Array.from(uniq.values())
+		})()
 
 		if (!this.toolPkgRegistry) {
-			this.toolPkgRegistry = new ToolPkgRegistry({ toolPkgsDirs: [primary, fallback], isBuiltIn: true })
+			this.toolPkgRegistry = new ToolPkgRegistry({ toolPkgsDirs, isBuiltIn: true })
 		}
 		// Always refresh; toolpkgs are few and this keeps dev iteration predictable.
 		await this.toolPkgRegistry.refresh()
@@ -619,8 +632,11 @@ export class ClineProvider
 		}
 
 		try {
-			await session.invokeAction({ actionId, payload })
-			const render = await session.render()
+			// Start the action but do not await immediately so we can flush a "loading" render
+			// for async handlers that set state before their first await.
+			const started = session.invokeActionNonBlocking({ actionId, payload })
+
+			const renderPending = await session.render()
 			this.toolPkgUiSessionState = {
 				...(this.toolPkgUiSessionState ?? {
 					sessionId,
@@ -631,7 +647,25 @@ export class ClineProvider
 				}),
 				sessionId,
 				title: session.title,
-				tree: render.tree,
+				tree: renderPending.tree,
+				error: undefined,
+			}
+			await this.postStateToWebview()
+
+			await started.promise
+
+			const renderDone = await session.render()
+			this.toolPkgUiSessionState = {
+				...(this.toolPkgUiSessionState ?? {
+					sessionId,
+					toolPkgId: "",
+					uiModuleId: "",
+					title: session.title,
+					tree: null,
+				}),
+				sessionId,
+				title: session.title,
+				tree: renderDone.tree,
 				error: undefined,
 			}
 		} catch (e) {
@@ -1633,6 +1667,10 @@ ${prompt}
 	 * rendered within the webview panel
 	 */
 	private async getHtmlContent(webview: vscode.Webview): Promise<string> {
+		// Cache-bust webview assets to avoid VS Code aggressively reusing stale `webview-ui/build` files
+		// across extension reloads/updates.
+		const cacheBust = `v=${Date.now()}`
+
 		// Get the local path to main script run in the webview,
 		// then convert it to a uri we can use in the webview.
 
@@ -1684,20 +1722,21 @@ ${prompt}
             <meta name="theme-color" content="#000000">
 			<!-- kilocode_change: add https://*.googleusercontent.com https://*.googleapis.com https://*.githubusercontent.com to img-src, https://*, http://localhost:3000 to connect-src -->
             <meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src ${webview.cspSource} data:; style-src ${webview.cspSource} 'unsafe-inline'; img-src ${webview.cspSource} https://*.googleusercontent.com https://storage.googleapis.com https://*.githubusercontent.com https://img.clerk.com data: https://*.googleapis.com http:; media-src ${webview.cspSource}; script-src ${webview.cspSource} 'wasm-unsafe-eval' 'nonce-${nonce}' ${openRouterDomain} https://us-assets.i.posthog.com 'strict-dynamic'; connect-src ${webview.cspSource} https://* http://localhost:3000 https://api.requesty.ai https://us.i.posthog.com https://us-assets.i.posthog.com;">
-            <link rel="stylesheet" type="text/css" href="${stylesUri}">
-			<link href="${codiconsUri}" rel="stylesheet" />
+            <link rel="stylesheet" type="text/css" href="${stylesUri}?${cacheBust}">
+			<link href="${codiconsUri}?${cacheBust}" rel="stylesheet" />
 			<script nonce="${nonce}">
 				window.IMAGES_BASE_URI = "${imagesUri}"
 				window.AUDIO_BASE_URI = "${audioUri}"
 				window.MATERIAL_ICONS_BASE_URI = "${materialIconsUri}"
 				window.KILOCODE_BACKEND_BASE_URL = "${process.env.KILOCODE_BACKEND_BASE_URL ?? ""}"
+				window.__OPERIT_WEBVIEW_BUILD_TAG = "${cacheBust}"
 			</script>
             <title>Operit Coder</title>
           </head>
           <body>
             <noscript>You need to enable JavaScript to run this app.</noscript>
             <div id="root"></div>
-            <script nonce="${nonce}" type="module" src="${scriptUri}"></script>
+            <script nonce="${nonce}" type="module" src="${scriptUri}?${cacheBust}"></script>
           </body>
         </html>
       `
@@ -2573,6 +2612,9 @@ ${prompt}
 			enabledExamplePackages, // kilocode_change
 			disabledExamplePackages, // kilocode_change
 			examplePackages, // kilocode_change
+			toolPkgUiModules, // kilocode_change
+			toolPkgUiSession, // kilocode_change
+			toolPkgDebug, // kilocode_change
 		} = await this.getState()
 
 		// kilocode_change start: Get active model for virtual quota fallback UI display
@@ -2670,6 +2712,9 @@ ${prompt}
 			enabledExamplePackages: enabledExamplePackages ?? [], // kilocode_change
 			disabledExamplePackages: disabledExamplePackages ?? [], // kilocode_change
 			examplePackages: examplePackages ?? [], // kilocode_change
+			toolPkgUiModules: toolPkgUiModules ?? [], // kilocode_change
+			toolPkgUiSession, // kilocode_change
+			toolPkgDebug, // kilocode_change
 			alwaysApproveResubmit: alwaysApproveResubmit ?? false,
 			requestDelaySeconds: requestDelaySeconds ?? 10,
 			currentApiConfigName: currentApiConfigName ?? "default",
@@ -2905,10 +2950,21 @@ ${prompt}
 						const fallbackExamplesDir = isDevExtensionLayout
 							? path.join(this.context.extensionPath, "examples")
 							: path.join(this.context.extensionPath, "src", "examples")
-						let packages = await scanExamplePackages({ examplesDir: primaryExamplesDir })
-						if (packages.length === 0) {
-							packages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })
+
+						const primaryPackages = await scanExamplePackages({ examplesDir: primaryExamplesDir })
+						const fallbackPackages = await scanExamplePackages({ examplesDir: fallbackExamplesDir })
+
+						// Merge both layouts so built-in examples in `dist/` don't hide `.toolpkg` subpackages
+						// that may only exist in `src/` during development.
+						const packagesByName = new Map<string, ToolPackage>()
+						for (const pkg of primaryPackages) packagesByName.set(pkg.name, pkg)
+						for (const pkg of fallbackPackages) {
+							if (!packagesByName.has(pkg.name)) {
+								packagesByName.set(pkg.name, pkg)
+							}
 						}
+
+						const packages = Array.from(packagesByName.values())
 						this.examplePackagesCache = packages.map((p) => {
 							const { tools: effectiveTools } = resolveToolPackageToolsForCapabilities(p, capabilities)
 							return ({
@@ -2955,31 +3011,77 @@ ${prompt}
 				}
 			})(),
 			toolPkgUiModules: await (async () => {
-				if (!this.toolPkgUiModulesCache) {
-					try {
-						const registry = await this.getToolPkgRegistry()
-						const modules = registry
-							.getContainers()
-							.flatMap((c) => {
-								const containerDesc = c.description
-								return c.uiModules
-									.filter((m) => m.showInPackageManager && m.runtime.toLowerCase() === "compose_dsl")
-									.map((m) => ({
-										toolPkgId: c.toolPkgId,
-										uiModuleId: m.id,
-										runtime: m.runtime,
-										title: m.title,
-										description: containerDesc,
-									}))
-							})
-						this.toolPkgUiModulesCache = modules
-					} catch {
-						this.toolPkgUiModulesCache = []
-					}
+				try {
+					const registry = await this.getToolPkgRegistry()
+					return registry
+						.getContainers()
+						.flatMap((c) => {
+							const containerDesc = c.description
+							return c.uiModules
+								.filter((m) => m.showInPackageManager && m.runtime.toLowerCase() === "compose_dsl")
+								.map((m) => ({
+									toolPkgId: c.toolPkgId,
+									uiModuleId: m.id,
+									runtime: m.runtime,
+									title: m.title,
+									description: containerDesc,
+								}))
+						})
+				} catch {
+					return []
 				}
-				return this.toolPkgUiModulesCache
 			})(),
 			toolPkgUiSession: this.toolPkgUiSessionState,
+			toolPkgDebug: await (async () => {
+				const extensionPath = this.context.extensionPath
+				const toolPkgsDirs = (() => {
+					const candidates = [
+						path.join(extensionPath, "dist", "toolpkgs"),
+						path.join(extensionPath, "toolpkgs"),
+						path.join(extensionPath, "src", "toolpkgs"),
+						path.join(extensionPath, "..", "toolpkgs"),
+						path.join(extensionPath, "..", "src", "toolpkgs"),
+						path.join(extensionPath, "..", "dist", "toolpkgs"),
+						path.join(extensionPath, "..", "src", "dist", "toolpkgs"),
+					]
+
+					const uniq = new Set<string>()
+					for (const c of candidates) {
+						uniq.add(path.resolve(c))
+					}
+					return Array.from(uniq.values())
+				})()
+				const toolPkgFilesByDir: Record<string, string[]> = {}
+
+				for (const dir of toolPkgsDirs) {
+					try {
+						const dirents = await fs.readdir(dir, { withFileTypes: true })
+						toolPkgFilesByDir[dir] = dirents
+							.filter((d) => d.isFile())
+							.map((d) => d.name)
+							.filter((name) => name.toLowerCase().endsWith(".toolpkg"))
+							.sort((a, b) => a.localeCompare(b))
+					} catch {
+						toolPkgFilesByDir[dir] = []
+					}
+				}
+
+				try {
+					const registry = await this.getToolPkgRegistry()
+					return {
+						toolPkgsDirs,
+						toolPkgFilesByDir,
+						containerCount: registry.getContainers().length,
+					}
+				} catch (error) {
+					return {
+						toolPkgsDirs,
+						toolPkgFilesByDir,
+						containerCount: 0,
+						error: error instanceof Error ? error.message : String(error),
+					}
+				}
+			})(),
 			// kilocode_change end
 			alwaysApproveResubmit: stateValues.alwaysApproveResubmit ?? false,
 			requestDelaySeconds: Math.max(5, stateValues.requestDelaySeconds ?? 10),

@@ -5,12 +5,14 @@ import * as path from "path"
 import JSZip from "jszip"
 
 import { scanToolPkgs } from "../toolpkg/scanner"
+import { scanExamplePackages } from "../scanner"
 import { ToolPkgRegistry } from "../toolpkg/registry"
 import { ToolPkgComposeDslSession } from "../toolpkg/compose-dsl"
 
 vi.mock("vscode", () => ({
 	env: { language: "en" },
 	commands: { executeCommand: vi.fn() },
+	window: { showSaveDialog: vi.fn(async () => undefined) },
 	workspace: { workspaceFolders: [] },
 	Uri: { file: (p: string) => ({ fsPath: p }) },
 }))
@@ -72,6 +74,43 @@ exports.hello = async function () { return { ok: true }; };
 		expect(result.subpackages.length).toBe(1)
 		expect(result.subpackages[0]?.name).toBe("demo_pkg")
 		expect(result.subpackages[0]?.toolPkgId).toBe("com.example.demo")
+	})
+
+	it("scanExamplePackages can discover toolpkgs in sibling dir", async () => {
+		const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "operit-coder-toolpkg-scan-"))
+		const examplesDir = path.join(tmp, "dist", "examples")
+		const toolpkgsDir = path.join(tmp, "toolpkgs")
+		await fs.mkdir(examplesDir, { recursive: true })
+		await fs.mkdir(toolpkgsDir, { recursive: true })
+
+		const zip = new JSZip()
+		zip.file(
+			"manifest.json",
+			JSON.stringify({
+				schema_version: 1,
+				toolpkg_id: "com.example.scan",
+				subpackages: [{ id: "scan_pkg", entry: "packages/p.js" }],
+			}),
+		)
+		zip.file(
+			"packages/p.js",
+			`/* METADATA
+{
+  "name": "p",
+  "description": "p",
+  "enabledByDefault": true,
+  "tools": [{ "name": "t", "description": "x", "parameters": [] }]
+}
+*/
+exports.t = async function () { return 1; };
+`,
+		)
+
+		const toolpkgPath = path.join(toolpkgsDir, "scan.toolpkg")
+		await fs.writeFile(toolpkgPath, await zip.generateAsync({ type: "nodebuffer" }))
+
+		const pkgs = await scanExamplePackages({ examplesDir })
+		expect(pkgs.some((p) => p.name === "scan_pkg" && p.toolPkgId === "com.example.scan")).toBe(true)
 	})
 
 	it("ToolPkgComposeDslSession renders and invokes actions", async () => {
@@ -165,4 +204,3 @@ exports.default = function Screen(ctx) {
 		expect(secrets.store).toHaveBeenCalled()
 	})
 })
-
