@@ -79,6 +79,7 @@ import { TerminalSettings } from "./TerminalSettings"
 import { ExperimentalSettings } from "./ExperimentalSettings"
 import { LanguageSettings } from "./LanguageSettings"
 import { ComposeDslRenderer, type ComposeDslNode } from "@src/components/toolpkg/ComposeDslRenderer"
+import { useDismissibleSessionId } from "@src/components/toolpkg/useDismissibleSessionId"
 import { About } from "./About"
 import { Section } from "./Section"
 import PromptsSettings from "./PromptsSettings"
@@ -140,10 +141,12 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 	const { currentApiConfigName, listApiConfigMeta, uriScheme, settingsImportedAt } = extensionState
 
 	const toolPkgUiSessionId = extensionState.toolPkgUiSession?.sessionId
+	const { isVisible: isToolPkgUiVisible, dismiss: dismissToolPkgUi } = useDismissibleSessionId(toolPkgUiSessionId)
 	const closeToolPkgUi = useCallback(() => {
+		dismissToolPkgUi(toolPkgUiSessionId)
 		vscode.postMessage({ type: "closeToolPkgUiModule", sessionId: toolPkgUiSessionId })
-	}, [toolPkgUiSessionId])
-	useEscapeKey(Boolean(toolPkgUiSessionId), closeToolPkgUi, { preventDefault: true, stopPropagation: true })
+	}, [dismissToolPkgUi, toolPkgUiSessionId])
+	useEscapeKey(isToolPkgUiVisible, closeToolPkgUi, { preventDefault: true, stopPropagation: true })
 
 	const [isDiscardDialogShow, setDiscardDialogShow] = useState(false)
 	const [isChangeDetected, setChangeDetectedState] = useState(false)
@@ -1580,7 +1583,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 								)}
 							</Section>
 
-							{extensionState.toolPkgUiSession ? (
+							{isToolPkgUiVisible && extensionState.toolPkgUiSession ? (
 								<div
 									className="fixed inset-0 z-50 bg-vscode-editor-background/80 backdrop-blur-sm overflow-auto p-4"
 									onMouseDown={(e) => {
