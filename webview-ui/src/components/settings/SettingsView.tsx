@@ -23,6 +23,7 @@ import {
 	Monitor,
 	Package,
 	Plug,
+	Search,
 	Server,
 	SquareTerminal,
 	type LucideIcon,
@@ -54,6 +55,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogFooter,
 	Button,
+	Input,
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
@@ -162,6 +164,9 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			? (targetSection as SectionName)
 			: "providers",
 	)
+	const [settingsSearchOpen, setSettingsSearchOpen] = useState(false)
+	const [settingsSearch, setSettingsSearch] = useState("")
+	const settingsSearchInputRef = useRef<HTMLInputElement>(null)
 
 	const [editingApiConfigName, setEditingApiConfigName] = useState<string>(currentApiConfigName || "default") // kilocode_change: Track which profile is being edited separately from the active profile
 
@@ -789,6 +794,22 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 	const [isCompactMode, setIsCompactMode] = useState(false)
 	const containerRef = useRef<HTMLDivElement>(null)
 
+	useEffect(() => {
+		if (!settingsSearchOpen) return
+		settingsSearchInputRef.current?.focus()
+	}, [settingsSearchOpen])
+
+	const getSectionTitle = useCallback(
+		(id: SectionName) => {
+			return id === "mcp"
+				? t(`kilocode:settings.sections.mcp`)
+				: id === "ghost"
+					? t(`kilocode:ghost.title`)
+					: t(`settings:sections.${id}`)
+		},
+		[t],
+	)
+
 	// Setup resize observer to detect when we should switch to compact mode
 	useEffect(() => {
 		if (!containerRef.current) return
@@ -829,6 +850,23 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		],
 		[], // kilocode_change
 	)
+
+	const visibleSections = useMemo(() => {
+		const query = settingsSearch.trim().toLowerCase()
+		if (!query) return sections
+
+		const matches = sections.filter(({ id }) => {
+			if (id.toLowerCase().includes(query)) return true
+			return getSectionTitle(id).toLowerCase().includes(query)
+		})
+
+		if (!matches.some((s) => s.id === activeTab)) {
+			const active = sections.find((s) => s.id === activeTab)
+			if (active) return [active, ...matches]
+		}
+
+		return matches
+	}, [activeTab, getSectionTitle, sections, settingsSearch])
 	// Update target section logic to set active tab
 	useEffect(() => {
 		if (targetSection && sectionNames.includes(targetSection as SectionName)) {
@@ -897,11 +935,45 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 
 	return (
 		<Tab>
-			<TabHeader className="flex justify-between items-center gap-2">
-				<div className="flex items-center gap-1">
-					<h3 className="text-vscode-foreground m-0">{t("settings:header.title")}</h3>
+			<TabHeader className="flex items-center gap-2 min-w-0">
+				<div className="flex items-center gap-1 flex-shrink-0">
+					<h3 className="text-vscode-foreground m-0 whitespace-nowrap">{t("settings:header.title")}</h3>
 				</div>
-				<div className="flex gap-2">
+				<div className="ml-auto flex items-center gap-2 min-w-0">
+					{settingsSearchOpen && (
+						<Input
+							ref={settingsSearchInputRef}
+							value={settingsSearch}
+							onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSettingsSearch(e.target.value)}
+							onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+								if (e.key === "Escape") {
+									e.preventDefault()
+									setSettingsSearch("")
+									setSettingsSearchOpen(false)
+								}
+							}}
+							placeholder={t("settings:header.searchPlaceholder")}
+							className="h-9 w-56 flex-1 min-w-0 max-w-[45vw]"
+							data-testid="settings-search-input"
+						/>
+					)}
+					<StandardTooltip content={t("settings:header.searchButtonTooltip")}>
+						<Button
+							variant="secondary"
+							size="icon"
+							className={cn("h-9 w-9 rounded-full", settingsSearchOpen && "bg-secondary/80")}
+							onClick={() => {
+								setSettingsSearchOpen((prev) => {
+									const next = !prev
+									if (!next) setSettingsSearch("")
+									return next
+								})
+							}}
+							data-testid="settings-search-toggle"
+							aria-label={t("settings:header.searchButtonTooltip")}>
+							<Search className="w-4 h-4" />
+						</Button>
+					</StandardTooltip>
 					<StandardTooltip
 						content={
 							!isSettingValid
@@ -936,7 +1008,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 					className={cn(settingsTabList)}
 					data-compact={isCompactMode}
 					data-testid="settings-tab-list">
-					{sections.map(({ id, icon: Icon }) => {
+					{visibleSections.map(({ id, icon: Icon }) => {
 						const isSelected = id === activeTab
 						const onSelect = () => handleTabChange(id)
 
@@ -958,11 +1030,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 								<div className={cn("flex items-center gap-2", isCompactMode && "justify-center")}>
 									<Icon className="w-4 h-4" />
 									<span className="tab-label">
-										{id === "mcp"
-											? t(`kilocode:settings.sections.mcp`)
-											: id === "ghost"
-												? t(`kilocode:ghost.title`)
-												: t(`settings:sections.${id}`)}
+										{getSectionTitle(id)}
 									</span>
 								</div>
 							</TabTrigger>
@@ -979,11 +1047,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 										</TooltipTrigger>
 										<TooltipContent side="right" className="text-base">
 											<p className="m-0">
-												{id === "mcp"
-													? t(`kilocode:settings.sections.mcp`)
-													: id === "ghost"
-														? t(`kilocode:ghost.title`)
-														: t(`settings:sections.${id}`)}
+												{getSectionTitle(id)}
 											</p>
 										</TooltipContent>
 									</Tooltip>

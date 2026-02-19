@@ -339,6 +339,28 @@ describe("SettingsView - Sound Settings", () => {
 		vi.clearAllMocks()
 	})
 
+	it("toggles settings search and filters visible tabs", async () => {
+		renderSettingsView({ language: "en" })
+
+		// Initially multiple tabs are visible
+		expect(await screen.findByTestId("tab-notifications")).toBeInTheDocument()
+
+		fireEvent.click(screen.getByTestId("settings-search-toggle"))
+		const input = await screen.findByTestId("settings-search-input")
+
+		fireEvent.change(input, { target: { value: "term" } })
+
+		// Active tab is pinned + matching tab is shown
+		expect(screen.getByTestId("tab-providers")).toBeInTheDocument()
+		expect(screen.getByTestId("tab-terminal")).toBeInTheDocument()
+		expect(screen.queryByTestId("tab-notifications")).not.toBeInTheDocument()
+
+		// Close search clears filter
+		fireEvent.click(screen.getByTestId("settings-search-toggle"))
+		expect(screen.queryByTestId("settings-search-input")).not.toBeInTheDocument()
+		expect(await screen.findByTestId("tab-notifications")).toBeInTheDocument()
+	})
+
 	it("toggles sandbox package and sends message to VSCode", async () => {
 		const { activateTab } = renderSettingsView({
 			examplePackages: [{ name: "alpha", enabledByDefault: true, toolCount: 1 }],
