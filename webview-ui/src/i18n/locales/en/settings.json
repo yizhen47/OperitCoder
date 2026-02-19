@@ -10,6 +10,8 @@
 	},
 	"header": {
 		"title": "Settings",
+		"searchPlaceholder": "Search settings…",
+		"searchButtonTooltip": "Search settings",
 		"saveButtonTooltip": "Save changes",
 		"nothingChangedTooltip": "Nothing changed",
 		"doneButtonTooltip": "Discard unsaved changes and close settings panel"

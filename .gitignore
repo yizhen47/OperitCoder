@@ -75,6 +75,8 @@ qdrant_storage/
 temp
 
 .windsurf
-.changeset
-
+.changeset/*
+!.changeset/update-windows-pc-agent.md
+!.changeset/windows-control-toolpkg-sync.md
+!.changeset/settings-search.md
 .explore

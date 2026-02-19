@@ -10,6 +10,8 @@
 	},
 	"header": {
 		"title": "设置",
+		"searchPlaceholder": "搜索设置…",
+		"searchButtonTooltip": "搜索设置",
 		"saveButtonTooltip": "保存更改",
 		"nothingChangedTooltip": "暂无更改",
 		"doneButtonTooltip": "放弃未保存的更改并关闭设置面板"
